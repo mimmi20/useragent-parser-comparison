@@ -1,0 +1,5 @@
+{
+    "require": {
+        "wolfcast/browser-detection": "^2.5"
+    }
+}
