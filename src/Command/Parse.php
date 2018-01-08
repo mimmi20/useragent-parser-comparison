@@ -12,7 +12,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 class Parse extends Command
 {
@@ -152,7 +151,7 @@ class Parse extends Command
                 }
 
                 if ($csvFile) {
-                    $output->writeln('Wrote CSV data to ' . $csvFile, 'success');
+                    $output->writeln('Wrote CSV data to ' . $csvFile);
                 } else {
                     $output->writeln($csvOutput);
                     $question = new Question('Press enter to continue', 'yes');
