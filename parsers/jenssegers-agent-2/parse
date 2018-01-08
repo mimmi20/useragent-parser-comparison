@@ -55,7 +55,7 @@ while (!$file->eof()) {
             $browser        = $agent->robot() . ' Bot';
             $browserVersion = '';
         }
-        $end   = microtime(true) - $start;
+        $end = microtime(true) - $start;
 
         if (!$benchmark) {
             $results[] = [
@@ -84,7 +84,7 @@ while (!$file->eof()) {
     }
 }
 
-$file = null;
+$file   = null;
 $memory = memory_get_peak_usage();
 
 $installed = json_decode(file_get_contents(__DIR__ . '/vendor/composer/installed.json'), true);

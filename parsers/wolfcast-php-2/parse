@@ -20,7 +20,7 @@ $parseTime = 0;
 
 $start = microtime(true);
 require __DIR__ . '/vendor/autoload.php';
-$parser = new \BrowserDetection('Test String');
+$parser   = new \BrowserDetection('Test String');
 $initTime = microtime(true) - $start;
 
 $file = new SplFileObject($agentListFile);
@@ -31,7 +31,7 @@ while (!$file->eof()) {
 
     if (!empty($agentString)) {
         $start  = microtime(true);
-		$result = new \BrowserDetection($agentString);
+        $result = new \BrowserDetection($agentString);
         $end    = microtime(true) - $start;
 
         if (!$benchmark) {

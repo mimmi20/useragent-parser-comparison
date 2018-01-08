@@ -20,11 +20,11 @@ $parseTime = 0;
 
 $start = microtime(true);
 require __DIR__ . '/vendor/autoload.php';
-$cacheDir = __DIR__ . '/data';
+$cacheDir  = __DIR__ . '/data';
 $fileCache = new \Doctrine\Common\Cache\FilesystemCache($cacheDir);
-$cache = new \Roave\DoctrineSimpleCache\SimpleCacheAdapter($fileCache);
-$logger = new \Monolog\Logger('null');
-$bc = new \BrowscapPHP\Browscap($cache, $logger);
+$cache     = new \Roave\DoctrineSimpleCache\SimpleCacheAdapter($fileCache);
+$logger    = new \Monolog\Logger('null');
+$bc        = new \BrowscapPHP\Browscap($cache, $logger);
 $bc->getBrowser('Test String');
 $initTime = microtime(true) - $start;
 

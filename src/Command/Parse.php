@@ -41,7 +41,7 @@ class Parse extends Command
 
         if ($csvFile) {
             $noOutput = true;
-            $csv = true;
+            $csv      = true;
         }
 
         $parserHelper    = $this->getHelper('parsers');

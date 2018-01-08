@@ -17,60 +17,60 @@ $finder->ignoreUnreadableDirs();
 $finder->in($path);
 
 foreach ($finder as $file) {
-	/** @var \Symfony\Component\Finder\SplFileInfo $file */
-	if (!$file->isFile() || 'json' !== $file->getExtension()) {
-		continue;
-	}
+    /** @var \Symfony\Component\Finder\SplFileInfo $file */
+    if (!$file->isFile() || 'json' !== $file->getExtension()) {
+        continue;
+    }
 
-	$filepath = $file->getPathname();
+    $filepath = $file->getPathname();
 
-	$content = file_get_contents($filepath);
+    $content = file_get_contents($filepath);
 
-	if ('' === $content || PHP_EOL === $content) {
-		continue;
-	}
+    if ('' === $content || PHP_EOL === $content) {
+        continue;
+    }
 
-	try {
-		$data = $jsonParser->parse(
-			$content,
-			JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
-		);
-	} catch (\Seld\JsonLint\ParsingException $e) {
-		continue;
-	}
+    try {
+        $data = $jsonParser->parse(
+            $content,
+            JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
+        );
+    } catch (\Seld\JsonLint\ParsingException $e) {
+        continue;
+    }
 
-	if (!is_array($data)) {
-		continue;
-	}
+    if (!is_array($data)) {
+        continue;
+    }
 
-	foreach ($data as $test) {
-		if (!isset($test['ua'])) {
-			continue;
-		}
+    foreach ($data as $test) {
+        if (!isset($test['ua'])) {
+            continue;
+        }
 
-		$agent = trim($test['ua']);
+        $agent = trim($test['ua']);
 
-		if (array_key_exists($agent, $allTests)) {
-			continue;
-		}
+        if (array_key_exists($agent, $allTests)) {
+            continue;
+        }
 
-		$allTests[$agent] = [
-			'browser' => [
-				'name' => $test['result']['browser']['name'],
-				'version' => ($test['result']['browser']['version'] === '0.0.0' ? null : $test['result']['browser']['version']),
-			],
-			'platform' => [
-				'name' => $test['result']['os']['name'],
-				'version' => ($test['result']['os']['version'] === '0.0.0' ? null : $test['result']['os']['version']),
-			],
-			'device' => [
-				'name' => $test['result']['device']['deviceName'],
-				'brand' => $test['result']['device']['brand'],
-				'type' => $test['result']['device']['type'],
-				'ismobile' => null,
-			]
-		];
-	}
+        $allTests[$agent] = [
+            'browser' => [
+                'name'    => $test['result']['browser']['name'],
+                'version' => ($test['result']['browser']['version'] === '0.0.0' ? null : $test['result']['browser']['version']),
+            ],
+            'platform' => [
+                'name'    => $test['result']['os']['name'],
+                'version' => ($test['result']['os']['version'] === '0.0.0' ? null : $test['result']['os']['version']),
+            ],
+            'device' => [
+                'name'     => $test['result']['device']['deviceName'],
+                'brand'    => $test['result']['device']['brand'],
+                'type'     => $test['result']['device']['type'],
+                'ismobile' => null,
+            ]
+        ];
+    }
 }
 
 // browser-detector doesn't provide version information in code at all, looking to composer for the installed version
