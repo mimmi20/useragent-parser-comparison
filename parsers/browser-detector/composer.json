@@ -1,0 +1,5 @@
+{
+    "require": {
+        "mimmi20/browser-detector": "^3.1"
+    }
+}

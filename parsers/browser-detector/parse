@@ -1,0 +1,92 @@
+#!/usr/bin/env php
+<?php
+
+ini_set('memory_limit', -1);
+ini_set('max_execution_time', -1);
+
+$benchmarkPos = array_search('--benchmark', $argv);
+$benchmark    = false;
+
+if ($benchmarkPos !== false) {
+    $benchmark = true;
+    unset($argv[$benchmarkPos]);
+    $argv = array_values($argv);
+}
+
+$agentListFile = $argv[1];
+
+$results   = [];
+$parseTime = 0;
+
+$start = microtime(true);
+require __DIR__ . '/vendor/autoload.php';
+$cacheDir = __DIR__ . '/data';
+$fileCache = new \Doctrine\Common\Cache\FilesystemCache($cacheDir);
+$cache = new \Roave\DoctrineSimpleCache\SimpleCacheAdapter($fileCache);
+$logger = new \Monolog\Logger('null');
+$detector = new \BrowserDetector\Detector($cache, $logger);
+$detector->warmupCache();
+$detector->getBrowser('Test String');
+$initTime = microtime(true) - $start;
+
+$file = new SplFileObject($agentListFile);
+$file->setFlags(SplFileObject::DROP_NEW_LINE);
+
+//$test = [];
+
+while (!$file->eof()) {
+    $agentString = $file->fgets();
+
+    if (!empty($agentString)) {
+        $start = microtime(true);
+        $r     = $detector->getBrowser($agentString);
+        $end   = microtime(true) - $start;
+
+        if (!$benchmark) {
+            $results[] = [
+                'useragent' => $agentString,
+                'parsed'    => [
+                    'browser' => [
+                        'name'    => $r->getBrowser()->getName(),
+                        'version' => $r->getBrowser()->getVersion()->getVersion(),
+                    ],
+                    'platform' => [
+                        'name'    => $r->getOs()->getName(),
+                        'version' => $r->getOs()->getVersion()->getVersion(),
+                    ],
+                    'device' => [
+                        'name'     => $r->getDevice()->getDeviceName(),
+                        'brand'    => $r->getDevice()->getBrand()->getName(),
+                        'type'     => $r->getDevice()->getType()->getName(),
+                        'ismobile' => $r->getDevice()->getType()->isMobile() ? 'true' : 'false',
+                    ],
+                ],
+                'time' => $end,
+            ];
+        }
+
+        $parseTime += $end;
+    }
+}
+
+$file = null;
+
+$memory = memory_get_peak_usage();
+
+// browser-detector doesn't provide version information in code at all, looking to composer for the installed version
+$installed = json_decode(file_get_contents(__DIR__ . '/vendor/composer/installed.json'), true);
+
+foreach ($installed as $package) {
+    if ($package['name'] == 'mimmi20/browser-detector') {
+        $version = $package['version'];
+        break;
+    }
+}
+
+print json_encode([
+    'results'     => $results,
+    'parse_time'  => $parseTime,
+    'init_time'   => $initTime,
+    'memory_used' => $memory,
+    'version'     => $version,
+], JSON_UNESCAPED_SLASHES);
