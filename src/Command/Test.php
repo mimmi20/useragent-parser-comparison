@@ -131,7 +131,10 @@ class Test extends Command
                     mkdir($resultsDir . '/' . $parserName);
                 }
 
-                file_put_contents($resultsDir . '/' . $parserName . '/' . $testName . '.json', json_encode($results));
+                file_put_contents(
+                    $resultsDir . '/' . $parserName . '/' . $testName . '.json',
+                    json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                );
                 $output->writeln('<info> done!</info>');
 
                 if (!empty($results['version'])) {
@@ -145,7 +148,7 @@ class Test extends Command
         // write some test data to file
         file_put_contents(
             $thisRunDir . '/metadata.json',
-            json_encode(['tests' => $usedTests, 'parsers' => $parsers, 'date' => time()])
+            json_encode(['tests' => $usedTests, 'parsers' => $parsers, 'date' => time()], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         );
 
         $output->writeln('<comment>Parsing complete, data stored in ' . $thisRunDirName . ' directory</comment>');

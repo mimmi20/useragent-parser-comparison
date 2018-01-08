@@ -79,7 +79,10 @@ class Parse extends Command
 
             if ($name) {
                 mkdir($this->runDir . '/' . $name . '/results/' . $parserName);
-                file_put_contents($this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($file) . '.json', json_encode($result));
+                file_put_contents(
+                    $this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($file) . '.json',
+                    json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                );
             }
 
             foreach ($result['results'] as $parsed) {
@@ -163,7 +166,7 @@ class Parse extends Command
         if ($name) {
             file_put_contents(
                 $this->runDir . '/' . $name . '/metadata.json',
-                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($file)])
+                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($file)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
             );
         }
     }
