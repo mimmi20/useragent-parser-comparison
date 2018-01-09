@@ -1,0 +1,1074 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "780282b23ca42f3dc3a8d0351a25cb17",
+    "packages": [
+        {
+            "name": "danielstjules/stringy",
+            "version": "3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/danielstjules/Stringy.git",
+                "reference": "df24ab62d2d8213bbbe88cc36fc35a4503b4bd7e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/danielstjules/Stringy/zipball/df24ab62d2d8213bbbe88cc36fc35a4503b4bd7e",
+                "reference": "df24ab62d2d8213bbbe88cc36fc35a4503b4bd7e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "symfony/polyfill-mbstring": "~1.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Stringy\\": "src/"
+                },
+                "files": [
+                    "src/Create.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Daniel St. Jules",
+                    "email": "danielst.jules@gmail.com",
+                    "homepage": "http://www.danielstjules.com"
+                }
+            ],
+            "description": "A string manipulation library with multibyte support",
+            "homepage": "https://github.com/danielstjules/Stringy",
+            "keywords": [
+                "UTF",
+                "helpers",
+                "manipulation",
+                "methods",
+                "multibyte",
+                "string",
+                "utf-8",
+                "utility",
+                "utils"
+            ],
+            "time": "2017-06-12T01:10:27+00:00"
+        },
+        {
+            "name": "mimmi20/browser-detector",
+            "version": "3.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/BrowserDetector.git",
+                "reference": "9d04e74f7855e1e2e38cfb62a3eadfcb1f44342a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/BrowserDetector/zipball/9d04e74f7855e1e2e38cfb62a3eadfcb1f44342a",
+                "reference": "9d04e74f7855e1e2e38cfb62a3eadfcb1f44342a",
+                "shasum": ""
+            },
+            "require": {
+                "danielstjules/stringy": "^3.0",
+                "mimmi20/browser-detector-loader-interface": "~2.0.5",
+                "mimmi20/browser-detector-version": "~4.0.4",
+                "mimmi20/ua-browser-type": "~5.0.2",
+                "mimmi20/ua-device-type": "~5.0.3",
+                "mimmi20/ua-result": "~5.2.1",
+                "mimmi20/ua-result-company": "3.2.1",
+                "peterkahl/apple-ios-build-version": ">=39",
+                "peterkahl/apple-os-x-build-version": ">=31",
+                "php": "^7.1",
+                "psr/http-message": "^1.0",
+                "psr/log": "^1.0",
+                "psr/simple-cache": "^1.0",
+                "seld/jsonlint": "^1.7",
+                "symfony/yaml": "^3.3||^4.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "monolog/monolog": "^1.23",
+                "phpstan/phpstan": "^0.9",
+                "phpunit/phpunit": "^6.5",
+                "squizlabs/php_codesniffer": "^3.2",
+                "symfony/cache": "^3.3||^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BrowserDetector\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/BrowserDetector/graphs/contributors"
+                }
+            ],
+            "description": "Library to detect Browsers and Devices",
+            "homepage": "https://github.com/mimmi20/BrowserDetector",
+            "keywords": [
+                "browser",
+                "http",
+                "parser",
+                "user agent",
+                "user-agent"
+            ],
+            "time": "2018-01-04T09:08:25+00:00"
+        },
+        {
+            "name": "mimmi20/browser-detector-loader-interface",
+            "version": "2.0.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/browser-detector-loader-interface.git",
+                "reference": "bdf183b0ec1e6e0d58e34fb22eb13f9e427e85d2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/browser-detector-loader-interface/zipball/bdf183b0ec1e6e0d58e34fb22eb13f9e427e85d2",
+                "reference": "bdf183b0ec1e6e0d58e34fb22eb13f9e427e85d2",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "phpstan/phpstan": "^0.9",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BrowserDetector\\Loader\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/browser-detector-loader-interface/graphs/contributors"
+                }
+            ],
+            "description": "the source interface for the browscap helper",
+            "time": "2018-01-03T21:05:56+00:00"
+        },
+        {
+            "name": "mimmi20/browser-detector-tests",
+            "version": "2.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/browser-detector-tests.git",
+                "reference": "bb2100c123f8748170fdf372415c788d230d8bef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/browser-detector-tests/zipball/bb2100c123f8748170fdf372415c788d230d8bef",
+                "reference": "bb2100c123f8748170fdf372415c788d230d8bef",
+                "shasum": ""
+            },
+            "require": {
+                "mimmi20/browser-detector": "~3.1.1",
+                "mimmi20/ua-result": "~5.2.1",
+                "php": "^7.1",
+                "seld/jsonlint": "^1.7"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "monolog/monolog": "^1.23",
+                "phpstan/phpstan": "^0.9",
+                "phpunit/phpunit": "^6.5",
+                "scriptfusion/phpunit-immediate-exception-printer": "^1.3",
+                "squizlabs/php_codesniffer": "^3.2",
+                "symfony/cache": "^3.3||^4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BrowserDetectorTest\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/browser-detector-tests/graphs/contributors"
+                }
+            ],
+            "description": "tests for the browser detector",
+            "homepage": "https://github.com/mimmi20/browser-detector-tests",
+            "keywords": [
+                "browser",
+                "parser",
+                "tests",
+                "user agent",
+                "user-agent"
+            ],
+            "time": "2018-01-09T12:14:04+00:00"
+        },
+        {
+            "name": "mimmi20/browser-detector-version",
+            "version": "4.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/version.git",
+                "reference": "83a3d32a1b93f97dddd0fa45ff1da37f940accc0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/version/zipball/83a3d32a1b93f97dddd0fa45ff1da37f940accc0",
+                "reference": "83a3d32a1b93f97dddd0fa45ff1da37f940accc0",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "version/version": "^2.2"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "phpstan/phpstan": "^0.9",
+                "phpunit/phpunit": "^6.5",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BrowserDetector\\Version\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/version/graphs/contributors"
+                }
+            ],
+            "description": "Version Class for the Browser Detector",
+            "homepage": "https://github.com/mimmi20/version",
+            "keywords": [
+                "version"
+            ],
+            "time": "2018-01-03T19:21:59+00:00"
+        },
+        {
+            "name": "mimmi20/ua-browser-type",
+            "version": "5.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/ua-browser-type.git",
+                "reference": "c3aa90b457e90450c722e12b1da1b9d95199a89e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/ua-browser-type/zipball/c3aa90b457e90450c722e12b1da1b9d95199a89e",
+                "reference": "c3aa90b457e90450c722e12b1da1b9d95199a89e",
+                "shasum": ""
+            },
+            "require": {
+                "mimmi20/browser-detector-loader-interface": "~2.0.5",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "phpstan/phpstan": "^0.9",
+                "phpunit/phpunit": "^6.5",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UaBrowserType\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/ua-browser-type/graphs/contributors"
+                }
+            ],
+            "description": "a class collection for different browser types",
+            "homepage": "https://github.com/mimmi20/ua-browser-type",
+            "keywords": [
+                "browser",
+                "http",
+                "parser",
+                "user agent",
+                "user-agent"
+            ],
+            "time": "2018-01-04T07:27:28+00:00"
+        },
+        {
+            "name": "mimmi20/ua-device-type",
+            "version": "5.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/ua-device-type.git",
+                "reference": "550f1851dea09867d6b941591f9a075aab196995"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/ua-device-type/zipball/550f1851dea09867d6b941591f9a075aab196995",
+                "reference": "550f1851dea09867d6b941591f9a075aab196995",
+                "shasum": ""
+            },
+            "require": {
+                "mimmi20/browser-detector-loader-interface": "~2.0.5",
+                "php": "^7.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "phpstan/phpstan": "^0.9",
+                "phpunit/phpunit": "^6.5",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UaDeviceType\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/ua-device-type/graphs/contributors"
+                }
+            ],
+            "description": "a class collection for different device types",
+            "homepage": "https://github.com/mimmi20/ua-device-type",
+            "keywords": [
+                "browser",
+                "http",
+                "parser",
+                "user agent",
+                "user-agent"
+            ],
+            "time": "2018-01-04T07:32:51+00:00"
+        },
+        {
+            "name": "mimmi20/ua-result",
+            "version": "5.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/ua-result.git",
+                "reference": "8f8135697b2c2b851f68983e272a677e2baaef69"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/ua-result/zipball/8f8135697b2c2b851f68983e272a677e2baaef69",
+                "reference": "8f8135697b2c2b851f68983e272a677e2baaef69",
+                "shasum": ""
+            },
+            "require": {
+                "mimmi20/browser-detector-version": "~4.0.4",
+                "mimmi20/ua-browser-type": "~5.0.2",
+                "mimmi20/ua-device-type": "~5.0.3",
+                "mimmi20/ua-result-company": "~3.2.1",
+                "php": "^7.1",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "phpstan/phpstan": "^0.9",
+                "phpunit/phpunit": "^6.5",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UaResult\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/ua-result/graphs/contributors"
+                }
+            ],
+            "description": "Library for PHP 5.6+ to handle useragent parser results",
+            "homepage": "https://github.com/mimmi20/ua-result",
+            "keywords": [
+                "browser",
+                "http",
+                "parser",
+                "user agent",
+                "user-agent"
+            ],
+            "time": "2018-01-04T08:16:16+00:00"
+        },
+        {
+            "name": "mimmi20/ua-result-company",
+            "version": "3.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/ua-result-company.git",
+                "reference": "c17e47f373eae5adb62f53eb0557fe184bf7c81e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/ua-result-company/zipball/c17e47f373eae5adb62f53eb0557fe184bf7c81e",
+                "reference": "c17e47f373eae5adb62f53eb0557fe184bf7c81e",
+                "shasum": ""
+            },
+            "require": {
+                "mimmi20/browser-detector-loader-interface": "~2.0.5",
+                "php": "^7.1",
+                "seld/jsonlint": "^1.7"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^2.9",
+                "phpstan/phpstan": "^0.9",
+                "phpunit/phpunit": "^6.5",
+                "squizlabs/php_codesniffer": "^3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UaResult\\Company\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/ua-result-company/graphs/contributors"
+                }
+            ],
+            "description": "a class collection for different companies",
+            "homepage": "https://github.com/mimmi20/ua-result-company",
+            "keywords": [
+                "browser",
+                "http",
+                "parser",
+                "user agent",
+                "user-agent"
+            ],
+            "time": "2018-01-04T07:43:50+00:00"
+        },
+        {
+            "name": "peterkahl/apple-ios-build-version",
+            "version": "v39.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/peterkahl/Apple-iOS-build.git",
+                "reference": "543ced2b7ecb90aa13103f67639fd2cfba999647"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/peterkahl/Apple-iOS-build/zipball/543ced2b7ecb90aa13103f67639fd2cfba999647",
+                "reference": "543ced2b7ecb90aa13103f67639fd2cfba999647",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "peterkahl\\iOSbuild\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache License Version 2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Peter Kahl",
+                    "email": "peter.kahl@colossalmind.com",
+                    "homepage": "https://www.colossalmind.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Associative array of iOS build and version codes that can be used in various ways.",
+            "homepage": "https://github.com/peterkahl/Apple-iOS-build",
+            "keywords": [
+                "apple",
+                "ios",
+                "user-agent",
+                "version"
+            ],
+            "time": "2017-12-20T10:42:19+00:00"
+        },
+        {
+            "name": "peterkahl/apple-os-x-build-version",
+            "version": "v31.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/peterkahl/Apple-OS-X-build.git",
+                "reference": "b0fe46c5d47e4873d599cb54ccb583ea883f6402"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/peterkahl/Apple-OS-X-build/zipball/b0fe46c5d47e4873d599cb54ccb583ea883f6402",
+                "reference": "b0fe46c5d47e4873d599cb54ccb583ea883f6402",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "peterkahl\\OSXbuild\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache License Version 2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Peter Kahl",
+                    "email": "peter.kahl@colossalmind.com",
+                    "homepage": "https://www.colossalmind.com/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Associative array of OS X build and version codes that can be used in various ways.",
+            "homepage": "https://github.com/peterkahl/Apple-OS-X-build",
+            "keywords": [
+                "apple",
+                "macos",
+                "os-x",
+                "user-agent",
+                "version"
+            ],
+            "time": "2017-12-20T11:16:42+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2016-08-06T14:39:51+00:00"
+        },
+        {
+            "name": "psr/log",
+            "version": "1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2016-10-10T12:19:37+00:00"
+        },
+        {
+            "name": "psr/simple-cache",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/simple-cache.git",
+                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/simple-cache/zipball/753fa598e8f3b9966c886fe13f370baa45ef0e24",
+                "reference": "753fa598e8f3b9966c886fe13f370baa45ef0e24",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\SimpleCache\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interfaces for simple caching",
+            "keywords": [
+                "cache",
+                "caching",
+                "psr",
+                "psr-16",
+                "simple-cache"
+            ],
+            "time": "2017-01-02T13:31:39+00:00"
+        },
+        {
+            "name": "seld/jsonlint",
+            "version": "1.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/jsonlint.git",
+                "reference": "9b355654ea99460397b89c132b5c1087b6bf4473"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/9b355654ea99460397b89c132b5c1087b6bf4473",
+                "reference": "9b355654ea99460397b89c132b5c1087b6bf4473",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
+            },
+            "bin": [
+                "bin/jsonlint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Seld\\JsonLint\\": "src/Seld/JsonLint/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "JSON Linter",
+            "keywords": [
+                "json",
+                "linter",
+                "parser",
+                "validator"
+            ],
+            "time": "2018-01-03T12:13:57+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "v4.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/finder.git",
+                "reference": "8b08180f2b7ccb41062366b9ad91fbc4f1af8601"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/8b08180f2b7ccb41062366b9ad91fbc4f1af8601",
+                "reference": "8b08180f2b7ccb41062366b9ad91fbc4f1af8601",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Finder\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Finder Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-01-03T07:38:00+00:00"
+        },
+        {
+            "name": "symfony/polyfill-mbstring",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-mbstring.git",
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
+                "reference": "2ec8b39c38cb16674bbf3fea2b6ce5bf117e1296",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-mbstring": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.6-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Mbstring\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for the Mbstring extension",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "mbstring",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2017-10-11T12:05:26+00:00"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v4.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "b84f646b9490d2101e2c25ddeec77ceefbda2eee"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/b84f646b9490d2101e2c25ddeec77ceefbda2eee",
+                "reference": "b84f646b9490d2101e2c25ddeec77ceefbda2eee",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "conflict": {
+                "symfony/console": "<3.4"
+            },
+            "require-dev": {
+                "symfony/console": "~3.4|~4.0"
+            },
+            "suggest": {
+                "symfony/console": "For validating YAML files using the lint command"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Yaml\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Yaml Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-01-03T07:38:00+00:00"
+        },
+        {
+            "name": "thadafinser/package-info",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ThaDafinser/PackageInfo.git",
+                "reference": "3cc580385cf694ba83eda3bbf7ea716a2253ea5a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ThaDafinser/PackageInfo/zipball/3cc580385cf694ba83eda3bbf7ea716a2253ea5a",
+                "reference": "3cc580385cf694ba83eda3bbf7ea716a2253ea5a",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0",
+                "php": "~5.6|~7.0"
+            },
+            "require-dev": {
+                "composer/composer": "^1.2.0",
+                "phpunit/phpunit": "^5.4.7"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "PackageInfo\\Installer"
+            },
+            "autoload": {
+                "psr-4": {
+                    "PackageInfo\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "ThaDafinser",
+                    "email": "martin.keckeis1@gmail.com"
+                }
+            ],
+            "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
+            "time": "2016-08-09T11:14:48+00:00"
+        },
+        {
+            "name": "version/version",
+            "version": "2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-mod/version.git",
+                "reference": "2fc90b9ce281b10efa68ebc90a6b339515aba35f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-mod/version/zipball/2fc90b9ce281b10efa68ebc90a6b339515aba35f",
+                "reference": "2fc90b9ce281b10efa68ebc90a6b339515aba35f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "fabpot/php-cs-fixer": "~1.7",
+                "phpunit/phpunit": "~4.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Version": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hassan Amouhzi",
+                    "email": "hassan@amouhzi.com",
+                    "homepage": "http://anezi.net"
+                }
+            ],
+            "description": "A library for creating, editing, and comparing semantic versioning numbers.",
+            "homepage": "http://github.com/php-mod/version",
+            "keywords": [
+                "semantic",
+                "version"
+            ],
+            "time": "2015-06-07T19:06:40+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

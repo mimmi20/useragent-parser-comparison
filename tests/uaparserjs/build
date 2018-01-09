@@ -9,17 +9,17 @@ $uas = [];
 
 $base = [
     'browser' => [
-        'name' => null,
+        'name'    => null,
         'version' => null,
     ],
     'platform' => [
-        'name' => null,
+        'name'    => null,
         'version' => null,
     ],
     'device' => [
-        'name' => null,
-        'brand' => null,
-        'type' => null,
+        'name'     => null,
+        'brand'    => null,
+        'type'     => null,
         'ismobile' => null,
     ]
 ];
@@ -27,7 +27,7 @@ $base = [
 foreach (new FilesystemIterator(__DIR__ . '/node_modules/ua-parser-js/test') as $fixture) {
     if (substr($fixture->getFilename(), -4) == 'json') {
         $providerName = $fixture->getFilename();
-        $provider = json_decode(file_get_contents($fixture->getPathname()), true);
+        $provider     = json_decode(file_get_contents($fixture->getPathname()), true);
 
         foreach ($provider as $data) {
             $ua = $data['ua'];
@@ -38,7 +38,7 @@ foreach (new FilesystemIterator(__DIR__ . '/node_modules/ua-parser-js/test') as 
 
             switch ($providerName) {
                 case 'browser-test.json':
-                    $uas[$ua]['browser']['name'] = $data['expect']['name'] === 'undefined' ? '' : $data['expect']['name'];
+                    $uas[$ua]['browser']['name']    = $data['expect']['name'] === 'undefined' ? '' : $data['expect']['name'];
                     $uas[$ua]['browser']['version'] = $data['expect']['version'] === 'undefined' ? '' : $data['expect']['version'];
                     break;
                 case 'device-test.json':
@@ -65,4 +65,4 @@ $version = $package->version;
 print json_encode([
     'tests'   => $uas,
     'version' => $version,
-]);
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

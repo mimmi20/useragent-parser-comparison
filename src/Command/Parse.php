@@ -12,7 +12,6 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Helper\ProgressBar;
 
 class Parse extends Command
 {
@@ -42,7 +41,7 @@ class Parse extends Command
 
         if ($csvFile) {
             $noOutput = true;
-            $csv = true;
+            $csv      = true;
         }
 
         $parserHelper    = $this->getHelper('parsers');
@@ -80,7 +79,10 @@ class Parse extends Command
 
             if ($name) {
                 mkdir($this->runDir . '/' . $name . '/results/' . $parserName);
-                file_put_contents($this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($file) . '.json', json_encode($result));
+                file_put_contents(
+                    $this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($file) . '.json',
+                    json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                );
             }
 
             foreach ($result['results'] as $parsed) {
@@ -152,7 +154,7 @@ class Parse extends Command
                 }
 
                 if ($csvFile) {
-                    $output->writeln('Wrote CSV data to ' . $csvFile, 'success');
+                    $output->writeln('Wrote CSV data to ' . $csvFile);
                 } else {
                     $output->writeln($csvOutput);
                     $question = new Question('Press enter to continue', 'yes');
@@ -164,7 +166,7 @@ class Parse extends Command
         if ($name) {
             file_put_contents(
                 $this->runDir . '/' . $name . '/metadata.json',
-                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($file)])
+                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($file)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
             );
         }
     }

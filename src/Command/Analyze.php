@@ -23,6 +23,8 @@ class Analyze extends Command
     protected $input;
     protected $output;
 
+    private $failures = [];
+
     protected function configure()
     {
         $this->setName('analyze')

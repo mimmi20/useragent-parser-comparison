@@ -1,0 +1,84 @@
+#!/usr/bin/env php
+<?php
+
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
+$allTests = [];
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+$jsonParser = new \Seld\JsonLint\JsonParser();
+
+$finder = new \Symfony\Component\Finder\Finder();
+$finder->files();
+$finder->name('*.json');
+$finder->ignoreDotFiles(true);
+$finder->ignoreVCS(true);
+$finder->sortByName();
+$finder->ignoreUnreadableDirs();
+$finder->in($path);
+
+foreach ($finder as $file) {
+    /** @var \Symfony\Component\Finder\SplFileInfo $file */
+    if (!$file->isFile() || 'json' !== $file->getExtension()) {
+        continue;
+    }
+
+    $filepath = $file->getPathname();
+
+    $content = file_get_contents($filepath);
+
+    if ('' === $content || PHP_EOL === $content) {
+        continue;
+    }
+
+    try {
+        $data = $jsonParser->parse(
+            $content,
+            JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
+        );
+    } catch (\Seld\JsonLint\ParsingException $e) {
+        continue;
+    }
+
+    if (!is_array($data)) {
+        continue;
+    }
+
+    foreach ($data as $test) {
+        if (!isset($test['ua'])) {
+            continue;
+        }
+
+        $agent = trim($test['ua']);
+
+        if (array_key_exists($agent, $allTests)) {
+            continue;
+        }
+
+        $allTests[$agent] = [
+            'browser' => [
+                'name'    => $test['result']['browser']['name'],
+                'version' => ($test['result']['browser']['version'] === '0.0.0' ? null : $test['result']['browser']['version']),
+            ],
+            'platform' => [
+                'name'    => $test['result']['os']['name'],
+                'version' => ($test['result']['os']['version'] === '0.0.0' ? null : $test['result']['os']['version']),
+            ],
+            'device' => [
+                'name'     => $test['result']['device']['deviceName'],
+                'brand'    => $test['result']['device']['brand'],
+                'type'     => $test['result']['device']['type'],
+                'ismobile' => null,
+            ]
+        ];
+    }
+}
+
+// Get version from composer
+$package = new \PackageInfo\Package('mimmi20/browser-detector-tests');
+
+print json_encode([
+    'tests'   => $tests,
+    'version' => $package->getVersion(),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

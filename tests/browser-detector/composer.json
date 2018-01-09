@@ -1,0 +1,8 @@
+{
+    "require": {
+        "mimmi20/browser-detector-tests": "^2.0",
+		"symfony/finder": "^3.3||^4.0",
+		"seld/jsonlint": "^1.7",
+        "thadafinser/package-info": "^1.0"
+    }
+}

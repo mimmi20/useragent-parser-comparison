@@ -73,7 +73,10 @@ class Normalize extends Command
                 }
 
                 // Write normalized to file
-                file_put_contents($this->runDir . '/' . $run . '/expected/normalized/' . $testFile->getFilename(), json_encode($normalized));
+                file_put_contents(
+                    $this->runDir . '/' . $run . '/expected/normalized/' . $testFile->getFilename(),
+                    json_encode($normalized, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                );
 
                 $output->writeln('<info> done!</info>');
             }
@@ -116,7 +119,10 @@ class Normalize extends Command
                     $data['results'] = $normalized;
 
                     // Write normalized to file
-                    file_put_contents($this->runDir . '/' . $run . '/results/' . $parserName . '/normalized/' . $resultFile->getFilename(), json_encode($data));
+                    file_put_contents(
+                        $this->runDir . '/' . $run . '/results/' . $parserName . '/normalized/' . $resultFile->getFilename(),
+                        json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                    );
 
                     $output->writeln('<info> done!</info>');
                 }

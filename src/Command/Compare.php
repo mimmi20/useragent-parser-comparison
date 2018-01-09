@@ -21,7 +21,7 @@ class Compare extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $file       = $input->getArgument('file');
+        $file = $input->getArgument('file');
 
         if ($file) {
             $command    = $this->getApplication()->find('parse');
