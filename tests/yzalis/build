@@ -27,7 +27,7 @@ $base = [
     ]
 ];
 
-foreach (new FilesystemIterator(__DIR__ . '/node_modules/ua-parser-js/test') as $fixture) {
+foreach (new FilesystemIterator(__DIR__ . '/vendor/yzalis/ua-parser/tests/UAParser/Tests/Fixtures') as $fixture) {
     if (substr($fixture->getFilename(), -3) == 'yml') {
         $providerName = $fixture->getFilename();
         $provider     = Spyc::YAMLLoad($fixture->getPathname());
