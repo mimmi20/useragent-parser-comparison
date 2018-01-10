@@ -16,7 +16,7 @@ $finder->ignoreDotFiles(true);
 $finder->ignoreVCS(true);
 $finder->sortByName();
 $finder->ignoreUnreadableDirs();
-$finder->in($path);
+$finder->in(__DIR__ . '/vendor/mimmi20/browser-detector-tests/tests/issues');
 
 foreach ($finder as $file) {
     /** @var \Symfony\Component\Finder\SplFileInfo $file */
@@ -35,7 +35,7 @@ foreach ($finder as $file) {
     try {
         $data = $jsonParser->parse(
             $content,
-            JsonParser::DETECT_KEY_CONFLICTS | JsonParser::PARSE_TO_ASSOC
+            \Seld\JsonLint\JsonParser::DETECT_KEY_CONFLICTS | \Seld\JsonLint\JsonParser::PARSE_TO_ASSOC
         );
     } catch (\Seld\JsonLint\ParsingException $e) {
         continue;

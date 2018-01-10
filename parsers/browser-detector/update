@@ -10,3 +10,6 @@ command -v "$composer_command" >/dev/null 2>&1 || {
 }
 
 $composer_command update --ignore-platform-reqs
+
+rm -rf ./data/*
+touch ./data/.gitkeep

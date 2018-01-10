@@ -64,16 +64,16 @@
         },
         {
             "name": "mimmi20/browser-detector",
-            "version": "3.1.1",
+            "version": "3.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/BrowserDetector.git",
-                "reference": "9d04e74f7855e1e2e38cfb62a3eadfcb1f44342a"
+                "reference": "4ed14c73e627e0b5445cbd660c6a9db9caccaf69"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/BrowserDetector/zipball/9d04e74f7855e1e2e38cfb62a3eadfcb1f44342a",
-                "reference": "9d04e74f7855e1e2e38cfb62a3eadfcb1f44342a",
+                "url": "https://api.github.com/repos/mimmi20/BrowserDetector/zipball/4ed14c73e627e0b5445cbd660c6a9db9caccaf69",
+                "reference": "4ed14c73e627e0b5445cbd660c6a9db9caccaf69",
                 "shasum": ""
             },
             "require": {
@@ -131,7 +131,7 @@
                 "user agent",
                 "user-agent"
             ],
-            "time": "2018-01-04T09:08:25+00:00"
+            "time": "2018-01-09T20:22:04+00:00"
         },
         {
             "name": "mimmi20/browser-detector-loader-interface",

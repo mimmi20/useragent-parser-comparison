@@ -30,22 +30,23 @@ function isMobile($data)
     return false;
 }
 
-$directory = new \RecursiveDirectoryIterator(__DIR__ . '/vendor/whichbrowser/parser/tests/data');
-$filter    = new \RecursiveCallbackFilterIterator($directory, function ($current, $key, $iterator) {
-    if ($current->getFilename()[0] === '.') {
-        return false;
-    }
-    if ($current->isDir()) {
-        return true;
-    } else {
-        return strpos($current->getFilename(), '.yaml') !== false;
-    }
-});
-$iterator = new \RecursiveIteratorIterator($filter);
-
 $uas = [];
 
-foreach ($iterator as $fixture) {
+$finder = new \Symfony\Component\Finder\Finder();
+$finder->files();
+$finder->name('*.yaml');
+$finder->ignoreDotFiles(true);
+$finder->ignoreVCS(true);
+$finder->sortByName();
+$finder->ignoreUnreadableDirs();
+$finder->in(__DIR__ . '/vendor/whichbrowser/parser/tests/data');
+
+foreach ($finder as $fixture) {
+    /** @var \Symfony\Component\Finder\SplFileInfo $fixture */
+    if (!$fixture->isFile() || 'yaml' !== $fixture->getExtension()) {
+        continue;
+    }
+
     $provider = Yaml::parse(file_get_contents($fixture->getPathname()));
 
     foreach ($provider as $data) {

@@ -23,7 +23,7 @@ require __DIR__ . '/vendor/autoload.php';
 $cacheDir  = __DIR__ . '/data';
 $fileCache = new \Doctrine\Common\Cache\FilesystemCache($cacheDir);
 $cache     = new \Roave\DoctrineSimpleCache\SimpleCacheAdapter($fileCache);
-$logger    = new \Monolog\Logger('null');
+$logger    = new \Psr\Log\NullLogger();
 $detector  = new \BrowserDetector\Detector($cache, $logger);
 $detector->warmupCache();
 $detector->getBrowser('Test String');
@@ -31,8 +31,6 @@ $initTime = microtime(true) - $start;
 
 $file = new SplFileObject($agentListFile);
 $file->setFlags(SplFileObject::DROP_NEW_LINE);
-
-//$test = [];
 
 while (!$file->eof()) {
     $agentString = $file->fgets();
@@ -55,7 +53,7 @@ while (!$file->eof()) {
                         'version' => $r->getOs()->getVersion()->getVersion(),
                     ],
                     'device' => [
-                        'name'     => $r->getDevice()->getDeviceName(),
+                        'name'     => $r->getDevice()->getMarketingName(),
                         'brand'    => $r->getDevice()->getBrand()->getName(),
                         'type'     => $r->getDevice()->getType()->getName(),
                         'ismobile' => $r->getDevice()->getType()->isMobile() ? 'true' : 'false',

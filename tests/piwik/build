@@ -68,7 +68,21 @@ function isDesktop($data)
     return in_array($data['os_family'], ['AmigaOS', 'IBM', 'GNU/Linux', 'Mac', 'Unix', 'Windows', 'BeOS', 'Chrome OS']);
 }
 
-foreach (new FilesystemIterator(__DIR__ . '/vendor/piwik/device-detector/Tests/fixtures') as $fixture) {
+$finder = new \Symfony\Component\Finder\Finder();
+$finder->files();
+$finder->name('*.yml');
+$finder->ignoreDotFiles(true);
+$finder->ignoreVCS(true);
+$finder->sortByName();
+$finder->ignoreUnreadableDirs();
+$finder->in(__DIR__ . '/vendor/piwik/device-detector/Tests/fixtures');
+
+foreach ($finder as $fixture) {
+    /** @var \Symfony\Component\Finder\SplFileInfo $fixture */
+    if (!$fixture->isFile() || 'yml' !== $fixture->getExtension()) {
+        continue;
+    }
+
     $provider = Spyc::YAMLLoad($fixture->getPathname());
 
     foreach ($provider as $data) {
