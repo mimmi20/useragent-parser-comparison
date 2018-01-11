@@ -20,7 +20,7 @@ foreach ($finder as $fixture) {
         continue;
     }
 
-    if (in_array($fixture->getFilename(), array('issue-000-invalids.php', 'issue-000-invalid-versions.php'))) {
+    if (in_array($fixture->getFilename(), ['issue-000-invalids.php', 'issue-000-invalid-versions.php'])) {
         continue;
     }
 
