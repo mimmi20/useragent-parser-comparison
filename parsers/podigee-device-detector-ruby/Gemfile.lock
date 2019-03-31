@@ -1,0 +1,12 @@
+GEM
+  specs:
+    device_detector (1.0.1)
+
+PLATFORMS
+  x64-mingw32
+
+DEPENDENCIES
+  device_detector
+
+BUNDLED WITH
+   1.17.2
