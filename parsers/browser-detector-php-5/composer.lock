@@ -288,16 +288,16 @@
         },
         {
             "name": "mimmi20/browser-detector",
-            "version": "5.0.34",
+            "version": "5.0.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/BrowserDetector.git",
-                "reference": "3fa52646825f8d08775f46a68cc19567de2a7bed"
+                "reference": "735a127eda2b6afc35f8b09b0da88f3738a2ec6c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/BrowserDetector/zipball/3fa52646825f8d08775f46a68cc19567de2a7bed",
-                "reference": "3fa52646825f8d08775f46a68cc19567de2a7bed",
+                "url": "https://api.github.com/repos/mimmi20/BrowserDetector/zipball/735a127eda2b6afc35f8b09b0da88f3738a2ec6c",
+                "reference": "735a127eda2b6afc35f8b09b0da88f3738a2ec6c",
                 "shasum": ""
             },
             "require": {
@@ -308,9 +308,9 @@
                 "mimmi20/ios-build": "~1.0.0",
                 "mimmi20/json-class": "~2.0.4",
                 "mimmi20/macos-build": "~1.0.0",
-                "mimmi20/ua-browser-type": "~7.0.3",
+                "mimmi20/ua-browser-type": "~7.0.4",
                 "mimmi20/ua-device-type": "~7.1.3",
-                "mimmi20/ua-display-size": "~1.0.33",
+                "mimmi20/ua-display-size": "~1.0.35",
                 "mimmi20/ua-generic-request": "~5.0.1",
                 "mimmi20/ua-normalizer": "~4.0.0",
                 "mimmi20/ua-result": "~7.0.2",
@@ -334,8 +334,8 @@
                 "phpunit/phpunit": "^7.5.16 || ^8.4.0",
                 "squizlabs/php_codesniffer": "^3.5.0",
                 "symfony/cache": "^4.3.4",
-                "symfony/finder": "^4.3.4",
-                "zendframework/zend-diactoros": "^2.1.3"
+                "symfony/finder": "^4.3.5",
+                "zendframework/zend-diactoros": "^2.1.4"
             },
             "type": "library",
             "autoload": {
@@ -367,7 +367,7 @@
                 "user agent",
                 "user-agent"
             ],
-            "time": "2019-10-07T04:17:54+00:00"
+            "time": "2019-10-13T08:06:01+00:00"
         },
         {
             "name": "mimmi20/browser-detector-loader-interface",
@@ -422,16 +422,16 @@
         },
         {
             "name": "mimmi20/browser-detector-version",
-            "version": "6.0.6",
+            "version": "6.0.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/version.git",
-                "reference": "1504c40cb11d4b939643146365664e48a5a1e14b"
+                "reference": "42354292d370b6b508397bd1b76f1115cb5ceae3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/version/zipball/1504c40cb11d4b939643146365664e48a5a1e14b",
-                "reference": "1504c40cb11d4b939643146365664e48a5a1e14b",
+                "url": "https://api.github.com/repos/mimmi20/version/zipball/42354292d370b6b508397bd1b76f1115cb5ceae3",
+                "reference": "42354292d370b6b508397bd1b76f1115cb5ceae3",
                 "shasum": ""
             },
             "require": {
@@ -442,7 +442,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.2.0",
-                "localheinz/phpstan-rules": "^0.10",
+                "localheinz/phpstan-rules": "^0.12",
                 "pepakriz/phpstan-exception-rules": "^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -477,20 +477,20 @@
             "keywords": [
                 "version"
             ],
-            "time": "2019-07-01T19:23:44+00:00"
+            "time": "2019-10-11T07:16:24+00:00"
         },
         {
             "name": "mimmi20/ios-build",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ios-build.git",
-                "reference": "cb618d36dc94d6a8dc4f039a77380be97e0fd3da"
+                "reference": "660df82d4ded6db55be7a6a34701ecc4b46b6f10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ios-build/zipball/cb618d36dc94d6a8dc4f039a77380be97e0fd3da",
-                "reference": "cb618d36dc94d6a8dc4f039a77380be97e0fd3da",
+                "url": "https://api.github.com/repos/mimmi20/ios-build/zipball/660df82d4ded6db55be7a6a34701ecc4b46b6f10",
+                "reference": "660df82d4ded6db55be7a6a34701ecc4b46b6f10",
                 "shasum": ""
             },
             "require": {
@@ -502,7 +502,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.10",
+                "localheinz/phpstan-rules": "^0.12",
                 "pepakriz/phpstan-exception-rules": "^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -537,20 +537,20 @@
             "keywords": [
                 "json"
             ],
-            "time": "2019-06-23T13:33:03+00:00"
+            "time": "2019-10-10T19:03:16+00:00"
         },
         {
             "name": "mimmi20/json-class",
-            "version": "2.0.4",
+            "version": "2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/json-class.git",
-                "reference": "f24f8504c4e91bd42d26588893625603e845670d"
+                "reference": "1ace159f7a3ffa2b0183a546c9585b44a3f0cb79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/f24f8504c4e91bd42d26588893625603e845670d",
-                "reference": "f24f8504c4e91bd42d26588893625603e845670d",
+                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/1ace159f7a3ffa2b0183a546c9585b44a3f0cb79",
+                "reference": "1ace159f7a3ffa2b0183a546c9585b44a3f0cb79",
                 "shasum": ""
             },
             "require": {
@@ -562,7 +562,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.10",
+                "localheinz/phpstan-rules": "^0.12",
                 "pepakriz/phpstan-exception-rules": "^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -597,20 +597,20 @@
             "keywords": [
                 "json"
             ],
-            "time": "2019-06-23T15:27:34+00:00"
+            "time": "2019-10-09T18:52:20+00:00"
         },
         {
             "name": "mimmi20/macos-build",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/macos-build.git",
-                "reference": "71c4eab868d95cc0e8c84cc5172ec6d28d06c4a0"
+                "reference": "4603c74c070d4736fccf74f767474de054a2a3bd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/macos-build/zipball/71c4eab868d95cc0e8c84cc5172ec6d28d06c4a0",
-                "reference": "71c4eab868d95cc0e8c84cc5172ec6d28d06c4a0",
+                "url": "https://api.github.com/repos/mimmi20/macos-build/zipball/4603c74c070d4736fccf74f767474de054a2a3bd",
+                "reference": "4603c74c070d4736fccf74f767474de054a2a3bd",
                 "shasum": ""
             },
             "require": {
@@ -622,7 +622,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.10",
+                "localheinz/phpstan-rules": "^0.12",
                 "pepakriz/phpstan-exception-rules": "^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -657,20 +657,20 @@
             "keywords": [
                 "json"
             ],
-            "time": "2019-06-23T15:05:01+00:00"
+            "time": "2019-10-10T18:28:18+00:00"
         },
         {
             "name": "mimmi20/ua-browser-type",
-            "version": "7.0.3",
+            "version": "7.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-browser-type.git",
-                "reference": "9a4b1c7f01f3080cccc17fe06d8e7df0190a0d38"
+                "reference": "ff718b13eafa0f257140ee63046931939569c735"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-browser-type/zipball/9a4b1c7f01f3080cccc17fe06d8e7df0190a0d38",
-                "reference": "9a4b1c7f01f3080cccc17fe06d8e7df0190a0d38",
+                "url": "https://api.github.com/repos/mimmi20/ua-browser-type/zipball/ff718b13eafa0f257140ee63046931939569c735",
+                "reference": "ff718b13eafa0f257140ee63046931939569c735",
                 "shasum": ""
             },
             "require": {
@@ -681,7 +681,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.8 || ^0.9",
+                "localheinz/phpstan-rules": "^0.12.2",
                 "pepakriz/phpstan-exception-rules": "^0.7 || ^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -720,20 +720,20 @@
                 "user agent",
                 "user-agent"
             ],
-            "time": "2019-05-28T20:27:16+00:00"
+            "time": "2019-10-11T07:18:45+00:00"
         },
         {
             "name": "mimmi20/ua-device-type",
-            "version": "7.1.3",
+            "version": "7.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-device-type.git",
-                "reference": "ce7cde3021859e5b9462ceae1f121fcd1e709ba8"
+                "reference": "d1196fef63c7feb17e1f8097035bfef555b5c78e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-device-type/zipball/ce7cde3021859e5b9462ceae1f121fcd1e709ba8",
-                "reference": "ce7cde3021859e5b9462ceae1f121fcd1e709ba8",
+                "url": "https://api.github.com/repos/mimmi20/ua-device-type/zipball/d1196fef63c7feb17e1f8097035bfef555b5c78e",
+                "reference": "d1196fef63c7feb17e1f8097035bfef555b5c78e",
                 "shasum": ""
             },
             "require": {
@@ -744,7 +744,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.8 || ^0.9",
+                "localheinz/phpstan-rules": "^0.12.2",
                 "pepakriz/phpstan-exception-rules": "^0.7 || ^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -783,20 +783,20 @@
                 "user agent",
                 "user-agent"
             ],
-            "time": "2019-05-28T20:25:53+00:00"
+            "time": "2019-10-11T12:01:46+00:00"
         },
         {
             "name": "mimmi20/ua-display-size",
-            "version": "1.0.33",
+            "version": "1.0.35",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-display-size.git",
-                "reference": "c455fb75406f94970d5c8894a09340a4a11448a3"
+                "reference": "f88d984574af7509335a7a6f12a30c96f3f063aa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-display-size/zipball/c455fb75406f94970d5c8894a09340a4a11448a3",
-                "reference": "c455fb75406f94970d5c8894a09340a4a11448a3",
+                "url": "https://api.github.com/repos/mimmi20/ua-display-size/zipball/f88d984574af7509335a7a6f12a30c96f3f063aa",
+                "reference": "f88d984574af7509335a7a6f12a30c96f3f063aa",
                 "shasum": ""
             },
             "require": {
@@ -846,20 +846,20 @@
                 "user agent",
                 "user-agent"
             ],
-            "time": "2019-10-02T21:42:37+00:00"
+            "time": "2019-10-12T10:27:59+00:00"
         },
         {
             "name": "mimmi20/ua-generic-request",
-            "version": "5.0.1",
+            "version": "5.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-generic-request.git",
-                "reference": "da307c3fa1066dfdfa13a55b71711fb8cb5058e8"
+                "reference": "226f9e65b7bd01f4c18e9741528b7a9c1dbc3e21"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-generic-request/zipball/da307c3fa1066dfdfa13a55b71711fb8cb5058e8",
-                "reference": "da307c3fa1066dfdfa13a55b71711fb8cb5058e8",
+                "url": "https://api.github.com/repos/mimmi20/ua-generic-request/zipball/226f9e65b7bd01f4c18e9741528b7a9c1dbc3e21",
+                "reference": "226f9e65b7bd01f4c18e9741528b7a9c1dbc3e21",
                 "shasum": ""
             },
             "require": {
@@ -869,19 +869,19 @@
                 "zendframework/zend-diactoros": "^2.1.1"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.15",
-                "infection/infection": "^0.12.0 || ^0.13.0",
-                "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.8 || ^0.9 || ^0.10",
+                "friendsofphp/php-cs-fixer": "^2.15.3",
+                "infection/infection": "^0.13.6",
+                "localheinz/composer-normalize": "^1.3.1",
+                "localheinz/phpstan-rules": "^0.12.2",
                 "mimmi20/json-class": "~2.0.4",
-                "pepakriz/phpstan-exception-rules": "^0.7 || ^0.8",
-                "phpstan/phpstan": "^0.11",
-                "phpstan/phpstan-deprecation-rules": "^0.11",
-                "phpstan/phpstan-phpunit": "^0.11",
-                "phpstan/phpstan-strict-rules": "^0.11",
-                "phpunit/phpunit": "^7.5 || ^8.0",
-                "squizlabs/php_codesniffer": "^3.4",
-                "symfony/finder": "^4.3"
+                "pepakriz/phpstan-exception-rules": "^0.8.3",
+                "phpstan/phpstan": "^0.11.16",
+                "phpstan/phpstan-deprecation-rules": "^0.11.2",
+                "phpstan/phpstan-phpunit": "^0.11.2",
+                "phpstan/phpstan-strict-rules": "^0.11.1",
+                "phpunit/phpunit": "^7.5.16 || ^8.4.0",
+                "squizlabs/php_codesniffer": "^3.5.0",
+                "symfony/finder": "^4.3.4"
             },
             "type": "library",
             "autoload": {
@@ -909,20 +909,20 @@
             "keywords": [
                 "generic request"
             ],
-            "time": "2019-07-13T15:24:11+00:00"
+            "time": "2019-10-10T19:03:56+00:00"
         },
         {
             "name": "mimmi20/ua-normalizer",
-            "version": "4.0.0",
+            "version": "4.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-normalizer.git",
-                "reference": "86373b9193ceb76193039bedf7678b703ecb8447"
+                "reference": "efe3c9b2c1081cdd785034698e910a75bac2dd43"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-normalizer/zipball/86373b9193ceb76193039bedf7678b703ecb8447",
-                "reference": "86373b9193ceb76193039bedf7678b703ecb8447",
+                "url": "https://api.github.com/repos/mimmi20/ua-normalizer/zipball/efe3c9b2c1081cdd785034698e910a75bac2dd43",
+                "reference": "efe3c9b2c1081cdd785034698e910a75bac2dd43",
                 "shasum": ""
             },
             "require": {
@@ -932,7 +932,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.8 || ^0.9",
+                "localheinz/phpstan-rules": "^0.12.2",
                 "pepakriz/phpstan-exception-rules": "^0.7 || ^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -972,20 +972,20 @@
                 "user agent",
                 "user-agent"
             ],
-            "time": "2019-06-02T12:56:12+00:00"
+            "time": "2019-10-11T07:17:12+00:00"
         },
         {
             "name": "mimmi20/ua-result",
-            "version": "7.0.2",
+            "version": "7.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-result.git",
-                "reference": "6dc1d4b7fe68adb103e6f2813b7353ef797fc80a"
+                "reference": "37606a0ddab0d2963c8ff0e08a51616a1f092aa7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-result/zipball/6dc1d4b7fe68adb103e6f2813b7353ef797fc80a",
-                "reference": "6dc1d4b7fe68adb103e6f2813b7353ef797fc80a",
+                "url": "https://api.github.com/repos/mimmi20/ua-result/zipball/37606a0ddab0d2963c8ff0e08a51616a1f092aa7",
+                "reference": "37606a0ddab0d2963c8ff0e08a51616a1f092aa7",
                 "shasum": ""
             },
             "require": {
@@ -995,21 +995,21 @@
                 "mimmi20/ua-device-type": "~7.1.3",
                 "mimmi20/ua-display-size": "~1.0.17",
                 "php": "^7.1",
-                "psr/log": "^1.0"
+                "psr/log": "^1.0.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.15",
-                "infection/infection": "^0.12.0 || ^0.13.0",
-                "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.8 || ^0.9",
+                "friendsofphp/php-cs-fixer": "^2.15.3",
+                "infection/infection": "^0.13.6",
+                "localheinz/composer-normalize": "^1.3.1",
+                "localheinz/phpstan-rules": "^0.12.2",
                 "mimmi20/json-class": "~2.0.3",
-                "pepakriz/phpstan-exception-rules": "^0.7 || ^0.8",
-                "phpstan/phpstan": "^0.11",
-                "phpstan/phpstan-deprecation-rules": "^0.11",
-                "phpstan/phpstan-phpunit": "^0.11",
-                "phpstan/phpstan-strict-rules": "^0.11",
-                "phpunit/phpunit": "^7.5 || ^8.0",
-                "squizlabs/php_codesniffer": "^3.4"
+                "pepakriz/phpstan-exception-rules": "^0.8.3",
+                "phpstan/phpstan": "^0.11.16",
+                "phpstan/phpstan-deprecation-rules": "^0.11.2",
+                "phpstan/phpstan-phpunit": "^0.11.2",
+                "phpstan/phpstan-strict-rules": "^0.11.1",
+                "phpunit/phpunit": "^7.5.16 || ^8.4.0",
+                "squizlabs/php_codesniffer": "^3.5.0"
             },
             "type": "library",
             "autoload": {
@@ -1041,7 +1041,7 @@
                 "user agent",
                 "user-agent"
             ],
-            "time": "2019-05-29T06:44:56+00:00"
+            "time": "2019-10-11T07:19:19+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1123,16 +1123,16 @@
         },
         {
             "name": "peterkahl/apple-ios-build-version",
-            "version": "v59.27",
+            "version": "v59.28",
             "source": {
                 "type": "git",
-                "url": "https://github.com/peterkahl/Apple-iOS-build.git",
-                "reference": "76973f656871866c040402d27786f960bc52c37b"
+                "url": "https://github.com/peterkahl/apple-ios-build-version.git",
+                "reference": "f174e3e5c09c604785a370f8a63bc3e6a530408e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/peterkahl/Apple-iOS-build/zipball/76973f656871866c040402d27786f960bc52c37b",
-                "reference": "76973f656871866c040402d27786f960bc52c37b",
+                "url": "https://api.github.com/repos/peterkahl/apple-ios-build-version/zipball/f174e3e5c09c604785a370f8a63bc3e6a530408e",
+                "reference": "f174e3e5c09c604785a370f8a63bc3e6a530408e",
                 "shasum": ""
             },
             "require": {
@@ -1163,20 +1163,20 @@
                 "user-agent",
                 "version"
             ],
-            "time": "2019-08-26T04:48:30+00:00"
+            "time": "2019-10-11T02:58:11+00:00"
         },
         {
             "name": "peterkahl/apple-os-x-build-version",
-            "version": "v43.7",
+            "version": "v43.8",
             "source": {
                 "type": "git",
-                "url": "https://github.com/peterkahl/Apple-OS-X-build.git",
-                "reference": "c31f9f1ce5f8102013de3141e1b52b0156ff0ad2"
+                "url": "https://github.com/peterkahl/apple-os-x-build-version.git",
+                "reference": "fea6afc59381e0c4ad211aa1beae39082d0383c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/peterkahl/Apple-OS-X-build/zipball/c31f9f1ce5f8102013de3141e1b52b0156ff0ad2",
-                "reference": "c31f9f1ce5f8102013de3141e1b52b0156ff0ad2",
+                "url": "https://api.github.com/repos/peterkahl/apple-os-x-build-version/zipball/fea6afc59381e0c4ad211aa1beae39082d0383c1",
+                "reference": "fea6afc59381e0c4ad211aa1beae39082d0383c1",
                 "shasum": ""
             },
             "require": {
@@ -1208,7 +1208,7 @@
                 "user-agent",
                 "version"
             ],
-            "time": "2019-01-11T06:46:14+00:00"
+            "time": "2019-10-11T03:55:13+00:00"
         },
         {
             "name": "psr/http-factory",
@@ -1503,16 +1503,16 @@
         },
         {
             "name": "zendframework/zend-diactoros",
-            "version": "2.1.4",
+            "version": "2.1.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-diactoros.git",
-                "reference": "a16378c4db99be661afc76805242281603d20a7c"
+                "reference": "6dcf9e760a6b476f3e9d80abbc9ce9c4aa921f9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/a16378c4db99be661afc76805242281603d20a7c",
-                "reference": "a16378c4db99be661afc76805242281603d20a7c",
+                "url": "https://api.github.com/repos/zendframework/zend-diactoros/zipball/6dcf9e760a6b476f3e9d80abbc9ce9c4aa921f9c",
+                "reference": "6dcf9e760a6b476f3e9d80abbc9ce9c4aa921f9c",
                 "shasum": ""
             },
             "require": {
@@ -1566,7 +1566,7 @@
                 "psr",
                 "psr-7"
             ],
-            "time": "2019-10-08T20:08:44+00:00"
+            "time": "2019-10-10T17:38:20+00:00"
         }
     ],
     "packages-dev": [],

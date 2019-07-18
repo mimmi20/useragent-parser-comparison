@@ -302,16 +302,16 @@
         },
         {
             "name": "mimmi20/json-class",
-            "version": "2.0.4",
+            "version": "2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/json-class.git",
-                "reference": "f24f8504c4e91bd42d26588893625603e845670d"
+                "reference": "1ace159f7a3ffa2b0183a546c9585b44a3f0cb79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/f24f8504c4e91bd42d26588893625603e845670d",
-                "reference": "f24f8504c4e91bd42d26588893625603e845670d",
+                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/1ace159f7a3ffa2b0183a546c9585b44a3f0cb79",
+                "reference": "1ace159f7a3ffa2b0183a546c9585b44a3f0cb79",
                 "shasum": ""
             },
             "require": {
@@ -323,7 +323,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.10",
+                "localheinz/phpstan-rules": "^0.12",
                 "pepakriz/phpstan-exception-rules": "^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -358,7 +358,7 @@
             "keywords": [
                 "json"
             ],
-            "time": "2019-06-23T15:27:34+00:00"
+            "time": "2019-10-09T18:52:20+00:00"
         },
         {
             "name": "mimmi20/wurfl-constants",

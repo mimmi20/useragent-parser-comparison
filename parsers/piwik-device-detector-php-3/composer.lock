@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7d79ea60aa763c59426b2faf98753b1e",
+    "content-hash": "8d230f93fa9c5a5afc735eebfda0735d",
     "packages": [
         {
             "name": "daverandom/exceptional-json",
@@ -46,16 +46,16 @@
         },
         {
             "name": "mimmi20/json-class",
-            "version": "2.0.4",
+            "version": "2.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/json-class.git",
-                "reference": "f24f8504c4e91bd42d26588893625603e845670d"
+                "reference": "1ace159f7a3ffa2b0183a546c9585b44a3f0cb79"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/f24f8504c4e91bd42d26588893625603e845670d",
-                "reference": "f24f8504c4e91bd42d26588893625603e845670d",
+                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/1ace159f7a3ffa2b0183a546c9585b44a3f0cb79",
+                "reference": "1ace159f7a3ffa2b0183a546c9585b44a3f0cb79",
                 "shasum": ""
             },
             "require": {
@@ -67,7 +67,7 @@
                 "friendsofphp/php-cs-fixer": "^2.15",
                 "infection/infection": "^0.12.0 || ^0.13.0",
                 "localheinz/composer-normalize": "^1.1.0",
-                "localheinz/phpstan-rules": "^0.10",
+                "localheinz/phpstan-rules": "^0.12",
                 "pepakriz/phpstan-exception-rules": "^0.8",
                 "phpstan/phpstan": "^0.11",
                 "phpstan/phpstan-deprecation-rules": "^0.11",
@@ -102,7 +102,7 @@
             "keywords": [
                 "json"
             ],
-            "time": "2019-06-23T15:27:34+00:00"
+            "time": "2019-10-09T18:52:20+00:00"
         },
         {
             "name": "mustangostang/spyc",
@@ -156,16 +156,16 @@
         },
         {
             "name": "piwik/device-detector",
-            "version": "3.12.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matomo-org/device-detector.git",
-                "reference": "a698de2c57d8e106b8f8e54671b4bf794dc9698e"
+                "reference": "a3db1e017262fb7aaa85f8706cac55db6d0d70c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/a698de2c57d8e106b8f8e54671b4bf794dc9698e",
-                "reference": "a698de2c57d8e106b8f8e54671b4bf794dc9698e",
+                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/a3db1e017262fb7aaa85f8706cac55db6d0d70c6",
+                "reference": "a3db1e017262fb7aaa85f8706cac55db6d0d70c6",
                 "shasum": ""
             },
             "require": {
@@ -207,7 +207,7 @@
                 "parser",
                 "useragent"
             ],
-            "time": "2019-07-22T14:35:14+00:00"
+            "time": "2019-10-13T19:52:06+00:00"
         },
         {
             "name": "thadafinser/package-info",
@@ -257,7 +257,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "piwik/device-detector": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
