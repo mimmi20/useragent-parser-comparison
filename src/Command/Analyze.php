@@ -92,24 +92,26 @@ class Analyze extends Command
             return 1;
         }
 
-        if (file_exists($this->runDir . '/' . $run . '/metadata.json')) {
-            try {
-                $contents = file_get_contents($this->runDir . '/' . $run . '/metadata.json');
-            } catch (Exception $e) {
-                $output->writeln(
-                    '<error>Could not read file (' . $this->runDir . '/' . $run . '/metadata.json' . ')</error>'
-                );
-
-                return 2;
-            }
-
-            try {
-                $this->options = json_decode($contents, true);
-            } catch (Exception $e) {
-                $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
-            }
-        } else {
+        if (!file_exists($this->runDir . '/' . $run . '/metadata.json')) {
             $output->writeln('<error>No options file found for this test run</error>');
+
+            return 2;
+        }
+
+        try {
+            $contents = file_get_contents($this->runDir . '/' . $run . '/metadata.json');
+        } catch (Exception $e) {
+            $output->writeln(
+                '<error>Could not read file (' . $this->runDir . '/' . $run . '/metadata.json' . ')</error>'
+            );
+
+            return 2;
+        }
+
+        try {
+            $this->options = json_decode($contents, true);
+        } catch (Exception $e) {
+            $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
 
             return 2;
         }
@@ -630,20 +632,19 @@ class Analyze extends Command
                     $questions = [
                         'Export User Agents',
                         'Change Section',
-                        'Change Property',
-                        'Change Test Suite',
                         $justFailureQuestion,
                         'Back to Main Menu',
                     ];
 
-                    if (count($this->options['tests']) <= 1) {
-                        unset($questions[array_search('Change Test Suite', $questions)]);
+                    if (count($this->options['tests']) >= 1) {
+                        array_splice($questions, 1, 0, 'Change Test Suite');
                     }
 
-                    if ($section === 'browser' || $section === 'platform') {
-                        unset($questions[array_search('Change Property', $questions)]);
+                    if ($section === 'device') {
+                        array_splice($questions, 2, 0, 'Change Property');
                     }
 
+                    // Re-index
                     $questions = array_values($questions);
 
                     $question = new ChoiceQuestion(
@@ -685,19 +686,20 @@ class Analyze extends Command
             $value = '';
         }
 
-        if (isset($this->comparison[$test][$section][$property][$value])) {
-            $agents = array_flip($this->agents);
-
-            $this->output->writeln('<comment>Showing ' . count($this->comparison[$test][$section][$property][$value]['expected']['agents']) . ' user agents</comment>');
-
-            $this->output->writeln('');
-            foreach ($this->comparison[$test][$section][$property][$value]['expected']['agents'] as $agentId) {
-                $this->output->writeln($agents[$agentId]);
-            }
-            $this->output->writeln('');
-        } else {
+        if (!isset($this->comparison[$test][$section][$property][$value])) {
             $this->output->writeln('<error>There were no agents processed with that property value</error>');
+            return;
         }
+
+        $agents = array_flip($this->agents);
+
+        $this->output->writeln('<comment>Showing ' . count($this->comparison[$test][$section][$property][$value]['expected']['agents']) . ' user agents</comment>');
+
+        $this->output->writeln('');
+        foreach ($this->comparison[$test][$section][$property][$value]['expected']['agents'] as $agentId) {
+            $this->output->writeln($agents[$agentId]);
+        }
+        $this->output->writeln('');
     }
 
     private function analyzeFailures(string $test, string $parser, bool $justAgents = false): void
@@ -750,89 +752,94 @@ class Analyze extends Command
 
     private function showComparison(string $test, string $compareKey, string $compareSubKey, bool $justFails = false): void
     {
-        if (!empty($this->comparison[$test][$compareKey][$compareSubKey])) {
-            ksort($this->comparison[$test][$compareKey][$compareSubKey]);
-            uasort($this->comparison[$test][$compareKey][$compareSubKey], static function (array $a, array $b): int {
-                if ($a['expected']['count'] === $b['expected']['count']) {
-                    return 0;
+        if (empty($this->comparison[$test][$compareKey][$compareSubKey])) {
+            return;
+        }
+
+        ksort($this->comparison[$test][$compareKey][$compareSubKey]);
+        uasort($this->comparison[$test][$compareKey][$compareSubKey], static function (array $a, array $b): int {
+            if ($a['expected']['count'] === $b['expected']['count']) {
+                return 0;
+            }
+
+            return ($a['expected']['count'] > $b['expected']['count']) ? -1 : 1;
+        });
+
+        $table = new Table($this->output);
+
+        $headers = [' Expected ' . ucfirst($compareKey) . ' ' . ucfirst($compareSubKey)];
+
+        foreach (array_keys($this->options['parsers']) as $parser) {
+            $headers[] = $parser;
+        }
+
+        $table->setHeaders($headers);
+
+        $rows = [];
+
+        foreach ($this->comparison[$test][$compareKey][$compareSubKey] as $expected => $compareRow) {
+            if ($justFails === true && empty($compareRow['expected']['hasFailures'])) {
+                continue;
+            }
+
+            $max = 0;
+            foreach ($compareRow as $child) {
+                if (count($child) > $max) {
+                    $max = count($child);
                 }
-
-                return ($a['expected']['count'] > $b['expected']['count']) ? -1 : 1;
-            });
-
-            $table = new Table($this->output);
-
-            $headers = [' Expected ' . ucfirst($compareKey) . ' ' . ucfirst($compareSubKey)];
+            }
 
             foreach (array_keys($this->options['parsers']) as $parser) {
-                $headers[] = $parser;
+                if (isset($compareRow[$parser])) {
+                    uasort($compareRow[$parser], static function (array $a, array $b): int {
+                        if ($a['count'] === $b['count']) {
+                            return 0;
+                        }
+
+                        return ($a['count'] > $b['count']) ? -1 : 1;
+                    });
+                }
             }
 
-            $table->setHeaders($headers);
+            for ($i = 0; $i < $max; ++$i) {
+                $row     = [];
+                $parsers = array_merge(['expected'], array_keys($this->options['parsers']));
 
-            $rows = [];
+                foreach ($parsers as $parser) {
+                    if ($parser === 'expected') {
+                        if ($i === 0) {
+                            $row[] = ($expected === '' ? '[no value]' : $expected) . ' <comment>(' . $compareRow['expected']['count'] . ')</comment>';
+                        } else {
+                            $row[] = ' ';
+                        }
+                    } else {
+                        if (isset($compareRow[$parser]) && count($compareRow[$parser]) > 0) {
+                            $key      = current(array_keys($compareRow[$parser]));
+                            $quantity = array_shift($compareRow[$parser]);
 
-            foreach ($this->comparison[$test][$compareKey][$compareSubKey] as $expected => $compareRow) {
-                if ($justFails === true && empty($compareRow['expected']['hasFailures'])) {
-                    continue;
-                }
-
-                $max = 0;
-                foreach ($compareRow as $child) {
-                    if (count($child) > $max) {
-                        $max = count($child);
-                    }
-                }
-
-                foreach (array_keys($this->options['parsers']) as $parser) {
-                    if (isset($compareRow[$parser])) {
-                        uasort($compareRow[$parser], static function (array $a, array $b): int {
-                            if ($a['count'] === $b['count']) {
-                                return 0;
-                            }
-
-                            return ($a['count'] > $b['count']) ? -1 : 1;
-                        });
-                    }
-                }
-
-                for ($i = 0; $i < $max; ++$i) {
-                    $row     = [];
-                    $parsers = array_merge(['expected'], array_keys($this->options['parsers']));
-
-                    foreach ($parsers as $parser) {
-                        if ($parser === 'expected') {
-                            if ($i === 0) {
-                                $row[] = ($expected === '' ? '[no value]' : $expected) . ' <comment>(' . $compareRow['expected']['count'] . ')</comment>';
+                            if ($key === $expected) {
+                                $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=green>(' . $quantity['count'] . ')</>';
+                            } elseif ($expected === '[n/a]' || $key === '[n/a]') {
+                                $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=blue>(' . $quantity['count'] . ')</>';
                             } else {
-                                $row[] = ' ';
+                                $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=red>(' . $quantity['count'] . ')</>';
                             }
                         } else {
-                            if (isset($compareRow[$parser]) && count($compareRow[$parser]) > 0) {
-                                $key      = current(array_keys($compareRow[$parser]));
-                                $quantity = array_shift($compareRow[$parser]);
-                                if ($expected === '[n/a]' || $key === $expected || $key === '[n/a]') {
-                                    $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=green>(' . $quantity['count'] . ')</>';
-                                } else {
-                                    $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=red>(' . $quantity['count'] . ')</>';
-                                }
-                            } else {
-                                $row[] = ' ';
-                            }
+                            $row[] = ' ';
                         }
                     }
-
-                    $rows[] = $row;
                 }
 
-                $rows[] = new TableSeparator();
+                $rows[] = $row;
             }
 
-            array_pop($rows);
-
-            $table->setRows($rows);
-            $table->render();
+            $rows[] = new TableSeparator();
         }
+
+        array_pop($rows);
+
+        $table->setRows($rows);
+        $table->render();
     }
 
     private function makeDiff(array $expected, array $actual): array
