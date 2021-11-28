@@ -5,25 +5,24 @@
   "requires": true,
   "dependencies": {
     "browscap-js": {
-      "version": "2.2.6000032",
-      "resolved": "https://registry.npmjs.org/browscap-js/-/browscap-js-2.2.6000032.tgz",
-      "integrity": "sha512-YW+IntClYeFmbN7GMUZvoPi7WmJw1LzwkUsG/E9Zx4o20VLTAomZa7oWIbPreuFZFlt1DxUHjuhIZQ2uAYPtHw==",
+      "version": "3.0.6000032",
+      "resolved": "https://registry.npmjs.org/browscap-js/-/browscap-js-3.0.6000032.tgz",
+      "integrity": "sha512-0zLQXxxCF9pmXPueYZe5W2jarrKv5QaplRFzcmq28d/rgtOBsIbvaZIrjgXeZkcs9jKS0zgR+RAtPAJnUxm7ig==",
       "requires": {
-        "browscap-js-cache": "^1.2.0",
+        "browscap-js-cache": "^2.0.1",
         "browscap-json-cache-files": "^1.2.6000032",
-        "md5": "^2.0.0",
-        "synchronous-promise": "^1.0.18||^2.0.4"
+        "md5": "^2.0.0"
       }
     },
     "browscap-js-cache": {
-      "version": "1.2.0",
-      "resolved": "https://registry.npmjs.org/browscap-js-cache/-/browscap-js-cache-1.2.0.tgz",
-      "integrity": "sha1-VN8MfBREDPQxUXOFSSIZ7lqtFfI="
+      "version": "2.0.2",
+      "resolved": "https://registry.npmjs.org/browscap-js-cache/-/browscap-js-cache-2.0.2.tgz",
+      "integrity": "sha512-BHj48dFUhjxHUQHuLC2Gs0zwCzp0UjU2Hcui0H8e43dBlMGaEGkkbiRZ7xS5Eq+TkpSHsmKCwwQaJ3JeFvN8SQ=="
     },
     "browscap-json-cache-files": {
-      "version": "1.2.6000032",
-      "resolved": "https://registry.npmjs.org/browscap-json-cache-files/-/browscap-json-cache-files-1.2.6000032.tgz",
-      "integrity": "sha512-tzlQG8qvuq0ZCoxZA4JjY6pUKYKgFceYFdg1pOS7rTKX1zJDDKTtTKhnZlHwbZ1AEKDlL3Sl95ClrtmR32dufA=="
+      "version": "1.2.6000037",
+      "resolved": "https://registry.npmjs.org/browscap-json-cache-files/-/browscap-json-cache-files-1.2.6000037.tgz",
+      "integrity": "sha512-27cfqwu3MCkNo1h048lg9yLDif8gpIeCfuYCZU+qzMpHj27pQj7WcC+QDRTyiT+IhliXvPtymWOMXXASJstKdA=="
     },
     "charenc": {
       "version": "0.0.2",
@@ -41,19 +40,14 @@
       "integrity": "sha512-NcdALwpXkTm5Zvvbk7owOUSvVvBKDgKP5/ewfXEznmQFfs4ZRmanOeKBTjRVjka3QFoN6XJ+9F3USqfHqTaU5w=="
     },
     "md5": {
-      "version": "2.2.1",
-      "resolved": "https://registry.npmjs.org/md5/-/md5-2.2.1.tgz",
-      "integrity": "sha1-U6s41f48iJG6RlMp6iP6wFQBJvk=",
+      "version": "2.3.0",
+      "resolved": "https://registry.npmjs.org/md5/-/md5-2.3.0.tgz",
+      "integrity": "sha512-T1GITYmFaKuO91vxyoQMFETst+O71VUPEU3ze5GNzDm0OWdP8v1ziTaAEPUr/3kLsY3Sftgz242A1SetQiDL7g==",
       "requires": {
-        "charenc": "~0.0.1",
-        "crypt": "~0.0.1",
-        "is-buffer": "~1.1.1"
+        "charenc": "0.0.2",
+        "crypt": "0.0.2",
+        "is-buffer": "~1.1.6"
       }
-    },
-    "synchronous-promise": {
-      "version": "2.0.9",
-      "resolved": "https://registry.npmjs.org/synchronous-promise/-/synchronous-promise-2.0.9.tgz",
-      "integrity": "sha512-LO95GIW16x69LuND1nuuwM4pjgFGupg7pZ/4lU86AmchPKrhk0o2tpMU2unXRrqo81iAFe1YJ0nAGEVwsrZAgg=="
     }
   }
 }
