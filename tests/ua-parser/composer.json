@@ -1,7 +1,7 @@
 {
     "require": {
         "doctrine/cache": "^1.8.0",
-        "symfony/finder": "^4.2.0",
+        "symfony/finder": "^5.3.7",
         "symfony/yaml": "^4.2.0"
     },
     "config": {
