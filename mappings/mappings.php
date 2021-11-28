@@ -203,6 +203,7 @@ return [
             'internetexplorerwithchromeframe'     => 'internetexplorer',
             'internetseercom'                     => 'internetseerbot',
             'ios'                                 => null,
+            'iphone'                              => null, // cbschuld/browser.php
             'iridium'                             => 'iridiumbrowser',
             'iris'                                => 'irisbrowser',
             'ironmobile'                          => 'iron',
@@ -650,6 +651,7 @@ return [
             'androidv1021413'             => 'android',
             'androidv22'                  => 'android',
             'androidwear'                 => 'android',
+            'apple'                       => 'macosx', // cbschuld/browser.php
             'appletv'                     => 'tvos',
             'archlinux'                   => 'linux',
             'arklinux'                    => 'linux',
