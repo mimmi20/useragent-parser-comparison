@@ -1,7 +1,7 @@
 {
     "require": {
         "mimmi20/browser-detector": "^5.0.0",
-        "roave/doctrine-simplecache": "^1.1.0",
+        "roave/doctrine-simplecache": "^2.4.0",
         "monolog/monolog": "^2.3.5"
     },
     "config": {
