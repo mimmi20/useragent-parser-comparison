@@ -3,7 +3,7 @@
         "ua-parser/uap-php": "^3.4.6",
         "mimmi20/json-class": "~2.0.1",
         "symfony/yaml": "^4.2.0",
-        "symfony/filesystem": "^4.2.0",
+        "symfony/filesystem": "^5.3.4",
         "symfony/finder": "^4.2.0",
         "symfony/console": "^4.2.0"
     },
