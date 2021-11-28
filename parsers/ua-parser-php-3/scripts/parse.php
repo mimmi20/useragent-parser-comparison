@@ -75,7 +75,7 @@ $package = new \PackageInfo\Package('ua-parser/uap-php');
 
 $regexVersion = file_get_contents(__DIR__ . '/../version.txt');
 
-echo (new \JsonClass\Json())->encode([
+echo json_encode([
     'results'     => $results,
     'parse_time'  => $parseTime,
     'init_time'   => $initTime,
