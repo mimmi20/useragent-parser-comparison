@@ -6,19 +6,20 @@ namespace UserAgentParserComparison\Command;
 
 use Exception;
 use FilesystemIterator;
-use function Safe\file_get_contents;
-use function Safe\file_put_contents;
-use function Safe\json_decode;
-use function Safe\json_encode;
-use function Safe\ksort;
-use function Safe\mkdir;
-use function Safe\sort;
-use function Safe\sprintf;
+use function file_get_contents;
+use function file_put_contents;
+use function json_decode;
+use function json_encode;
+use function ksort;
+use function mkdir;
+use function sort;
+use function sprintf;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
@@ -49,19 +50,28 @@ class Test extends Command
         $this->setName('test')
             ->setDescription('Runs test against the parsers')
             ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run, if omitted will be generated from date')
+            ->addOption('single-ua', null, InputOption::VALUE_NONE, 'parses one useragent after another')
             ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws \Safe\Exceptions\ArrayException
+     * @throws \Safe\Exceptions\FilesystemException
+     * @throws \Safe\Exceptions\JsonException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->collectTests($output);
 
         $rows = [];
 
-        $output->writeln('These are all of the tests available, choose which you would like to run');
+        $output->writeln('These are all available test suites, choose which you would like to run');
 
         $questions = array_keys($this->tests);
-        sort($questions);
+        sort($questions, SORT_FLAG_CASE | SORT_NATURAL);
 
         $i = 1;
         foreach ($questions as $name) {
@@ -98,6 +108,8 @@ class Test extends Command
         }
 
         $output->writeln('Choose which parsers you would like to run this test suite against');
+
+        /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
         $parsers      = $parserHelper->getParsers($input, $output);
 
@@ -151,61 +163,153 @@ class Test extends Command
 
             $output->write("\r" . $message . '<info>  write test data into file...</info>');
 
-            // write our test's file that we'll pass to the parsers
-            $filename = $testFilesDir . '/' . $testName . '.txt';
+            if ($input->getOption('single-ua')) {
+                $result     = [];
+                $countTests = (string) count($testOutput['tests']);
+                $actualTest = 0;
 
-            if (is_array($testOutput['tests'])) {
-                $agents = array_keys($testOutput['tests']);
+                foreach (array_keys($testOutput['tests']) as $agent) {
+                    ++$actualTest;
+
+                    if (is_int($agent)) {
+                        continue;
+                    }
+
+                    $agent = addcslashes($agent, PHP_EOL);
+
+                    $message = sprintf(
+                        '%s[%s/%s] Testing UA <fg=yellow>%s</> ',
+                        '  ',
+                        str_pad((string) $actualTest, mb_strlen($countTests), ' ', STR_PAD_LEFT),
+                        $countTests,
+                        $agent
+                    );
+
+                    $output->write($message);
+
+                    foreach ($parsers as $parserName => $parser) {
+                        if (!array_key_exists($parserName, $result)) {
+                            $result[$parserName] = [
+                                'results'     => [],
+                                'parse_time'  => 0,
+                                'init_time'   => 0,
+                                'memory_used' => 0,
+                                'version'     => null,
+                            ];
+                        }
+
+                        $output->write("\r" . str_pad($message . '<info> against the <fg=green;options=bold,underscore>' . $parserName . '</> parser... </info>', 285));
+                        $singleResult = $parser['parse-ua']($agent);
+
+                        if (empty($singleResult)) {
+                            $output->writeln("\r" . $message . '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>');
+
+                            continue;
+                        }
+
+                        if (!empty($singleResult['version'])) {
+                            $parsers[$parserName]['metadata']['version'] = $singleResult['version'];
+                        }
+
+                        if (!file_exists($resultsDir . '/' . $parserName)) {
+                            mkdir($resultsDir . '/' . $parserName);
+                        }
+
+                        $result[$parserName]['results'][] = $singleResult['result'];
+
+                        if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
+                            $result[$parserName]['init_time'] = $singleResult['init_time'];
+                        }
+
+                        if ($singleResult['memory_used'] > $result[$parserName]['memory_used']) {
+                            $result[$parserName]['memory_used'] = $singleResult['memory_used'];
+                        }
+
+                        $result[$parserName]['parse_time'] += $singleResult['parse_time'];
+                        $result[$parserName]['version'] = $singleResult['version'];
+                    }
+
+                    $output->writeln("\r" . str_pad($message . '<info> done!</info>', 245));
+                }
+
+                foreach (array_keys($parsers) as $parserName) {
+                    if (!array_key_exists($parserName, $result)) {
+                        $output->writeln(
+                            '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>'
+                        );
+
+                        continue;
+                    }
+
+                    if (!file_exists($resultsDir . '/' . $parserName)) {
+                        mkdir($resultsDir . '/' . $parserName);
+                    }
+
+                    file_put_contents(
+                        $resultsDir . '/' . $parserName . '/' . $testName . '.json',
+                        json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                    );
+
+                    $usedTests[$testName] = $testData;
+                }
             } else {
-                $agents = [];
-            }
+                $output->write('write test data for the ' . $testName . ' test suite into file... ');
+                // write our test's file that we'll pass to the parsers
+                $filename = $testFilesDir . '/' . $testName . '.txt';
 
-            array_walk($agents, static function (string &$item): void {
-                $item = addcslashes($item, PHP_EOL);
-            });
+                if (is_array($testOutput['tests'])) {
+                    $agents = array_keys($testOutput['tests']);
+                } else {
+                    $agents = [];
+                }
 
-            file_put_contents($filename, implode(PHP_EOL, $agents));
-            $output->writeln("\r" . $message . '<info>  done! [' . count($agents) . ' tests found]</info>       ');
+                array_walk($agents, static function (string &$item): void {
+                    $item = addcslashes($item, PHP_EOL);
+                });
 
-            foreach ($parsers as $parserName => $parser) {
+                file_put_contents($filename, implode(PHP_EOL, $agents));
+                $output->writeln("\r" . $message . '<info>  done! [' . count($agents) . ' tests found]</info>       ');
+
+                foreach ($parsers as $parserName => $parser) {
                 $testMessage = sprintf('  Testing against the <fg=green;options=bold,underscore>%s</> parser...', $parserName);
                 $output->write($testMessage . ' <info> parsing</info>');
 
-                $result = $parser['parse']($filename);
+                    $result = $parser['parse']($filename);
 
-                if (empty($result)) {
-                    $output->writeln(
+                    if (empty($result)) {
+                        $output->writeln(
                         "\r" . $testMessage . ' <error>The parser did not return any data, there may have been an error</error>'
-                    );
+                        );
 
-                    continue;
-                }
+                        continue;
+                    }
 
-                if (!empty($result['version'])) {
-                    $parsers[$parserName]['metadata']['version'] = $result['version'];
-                }
+                    if (!empty($result['version'])) {
+                        $parsers[$parserName]['metadata']['version'] = $result['version'];
+                    }
 
-                if (!file_exists($resultsDir . '/' . $parserName)) {
-                    mkdir($resultsDir . '/' . $parserName);
-                }
+                    if (!file_exists($resultsDir . '/' . $parserName)) {
+                        mkdir($resultsDir . '/' . $parserName);
+                    }
 
-                try {
-                    $encoded = json_encode(
-                        $result,
-                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                    );
-                } catch (Exception $e) {
+                    try {
+                        $encoded = json_encode(
+                            $result,
+                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                        );
+                    } catch (Exception $e) {
                     $output->writeln("\r" . $testMessage . ' <error>encoding the result failed!</error>');
-                    continue;
+                        continue;
+                    }
+
+                    file_put_contents(
+                        $resultsDir . '/' . $parserName . '/' . $testName . '.json',
+                        $encoded
+                    );
+                $output->writeln("\r" . $testMessage . ' <info>done!</info>                                                                                 ');
+
+                    $usedTests[$testName] = $testData;
                 }
-
-                file_put_contents(
-                    $resultsDir . '/' . $parserName . '/' . $testName . '.json',
-                    $encoded
-                );
-                $output->writeln("\r" . $testMessage . ' <info> done!</info>                                                                                 ');
-
-                $usedTests[$testName] = $testData;
             }
         }
 
@@ -249,6 +353,8 @@ class Test extends Command
                     $metadata = json_decode($contents, true);
                 } catch (Exception $e) {
                     $output->writeln('<error>An error occured while parsing results for the ' . $testDir->getPathname() . ' test suite</error>');
+
+                    continue;
                 }
             }
 

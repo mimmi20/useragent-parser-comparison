@@ -9,7 +9,7 @@
       "resolved": "https://registry.npmjs.org/device-detector-js/-/device-detector-js-1.1.1.tgz",
       "integrity": "sha512-5WEK8GDH6qGLkOpHn362emYJ2Tk5Auk8anj77HLd9yfiFmZNto1wb9ysfSYbKlhesGBdjPQ8tU1fLk9RxcLLlQ==",
       "requires": {
-        "lodash": "^4.17.11",
+        "lodash": "4.17.15",
         "lru-cache": "4.1.3"
       }
     },
@@ -23,8 +23,8 @@
       "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-4.1.3.tgz",
       "integrity": "sha512-fFEhvcgzuIoJVUF8fYr5KR0YqxD238zgObTps31YdADwPPAp82a4M8TrckkWyx7ekNlf9aBcVn81cFwwXngrJA==",
       "requires": {
-        "pseudomap": "^1.0.2",
-        "yallist": "^2.1.2"
+        "pseudomap": "1.0.2",
+        "yallist": "2.1.2"
       }
     },
     "pseudomap": {

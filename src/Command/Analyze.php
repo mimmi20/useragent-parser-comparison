@@ -5,12 +5,14 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use Exception;
-use function Safe\array_flip;
-use function Safe\file_get_contents;
-use function Safe\json_decode;
-use function Safe\ksort;
-use function Safe\sort;
-use function Safe\uasort;
+use UserAgentParserComparison\Compare\Comparison;
+use function array_flip;
+use function file_get_contents;
+use function json_decode;
+use function ksort;
+use function sort;
+use function sprintf;
+use function uasort;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -80,30 +82,35 @@ class Analyze extends Command
         $run = $input->getArgument('run');
 
         if (empty($run)) {
-            // @todo Show user the available runs, perhaps limited to 10 or something, for now, throw an error
-            $output->writeln('<error>run argument is required</error>');
+            /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
+            $testHelper = $this->getHelper('tests');
+            $run        = $testHelper->getTest($input, $output);
 
-            return 1;
+            if ($run === null) {
+                $output->writeln('<error>No valid test run found</error>');
+
+                return 1;
+            }
         }
 
         if (!file_exists($this->runDir . '/' . $run)) {
-            $output->writeln('<error>No run directory found with that id (' . $run . ')</error>');
+            $output->writeln(sprintf('<error>No run directory found with that id (%s)</error>', $run));
 
             return 1;
         }
 
-        if (!file_exists($this->runDir . '/' . $run . '/metadata.json')) {
-            $output->writeln('<error>No options file found for this test run</error>');
+        $metaDataFile = $this->runDir . '/' . $run . '/metadata.json';
+
+        if (!file_exists($metaDataFile)) {
+            $output->writeln(sprintf('<error>No options file found for run (%s)</error>', $run));
 
             return 2;
         }
 
         try {
-            $contents = file_get_contents($this->runDir . '/' . $run . '/metadata.json');
+            $contents = file_get_contents($metaDataFile);
         } catch (Exception $e) {
-            $output->writeln(
-                '<error>Could not read file (' . $this->runDir . '/' . $run . '/metadata.json' . ')</error>'
-            );
+            $output->writeln(sprintf('<error>Could not read file (%s)</error>', $metaDataFile));
 
             return 2;
         }
@@ -116,7 +123,7 @@ class Analyze extends Command
             return 2;
         }
 
-        $output->writeln('<info>Analyzing data from test run: ' . $run . '</info>');
+        $output->writeln(sprintf('<info>Analyzing data from test run: %s</info>', $run));
 
         if (!empty($this->options['tests'])) {
             $tests = $this->options['tests'];
@@ -126,7 +133,7 @@ class Analyze extends Command
             ];
             $this->options['tests'] = $tests;
         } else {
-            $output->writeln('<error>Error in options file for this test run</error>');
+            $output->writeln(sprintf('<error>Error in options file for run (%s)</error>', $run));
 
             return 3;
         }
@@ -151,9 +158,9 @@ class Analyze extends Command
 
                 try {
                     $expectedResults = json_decode($contents, true);
-                    $headerMessage   = '<fg=yellow>Parser comparison for ' . $testName . ' test suite' . (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '') . '</>';
+                    $headerMessage   = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : ''));
                 } catch (Exception $e) {
-                    $this->output->writeln('<error>An error occured while parsing file (' . $expectedFilename . '), skipping</error>');
+                    $this->output->writeln(sprintf('<error>An error occured while parsing file (%s), skipping</error>', $expectedFilename));
                     continue;
                 }
             } else {
@@ -169,9 +176,9 @@ class Analyze extends Command
 
                 try {
                     $testResult    = json_decode($contents, true);
-                    $headerMessage = '<fg=yellow>Parser comparison for ' . $testName . ' file, using ' . array_keys($this->options['parsers'])[0] . ' results as expected</>';
+                    $headerMessage = sprintf('<fg=yellow>Parser comparison for %s file, using %s results as expected</>', $testName, array_keys($this->options['parsers'])[0]);
                 } catch (Exception $e) {
-                    $this->output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
+                    $this->output->writeln(sprintf('<error>An error occured while parsing metadata for run %s, skipping</error>', $run));
                     continue;
                 }
 
@@ -187,53 +194,14 @@ class Analyze extends Command
             $rows[] = [new TableCell($headerMessage, ['colspan' => 7])];
             $rows[] = new TableSeparator();
 
-            foreach ($expectedResults['tests'] as $agent => $result) {
-                if (!isset($this->agents[$agent])) {
-                    $this->agents[$agent] = count($this->agents);
-                }
-
-                foreach (['browser', 'platform', 'device'] as $compareKey) {
-                    $subs = ['name'];
-                    if ($compareKey === 'device') {
-                        $subs = ['name', 'brand', 'type'];
-                    }
-
-                    if (!isset($this->comparison[$testName][$compareKey])) {
-                        $this->comparison[$testName][$compareKey] = [];
-                    }
-
-                    foreach ($subs as $compareSubKey) {
-                        if (!isset($this->comparison[$testName][$compareKey][$compareSubKey])) {
-                            $this->comparison[$testName][$compareKey][$compareSubKey] = [];
-                        }
-
-                        if (isset($result[$compareKey][$compareSubKey]) && $result[$compareKey][$compareSubKey] !== null) {
-                            $expectedValue = $result[$compareKey][$compareSubKey];
-                        } else {
-                            $expectedValue = '[n/a]';
-                        }
-
-                        if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue])) {
-                            $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue] = [
-                                'expected' => [
-                                    'count'  => 0,
-                                    'agents' => [],
-                                ],
-                            ];
-                        }
-
-                        ++$this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue]['expected']['count'];
-                        $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue]['expected']['agents'][] = $this->agents[$agent];
-                    }
-                }
-            }
+            $this->agents = array_flip(array_keys($expectedResults['tests']));
 
             $parserScores   = [];
             $possibleScores = [];
 
             foreach ($this->options['parsers'] as $parserName => $parserData) {
                 if (!file_exists($this->runDir . '/' . $run . '/results/' . $parserName . '/normalized/' . $testName . '.json')) {
-                    $this->output->writeln('<error>No output found for the ' . $parserName . ' parser, skipping</error>');
+                    $this->output->writeln(sprintf('<error>No output found for the %s parser, skipping</error>', $parserName));
 
                     continue;
                 }
@@ -242,7 +210,7 @@ class Analyze extends Command
                 try {
                     $contents = file_get_contents($fileName);
                 } catch (Exception $e) {
-                    $this->output->writeln('<error>Could not read file (' . $fileName . '), skipping</error>');
+                    $this->output->writeln(sprintf('<error>Could not read file (%s), skipping</error>', $fileName));
 
                     continue;
                 }
@@ -250,7 +218,7 @@ class Analyze extends Command
                 try {
                     $testResult = json_decode($contents, true);
                 } catch (Exception $e) {
-                    $this->output->writeln('<error>An error occured while parsing file (' . $fileName . '), skipping</error>');
+                    $this->output->writeln(sprintf('<error>An error occured while parsing file (%s), skipping</error>', $fileName));
 
                     continue;
                 }
@@ -266,55 +234,10 @@ class Analyze extends Command
 
                 foreach ($testResult['results'] as $data) {
                     $expected = $expectedResults['tests'][$data['useragent']];
-                    $failures = [];
+
+                    $comparison = new Comparison($expected, $data['parsed']);
 
                     foreach (['browser', 'platform', 'device'] as $compareKey) {
-                        $subs = ['name'];
-                        if ($compareKey === 'device') {
-                            $subs = ['name', 'brand', 'type'];
-                        }
-
-                        foreach ($subs as $compareSubKey) {
-                            if (isset($expected[$compareKey][$compareSubKey]) && $expected[$compareKey][$compareSubKey] !== null) {
-                                $expectedValue = $expected[$compareKey][$compareSubKey];
-                            } else {
-                                $expectedValue = '[n/a]';
-                            }
-
-                            if (isset($data['parsed'][$compareKey][$compareSubKey]) && $data['parsed'][$compareKey][$compareSubKey] !== null) {
-                                $actualValue = $data['parsed'][$compareKey][$compareSubKey];
-                            } else {
-                                $actualValue = '[n/a]';
-                            }
-
-                            if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName])) {
-                                $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName] = [];
-                            }
-
-                            if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue])) {
-                                $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue] = [
-                                    'count'  => 0,
-                                    'agents' => [],
-                                ];
-                            }
-
-                            ++$this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['count'];
-                            $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['agents'][] = $this->agents[$data['useragent']];
-
-                            if ($expectedValue !== $actualValue) {
-                                if ($expectedValue !== '[n/a]' && $actualValue !== '[n/a]') {
-                                    $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue]['expected']['hasFailures'] = true;
-                                }
-                            }
-                        }
-
-                        if ($data['parsed'][$compareKey] !== $expected[$compareKey]) {
-                            $diff = $this->makeDiff($expected[$compareKey], $data['parsed'][$compareKey]);
-                            if (!empty($diff)) {
-                                $failures[$compareKey] = $diff;
-                            }
-                        }
-
                         $score         = $this->calculateScore($expected[$compareKey], $data['parsed'][$compareKey]);
                         $possibleScore = $this->calculateScore($expected[$compareKey], $data['parsed'][$compareKey], true);
 
@@ -324,6 +247,9 @@ class Analyze extends Command
                         $parserScores[$parserName][$testName]   += $score;
                         $possibleScores[$parserName][$testName] += $possibleScore;
                     }
+
+                    $this->comparison[$testName] = $comparison->getComparison($parserName, $this->agents[$data['useragent']]);
+                    $failures = $comparison->getFailures();
 
                     if (!empty($failures)) {
                         $this->failures[$testName][$parserName][$data['useragent']] = $failures;
@@ -359,7 +285,7 @@ class Analyze extends Command
                 }
 
                 $rows[] = [
-                    $parserName,
+                    $parserData['metadata']['name'],
                     $parserData['metadata']['version'] ?? 'n/a',
                     $browserContent,
                     $platformContent,
@@ -721,6 +647,11 @@ class Analyze extends Command
         $table->setColumnMaxWidth(2, 50);
         $table->setStyle('box');
 
+        $htmlG = '<html><body><table><colgroup><col span="3" style="width: 33%"></colgroup><thead><tr><th colspan="3">UserAgent</th></tr><tr><th>Browser</th><th>Platform</th><th>Device</th></tr></thead><tbody>';
+        $htmlB = '<html><body><table><thead><tr><th>UserAgent</th></tr><tr><th>Browser</th></tr></thead><tbody>';
+        $htmlP = '<html><body><table><thead><tr><th>UserAgent</th></tr><tr><th>Platform</th></tr></thead><tbody>';
+        $htmlD = '<html><body><table><thead><tr><th>UserAgent</th></tr><tr><th>Device</th></tr></thead><tbody>';
+
         $table->setHeaders([
             [new TableCell('UserAgent', ['colspan' => 3])],
             [new TableCell('Browser'), new TableCell('Platform'), new TableCell('Device')],
@@ -728,18 +659,46 @@ class Analyze extends Command
 
         $rows = [];
         foreach ($this->failures[$test][$parser] as $agent => $failData) {
+            if (empty($failData['browser']) && empty($failData['platform']) && empty($failData['device'])) {
+                continue;
+            }
+
             if ($justAgents === true) {
                 $this->output->writeln($agent);
-            } else {
-                $rows[] = [new TableCell((string) $agent, ['colspan' => 3])];
-                $rows[] = [
-                    new TableCell(isset($failData['browser']) ? $this->outputDiff($failData['browser']) : ''),
-                    new TableCell(isset($failData['platform']) ? $this->outputDiff($failData['platform']) : ''),
-                    new TableCell(isset($failData['device']) ? $this->outputDiff($failData['device']) : ''),
-                ];
-                $rows[] = new TableSeparator();
+                continue;
+            }
+
+            $rows[] = [new TableCell((string) $agent, ['colspan' => 3])];
+            $rows[] = [
+                new TableCell(isset($failData['browser']) ? $this->outputDiff($failData['browser']) : ''),
+                new TableCell(isset($failData['platform']) ? $this->outputDiff($failData['platform']) : ''),
+                new TableCell(isset($failData['device']) ? $this->outputDiff($failData['device']) : ''),
+            ];
+            $rows[] = new TableSeparator();
+
+            $htmlG .= '<tr><td colspan="3">' . (string) $agent . '</td></tr>';
+            $htmlG .= '<tr><td>' . (!empty($failData['browser']) ? $this->outputDiffHtml($failData['browser']) : '') . '</td><td>' . (!empty($failData['platform']) ? $this->outputDiffHtml($failData['platform']) : '') . '</td><td>' . (!empty($failData['device']) ? $this->outputDiffHtml($failData['device']) : '') . '</td></tr>';
+
+            if (!empty($failData['browser'])) {
+                $htmlB .= '<tr><td>' . (string) $agent . '</td></tr>';
+                $htmlB .= '<tr><td>' . $this->outputDiffHtml($failData['browser']) . '</td></tr>';
+            }
+
+            if (!empty($failData['platform'])) {
+                $htmlP .= '<tr><td>' . (string) $agent . '</td></tr>';
+                $htmlP .= '<tr><td>' . $this->outputDiffHtml($failData['platform']) . '</td></tr>';
+            }
+
+            if (!empty($failData['device'])) {
+                $htmlD .= '<tr><td>' . (string) $agent . '</td></tr>';
+                $htmlD .= '<tr><td>' . $this->outputDiffHtml($failData['device']) . '</td></tr>';
             }
         }
+
+        $htmlG .= '</tbody></table></body></html>';
+        $htmlB .= '</tbody></table></body></html>';
+        $htmlP .= '</tbody></table></body></html>';
+        $htmlD .= '</tbody></table></body></html>';
 
         if ($justAgents === false) {
             array_pop($rows);
@@ -747,6 +706,10 @@ class Analyze extends Command
             $table->setRows($rows);
 
             $table->render();
+            file_put_contents($this->runDir . '/errors-summary.html', $htmlG);
+            file_put_contents($this->runDir . '/errors-browsers.html', $htmlB);
+            file_put_contents($this->runDir . '/errors-platforms.html', $htmlP);
+            file_put_contents($this->runDir . '/errors-devices.html', $htmlD);
         }
     }
 
@@ -842,27 +805,6 @@ class Analyze extends Command
         $table->render();
     }
 
-    private function makeDiff(array $expected, array $actual): array
-    {
-        if (empty($expected)) {
-            return [];
-        }
-
-        $result = [];
-        $diff   = array_diff_assoc($expected, $actual);
-
-        foreach ($diff as $field => $value) {
-            // We can only compare the fields that aren't null in either expected or actual
-            // to be "fair" to parsers that don't have all of the data (or have too much if the test
-            // suite doesn't contain the properties that a parser may)
-            if (isset($actual[$field], $expected[$field])) {
-                $result[$field] = ['expected' => $value, 'actual' => $actual[$field]];
-            }
-        }
-
-        return $result;
-    }
-
     private function calculateScore(array $expected, array $actual, bool $possible = false): int
     {
         $score = 0;
@@ -892,7 +834,39 @@ class Analyze extends Command
         $output = '';
 
         foreach ($diff as $field => $data) {
-            $output .= $field . ': <fg=white;bg=green>' . $data['expected'] . '</> <fg=white;bg=red>' . $data['actual'] . '</> ';
+            $output .= $field . ' (expected) : <fg=white;bg=green>' . $data['expected'] . '</> ';
+            $output .= $field . ' (actual)   : <fg=white;bg=red>' . $data['actual'] . '</> ';
+        }
+
+        return $output;
+    }
+
+    private function outputDiffHtml(array $diff): string
+    {
+        if (empty($diff)) {
+            return '';
+        }
+
+        $output = '';
+
+        foreach ($diff as $field => $data) {
+            $expected = $data['expected'];
+
+            if (null === $expected) {
+                $expected = '(null)';
+            } elseif ('' === $expected) {
+                $expected = '(empty)';
+            }
+
+            $actual = $data['actual'];
+
+            if (null === $actual) {
+                $actual = '(null)';
+            } elseif ('' === $actual) {
+                $actual = '(empty)';
+            }
+
+            $output .= $field . ': "<span style="background-color: green; color: white">' . $expected . '</span>" "<span style="background-color: red; color: white">' . $actual . '</span>" ';
         }
 
         return $output;

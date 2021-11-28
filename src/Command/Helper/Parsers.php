@@ -6,10 +6,10 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use Exception;
 use FilesystemIterator;
-use function Safe\file_get_contents;
-use function Safe\json_decode;
-use function Safe\ksort;
-use function Safe\sort;
+use function file_get_contents;
+use function json_decode;
+use function ksort;
+use function sort;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\Table;
@@ -80,6 +80,23 @@ class Parsers extends Helper
 
                     return $result;
                 },
+                'parse-ua' => static function (string $useragent) use ($parserDir, $output) {
+                    $result = shell_exec($parserDir->getPathname() . '/parse-ua.sh --ua ' . escapeshellarg($useragent));
+
+                    if ($result !== null) {
+                        $result = trim($result);
+
+                        try {
+                            $result = json_decode($result, true);
+                        } catch (Exception $e) {
+                            $output->writeln('<error>' . $result . $e . '</error>');
+
+                            return null;
+                        }
+                    }
+
+                    return $result;
+                },
             ];
 
             $rows[] = [
@@ -97,7 +114,7 @@ class Parsers extends Helper
         $table->render();
 
         $questions = array_keys($names);
-        sort($questions);
+        sort($questions, SORT_FLAG_CASE | SORT_NATURAL);
 
         if ($multiple === true) {
             $questions[] = 'All Parsers';
@@ -121,6 +138,7 @@ class Parsers extends Helper
             $question->setMultiselect(true);
         }
 
+        /** @var \Symfony\Component\Console\Helper\QuestionHelper $helper */
         $helper  = $this->helperSet->get('question');
         $answers = $helper->ask($input, $output, $question);
 
