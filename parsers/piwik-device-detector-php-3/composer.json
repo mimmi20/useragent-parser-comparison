@@ -1,7 +1,6 @@
 {
     "require": {
-        "piwik/device-detector": "^3.7.5",
-        "mimmi20/json-class": "^2.0.1"
+        "piwik/device-detector": "^3.7.5"
     },
     "config": {
         "preferred-install": "dist",

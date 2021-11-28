@@ -1,7 +1,6 @@
 {
     "require": {
-        "woothee/woothee": "^1.5.0",
-        "mimmi20/json-class": "^2.0.1"
+        "woothee/woothee": "^1.5.0"
     },
     "config": {
         "preferred-install": "dist",

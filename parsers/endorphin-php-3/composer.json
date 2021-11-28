@@ -1,7 +1,6 @@
 {
     "require": {
-        "endorphin-studio/browser-detector": "^3.0.0",
-        "mimmi20/json-class": "^2.0.1"
+        "endorphin-studio/browser-detector": "^3.0.0"
     },
     "config": {
         "preferred-install": "dist",

@@ -1,7 +1,6 @@
 {
     "require": {
-        "symfony/finder": "^4.2",
-        "mimmi20/json-class": "~2.0.1"
+        "symfony/finder": "^4.2.0"
     },
     "config": {
         "preferred-install": "dist",

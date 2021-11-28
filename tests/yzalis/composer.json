@@ -2,7 +2,7 @@
     "require": {
         "yzalis/ua-parser": "^0.3.0",
         "mustangostang/spyc": "^0.6.1",
-        "symfony/finder": "^3.3.0||^4.0.0"
+        "symfony/finder": "^4.2.0"
     },
     "config": {
         "preferred-install": "dist",

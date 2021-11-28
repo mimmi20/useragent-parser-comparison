@@ -1,7 +1,6 @@
 {
     "require": {
-        "browscap/browscap-php": "^4.0.0",
-        "mimmi20/json-class": "^2.0.1"
+        "browscap/browscap-php": "^4.0.0"
     },
     "config": {
         "preferred-install": "dist",
