@@ -1,6 +1,6 @@
 {
     "require": {
-        "doctrine/cache": "^1.8.0",
+        "doctrine/cache": "^2.1.1",
         "symfony/finder": "^4.2.0",
         "symfony/yaml": "^4.2.0"
     },
