@@ -1,6 +1,6 @@
 {
     "require": {
-        "symfony/finder": "^4.2.0"
+        "symfony/finder": "^5.3.7"
     },
     "config": {
         "preferred-install": "dist",
