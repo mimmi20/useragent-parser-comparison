@@ -1,6 +1,6 @@
 {
     "require": {
-        "piwik/device-detector": "^3.7.5"
+        "matomo/device-detector": "^5.0.0"
     },
     "config": {
         "preferred-install": "dist",

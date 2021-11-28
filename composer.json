@@ -1,4 +1,9 @@
 {
+    "name": "diablomedia/useragent-parser-comparison",
+    "type": "library",
+    "description": "project to compare some useragent parsers",
+    "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
+    "license": "MIT",
     "require": {
         "ext-json": "*",
         "ext-simplexml": "*",
