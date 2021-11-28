@@ -6,12 +6,12 @@ namespace UserAgentParserComparison\Command;
 
 use Exception;
 use UserAgentParserComparison\Compare\Comparison;
-use function Safe\array_flip;
-use function Safe\file_get_contents;
-use function Safe\json_decode;
-use function Safe\ksort;
-use function Safe\sort;
-use function Safe\uasort;
+use function array_flip;
+use function file_get_contents;
+use function json_decode;
+use function ksort;
+use function sort;
+use function uasort;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -108,6 +108,8 @@ class Analyze extends Command
                 $this->options = json_decode($contents, true);
             } catch (Exception $e) {
                 $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
+
+                return 2;
             }
         } else {
             $output->writeln('<error>No options file found for this test run</error>');
@@ -125,6 +127,7 @@ class Analyze extends Command
             ];
             $this->options['tests'] = $tests;
         } else {
+            var_dump($this->options);
             $output->writeln('<error>Error in options file for this test run</error>');
 
             return 3;
@@ -659,7 +662,7 @@ class Analyze extends Command
                 $this->output->writeln($agent);
                 continue;
             }
-            
+
             $rows[] = [new TableCell((string) $agent, ['colspan' => 3])];
             $rows[] = [
                 new TableCell(isset($failData['browser']) ? $this->outputDiff($failData['browser']) : ''),
@@ -670,17 +673,17 @@ class Analyze extends Command
 
             $htmlG .= '<tr><td colspan="3">' . (string) $agent . '</td></tr>';
             $htmlG .= '<tr><td>' . (!empty($failData['browser']) ? $this->outputDiffHtml($failData['browser']) : '') . '</td><td>' . (!empty($failData['platform']) ? $this->outputDiffHtml($failData['platform']) : '') . '</td><td>' . (!empty($failData['device']) ? $this->outputDiffHtml($failData['device']) : '') . '</td></tr>';
-            
+
             if (!empty($failData['browser'])) {
                 $htmlB .= '<tr><td>' . (string) $agent . '</td></tr>';
                 $htmlB .= '<tr><td>' . $this->outputDiffHtml($failData['browser']) . '</td></tr>';
             }
-            
+
             if (!empty($failData['platform'])) {
                 $htmlP .= '<tr><td>' . (string) $agent . '</td></tr>';
                 $htmlP .= '<tr><td>' . $this->outputDiffHtml($failData['platform']) . '</td></tr>';
             }
-            
+
             if (!empty($failData['device'])) {
                 $htmlD .= '<tr><td>' . (string) $agent . '</td></tr>';
                 $htmlD .= '<tr><td>' . $this->outputDiffHtml($failData['device']) . '</td></tr>';
@@ -821,7 +824,8 @@ class Analyze extends Command
         $output = '';
 
         foreach ($diff as $field => $data) {
-            $output .= $field . ': <fg=white;bg=green>' . $data['expected'] . '</> <fg=white;bg=red>' . $data['actual'] . '</> ';
+            $output .= $field . ' (expected) : <fg=white;bg=green>' . $data['expected'] . '</> ';
+            $output .= $field . ' (actual)   : <fg=white;bg=red>' . $data['actual'] . '</> ';
         }
 
         return $output;

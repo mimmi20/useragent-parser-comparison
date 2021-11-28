@@ -6,12 +6,12 @@ namespace UserAgentParserComparison\Command;
 
 use Exception;
 use FilesystemIterator;
-use function Safe\file_get_contents;
-use function Safe\file_put_contents;
-use function Safe\json_decode;
-use function Safe\json_encode;
-use function Safe\mkdir;
-use function Safe\sprintf;
+use function file_get_contents;
+use function file_put_contents;
+use function json_decode;
+use function json_encode;
+use function mkdir;
+use function sprintf;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -67,9 +67,13 @@ class Normalize extends Command
                     $this->options = json_decode($contents, true);
                 } catch (Exception $e) {
                     $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
+
+                    return 2;
                 }
             } catch (Exception $e) {
                 $output->writeln('<error>Could not read metadata file for run ' . $run . '</error>');
+
+                return 2;
             }
         }
 
