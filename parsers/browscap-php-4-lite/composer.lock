@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a5cfe7d89d1a8b62d0bee4bacce6e194",
+    "content-hash": "fd2a8b4b0aa020e577db9d2b795d7ccc",
     "packages": [
         {
             "name": "browscap/browscap-php",
-            "version": "4.3.0",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/browscap/browscap-php.git",
-                "reference": "476851a1d90bfb74b91cb84ff40ab8a207492132"
+                "reference": "aa6bde6900922102a67a4187db8880c01e228fd8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/browscap/browscap-php/zipball/476851a1d90bfb74b91cb84ff40ab8a207492132",
-                "reference": "476851a1d90bfb74b91cb84ff40ab8a207492132",
+                "url": "https://api.github.com/repos/browscap/browscap-php/zipball/aa6bde6900922102a67a4187db8880c01e228fd8",
+                "reference": "aa6bde6900922102a67a4187db8880c01e228fd8",
                 "shasum": ""
             },
             "require": {
@@ -25,7 +25,7 @@
                 "ext-json": "*",
                 "guzzlehttp/guzzle": "^6.5.2 || ^7.0",
                 "monolog/monolog": "^1.25.3 || ^2.0.2",
-                "php": ">=7.1.0,<7.5.0",
+                "php": ">=7.3.0,<8.1.0",
                 "psr/simple-cache": "^1.0.1",
                 "roave/doctrine-simplecache": "^2.2.0",
                 "symfony/console": "^3.4.36 || ^4.4.2 || ^5.0.2",
@@ -41,7 +41,7 @@
                 "phpstan/phpstan-deprecation-rules": "^0.12.2",
                 "phpstan/phpstan-phpunit": "^0.12.6",
                 "phpstan/phpstan-strict-rules": "^0.12.2",
-                "phpunit/phpunit": "^7.5.20 || ^8.5.2"
+                "phpunit/phpunit": "^9.5.0"
             },
             "suggest": {
                 "ext-curl": "to use curl requests to get the ini file"
@@ -85,7 +85,7 @@
                 "issues": "https://github.com/browscap/browscap-php/issues",
                 "source": "https://github.com/browscap/browscap-php"
             },
-            "time": "2020-08-17T16:30:15+00:00"
+            "time": "2021-01-06T19:02:13+00:00"
         },
         {
             "name": "daverandom/exceptional-json",
@@ -552,64 +552,6 @@
             "time": "2021-10-06T17:43:30+00:00"
         },
         {
-            "name": "mimmi20/json-class",
-            "version": "2.0.17",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mimmi20/json-class.git",
-                "reference": "b45b88efcfb481684bcde0345dbf631044f16af3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/b45b88efcfb481684bcde0345dbf631044f16af3",
-                "reference": "b45b88efcfb481684bcde0345dbf631044f16af3",
-                "shasum": ""
-            },
-            "require": {
-                "daverandom/exceptional-json": "~1.0.4",
-                "ext-json": "*",
-                "php": "^7.1.3 || ^8.0.0"
-            },
-            "require-dev": {
-                "infection/infection": "~0.13.6 || ~0.18 || ~0.20.2",
-                "mimmi20/coding-standard": "~1.0.9",
-                "pepakriz/phpstan-exception-rules": "~0.11.4",
-                "phpstan/extension-installer": "~1.1.0",
-                "phpstan/phpstan": "~0.12.68",
-                "phpstan/phpstan-deprecation-rules": "~0.12.6",
-                "phpstan/phpstan-phpunit": "~0.12.17",
-                "phpunit/phpunit": "~7.5.20 || ~8.5.13 || ~9.5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "JsonClass\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Thomas Müller",
-                    "homepage": "https://github.com/mimmi20",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/mimmi20/json-class/graphs/contributors"
-                }
-            ],
-            "description": "Class wrapper for daverandom/exceptional-json",
-            "homepage": "https://github.com/mimmi20/json-class",
-            "support": {
-                "issues": "https://github.com/mimmi20/json-class/issues",
-                "source": "https://github.com/mimmi20/json-class"
-            },
-            "time": "2021-01-19T10:14:50+00:00"
-        },
-        {
             "name": "monolog/monolog",
             "version": "2.3.5",
             "source": {
@@ -918,30 +860,30 @@
         },
         {
             "name": "psr/log",
-            "version": "3.0.0",
+            "version": "1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001"
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/fe5ea303b0887d5caefd3d431c3e61ad47037001",
-                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.0.0"
+                "php": ">=5.3.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.x-dev"
+                    "dev-master": "1.1.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Log\\": "src"
+                    "Psr\\Log\\": "Psr/Log/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -962,9 +904,9 @@
                 "psr-3"
             ],
             "support": {
-                "source": "https://github.com/php-fig/log/tree/3.0.0"
+                "source": "https://github.com/php-fig/log/tree/1.1.4"
             },
-            "time": "2021-07-14T16:46:02+00:00"
+            "time": "2021-05-03T11:20:27+00:00"
         },
         {
             "name": "psr/simple-cache",
