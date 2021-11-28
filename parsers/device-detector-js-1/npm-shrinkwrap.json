@@ -9,7 +9,7 @@
       "resolved": "https://registry.npmjs.org/device-detector-js/-/device-detector-js-1.1.1.tgz",
       "integrity": "sha512-5WEK8GDH6qGLkOpHn362emYJ2Tk5Auk8anj77HLd9yfiFmZNto1wb9ysfSYbKlhesGBdjPQ8tU1fLk9RxcLLlQ==",
       "requires": {
-        "lodash": "^4.17.11",
+        "lodash": "4.17.15",
         "lru-cache": "4.1.3"
       }
     },
