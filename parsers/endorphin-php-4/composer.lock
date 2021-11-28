@@ -4,34 +4,31 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b49026bf7e7544bbcb16f5cf564d9b9d",
+    "content-hash": "2459e35b984271881b381b2341d17765",
     "packages": [
         {
             "name": "endorphin-studio/browser-detector",
-            "version": "4.0.2",
+            "version": "4.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/endorphin-studio/browser-detector.git",
-                "reference": "bb5e2d34917e98fd4a1214e146bb2ec64390bc13"
+                "reference": "63fa495b14c823023816de28d7087f564afe3725"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/endorphin-studio/browser-detector/zipball/bb5e2d34917e98fd4a1214e146bb2ec64390bc13",
-                "reference": "bb5e2d34917e98fd4a1214e146bb2ec64390bc13",
+                "url": "https://api.github.com/repos/endorphin-studio/browser-detector/zipball/63fa495b14c823023816de28d7087f564afe3725",
+                "reference": "63fa495b14c823023816de28d7087f564afe3725",
                 "shasum": ""
             },
             "require": {
-                "endorphin-studio/browser-detector-data": ">=1.0.0a",
-                "endorphin-studio/browser-detector-detection": ">=1.0.0",
+                "endorphin-studio/browser-detector-data": ">=1.0",
+                "endorphin-studio/browser-detector-detection": ">=1.0.1",
                 "endorphin-studio/browser-detector-tools": ">=1.0.0",
-                "php": ">=7.0"
+                "php": ">=7.0 <7.3"
             },
             "require-dev": {
-                "endorphin-studio/browser-detector-data": ">=1.0.0a",
-                "endorphin-studio/browser-detector-detection": ">=1.0.0",
-                "endorphin-studio/browser-detector-tools": ">=1.0.0",
-                "phpunit/phpunit": "^6.5.11",
-                "twig/twig": "^2.5.0"
+                "doctrine/instantiator": "1.0.5",
+                "phpunit/phpunit": "6.5.14"
             },
             "type": "library",
             "autoload": {
@@ -58,9 +55,9 @@
             ],
             "support": {
                 "issues": "https://github.com/endorphin-studio/browser-detector/issues",
-                "source": "https://github.com/endorphin-studio/browser-detector/tree/4.0"
+                "source": "https://github.com/endorphin-studio/browser-detector/tree/4.0.5"
             },
-            "time": "2018-10-18T09:11:25+00:00"
+            "time": "2019-10-24T13:05:34+00:00"
         },
         {
             "name": "endorphin-studio/browser-detector-data",
@@ -653,7 +650,10 @@
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "^7.4.3",
+        "composer-runtime-api": "*"
+    },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
 }

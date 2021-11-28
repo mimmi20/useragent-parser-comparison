@@ -1,5 +1,7 @@
 {
     "require": {
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
         "matomo/device-detector": "^5.0.0"
     },
     "config": {

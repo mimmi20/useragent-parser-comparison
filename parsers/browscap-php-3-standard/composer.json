@@ -1,6 +1,8 @@
 {
     "require": {
-        "browscap/browscap-php": "~3.0.0"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "browscap/browscap-php": "^3.1.0"
     },
     "config": {
         "preferred-install": "dist",

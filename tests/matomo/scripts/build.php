@@ -4,7 +4,7 @@ declare(strict_types = 1);
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 
 use DeviceDetector\Parser\Client\Browser;
-use DeviceDetector\Parser\Device\DeviceParserAbstract;
+use DeviceDetector\Parser\Device\AbstractDeviceParser;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -17,16 +17,16 @@ function isMobile($data): bool
 {
     $device     = $data['device']['type'];
     $os         = $data['os']['short_name'];
-    $deviceType = DeviceParserAbstract::getAvailableDeviceTypes()[$device];
+    $deviceType = AbstractDeviceParser::getAvailableDeviceTypes()[$device];
 
     // Mobile device types
     if (!empty($deviceType) && in_array($deviceType, [
-            DeviceParserAbstract::DEVICE_TYPE_FEATURE_PHONE,
-            DeviceParserAbstract::DEVICE_TYPE_SMARTPHONE,
-            DeviceParserAbstract::DEVICE_TYPE_TABLET,
-            DeviceParserAbstract::DEVICE_TYPE_PHABLET,
-            DeviceParserAbstract::DEVICE_TYPE_CAMERA,
-            DeviceParserAbstract::DEVICE_TYPE_PORTABLE_MEDIA_PAYER,
+            AbstractDeviceParser::DEVICE_TYPE_FEATURE_PHONE,
+            AbstractDeviceParser::DEVICE_TYPE_SMARTPHONE,
+            AbstractDeviceParser::DEVICE_TYPE_TABLET,
+            AbstractDeviceParser::DEVICE_TYPE_PHABLET,
+            AbstractDeviceParser::DEVICE_TYPE_CAMERA,
+            AbstractDeviceParser::DEVICE_TYPE_PORTABLE_MEDIA_PAYER,
         ])
     ) {
         return true;
@@ -34,9 +34,9 @@ function isMobile($data): bool
 
     // non mobile device types
     if (!empty($deviceType) && in_array($deviceType, [
-            DeviceParserAbstract::DEVICE_TYPE_TV,
-            DeviceParserAbstract::DEVICE_TYPE_SMART_DISPLAY,
-            DeviceParserAbstract::DEVICE_TYPE_CONSOLE,
+            AbstractDeviceParser::DEVICE_TYPE_TV,
+            AbstractDeviceParser::DEVICE_TYPE_SMART_DISPLAY,
+            AbstractDeviceParser::DEVICE_TYPE_CONSOLE,
         ])
     ) {
         return false;
@@ -75,7 +75,7 @@ $finder->ignoreDotFiles(true);
 $finder->ignoreVCS(true);
 $finder->sortByName();
 $finder->ignoreUnreadableDirs();
-$finder->in(__DIR__ . '/../vendor/piwik/device-detector/Tests/fixtures');
+$finder->in(__DIR__ . '/../vendor/matomo/device-detector/Tests/fixtures');
 
 foreach ($finder as $fixture) {
     /** @var \Symfony\Component\Finder\SplFileInfo $fixture */
@@ -101,7 +101,7 @@ foreach ($finder as $fixture) {
                     ],
                     'device' => [
                         'name'     => (string) $data['device']['model'],
-                        'brand'    => DeviceParserAbstract::getFullName($data['device']['brand']),
+                        'brand'    => AbstractDeviceParser::getFullName($data['device']['brand']),
                         'type'     => $data['device']['type'],
                         'ismobile' => isMobile($data),
                     ],
@@ -113,10 +113,7 @@ foreach ($finder as $fixture) {
     }
 }
 
-// Get version from composer
-$package = new \PackageInfo\Package('piwik/device-detector');
-
 echo json_encode([
     'tests'   => $tests,
-    'version' => $package->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version' => \Composer\InstalledVersions::getPrettyVersion('matomo/device-detector'),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

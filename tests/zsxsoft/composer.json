@@ -1,6 +1,8 @@
 {
     "require": {
-        "zsxsoft/php-useragent": "^1.4.0"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "zsxsoft/php-useragent": "^1.5.0"
     },
     "config": {
         "preferred-install": "dist",

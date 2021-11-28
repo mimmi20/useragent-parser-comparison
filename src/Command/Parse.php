@@ -165,7 +165,7 @@ class Parse extends Command
 
                         file_put_contents(
                             $this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($filename) . '.json',
-                            json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                            json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
                         );
                     }
 
@@ -280,7 +280,7 @@ class Parse extends Command
 
                     file_put_contents(
                         $this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($filename) . '.json',
-                        json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                        json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
                     );
                 }
 
@@ -380,7 +380,7 @@ class Parse extends Command
         if ($name) {
             file_put_contents(
                 $this->runDir . '/' . $name . '/metadata.json',
-                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($filename)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($filename)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
             );
         }
 

@@ -1,7 +1,10 @@
 {
     "require": {
-        "mimmi20/browser-detector": "^5.0.0",
-        "roave/doctrine-simplecache": "^1.1.0",
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "mimmi20/browser-detector": "^5.0.85",
+        "psr/log": "^1.1.4",
+        "roave/doctrine-simplecache": "^2.4.0",
         "monolog/monolog": "^2.3.5"
     },
     "config": {

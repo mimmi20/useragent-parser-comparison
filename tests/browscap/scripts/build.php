@@ -70,10 +70,7 @@ foreach ($finder as $fixture) {
     }
 }
 
-// Get version from composer
-$package = new \PackageInfo\Package('browscap/browscap');
-
 echo json_encode([
     'tests'   => $tests,
-    'version' => $package->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version' => \Composer\InstalledVersions::getPrettyVersion('browscap/browscap'),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

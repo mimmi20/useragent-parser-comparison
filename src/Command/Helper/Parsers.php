@@ -44,7 +44,7 @@ class Parsers extends Helper
                     $contents = file_get_contents($parserDir->getPathname() . '/metadata.json');
 
                     try {
-                        $metadata = json_decode($contents, true);
+                        $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                     } catch (Exception $e) {
                         $output->writeln('<error>An error occured while parsing metadata for parser ' . $parserDir->getPathname() . '</error>');
                     }
@@ -70,7 +70,7 @@ class Parsers extends Helper
                         $result = trim($result);
 
                         try {
-                            $result = json_decode($result, true);
+                            $result = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
                         } catch (Exception $e) {
                             $output->writeln('<error>' . $result . $e . '</error>');
 
@@ -87,7 +87,7 @@ class Parsers extends Helper
                         $result = trim($result);
 
                         try {
-                            $result = json_decode($result, true);
+                            $result = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
                         } catch (Exception $e) {
                             $output->writeln('<error>' . $result . $e . '</error>');
 

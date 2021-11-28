@@ -3,5 +3,5 @@
     "language": "PHP",
     "local": true,
     "api": false,
-    "data_source": "endorphin-4"
+    "data_source": "endorphin"
 }

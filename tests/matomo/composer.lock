@@ -4,107 +4,76 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "13f73fa5fa3fb189c90256198be4c36c",
+    "content-hash": "45538558c7e43cf7576dbdae83bcbc1a",
     "packages": [
         {
-            "name": "daverandom/exceptional-json",
-            "version": "v1.0.4",
+            "name": "matomo/device-detector",
+            "version": "5.0.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/DaveRandom/ExceptionalJSON.git",
-                "reference": "fed957142b4687b079495c80975666dd1a67d61d"
+                "url": "https://github.com/matomo-org/device-detector.git",
+                "reference": "f7f0509f284bda14890909de53da9bb0f7494532"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DaveRandom/ExceptionalJSON/zipball/fed957142b4687b079495c80975666dd1a67d61d",
-                "reference": "fed957142b4687b079495c80975666dd1a67d61d",
+                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/f7f0509f284bda14890909de53da9bb0f7494532",
+                "reference": "f7f0509f284bda14890909de53da9bb0f7494532",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0"
+                "mustangostang/spyc": "*",
+                "php": ">=7.2"
+            },
+            "replace": {
+                "piwik/device-detector": "self.version"
+            },
+            "require-dev": {
+                "matthiasmullie/scrapbook": "^1.4.7",
+                "mayflower/mo4-coding-standard": "dev-master#275cb9d",
+                "phpstan/phpstan": "^0.12.52",
+                "phpunit/phpunit": "^8.5.8",
+                "psr/cache": "^1.0.1",
+                "psr/simple-cache": "^1.0.1",
+                "symfony/yaml": "^5.1.7"
+            },
+            "suggest": {
+                "doctrine/cache": "Can directly be used for caching purpose",
+                "ext-yaml": "Necessary for using the Pecl YAML parser"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "ExceptionalJSON\\": "src/"
+                    "DeviceDetector\\": ""
                 },
-                "files": [
-                    "src/functions.php"
+                "exclude-from-classmap": [
+                    "Tests/"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "MIT"
+                "LGPL-3.0-or-later"
             ],
             "authors": [
                 {
-                    "name": "Chris Wright"
+                    "name": "The Matomo Team",
+                    "email": "hello@matomo.org",
+                    "homepage": "https://matomo.org/team/"
                 }
             ],
-            "description": "JSON encoding and decoding that throws exceptions on failure",
+            "description": "The Universal Device Detection library, that parses User Agents and detects devices (desktop, tablet, mobile, tv, cars, console, etc.), clients (browsers, media players, mobile apps, feed readers, libraries, etc), operating systems, devices, brands and models.",
+            "homepage": "https://matomo.org",
+            "keywords": [
+                "devicedetection",
+                "parser",
+                "useragent"
+            ],
             "support": {
-                "issues": "https://github.com/DaveRandom/ExceptionalJSON/issues",
-                "source": "https://github.com/DaveRandom/ExceptionalJSON/tree/v1.0.4"
+                "forum": "https://forum.matomo.org/",
+                "issues": "https://github.com/matomo-org/device-detector/issues",
+                "source": "https://github.com/matomo-org/matomo",
+                "wiki": "https://dev.matomo.org/"
             },
-            "time": "2018-06-11T11:25:57+00:00"
-        },
-        {
-            "name": "mimmi20/json-class",
-            "version": "2.0.17",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mimmi20/json-class.git",
-                "reference": "b45b88efcfb481684bcde0345dbf631044f16af3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/b45b88efcfb481684bcde0345dbf631044f16af3",
-                "reference": "b45b88efcfb481684bcde0345dbf631044f16af3",
-                "shasum": ""
-            },
-            "require": {
-                "daverandom/exceptional-json": "~1.0.4",
-                "ext-json": "*",
-                "php": "^7.1.3 || ^8.0.0"
-            },
-            "require-dev": {
-                "infection/infection": "~0.13.6 || ~0.18 || ~0.20.2",
-                "mimmi20/coding-standard": "~1.0.9",
-                "pepakriz/phpstan-exception-rules": "~0.11.4",
-                "phpstan/extension-installer": "~1.1.0",
-                "phpstan/phpstan": "~0.12.68",
-                "phpstan/phpstan-deprecation-rules": "~0.12.6",
-                "phpstan/phpstan-phpunit": "~0.12.17",
-                "phpunit/phpunit": "~7.5.20 || ~8.5.13 || ~9.5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "JsonClass\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Thomas Müller",
-                    "homepage": "https://github.com/mimmi20",
-                    "role": "Developer"
-                },
-                {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/mimmi20/json-class/graphs/contributors"
-                }
-            ],
-            "description": "Class wrapper for daverandom/exceptional-json",
-            "homepage": "https://github.com/mimmi20/json-class",
-            "support": {
-                "issues": "https://github.com/mimmi20/json-class/issues",
-                "source": "https://github.com/mimmi20/json-class"
-            },
-            "time": "2021-01-19T10:14:50+00:00"
+            "time": "2021-11-12T08:08:31+00:00"
         },
         {
             "name": "mustangostang/spyc",
@@ -157,86 +126,21 @@
             "time": "2019-09-10T13:16:29+00:00"
         },
         {
-            "name": "piwik/device-detector",
-            "version": "3.13.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/matomo-org/device-detector.git",
-                "reference": "e90533302c58acf41f0d8075a0151537d0ddf34d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/e90533302c58acf41f0d8075a0151537d0ddf34d",
-                "reference": "e90533302c58acf41f0d8075a0151537d0ddf34d",
-                "shasum": ""
-            },
-            "require": {
-                "mustangostang/spyc": "*",
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "fabpot/php-cs-fixer": "~1.7",
-                "matthiasmullie/scrapbook": "@stable",
-                "phpunit/phpunit": "^4.8.36",
-                "psr/cache": "^1.0",
-                "psr/simple-cache": "^1.0"
-            },
-            "suggest": {
-                "doctrine/cache": "Can directly be used for caching purpose",
-                "ext-yaml": "Necessary for using the Pecl YAML parser"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "DeviceDetector\\": ""
-                },
-                "exclude-from-classmap": [
-                    "Tests/"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "LGPL-3.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "The Matomo Team",
-                    "email": "hello@matomo.org",
-                    "homepage": "https://matomo.org/team/"
-                }
-            ],
-            "description": "The Universal Device Detection library, that parses User Agents and detects devices (desktop, tablet, mobile, tv, cars, console, etc.), clients (browsers, media players, mobile apps, feed readers, libraries, etc), operating systems, devices, brands and models.",
-            "homepage": "https://matomo.org",
-            "keywords": [
-                "devicedetection",
-                "parser",
-                "useragent"
-            ],
-            "support": {
-                "forum": "http://forum.matomo.org/",
-                "issues": "https://github.com/matomo-org/device-detector/issues",
-                "source": "https://github.com/matomo-org/piwik",
-                "wiki": "https://dev.matomo.org/"
-            },
-            "abandoned": "matomo/device-detector",
-            "time": "2020-10-25T10:17:36+00:00"
-        },
-        {
             "name": "symfony/finder",
-            "version": "v4.4.30",
+            "version": "v5.3.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "70362f1e112280d75b30087c7598b837c1b468b6"
+                "reference": "a10000ada1e600d109a6c7632e9ac42e8bf2fb93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/70362f1e112280d75b30087c7598b837c1b468b6",
-                "reference": "70362f1e112280d75b30087c7598b837c1b468b6",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/a10000ada1e600d109a6c7632e9ac42e8bf2fb93",
+                "reference": "a10000ada1e600d109a6c7632e9ac42e8bf2fb93",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1.3",
+                "php": ">=7.2.5",
                 "symfony/polyfill-php80": "^1.16"
             },
             "type": "library",
@@ -265,7 +169,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v4.4.30"
+                "source": "https://github.com/symfony/finder/tree/v5.3.7"
             },
             "funding": [
                 {
@@ -281,7 +185,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-08-04T20:31:23+00:00"
+            "time": "2021-08-04T21:20:46+00:00"
         },
         {
             "name": "symfony/polyfill-php80",
@@ -373,7 +277,10 @@
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "^7.4.3",
+        "composer-runtime-api": "*"
+    },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
 }

@@ -1,6 +1,8 @@
 {
     "require": {
-        "matomo/device-detector": "^3.7.5"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "matomo/device-detector": "^3.13.1"
     },
     "config": {
         "preferred-install": "dist",

@@ -88,10 +88,7 @@ foreach ($finder as $file) {
     }
 }
 
-// Get version from composer
-$package = new \PackageInfo\Package('mimmi20/browser-detector');
-
 echo json_encode([
     'tests'   => $allTests,
-    'version' => $package->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version' => \Composer\InstalledVersions::getPrettyVersion('mimmi20/browser-detector'),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

@@ -1,5 +1,7 @@
 {
     "require": {
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
         "browscap/browscap-php": "^2.1.1"
     },
     "config": {

@@ -42,10 +42,7 @@ foreach ($provider->strings as $string) {
     }
 }
 
-// Get version from composer
-$package = new \PackageInfo\Package('sinergi/browser-detector');
-
 echo json_encode([
     'tests'   => $uas,
-    'version' => $package->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version' => \Composer\InstalledVersions::getPrettyVersion('sinergi/browser-detector'),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

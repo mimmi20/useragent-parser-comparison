@@ -59,13 +59,10 @@ if ($hasUa) {
 
 $memory = memory_get_peak_usage();
 
-// Get version from composer
-$package = new \PackageInfo\Package('browscap/browscap-php');
-
 echo json_encode([
     'result'      => $result,
     'parse_time'  => $parseTime,
     'init_time'   => $initTime,
     'memory_used' => $memory,
-    'version'     => $package->getVersion() . '-' . $browscap->getSourceVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('browscap/browscap-php') . '-' . $browscap->getSourceVersion(),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

@@ -1,7 +1,9 @@
 {
     "require": {
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
         "matomo/device-detector": "^5.0.0",
-        "symfony/finder": "^4.2.0"
+        "symfony/finder": "^v5.3.7"
     },
     "config": {
         "preferred-install": "dist",

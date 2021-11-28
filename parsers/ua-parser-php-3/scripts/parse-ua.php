@@ -57,9 +57,6 @@ if ($hasUa) {
 
 $memory = memory_get_peak_usage();
 
-// Get version from composer
-$package = new \PackageInfo\Package('ua-parser/uap-php');
-
 $regexVersion = file_get_contents(__DIR__ . '/../version.txt');
 
 echo json_encode([
@@ -67,5 +64,5 @@ echo json_encode([
     'parse_time'  => $parseTime,
     'init_time'   => $initTime,
     'memory_used' => $memory,
-    'version'     => $package->getVersion() . '-' . $regexVersion,
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('ua-parser/uap-php') . '-' . $regexVersion,
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

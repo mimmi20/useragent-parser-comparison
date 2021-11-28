@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ba6e05c217943cab586764c1e70c8e92",
+    "content-hash": "e7b9ac0e57e5f67d727a9e89600b64b8",
     "packages": [
         {
             "name": "daverandom/exceptional-json",
@@ -1307,31 +1307,33 @@
         },
         {
             "name": "roave/doctrine-simplecache",
-            "version": "1.1.0",
+            "version": "2.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/DoctrineSimpleCache.git",
-                "reference": "36f2839ee60ec03186efad48feb03dcf37af5648"
+                "reference": "486e2333cf2bf4cc92a9d33a7a5a2314b36c9222"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/DoctrineSimpleCache/zipball/36f2839ee60ec03186efad48feb03dcf37af5648",
-                "reference": "36f2839ee60ec03186efad48feb03dcf37af5648",
+                "url": "https://api.github.com/repos/Roave/DoctrineSimpleCache/zipball/486e2333cf2bf4cc92a9d33a7a5a2314b36c9222",
+                "reference": "486e2333cf2bf4cc92a9d33a7a5a2314b36c9222",
                 "shasum": ""
             },
             "require": {
-                "doctrine/cache": "^1.6",
-                "php": "~7.1.0",
+                "doctrine/cache": "^1.7",
+                "php": "^7.4 || ~8.0.0",
                 "psr/simple-cache": "^1.0"
             },
             "provide": {
                 "psr/simple-cache-implementation": "1.0"
             },
             "require-dev": {
-                "cache/integration-tests": "^0.15.0",
-                "cache/tag-interop": "^1.0@dev",
-                "humbug/humbug": "~1.0@dev",
-                "phpunit/phpunit": "^5.7"
+                "cache/integration-tests": "dev-master",
+                "cache/tag-interop": "dev-master",
+                "infection/infection": "^0.20.0",
+                "phpunit/phpunit": "^8.4",
+                "symfony/console": "^4.3",
+                "symfony/phpunit-bridge": "^4.4@dev"
             },
             "type": "library",
             "autoload": {
@@ -1355,9 +1357,9 @@
             "description": "Doctrine Cache adapter for PSR-16 Simple Cache",
             "support": {
                 "issues": "https://github.com/Roave/DoctrineSimpleCache/issues",
-                "source": "https://github.com/Roave/DoctrineSimpleCache/tree/master"
+                "source": "https://github.com/Roave/DoctrineSimpleCache/tree/2.4.0"
             },
-            "time": "2017-01-20T13:41:18+00:00"
+            "time": "2021-01-17T14:45:21+00:00"
         }
     ],
     "packages-dev": [],
@@ -1366,7 +1368,10 @@
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "^7.4.3",
+        "composer-runtime-api": "*"
+    },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
 }

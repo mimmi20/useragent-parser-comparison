@@ -116,7 +116,7 @@ class Analyze extends Command
         }
 
         try {
-            $this->options = json_decode($contents, true);
+            $this->options = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
         } catch (Exception $e) {
             $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
 
@@ -157,7 +157,7 @@ class Analyze extends Command
                 }
 
                 try {
-                    $expectedResults = json_decode($contents, true);
+                    $expectedResults = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                     $headerMessage   = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : ''));
                 } catch (Exception $e) {
                     $this->output->writeln(sprintf('<error>An error occured while parsing file (%s), skipping</error>', $expectedFilename));
@@ -175,7 +175,7 @@ class Analyze extends Command
                 }
 
                 try {
-                    $testResult    = json_decode($contents, true);
+                    $testResult    = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                     $headerMessage = sprintf('<fg=yellow>Parser comparison for %s file, using %s results as expected</>', $testName, array_keys($this->options['parsers'])[0]);
                 } catch (Exception $e) {
                     $this->output->writeln(sprintf('<error>An error occured while parsing metadata for run %s, skipping</error>', $run));
@@ -216,7 +216,7 @@ class Analyze extends Command
                 }
 
                 try {
-                    $testResult = json_decode($contents, true);
+                    $testResult = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Exception $e) {
                     $this->output->writeln(sprintf('<error>An error occured while parsing file (%s), skipping</error>', $fileName));
 

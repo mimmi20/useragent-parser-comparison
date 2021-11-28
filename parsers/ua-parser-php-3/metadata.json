@@ -3,5 +3,5 @@
     "language": "PHP",
     "local": true,
     "api": false,
-    "data_source": "uaparser"
+    "data_source": "ua-parser"
 }

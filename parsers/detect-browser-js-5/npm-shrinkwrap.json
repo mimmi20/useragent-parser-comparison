@@ -1,0 +1,13 @@
+{
+  "name": "detect-browser-js-5",
+  "version": "1.0.0",
+  "lockfileVersion": 1,
+  "requires": true,
+  "dependencies": {
+    "detect-browser": {
+      "version": "5.2.1",
+      "resolved": "https://registry.npmjs.org/detect-browser/-/detect-browser-5.2.1.tgz",
+      "integrity": "sha512-eAcRiEPTs7utXWPaAgu/OX1HRJpxW7xSHpw4LTDrGFaeWnJ37HRlqpUkKsDm0AoTbtrvHQhH+5U2Cd87EGhJTg=="
+    }
+  }
+}

@@ -49,10 +49,7 @@ foreach ($finder as $fixture) {
     }
 }
 
-// Get version from composer
-$package = new \PackageInfo\Package('woothee/woothee-testset');
-
 echo json_encode([
     'tests'   => $tests,
-    'version' => $package->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version' => \Composer\InstalledVersions::getPrettyVersion('woothee/woothee-testset'),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

@@ -69,13 +69,10 @@ $file = null;
 
 $memory = memory_get_peak_usage();
 
-// Get version from composer
-$package = new \PackageInfo\Package('zsxsoft/php-useragent');
-
 echo json_encode([
     'results'     => $results,
     'parse_time'  => $parseTime,
     'init_time'   => $initTime,
     'memory_used' => $memory,
-    'version'     => $package->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('zsxsoft/php-useragent'),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

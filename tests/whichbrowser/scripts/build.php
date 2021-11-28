@@ -105,10 +105,7 @@ foreach ($uas as $ua => $data) {
     }
 }
 
-// Get version from composer
-$package = new \PackageInfo\Package('whichbrowser/parser');
-
 echo json_encode([
     'tests'   => $tests,
-    'version' => $package->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    'version' => \Composer\InstalledVersions::getPrettyVersion('whichbrowser/parser'),
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

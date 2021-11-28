@@ -1,8 +1,10 @@
 {
     "require": {
-        "woothee/woothee-testset": "^1.4.0",
-        "mustangostang/spyc": "^0.6.1",
-        "symfony/finder": "^4.2.0"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "woothee/woothee-testset": "^v1.13.0",
+        "mustangostang/spyc": "^0.6.3",
+        "symfony/finder": "^v5.3.7"
     },
     "config": {
         "preferred-install": "dist",

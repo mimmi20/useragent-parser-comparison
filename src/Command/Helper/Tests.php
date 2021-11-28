@@ -6,9 +6,9 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use Exception;
 use FilesystemIterator;
-use function Safe\file_get_contents;
-use function Safe\json_decode;
-use function Safe\ksort;
+use function file_get_contents;
+use function json_decode;
+use function ksort;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\Table;
@@ -58,7 +58,7 @@ class Tests extends Helper
                 $contents = file_get_contents($testDir->getPathname() . '/metadata.json');
 
                 try {
-                    $metadata = json_decode($contents, true);
+                    $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Exception $e) {
                     $output->writeln('<error>An error occured while parsing metadata for test ' . $testDir->getPathname() . '</error>');
                     continue;

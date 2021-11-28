@@ -4,62 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79cfa51ec54a361745dd8b06c31538a7",
+    "content-hash": "5d30286caf97452e4d27d5cebbce2663",
     "packages": [
         {
-            "name": "daverandom/exceptional-json",
-            "version": "v1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/DaveRandom/ExceptionalJSON.git",
-                "reference": "fed957142b4687b079495c80975666dd1a67d61d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/DaveRandom/ExceptionalJSON/zipball/fed957142b4687b079495c80975666dd1a67d61d",
-                "reference": "fed957142b4687b079495c80975666dd1a67d61d",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "ExceptionalJSON\\": "src/"
-                },
-                "files": [
-                    "src/functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Wright"
-                }
-            ],
-            "description": "JSON encoding and decoding that throws exceptions on failure",
-            "support": {
-                "issues": "https://github.com/DaveRandom/ExceptionalJSON/issues",
-                "source": "https://github.com/DaveRandom/ExceptionalJSON/tree/v1.0.4"
-            },
-            "time": "2018-06-11T11:25:57+00:00"
-        },
-        {
             "name": "donatj/phpuseragentparser",
-            "version": "v0.9.0",
+            "version": "v0.20.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/donatj/PhpUserAgent.git",
-                "reference": "ea79de6a18e52285e62cd75cf1cebe276ecaf503"
+                "reference": "5992d7836868b408e73d0d490c779dda7a39135e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/donatj/PhpUserAgent/zipball/ea79de6a18e52285e62cd75cf1cebe276ecaf503",
-                "reference": "ea79de6a18e52285e62cd75cf1cebe276ecaf503",
+                "url": "https://api.github.com/repos/donatj/PhpUserAgent/zipball/5992d7836868b408e73d0d490c779dda7a39135e",
+                "reference": "5992d7836868b408e73d0d490c779dda7a39135e",
                 "shasum": ""
             },
             "require": {
@@ -68,12 +26,12 @@
             "require-dev": {
                 "camspiers/json-pretty": "0.1.*",
                 "donatj/drop": "*",
-                "phpunit/phpunit": "~4.8"
+                "phpunit/phpunit": "~4.8|~9"
             },
             "type": "library",
             "autoload": {
                 "files": [
-                    "Source/UserAgentParser.php"
+                    "src/UserAgentParser.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -84,12 +42,12 @@
                 {
                     "name": "Jesse G. Donat",
                     "email": "donatj@gmail.com",
-                    "homepage": "http://donatstudios.com",
+                    "homepage": "https://donatstudios.com",
                     "role": "Developer"
                 }
             ],
-            "description": "Simple, streamlined PHP user-agent parser",
-            "homepage": "http://donatstudios.com/PHP-Parser-HTTP_USER_AGENT",
+            "description": "Lightning fast, minimalist PHP UserAgent string parser.",
+            "homepage": "https://donatstudios.com/PHP-Parser-HTTP_USER_AGENT",
             "keywords": [
                 "browser",
                 "browser detection",
@@ -99,67 +57,19 @@
             ],
             "support": {
                 "issues": "https://github.com/donatj/PhpUserAgent/issues",
-                "source": "https://github.com/donatj/PhpUserAgent/tree/master"
+                "source": "https://github.com/donatj/PhpUserAgent/tree/v0.20.0"
             },
-            "time": "2017-10-23T16:52:52+00:00"
-        },
-        {
-            "name": "mimmi20/json-class",
-            "version": "2.0.17",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mimmi20/json-class.git",
-                "reference": "b45b88efcfb481684bcde0345dbf631044f16af3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/json-class/zipball/b45b88efcfb481684bcde0345dbf631044f16af3",
-                "reference": "b45b88efcfb481684bcde0345dbf631044f16af3",
-                "shasum": ""
-            },
-            "require": {
-                "daverandom/exceptional-json": "~1.0.4",
-                "ext-json": "*",
-                "php": "^7.1.3 || ^8.0.0"
-            },
-            "require-dev": {
-                "infection/infection": "~0.13.6 || ~0.18 || ~0.20.2",
-                "mimmi20/coding-standard": "~1.0.9",
-                "pepakriz/phpstan-exception-rules": "~0.11.4",
-                "phpstan/extension-installer": "~1.1.0",
-                "phpstan/phpstan": "~0.12.68",
-                "phpstan/phpstan-deprecation-rules": "~0.12.6",
-                "phpstan/phpstan-phpunit": "~0.12.17",
-                "phpunit/phpunit": "~7.5.20 || ~8.5.13 || ~9.5.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "JsonClass\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
+            "funding": [
                 {
-                    "name": "Thomas Müller",
-                    "homepage": "https://github.com/mimmi20",
-                    "role": "Developer"
+                    "url": "https://www.paypal.me/donatj/5",
+                    "type": "custom"
                 },
                 {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/mimmi20/json-class/graphs/contributors"
+                    "url": "https://github.com/donatj",
+                    "type": "github"
                 }
             ],
-            "description": "Class wrapper for daverandom/exceptional-json",
-            "homepage": "https://github.com/mimmi20/json-class",
-            "support": {
-                "issues": "https://github.com/mimmi20/json-class/issues",
-                "source": "https://github.com/mimmi20/json-class"
-            },
-            "time": "2021-01-19T10:14:50+00:00"
+            "time": "2021-03-16T16:42:25+00:00"
         }
     ],
     "packages-dev": [],
@@ -168,7 +78,10 @@
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": "^7.4.3",
+        "composer-runtime-api": "*"
+    },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"
 }

@@ -10,7 +10,3 @@ command -v "$composer_command" >/dev/null 2>&1 || {
 }
 
 $composer_command update
-
-./vendor/bin/uaparser ua-parser:update
-
-php ./scripts/getversion.php

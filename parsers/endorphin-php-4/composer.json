@@ -1,6 +1,8 @@
 {
     "require": {
-        "endorphin-studio/browser-detector": "^4.0.3"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "endorphin-studio/browser-detector": "^4.0.5"
     },
     "config": {
         "preferred-install": "dist",

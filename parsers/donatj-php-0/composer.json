@@ -1,6 +1,8 @@
 {
     "require": {
-        "donatj/phpuseragentparser": "^0.9.0"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "donatj/phpuseragentparser": "^v0.20.0"
     },
     "config": {
         "preferred-install": "dist",

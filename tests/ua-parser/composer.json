@@ -1,8 +1,9 @@
 {
     "require": {
-        "doctrine/cache": "^1.8.0",
-        "symfony/finder": "^4.2.0",
-        "symfony/yaml": "^4.2.0"
+        "php": "^7.4.3",
+        "doctrine/cache": "^2.1.1",
+        "symfony/finder": "^v5.3.7",
+        "symfony/yaml": "^v5.3.11"
     },
     "config": {
         "preferred-install": "dist",

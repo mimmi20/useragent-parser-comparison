@@ -58,9 +58,9 @@ class Test extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws \Safe\Exceptions\ArrayException
-     * @throws \Safe\Exceptions\FilesystemException
-     * @throws \Safe\Exceptions\JsonException
+     * @throws \Exceptions\ArrayException
+     * @throws \Exceptions\FilesystemException
+     * @throws \Exceptions\JsonException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -133,27 +133,27 @@ class Test extends Command
         $usedTests = [];
 
         foreach ($selectedTests as $testName => $testData) {
-            $message = sprintf('Generating data for the <fg=yellow>%s</> test suite... ', $testName);
+            $message = sprintf('Generating data for the <fg=yellow>%s</> test suite', $testName);
 
-            $output->write($message . '<info> building test suite</info>');
+            $output->write($message . ' <info>building test suite</info>');
             $this->results[$testName] = [];
 
             $testOutput = trim((string) shell_exec($testData['path'] . '/build.sh'));
 
-            $output->write("\r" . $message . '<info> writing test suite</info>    ');
+            $output->write("\r" . $message . ' <info>writing test suite</info>');
 
             file_put_contents($expectedDir . '/' . $testName . '.json', $testOutput);
 
             try {
-                $testOutput = json_decode($testOutput, true);
+                $testOutput = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
             } catch (Exception $e) {
-                $output->writeln("\r" . $message . '<error>There was an error with the output from the ' . $testName . ' test suite.</error>');
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the ' . $testName . ' test suite.</error>');
 
                 continue;
             }
 
-            if ($testOutput['tests'] === null) {
-                $output->writeln("\r" . $message . '<error>There was an error with the output from the ' . $testName . ' test suite, no tests were found.</error>');
+            if ($testOutput['tests'] === null || $testOutput['tests'] === []) {
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the ' . $testName . ' test suite, no tests were found.</error>');
                 continue;
             }
 
@@ -161,7 +161,7 @@ class Test extends Command
                 $testData['metadata']['version'] = $testOutput['version'];
             }
 
-            $output->write("\r" . $message . '<info>  write test data into file...</info>');
+            $output->write("\r" . $message . ' <info>write test data into file...</info>');
 
             if ($input->getOption('single-ua')) {
                 $result     = [];
@@ -177,7 +177,7 @@ class Test extends Command
 
                     $agent = addcslashes($agent, PHP_EOL);
 
-                    $message = sprintf(
+                    $testMessage = sprintf(
                         '%s[%s/%s] Testing UA <fg=yellow>%s</> ',
                         '  ',
                         str_pad((string) $actualTest, mb_strlen($countTests), ' ', STR_PAD_LEFT),
@@ -185,7 +185,7 @@ class Test extends Command
                         $agent
                     );
 
-                    $output->write($message);
+                    $output->write($testMessage);
 
                     foreach ($parsers as $parserName => $parser) {
                         if (!array_key_exists($parserName, $result)) {
@@ -198,11 +198,11 @@ class Test extends Command
                             ];
                         }
 
-                        $output->write("\r" . str_pad($message . '<info> against the <fg=green;options=bold,underscore>' . $parserName . '</> parser... </info>', 285));
+                        $output->write("\r" . str_pad($testMessage . ' <info>against the <fg=green;options=bold,underscore>' . $parserName . '</> parser... </info>', 285));
                         $singleResult = $parser['parse-ua']($agent);
 
                         if (empty($singleResult)) {
-                            $output->writeln("\r" . $message . '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>');
+                            $output->writeln("\r" . $testMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>');
 
                             continue;
                         }
@@ -229,7 +229,7 @@ class Test extends Command
                         $result[$parserName]['version'] = $singleResult['version'];
                     }
 
-                    $output->writeln("\r" . str_pad($message . '<info> done!</info>', 245));
+                    $output->writeln("\r" . str_pad($testMessage . ' <info>done!</info>', 245));
                 }
 
                 foreach (array_keys($parsers) as $parserName) {
@@ -247,13 +247,13 @@ class Test extends Command
 
                     file_put_contents(
                         $resultsDir . '/' . $parserName . '/' . $testName . '.json',
-                        json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                        json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
                     );
 
                     $usedTests[$testName] = $testData;
                 }
             } else {
-                $output->write('write test data for the ' . $testName . ' test suite into file... ');
+                $output->write("\r" . $message . ' <info>write test data for the ' . $testName . ' test suite into file...</info>');
                 // write our test's file that we'll pass to the parsers
                 $filename = $testFilesDir . '/' . $testName . '.txt';
 
@@ -268,11 +268,11 @@ class Test extends Command
                 });
 
                 file_put_contents($filename, implode(PHP_EOL, $agents));
-                $output->writeln("\r" . $message . '<info>  done! [' . count($agents) . ' tests found]</info>       ');
+                $output->writeln("\r" . $message . ' <info>done! [' . count($agents) . ' tests found]</info>');
 
                 foreach ($parsers as $parserName => $parser) {
-                $testMessage = sprintf('  Testing against the <fg=green;options=bold,underscore>%s</> parser...', $parserName);
-                $output->write($testMessage . ' <info> parsing</info>');
+                    $testMessage = sprintf(' Testing against the <fg=green;options=bold,underscore>%s</> parser...', $parserName);
+                    $output->write($testMessage . ' <info> parsing</info>');
 
                     $result = $parser['parse']($filename);
 
@@ -295,7 +295,7 @@ class Test extends Command
                     try {
                         $encoded = json_encode(
                             $result,
-                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
                         );
                     } catch (Exception $e) {
                     $output->writeln("\r" . $testMessage . ' <error>encoding the result failed!</error>');
@@ -306,7 +306,7 @@ class Test extends Command
                         $resultsDir . '/' . $parserName . '/' . $testName . '.json',
                         $encoded
                     );
-                $output->writeln("\r" . $testMessage . ' <info>done!</info>                                                                                 ');
+                    $output->writeln("\r" . $testMessage . ' <info>done!</info>                                                                                 ');
 
                     $usedTests[$testName] = $testData;
                 }
@@ -316,7 +316,7 @@ class Test extends Command
         try {
             $encoded = json_encode(
                 ['tests' => $usedTests, 'parsers' => $parsers, 'date' => time()],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
             );
         } catch (Exception $e) {
             $output->writeln('<error>Encoding result metadata failed for the ' . $thisRunDirName . ' directory</error>');
@@ -350,7 +350,7 @@ class Test extends Command
                 }
 
                 try {
-                    $metadata = json_decode($contents, true);
+                    $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Exception $e) {
                     $output->writeln('<error>An error occured while parsing results for the ' . $testDir->getPathname() . ' test suite</error>');
 

@@ -1,6 +1,8 @@
 {
     "require": {
-        "jenssegers/agent": "^2.4.0"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "jenssegers/agent": "^v2.6.4"
     },
     "config": {
         "preferred-install": "dist",

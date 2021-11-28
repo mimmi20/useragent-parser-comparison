@@ -1,7 +1,0 @@
-{
-    "name": "Crossjoin Browscap 3.x",
-    "language": "PHP",
-    "local": true,
-    "api": false,
-    "data_source": "browscap"
-}

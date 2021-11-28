@@ -1,6 +1,8 @@
 {
     "require": {
-        "wolfcast/browser-detection": "^2.5.0"
+        "php": "^7.4.3",
+        "composer-runtime-api": "*",
+        "wolfcast/browser-detection": "^2.9.5"
     },
     "config": {
         "preferred-install": "dist",
