@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2840fd8948fde4794a5ff620cf85c161",
+    "content-hash": "55fb7eb7dc409dc308cde6bdb9ecc1df",
     "packages": [
         {
             "name": "daverandom/exceptional-json",
@@ -50,30 +50,26 @@
         },
         {
             "name": "endorphin-studio/browser-detector",
-            "version": "4.0.2",
+            "version": "6.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/endorphin-studio/browser-detector.git",
-                "reference": "bb5e2d34917e98fd4a1214e146bb2ec64390bc13"
+                "reference": "b8ef95bd9483c065be03e6d02837599f4bb290db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/endorphin-studio/browser-detector/zipball/bb5e2d34917e98fd4a1214e146bb2ec64390bc13",
-                "reference": "bb5e2d34917e98fd4a1214e146bb2ec64390bc13",
+                "url": "https://api.github.com/repos/endorphin-studio/browser-detector/zipball/b8ef95bd9483c065be03e6d02837599f4bb290db",
+                "reference": "b8ef95bd9483c065be03e6d02837599f4bb290db",
                 "shasum": ""
             },
             "require": {
-                "endorphin-studio/browser-detector-data": ">=1.0.0a",
-                "endorphin-studio/browser-detector-detection": ">=1.0.0",
-                "endorphin-studio/browser-detector-tools": ">=1.0.0",
+                "endorphin-studio/browser-detector-data": "^1.2",
+                "endorphin-studio/browser-detector-detection": "^2.1",
+                "endorphin-studio/browser-detector-tools": "^1.2",
                 "php": ">=7.0"
             },
             "require-dev": {
-                "endorphin-studio/browser-detector-data": ">=1.0.0a",
-                "endorphin-studio/browser-detector-detection": ">=1.0.0",
-                "endorphin-studio/browser-detector-tools": ">=1.0.0",
-                "phpunit/phpunit": "^6.5.11",
-                "twig/twig": "^2.5.0"
+                "endorphin-studio/browser-detector-tests": "^2.2 || ^3.1"
             },
             "type": "library",
             "autoload": {
@@ -83,12 +79,12 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-3.0+"
+                "MIT"
             ],
             "authors": [
                 {
                     "name": "Serhii Nekhaienko",
-                    "email": "sergey.nekhaenko@gmail.com"
+                    "email": "serhii.nekhaienko@gmail.com"
                 }
             ],
             "description": "Detect user Browser, OS and Device through Browser USER AGENT",
@@ -100,9 +96,9 @@
             ],
             "support": {
                 "issues": "https://github.com/endorphin-studio/browser-detector/issues",
-                "source": "https://github.com/endorphin-studio/browser-detector/tree/4.0"
+                "source": "https://github.com/endorphin-studio/browser-detector/tree/6.0.1"
             },
-            "time": "2018-10-18T09:11:25+00:00"
+            "time": "2021-06-02T05:41:29+00:00"
         },
         {
             "name": "endorphin-studio/browser-detector-data",
