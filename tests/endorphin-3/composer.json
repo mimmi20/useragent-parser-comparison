@@ -1,6 +1,6 @@
 {
     "require": {
-        "endorphin-studio/browser-detector": "^3.0.0",
+        "endorphin-studio/browser-detector": "^6.0.1",
         "symfony/finder": "^5.3.7"
     },
     "config": {
