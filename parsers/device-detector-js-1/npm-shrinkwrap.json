@@ -5,37 +5,9 @@
   "requires": true,
   "dependencies": {
     "device-detector-js": {
-      "version": "1.1.1",
-      "resolved": "https://registry.npmjs.org/device-detector-js/-/device-detector-js-1.1.1.tgz",
-      "integrity": "sha512-5WEK8GDH6qGLkOpHn362emYJ2Tk5Auk8anj77HLd9yfiFmZNto1wb9ysfSYbKlhesGBdjPQ8tU1fLk9RxcLLlQ==",
-      "requires": {
-        "lodash": "^4.17.11",
-        "lru-cache": "4.1.3"
-      }
-    },
-    "lodash": {
-      "version": "4.17.15",
-      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.15.tgz",
-      "integrity": "sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A=="
-    },
-    "lru-cache": {
-      "version": "4.1.3",
-      "resolved": "https://registry.npmjs.org/lru-cache/-/lru-cache-4.1.3.tgz",
-      "integrity": "sha512-fFEhvcgzuIoJVUF8fYr5KR0YqxD238zgObTps31YdADwPPAp82a4M8TrckkWyx7ekNlf9aBcVn81cFwwXngrJA==",
-      "requires": {
-        "pseudomap": "1.0.2",
-        "yallist": "2.1.2"
-      }
-    },
-    "pseudomap": {
-      "version": "1.0.2",
-      "resolved": "https://registry.npmjs.org/pseudomap/-/pseudomap-1.0.2.tgz",
-      "integrity": "sha1-8FKijacOYYkX7wqKw0wa5aaChrM="
-    },
-    "yallist": {
-      "version": "2.1.2",
-      "resolved": "https://registry.npmjs.org/yallist/-/yallist-2.1.2.tgz",
-      "integrity": "sha1-HBH5IY8HYImkfdUS+TxmmaaoHVI="
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/device-detector-js/-/device-detector-js-3.0.0.tgz",
+      "integrity": "sha512-bmdq9JZano9y2uor1VT4/g0rfN29hVnU1q0g8sgxtMGF9/UBaEBEeN/o0K4sEy8LIga9yIdmyXSaa04ncUBsoQ=="
     }
   }
 }
