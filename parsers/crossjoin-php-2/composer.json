@@ -1,6 +1,6 @@
 {
     "require": {
-        "crossjoin/browscap": "^2.0.0",
+        "crossjoin/browscap": "^3.0.5",
         "ext-sqlite3": "*"
     },
     "config": {
