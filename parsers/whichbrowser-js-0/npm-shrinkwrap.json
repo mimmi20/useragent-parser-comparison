@@ -5,9 +5,9 @@
   "requires": true,
   "dependencies": {
     "which-browser": {
-      "version": "0.2.9",
-      "resolved": "https://registry.npmjs.org/which-browser/-/which-browser-0.2.9.tgz",
-      "integrity": "sha512-5rFGxmfBizQSej8ru/jvbeDTl74n2HCOeEoGLFT9HuGkFwvsjCgKxvNLX8wA7lIhdj3PIxmaKfY1shsf8HvXQw=="
+      "version": "0.5.1",
+      "resolved": "https://registry.npmjs.org/which-browser/-/which-browser-0.5.1.tgz",
+      "integrity": "sha512-MulGxP+e6dN62chtrKRPRftpyAqt870E8KtonNRwuOn5hilWkNW4MUbsXxNy1IdyrPD8xKKFLqLbuYV1pOIi4Q=="
     }
   }
 }
