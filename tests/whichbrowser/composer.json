@@ -1,7 +1,7 @@
 {
     "require": {
         "whichbrowser/parser": "^2.0.0",
-        "symfony/finder": "^4.2.0",
+        "symfony/finder": "^5.3.7",
         "symfony/yaml": "^5.3.11"
     },
     "config": {
