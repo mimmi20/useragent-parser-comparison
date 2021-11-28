@@ -1,6 +1,6 @@
 {
     "require": {
-        "browscap/browscap": "^6.0.29",
+        "browscap/browscap": "^6028",
         "symfony/finder": "^5.3.7"
     },
     "config": {
