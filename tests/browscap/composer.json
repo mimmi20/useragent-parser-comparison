@@ -1,7 +1,7 @@
 {
     "require": {
         "browscap/browscap": "^6.0.29",
-        "symfony/finder": "^4.2.0"
+        "symfony/finder": "^5.3.7"
     },
     "config": {
         "preferred-install": "dist",
