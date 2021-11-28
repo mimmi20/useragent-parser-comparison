@@ -1,6 +1,6 @@
 {
     "require": {
-        "mimmi20/browser-detector": "^5.0.0",
+        "mimmi20/browser-detector": "^6.0.6",
         "symfony/finder": "^4.1.0"
     },
     "autoload": {
