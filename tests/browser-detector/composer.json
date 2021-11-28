@@ -1,7 +1,7 @@
 {
     "require": {
         "mimmi20/browser-detector": "^5.0.0",
-        "symfony/finder": "^4.1.0"
+        "symfony/finder": "^5.3.7"
     },
     "autoload": {
         "files": ["scripts/ResultFactory.php"]
