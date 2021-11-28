@@ -1,7 +1,7 @@
 {
     "require": {
         "ua-parser/uap-php": "^3.4.6",
-        "mimmi20/json-class": "~2.0.1",
+        "mimmi20/json-class": "~4.0.0",
         "symfony/yaml": "^4.2.0",
         "symfony/filesystem": "^4.2.0",
         "symfony/finder": "^4.2.0",
