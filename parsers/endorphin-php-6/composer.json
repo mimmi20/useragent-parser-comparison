@@ -2,7 +2,10 @@
     "require": {
         "php": "^7.4.3",
         "composer-runtime-api": "*",
-        "endorphin-studio/browser-detector": "^6.0.1"
+        "endorphin-studio/browser-detector": "^6.0.1",
+        "symfony/finder": "^v5.4.0",
+        "symfony/http-foundation": "^v5.4.0",
+        "symfony/yaml": "^v5.4.0"
     },
     "config": {
         "preferred-install": "dist",

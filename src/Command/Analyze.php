@@ -233,11 +233,18 @@ class Analyze extends Command
                 $possibleScores[$parserName][$testName] = 0;
 
                 foreach ($testResult['results'] as $data) {
-                    $expected = $expectedResults['tests'][$data['useragent']];
+                    if (!array_key_exists('useragent', $data) || !array_key_exists('parsed', $data)) {
+                        continue;
+                    }
 
-                    $comparison = new Comparison($expected, $data['parsed']);
+                    $expected   = $expectedResults['tests'][$data['useragent']] ?? [];
+                    $comparison = new Comparison($expected, $data['parsed'] ?? []);
 
                     foreach (['browser', 'platform', 'device'] as $compareKey) {
+                        if (!array_key_exists($compareKey, $expected) || !array_key_exists($compareKey, $data['parsed'])) {
+                            continue;
+                        }
+
                         $score         = $this->calculateScore($expected[$compareKey], $data['parsed'][$compareKey]);
                         $possibleScore = $this->calculateScore($expected[$compareKey], $data['parsed'][$compareKey], true);
 
@@ -248,7 +255,7 @@ class Analyze extends Command
                         $possibleScores[$parserName][$testName] += $possibleScore;
                     }
 
-                    $this->comparison[$testName] = $comparison->getComparison($parserName, $this->agents[$data['useragent']]);
+                    $this->comparison[$testName] = $comparison->getComparison($parserName, $this->agents[$data['useragent']] ?? 0);
                     $failures = $comparison->getFailures();
 
                     if (!empty($failures)) {

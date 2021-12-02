@@ -133,7 +133,7 @@ class Test extends Command
         $usedTests = [];
 
         foreach ($selectedTests as $testName => $testData) {
-            $message = sprintf('Generating data for the <fg=yellow>%s</> test suite', $testName);
+            $message = sprintf('Test suite <fg=yellow>%s</>', $testName);
 
             $output->write($message . ' <info>building test suite</info>');
             $this->results[$testName] = [];
@@ -161,14 +161,19 @@ class Test extends Command
                 $testData['metadata']['version'] = $testOutput['version'];
             }
 
-            $output->write("\r" . $message . ' <info>write test data into file...</info>');
-
             if ($input->getOption('single-ua')) {
+                if (is_array($testOutput['tests'])) {
+                    $agents = array_keys($testOutput['tests']);
+                } else {
+                    $agents = [];
+                }
+
+                $output->writeln("\r" . $message . ' <info>build done! [' . count($agents) . ' tests found]</info>');
                 $result     = [];
-                $countTests = (string) count($testOutput['tests']);
+                $countTests = (string) count($agents);
                 $actualTest = 0;
 
-                foreach (array_keys($testOutput['tests']) as $agent) {
+                foreach ($agents as $agent) {
                     ++$actualTest;
 
                     if (is_int($agent)) {
@@ -177,15 +182,25 @@ class Test extends Command
 
                     $agent = addcslashes($agent, PHP_EOL);
 
-                    $testMessage = sprintf(
-                        '%s[%s/%s] Testing UA <fg=yellow>%s</> ',
-                        '  ',
-                        str_pad((string) $actualTest, mb_strlen($countTests), ' ', STR_PAD_LEFT),
-                        $countTests,
-                        $agent
+                    $output->writeln(
+                        sprintf(
+                            '%s[%s/%s] UA: <fg=yellow>%s</>',
+                            '  ',
+                            str_pad((string) $actualTest, mb_strlen($countTests), ' ', STR_PAD_LEFT),
+                            $countTests,
+                            $agent
+                        )
                     );
 
-                    $output->write($testMessage);
+                    $basicTestMessage = sprintf(
+                        '%s[%s/%s] Testing',
+                        '  ',
+                        str_pad((string) $actualTest, mb_strlen($countTests), ' ', STR_PAD_LEFT),
+                        $countTests
+                    );
+
+                    $output->write($basicTestMessage);
+                    $textLength = mb_strlen($basicTestMessage);
 
                     foreach ($parsers as $parserName => $parser) {
                         if (!array_key_exists($parserName, $result)) {
@@ -198,11 +213,24 @@ class Test extends Command
                             ];
                         }
 
-                        $output->write("\r" . str_pad($testMessage . ' <info>against the <fg=green;options=bold,underscore>' . $parserName . '</> parser... </info>', 285));
+                        $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser...';
+
+                        if (mb_strlen($testMessage) > $textLength) {
+                            $textLength = mb_strlen($testMessage);
+                        }
+
+                        $output->write("\r" . str_pad($testMessage, $textLength));
+
                         $singleResult = $parser['parse-ua']($agent);
 
                         if (empty($singleResult)) {
-                            $output->writeln("\r" . $testMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>');
+                            $testMessage = $basicTestMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>';
+
+                            if (mb_strlen($testMessage) > $textLength) {
+                                $textLength = mb_strlen($testMessage);
+                            }
+
+                            $output->writeln("\r" . str_pad($testMessage, $textLength));
 
                             continue;
                         }
@@ -229,7 +257,13 @@ class Test extends Command
                         $result[$parserName]['version'] = $singleResult['version'];
                     }
 
-                    $output->writeln("\r" . str_pad($testMessage . ' <info>done!</info>', 245));
+                    $testMessage = $basicTestMessage . ' <info>done!</info>';
+
+                    if (mb_strlen($testMessage) > $textLength) {
+                        $textLength = mb_strlen($testMessage);
+                    }
+
+                    $output->writeln("\r" . str_pad($testMessage, $textLength));
                 }
 
                 foreach (array_keys($parsers) as $parserName) {
@@ -253,7 +287,8 @@ class Test extends Command
                     $usedTests[$testName] = $testData;
                 }
             } else {
-                $output->write("\r" . $message . ' <info>write test data for the ' . $testName . ' test suite into file...</info>');
+                $output->write("\r" . $message . ' <info>write test data into file...</info>');
+
                 // write our test's file that we'll pass to the parsers
                 $filename = $testFilesDir . '/' . $testName . '.txt';
 
@@ -268,17 +303,17 @@ class Test extends Command
                 });
 
                 file_put_contents($filename, implode(PHP_EOL, $agents));
-                $output->writeln("\r" . $message . ' <info>done! [' . count($agents) . ' tests found]</info>');
+                $output->writeln("\r" . $message . ' <info>build done! [' . count($agents) . ' tests found]</info>');
 
                 foreach ($parsers as $parserName => $parser) {
-                    $testMessage = sprintf(' Testing against the <fg=green;options=bold,underscore>%s</> parser...', $parserName);
-                    $output->write($testMessage . ' <info> parsing</info>');
+                    $basicTestMessage = sprintf(' Testing against the <fg=green;options=bold,underscore>%s</> parser...', $parserName);
+                    $output->write($basicTestMessage . ' <info> parsing</info>');
 
                     $result = $parser['parse']($filename);
 
                     if (empty($result)) {
                         $output->writeln(
-                        "\r" . $testMessage . ' <error>The parser did not return any data, there may have been an error</error>'
+                        "\r" . $basicTestMessage . ' <error>The parser did not return any data, there may have been an error</error>'
                         );
 
                         continue;
@@ -298,7 +333,7 @@ class Test extends Command
                             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
                         );
                     } catch (Exception $e) {
-                    $output->writeln("\r" . $testMessage . ' <error>encoding the result failed!</error>');
+                    $output->writeln("\r" . $basicTestMessage . ' <error>encoding the result failed!</error>');
                         continue;
                     }
 
@@ -306,7 +341,7 @@ class Test extends Command
                         $resultsDir . '/' . $parserName . '/' . $testName . '.json',
                         $encoded
                     );
-                    $output->writeln("\r" . $testMessage . ' <info>done!</info>                                                                                 ');
+                    $output->writeln("\r" . $basicTestMessage . ' <info>done!</info>                                                                                 ');
 
                     $usedTests[$testName] = $testData;
                 }
