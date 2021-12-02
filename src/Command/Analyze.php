@@ -326,7 +326,7 @@ class Analyze extends Command
         }
 
         if (count($this->options['tests']) > 1) {
-            $rows[] = [new TableCell('<fg=yellow>Total for all Test suites</>', ['colspan' => 6])];
+            $rows[] = [new TableCell('<fg=yellow>Total for all Test suites</>', ['colspan' => 7])];
             $rows[] = new TableSeparator();
 
             foreach ($totals as $parser => $total) {
@@ -882,7 +882,7 @@ class Analyze extends Command
     private function colorByPercent(float $percent): string
     {
         if ($percent >= 100.0) {
-            return '<fg=green;bg=black;options=bold>';
+            return '<fg=bright-green;bg=black>';
         }
 
         if ($percent >= 95.0) {
@@ -890,7 +890,7 @@ class Analyze extends Command
         }
 
         if ($percent >= 90.0) {
-            return '<fg=yellow;bg=black;options=bold>';
+            return '<fg=bright-yellow;bg=black>';
         }
 
         if ($percent >= 85.0) {
@@ -901,6 +901,6 @@ class Analyze extends Command
             return '<fg=red;bg=black>';
         }
 
-        return '</>';
+        return '<fg=white;bg=black>';
     }
 }
