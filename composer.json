@@ -1,20 +1,15 @@
 {
     "name": "diablomedia/useragent-parser-comparison",
-    "type": "library",
     "description": "project to compare some useragent parsers",
-    "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
     "license": "MIT",
+    "type": "library",
+    "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
     "require": {
-        "ext-json": "*",
-        "ext-simplexml": "*",
-        "ext-mbstring": "*",
         "php": "^7.4.3 || ^8.0.0",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-simplexml": "*",
         "symfony/console": "^v5.3.11"
-    },
-    "autoload": {
-        "psr-4": {
-            "UserAgentParserComparison\\": "src/"
-        }
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^3.7.0",
@@ -22,21 +17,25 @@
         "phpstan/extension-installer": "^1.1.0",
         "phpstan/phpstan": "^1.2.0",
         "phpstan/phpstan-deprecation-rules": "^1.0.0",
-        "rector/rector": "^0.12.5",
         "vimeo/psalm": "^4.14.0"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "UserAgentParserComparison\\": "src/"
+        }
     },
     "config": {
         "preferred-install": "dist",
         "sort-packages": true
     },
     "scripts": {
-        "phpstan": "phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress",
-        "psalm": "psalm --show-info=false",
         "php-cs-fixer-check": "php-cs-fixer fix --dry-run -vv",
         "php-cs-fixer-fix": "php-cs-fixer fix -vv",
+        "phpstan": "phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress",
         "prettier-check": "yarn run prettier -l \"**/*.js\"",
-        "prettier-fix": "yarn run prettier --write \"**/*.js\""
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
+        "prettier-fix": "yarn run prettier --write \"**/*.js\"",
+        "psalm": "psalm --show-info=false"
+    }
 }

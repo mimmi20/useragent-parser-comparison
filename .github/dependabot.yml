@@ -45,15 +45,7 @@ updates:
       - "dependencies"
     versioning-strategy: increase
     commit-message:
-      include: "scope"
-      prefix: "composer"
-  #    ignore:
-  #      - dependency-name: infection/infection
-  #        versions:
-  #          - ">= 0"
-  #      - dependency-name: phpunit/phpunit
-  #        versions:
-  #          - ">= 0"
+      prefix: "npm"
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -70,5 +62,4 @@ updates:
     labels:
       - "dependencies"
     commit-message:
-      include: "scope"
       prefix: "github-actions"
