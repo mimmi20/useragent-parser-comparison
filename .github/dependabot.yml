@@ -29,6 +29,222 @@ updates:
 #        versions:
 #          - ">= 0"
 
+  - package-ecosystem: "composer"
+    directory: "tests/browscap/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/browscap"
+
+  - package-ecosystem: "composer"
+    directory: "tests/browser-detector/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/browser-detector"
+
+  - package-ecosystem: "composer"
+    directory: "tests/curated/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/curated"
+
+  - package-ecosystem: "composer"
+    directory: "tests/donatj/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/donatj"
+
+  - package-ecosystem: "composer"
+    directory: "tests/endorphin/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/endorphin"
+
+  - package-ecosystem: "composer"
+    directory: "tests/matomo/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/matomo"
+
+  - package-ecosystem: "composer"
+    directory: "tests/sinergi/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/sinergi"
+
+  - package-ecosystem: "composer"
+    directory: "tests/ua-parser/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/ua-parser"
+
+  - package-ecosystem: "composer"
+    directory: "tests/ua-parser-js/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/ua-parser-js"
+
+  - package-ecosystem: "composer"
+    directory: "tests/whichbrowser/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/whichbrowser"
+
+  - package-ecosystem: "composer"
+    directory: "tests/woothee/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/woothee"
+
+  - package-ecosystem: "composer"
+    directory: "tests/zsxsoft/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "composer/tests/zsxsoft"
+
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
@@ -46,6 +262,96 @@ updates:
     versioning-strategy: increase
     commit-message:
       prefix: "npm"
+
+  - package-ecosystem: "npm"
+    directory: "tests/ua-parser/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "npm/tests/ua-parser"
+
+  - package-ecosystem: "npm"
+    directory: "tests/ua-parser-js/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "npm/tests/ua-parser-js"
+
+  - package-ecosystem: "npm"
+    directory: "parsers/3rd-eden-useragent-js-2/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "npm/parsers/3rd-eden-useragent-js-2"
+
+  - package-ecosystem: "npm"
+    directory: "parsers/bowser-js-2/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "npm/parsers/bowser-js-2"
+
+  - package-ecosystem: "npm"
+    directory: "parsers/browser-detect-js-0/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "05:30"
+      timezone: "Europe/Berlin"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "mimmi20"
+    assignees:
+      - "mimmi20"
+    labels:
+      - "dependencies"
+    versioning-strategy: increase
+    commit-message:
+      prefix: "npm/parsers/browser-detect-js-0"
 
   - package-ecosystem: "github-actions"
     directory: "/"
