@@ -50,7 +50,6 @@ class Test extends Command
         $this->setName('test')
             ->setDescription('Runs test against the parsers')
             ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run, if omitted will be generated from date')
-            ->addOption('single-ua', null, InputOption::VALUE_NONE, 'parses one useragent after another')
             ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
     }
 
@@ -58,13 +57,15 @@ class Test extends Command
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return int
-     * @throws \Exceptions\ArrayException
-     * @throws \Exceptions\FilesystemException
-     * @throws \Exceptions\JsonException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->collectTests($output);
+        /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
+        $testHelper = $this->getHelper('tests');
+
+        foreach ($testHelper->collectTests($output) as $testPath => $testData) {
+            $this->tests[$testPath] = $testData;
+        }
 
         $rows = [];
 
@@ -133,218 +134,121 @@ class Test extends Command
         $usedTests = [];
 
         foreach ($selectedTests as $testName => $testData) {
-            $message = sprintf('Test suite <fg=yellow>%s</>', $testName);
+            $result     = [];
+            $actualTest = 0;
 
-            $output->write($message . ' <info>building test suite</info>');
-            $this->results[$testName] = [];
+            foreach ($testData['build']() as $singleTestName => $singleTestData) {
+                ++$actualTest;
 
-            $testOutput = trim((string) shell_exec($testData['path'] . '/build.sh'));
+                $agent = $singleTestData['headers']['user-agent'] ?? null;
 
-            $output->write("\r" . $message . ' <info>writing test suite</info>');
-
-            file_put_contents($expectedDir . '/' . $testName . '.json', $testOutput);
-
-            try {
-                $testOutput = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
-            } catch (Exception $e) {
-                $output->writeln("\r" . $message . ' <error>There was an error with the output from the ' . $testName . ' test suite.</error>');
-
-                continue;
-            }
-
-            if ($testOutput['tests'] === null || $testOutput['tests'] === []) {
-                $output->writeln("\r" . $message . ' <error>There was an error with the output from the ' . $testName . ' test suite, no tests were found.</error>');
-                continue;
-            }
-
-            if (!empty($testOutput['version'])) {
-                $testData['metadata']['version'] = $testOutput['version'];
-            }
-
-            if ($input->getOption('single-ua')) {
-                if (is_array($testOutput['tests'])) {
-                    $agents = array_keys($testOutput['tests']);
-                } else {
-                    $agents = [];
+                if (null === $agent) {
+                    var_dump($singleTestData);
+                    $output->writeln("\r" . ' <error>There was no useragent header for the testsuite ' . $singleTestName . '.</error>');
+                    continue;
                 }
 
-                $output->writeln("\r" . $message . ' <info>build done! [' . count($agents) . ' tests found]</info>');
-                $result     = [];
-                $countTests = (string) count($agents);
-                $actualTest = 0;
+                $agent = addcslashes($agent, PHP_EOL);
 
-                foreach ($agents as $agent) {
-                    ++$actualTest;
+                $output->writeln(
+                    sprintf(
+                        '  [%s] UA: <fg=yellow>%s</>',
+                        $actualTest,
+                        $agent
+                    )
+                );
 
-                    if (is_int($agent)) {
-                        continue;
+                $basicTestMessage = sprintf(
+                    '  [%s] Testing',
+                    $actualTest
+                );
+
+                $output->write($basicTestMessage);
+                $textLength = mb_strlen($basicTestMessage);
+
+                foreach ($parsers as $parserName => $parser) {
+                    if (!array_key_exists($parserName, $result)) {
+                        $result[$parserName] = [
+                            'results'     => [],
+                            'parse_time'  => 0,
+                            'init_time'   => 0,
+                            'memory_used' => 0,
+                            'version'     => null,
+                        ];
                     }
 
-                    $agent = addcslashes($agent, PHP_EOL);
-
-                    $output->writeln(
-                        sprintf(
-                            '%s[%s/%s] UA: <fg=yellow>%s</>',
-                            '  ',
-                            str_pad((string) $actualTest, mb_strlen($countTests), ' ', STR_PAD_LEFT),
-                            $countTests,
-                            $agent
-                        )
-                    );
-
-                    $basicTestMessage = sprintf(
-                        '%s[%s/%s] Testing',
-                        '  ',
-                        str_pad((string) $actualTest, mb_strlen($countTests), ' ', STR_PAD_LEFT),
-                        $countTests
-                    );
-
-                    $output->write($basicTestMessage);
-                    $textLength = mb_strlen($basicTestMessage);
-
-                    foreach ($parsers as $parserName => $parser) {
-                        if (!array_key_exists($parserName, $result)) {
-                            $result[$parserName] = [
-                                'results'     => [],
-                                'parse_time'  => 0,
-                                'init_time'   => 0,
-                                'memory_used' => 0,
-                                'version'     => null,
-                            ];
-                        }
-
-                        $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser...';
-
-                        if (mb_strlen($testMessage) > $textLength) {
-                            $textLength = mb_strlen($testMessage);
-                        }
-
-                        $output->write("\r" . str_pad($testMessage, $textLength));
-
-                        $singleResult = $parser['parse-ua']($agent);
-
-                        if (empty($singleResult)) {
-                            $testMessage = $basicTestMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>';
-
-                            if (mb_strlen($testMessage) > $textLength) {
-                                $textLength = mb_strlen($testMessage);
-                            }
-
-                            $output->writeln("\r" . str_pad($testMessage, $textLength));
-
-                            continue;
-                        }
-
-                        if (!empty($singleResult['version'])) {
-                            $parsers[$parserName]['metadata']['version'] = $singleResult['version'];
-                        }
-
-                        if (!file_exists($resultsDir . '/' . $parserName)) {
-                            mkdir($resultsDir . '/' . $parserName);
-                        }
-
-                        $result[$parserName]['results'][] = $singleResult['result'];
-
-                        if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
-                            $result[$parserName]['init_time'] = $singleResult['init_time'];
-                        }
-
-                        if ($singleResult['memory_used'] > $result[$parserName]['memory_used']) {
-                            $result[$parserName]['memory_used'] = $singleResult['memory_used'];
-                        }
-
-                        $result[$parserName]['parse_time'] += $singleResult['parse_time'];
-                        $result[$parserName]['version'] = $singleResult['version'];
-                    }
-
-                    $testMessage = $basicTestMessage . ' <info>done!</info>';
+                    $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser...';
 
                     if (mb_strlen($testMessage) > $textLength) {
                         $textLength = mb_strlen($testMessage);
                     }
 
-                    $output->writeln("\r" . str_pad($testMessage, $textLength));
-                }
+                    $output->write("\r" . str_pad($testMessage, $textLength));
 
-                foreach (array_keys($parsers) as $parserName) {
-                    if (!array_key_exists($parserName, $result)) {
-                        $output->writeln(
-                            '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>'
-                        );
+                    $singleResult = $parser['parse-ua']($agent);
+
+                    if (empty($singleResult)) {
+                        $testMessage = $basicTestMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>';
+
+                        if (mb_strlen($testMessage) > $textLength) {
+                            $textLength = mb_strlen($testMessage);
+                        }
+
+                        $output->writeln("\r" . str_pad($testMessage, $textLength));
 
                         continue;
+                    }
+
+                    if (!empty($singleResult['version'])) {
+                        $parsers[$parserName]['metadata']['version'] = $singleResult['version'];
                     }
 
                     if (!file_exists($resultsDir . '/' . $parserName)) {
                         mkdir($resultsDir . '/' . $parserName);
                     }
 
-                    file_put_contents(
-                        $resultsDir . '/' . $parserName . '/' . $testName . '.json',
-                        json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                    $result[$parserName]['results'][] = $singleResult['result'];
+
+                    if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
+                        $result[$parserName]['init_time'] = $singleResult['init_time'];
+                    }
+
+                    if ($singleResult['memory_used'] > $result[$parserName]['memory_used']) {
+                        $result[$parserName]['memory_used'] = $singleResult['memory_used'];
+                    }
+
+                    $result[$parserName]['parse_time'] += $singleResult['parse_time'];
+                    $result[$parserName]['version'] = $singleResult['version'];
+                }
+
+                $testMessage = $basicTestMessage . ' <info>done!</info>';
+
+                if (mb_strlen($testMessage) > $textLength) {
+                    $textLength = mb_strlen($testMessage);
+                }
+
+                $output->writeln("\r" . str_pad($testMessage, $textLength));
+            }
+
+            foreach (array_keys($parsers) as $parserName) {
+                if (!array_key_exists($parserName, $result)) {
+                    $output->writeln(
+                        '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>'
                     );
 
-                    $usedTests[$testName] = $testData;
-                }
-            } else {
-                $output->write("\r" . $message . ' <info>write test data into file...</info>');
-
-                // write our test's file that we'll pass to the parsers
-                $filename = $testFilesDir . '/' . $testName . '.txt';
-
-                if (is_array($testOutput['tests'])) {
-                    $agents = array_keys($testOutput['tests']);
-                } else {
-                    $agents = [];
+                    continue;
                 }
 
-                array_walk($agents, static function (string &$item): void {
-                    $item = addcslashes($item, PHP_EOL);
-                });
-
-                file_put_contents($filename, implode(PHP_EOL, $agents));
-                $output->writeln("\r" . $message . ' <info>build done! [' . count($agents) . ' tests found]</info>');
-
-                foreach ($parsers as $parserName => $parser) {
-                    $basicTestMessage = sprintf(' Testing against the <fg=green;options=bold,underscore>%s</> parser...', $parserName);
-                    $output->write($basicTestMessage . ' <info> parsing</info>');
-
-                    $result = $parser['parse']($filename);
-
-                    if (empty($result)) {
-                        $output->writeln(
-                        "\r" . $basicTestMessage . ' <error>The parser did not return any data, there may have been an error</error>'
-                        );
-
-                        continue;
-                    }
-
-                    if (!empty($result['version'])) {
-                        $parsers[$parserName]['metadata']['version'] = $result['version'];
-                    }
-
-                    if (!file_exists($resultsDir . '/' . $parserName)) {
-                        mkdir($resultsDir . '/' . $parserName);
-                    }
-
-                    try {
-                        $encoded = json_encode(
-                            $result,
-                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
-                        );
-                    } catch (Exception $e) {
-                    $output->writeln("\r" . $basicTestMessage . ' <error>encoding the result failed!</error>');
-                        continue;
-                    }
-
-                    file_put_contents(
-                        $resultsDir . '/' . $parserName . '/' . $testName . '.json',
-                        $encoded
-                    );
-                    $output->writeln("\r" . $basicTestMessage . ' <info>done!</info>                                                                                 ');
-
-                    $usedTests[$testName] = $testData;
+                if (!file_exists($resultsDir . '/' . $parserName)) {
+                    mkdir($resultsDir . '/' . $parserName);
                 }
+
+                file_put_contents(
+                    $resultsDir . '/' . $parserName . '/' . $testName . '.json',
+                    json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                );
+
+                $usedTests[$testName] = $testData;
             }
         }
 
@@ -356,7 +260,7 @@ class Test extends Command
         } catch (Exception $e) {
             $output->writeln('<error>Encoding result metadata failed for the ' . $thisRunDirName . ' directory</error>');
 
-            return 1;
+            return self::FAILURE;
         }
 
         // write some test data to file
@@ -367,38 +271,6 @@ class Test extends Command
 
         $output->writeln('<comment>Parsing complete, data stored in ' . $thisRunDirName . ' directory</comment>');
 
-        return 0;
-    }
-
-    private function collectTests(OutputInterface $output): void
-    {
-        /** @var SplFileInfo $testDir */
-        foreach (new FilesystemIterator($this->testsDir) as $testDir) {
-            $metadata = [];
-            if (file_exists($testDir->getPathname() . '/metadata.json')) {
-                try {
-                    $contents = file_get_contents($testDir->getPathname() . '/metadata.json');
-                } catch (Exception $e) {
-                    $output->writeln('<error>An error occured while reading the metadata file</error>');
-
-                    continue;
-                }
-
-                try {
-                    $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                } catch (Exception $e) {
-                    $output->writeln('<error>An error occured while parsing results for the ' . $testDir->getPathname() . ' test suite</error>');
-
-                    continue;
-                }
-            }
-
-            $this->tests[$testDir->getFilename()] = [
-                'path'     => $testDir->getPathname(),
-                'metadata' => $metadata,
-            ];
-        }
-
-        ksort($this->tests);
+        return self::SUCCESS;
     }
 }

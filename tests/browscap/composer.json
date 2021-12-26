@@ -1,15 +1,15 @@
 {
-    "require": {
-        "php": "^7.4.3",
-        "composer-runtime-api": "*",
-        "browscap/browscap": "^6.0.50",
-        "psr/log": "^1.1.4",
-        "symfony/finder": "^v5.3.7"
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
+  "require": {
+    "php": "^8.1.0",
+    "composer-runtime-api": "^2.0",
+    "browscap/browscap": "dev-updates",
+    "psr/log": "^1.1.4 || ^3.0.0",
+    "symfony/finder": "^v5.3.7 || ^v6.0.0"
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }

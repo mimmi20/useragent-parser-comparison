@@ -13,11 +13,11 @@ $tests = [];
 // These functions are adapted from DeviceDetector's source
 // Didn't want to use the actual classes here due to performance and consideration of what we're actually testing
 // (i.e. how can the parser ever fail on this field if the parser is generating it)
-function isMobile($data): bool
+function isMobile(array $data): bool
 {
     $device     = $data['device']['type'];
-    $os         = $data['os']['short_name'];
-    $deviceType = AbstractDeviceParser::getAvailableDeviceTypes()[$device];
+    $os         = $data['os']['short_name'] ?? null;
+    $deviceType = AbstractDeviceParser::getAvailableDeviceTypes()[$device] ?? null;
 
     // Mobile device types
     if (!empty($deviceType) && in_array($deviceType, [
@@ -43,7 +43,10 @@ function isMobile($data): bool
     }
 
     // Check for browsers available for mobile devices only
-    if ($data['client']['type'] === 'browser' && Browser::isMobileOnlyBrowser($data['client']['short_name'] ? $data['client']['short_name'] : 'UNK')) {
+    if (isset($data['client']['type'])
+        && $data['client']['type'] === 'browser'
+        && Browser::isMobileOnlyBrowser($data['client']['short_name'] ?? 'UNK')
+    ) {
         return true;
     }
 
@@ -54,9 +57,9 @@ function isMobile($data): bool
     return !isDesktop($data);
 }
 
-function isDesktop($data): bool
+function isDesktop(array $data): bool
 {
-    $osShort = $data['os']['short_name'];
+    $osShort = $data['os']['short_name'] ?? null;
     if (empty($osShort) || $osShort === 'UNK') {
         return false;
     }
@@ -68,48 +71,104 @@ function isDesktop($data): bool
     return in_array($data['os_family'], ['AmigaOS', 'IBM', 'GNU/Linux', 'Mac', 'Unix', 'Windows', 'BeOS', 'Chrome OS']);
 }
 
-$finder = new \Symfony\Component\Finder\Finder();
-$finder->files();
-$finder->name('*.yml');
-$finder->ignoreDotFiles(true);
-$finder->ignoreVCS(true);
-$finder->sortByName();
-$finder->ignoreUnreadableDirs();
-$finder->in(__DIR__ . '/../vendor/matomo/device-detector/Tests/fixtures');
+$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/../vendor/matomo/device-detector/Tests/fixtures'));
+$files = new class($iterator, 'yml') extends \FilterIterator {
+    private string $extension;
 
-foreach ($finder as $fixture) {
-    /** @var \Symfony\Component\Finder\SplFileInfo $fixture */
-    if (!$fixture->isFile() || $fixture->getExtension() !== 'yml') {
-        continue;
+    public function __construct(\Iterator $iterator , string $extension)
+    {
+        parent::__construct($iterator);
+        $this->extension = $extension;
     }
 
-    $provider = Spyc::YAMLLoad($fixture->getPathname());
+    public function accept(): bool
+    {
+        $file = $this->getInnerIterator()->current();
+
+        assert($file instanceof \SplFileInfo);
+
+        return $file->isFile() && $file->getExtension() === $this->extension;
+    }
+};
+
+foreach ($files as $fixture) {
+    /** @var \SplFileInfo $fixture */
+    $pathName = $fixture->getPathname();
+    $pathName = str_replace('\\', '/', $pathName);
+
+    $provider = Spyc::YAMLLoad($pathName);
 
     foreach ($provider as $data) {
         // If no client property, may be in bot file, which we're not parsing just yet
-        if (isset($data['client'])) {
-            $ua = $data['user_agent'];
-            if (!empty($ua)) {
-                $expected = [
-                    'browser' => [
-                        'name'    => $data['client']['name'],
-                        'version' => $data['client']['version'],
-                    ],
-                    'platform' => [
-                        'name'    => $data['os']['name'],
-                        'version' => $data['os']['version'],
-                    ],
-                    'device' => [
-                        'name'     => (string) $data['device']['model'],
-                        'brand'    => AbstractDeviceParser::getFullName($data['device']['brand']),
-                        'type'     => $data['device']['type'],
-                        'ismobile' => isMobile($data),
-                    ],
-                ];
-
-                $tests[$ua] = $expected;
-            }
+        if (empty($data['user_agent'])) {
+            continue;
         }
+
+        $ua = $data['user_agent'];
+
+        if (!empty($data['client'])) {
+            $expected = [
+                'headers' => [
+                    'user-agent' => $ua,
+                ],
+                'client' => [
+                    'name' => $data['client']['name'] ?? null,
+                    'version' => $data['client']['version'] ?? null,
+                    'isBot'   => false,
+                    'type'    => $data['client']['type'] ?? null,
+                ],
+                'engine' => [
+                    'name' => $data['client']['engine'] ?? null,
+                    'version' => $data['client']['engine_version'] ?? null,
+                ],
+                'platform' => [
+                    'name' => $data['os']['name'] ?? null,
+                    'version' => $data['os']['version'] ?? null,
+                ],
+                'device' => [
+                    'name' => (string)$data['device']['model'],
+                    'brand' => AbstractDeviceParser::getFullName($data['device']['brand']),
+                    'type' => $data['device']['type'],
+                    'ismobile' => isMobile($data),
+                    'istouch' => null,
+                ],
+                'raw' => $data,
+                'file' => $pathName,
+            ];
+        } elseif (!empty($data['bot'])) {
+            $expected = [
+                'headers' => [
+                    'user-agent' => $ua,
+                ],
+                'client' => [
+                    'name' => $data['bot']['name'] ?? null,
+                    'version' => null,
+                    'isBot'   => true,
+                    'type'    => $data['bot']['category'] ?? null,
+                ],
+                'engine' => [
+                    'name' => null,
+                    'version' => null,
+                ],
+                'platform' => [
+                    'name' => null,
+                    'version' => null,
+                ],
+                'device' => [
+                    'name' => null,
+                    'brand' => null,
+                    'type' => null,
+                    'ismobile' => null,
+                    'istouch' => null,
+                ],
+                'raw' => $data,
+                'file' => $pathName,
+            ];
+        } else {
+            continue;
+        }
+
+        $tests[] = $expected;
     }
 }
 

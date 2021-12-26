@@ -35,81 +35,21 @@ class Parsers extends Helper
         $names   = [];
         $parsers = [];
 
-        /** @var SplFileInfo $parserDir */
-        foreach (new FilesystemIterator($this->parsersDir) as $parserDir) {
-            $metadata = [];
-
-            if (file_exists($parserDir->getPathname() . '/metadata.json')) {
-                try {
-                    $contents = file_get_contents($parserDir->getPathname() . '/metadata.json');
-
-                    try {
-                        $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (Exception $e) {
-                        $output->writeln('<error>An error occured while parsing metadata for parser ' . $parserDir->getPathname() . '</error>');
-                    }
-                } catch (Exception $e) {
-                    $output->writeln('<error>Could not read metadata file for parser in ' . $parserDir->getPathname() . '</error>');
-                }
-            }
-
-            $parsers[$parserDir->getFilename()] = [
-                'path'     => $parserDir->getPathname(),
-                'metadata' => $metadata,
-                'parse'    => static function (string $file, bool $benchmark = false) use ($parserDir, $output): ?array {
-                    $args = [
-                        escapeshellarg($file),
-                    ];
-                    if ($benchmark === true) {
-                        $args[] = '--benchmark';
-                    }
-
-                    $result = shell_exec($parserDir->getPathname() . '/parse.sh ' . implode(' ', $args));
-
-                    if ($result !== null) {
-                        $result = trim($result);
-
-                        try {
-                            $result = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
-                        } catch (Exception $e) {
-                            $output->writeln('<error>' . $result . $e . '</error>');
-
-                            return null;
-                        }
-                    }
-
-                    return $result;
-                },
-                'parse-ua' => static function (string $useragent) use ($parserDir, $output) {
-                    $result = shell_exec($parserDir->getPathname() . '/parse-ua.sh --ua ' . escapeshellarg($useragent));
-
-                    if ($result !== null) {
-                        $result = trim($result);
-
-                        try {
-                            $result = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
-                        } catch (Exception $e) {
-                            $output->writeln('<error>' . $result . $e . '</error>');
-
-                            return null;
-                        }
-                    }
-
-                    return $result;
-                },
-            ];
+        foreach ($this->getAllParsers($output) as $parserPath => $parserConfig) {
+            $parsers[$parserPath] = $parserConfig;
 
             $rows[] = [
-                $metadata['name'] ?? $parserDir->getFilename(),
-                $metadata['language'] ?? '',
-                $metadata['data_source'] ?? '',
+                $parserConfig['metadata']['name'] ?? $parserPath,
+                $parserConfig['metadata']['language'] ?? '',
+                $parserConfig['metadata']['local'] ? 'yes' : 'no',
+                $parserConfig['metadata']['api'] ? 'yes' : 'no',
             ];
 
-            $names[$metadata['name'] ?? $parserDir->getFilename()] = $parserDir->getFilename();
+            $names[$parserConfig['metadata']['name'] ?? $parserPath] = $parserPath;
         }
 
         $table = new Table($output);
-        $table->setHeaders(['Name', 'Language', 'Data Source']);
+        $table->setHeaders(['Name', 'Language', 'Local', 'API']);
         $table->setRows($rows);
         $table->render();
 
@@ -158,5 +98,190 @@ class Parsers extends Helper
         ksort($selectedParsers);
 
         return $selectedParsers;
+    }
+
+    public function getAllParsers(OutputInterface $output): iterable
+    {
+        /** @var SplFileInfo $parserDir */
+        foreach (new FilesystemIterator($this->parsersDir) as $parserDir) {
+            $metadata = [];
+
+            $pathName = $parserDir->getPathname();
+            $pathName = str_replace('\\', '/', $pathName);
+
+            if (file_exists($pathName . '/metadata.json')) {
+                $contents = @file_get_contents($pathName . '/metadata.json');
+
+                if (false === $contents) {
+                    $output->writeln('<error>Could not read metadata file for parser in ' . $pathName . '</error>');
+                } else {
+                    try {
+                        $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $e) {
+                        $output->writeln('<error>An error occured while parsing metadata for parser ' . $pathName . '</error>');
+                    }
+                }
+            }
+
+            $language = $metadata['language'] ?? '';
+            $local    = $metadata['local'] ?? false;
+            $api      = $metadata['api'] ?? false;
+
+            if (is_string($metadata['packageName'])) {
+                switch ($language) {
+                    case 'PHP':
+                        $metadata['version'] = $this->getVersionPHP($pathName, $metadata['packageName']);
+                        $metadata['release-date'] = $this->getUpdateDatePHP($pathName, $metadata['packageName']);
+                        break;
+                    case 'JavaScript':
+                        $metadata['version'] = $this->getVersionJS($pathName, $metadata['packageName']);
+                        $metadata['release-date'] = $this->getUpdateDateJS($pathName, $metadata['packageName']);
+                        break;
+                    default:
+                        $output->writeln('<error>could not detect version and release date for parser ' . $pathName . '</error>');
+                }
+            }
+
+            yield $parserDir->getFilename() => [
+                'path'     => $pathName,
+                'metadata' => $metadata,
+                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language): ?array {
+                    switch ($language) {
+                        case 'PHP':
+                            switch ($pathName) {
+                                case 'php-get-browser':
+                                    $command = 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
+                                    break;
+                                case 'browser-detector':
+                                    $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
+                                    break;
+                                default:
+                                    $command = 'php ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
+                                    break;
+                            }
+                            break;
+                        case 'JavaScript':
+                            $command = 'node ' . $pathName . '/scripts/parse-ua.js --ua ' . escapeshellarg($useragent);
+                            break;
+                        default:
+                            return null;
+                    }
+
+                    $result = shell_exec($command);
+
+                    if (null === $result) {
+                        return null;
+                    }
+
+                    $result = trim($result);
+
+                    try {
+                        return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $e) {
+                        $output->writeln('<error>' . $result . $e . '</error>');
+                    }
+
+                    return null;
+                },
+            ];
+        }
+    }
+
+    /**
+     * Return the version of the provider
+     *
+     * @return string|null
+     */
+    private function getVersionPHP(string $path, string $packageName): ?string
+    {
+        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        $filtered = array_filter(
+            $installed['packages'],
+            function (array $value) use ($packageName): bool {
+                return array_key_exists('name', $value) && $packageName === $value['name'];
+            }
+        );
+
+        if ([] === $filtered) {
+            return null;
+        }
+
+        $filtered = reset($filtered);
+
+        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+            return null;
+        }
+
+        return $filtered['version'];
+    }
+
+    /**
+     * Get the last change date of the provider
+     *
+     * @return \DateTimeImmutable|null
+     */
+    private function getUpdateDatePHP(string $path, string $packageName): ?\DateTimeImmutable
+    {
+        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        $filtered = array_filter(
+            $installed['packages'],
+            function (array $value) use ($packageName): bool {
+                return array_key_exists('name', $value) && $packageName === $value['name'];
+            }
+        );
+
+        if ([] === $filtered) {
+            return null;
+        }
+
+        $filtered = reset($filtered);
+
+        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+            return null;
+        }
+
+        return new \DateTimeImmutable($filtered['time']);
+    }
+
+    /**
+     * Return the version of the provider
+     *
+     * @return string|null
+     */
+    private function getVersionJS(string $path, string $packageName): ?string
+    {
+        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
+            return $installed['packages']['node_modules/' . $packageName]['version'];
+        }
+
+        if (isset($installed['dependencies'][$packageName]['version'])) {
+            return $installed['dependencies'][$packageName]['version'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the last change date of the provider
+     *
+     * @return \DateTimeImmutable|null
+     */
+    private function getUpdateDateJS(string $path, string $packageName): ?\DateTimeImmutable
+    {
+        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {
+            return new \DateTimeImmutable($installed['packages']['node_modules/' . $packageName]['time']);
+        }
+
+        if (isset($installed['dependencies'][$packageName]['time'])) {
+            return new \DateTimeImmutable($installed['dependencies'][$packageName]['time']);
+        }
+
+        return null;
     }
 }

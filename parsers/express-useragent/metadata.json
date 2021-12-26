@@ -1,0 +1,31 @@
+{
+  "name": "express-useragent",
+  "homepage": "https://github.com/biggora/express-useragent",
+  "packageName": "express-useragent",
+  "language": "JavaScript",
+  "local": true,
+  "api": false,
+  "detectionCapabilities": {
+    "client": {
+      "name": true,
+      "version": true,
+      "isBot": false,
+      "type": false
+    },
+    "renderingEngine": {
+      "name": false,
+      "version": false
+    },
+    "operatingSystem": {
+      "name": true,
+      "version": false
+    },
+    "device": {
+      "model": false,
+      "brand": false,
+      "type": false,
+      "isMobile": true,
+      "isTouch": false
+    }
+  }
+}

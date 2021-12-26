@@ -1,7 +1,0 @@
-{
-    "name": "Jenssegers Agent 2.x",
-    "language": "PHP",
-    "local": true,
-    "api": false,
-    "data_source": "jenssegers"
-}

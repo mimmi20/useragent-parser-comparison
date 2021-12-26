@@ -1,7 +1,0 @@
-{
-    "name": "ua-parser-js 0.x",
-    "language": "JavaScript",
-    "local": true,
-    "api": false,
-    "data_source": "ua-parser-js"
-}

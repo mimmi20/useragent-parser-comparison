@@ -1,18 +1,22 @@
 {
-    "require": {
-        "php": "^7.4.3",
-        "composer-runtime-api": "*",
-        "mimmi20/browser-detector": "^6.0.6",
-        "psr/log": "^1.1.4",
-        "symfony/finder": "^v5.3.7"
+  "require": {
+    "php": "^8.1.0",
+    "composer-runtime-api": "^2.0",
+    "mimmi20/browser-detector": "^6.0.6 || ^7.0.0",
+    "psr/log": "^1.1.4 || ^3.0.0"
+  },
+  "autoload": {
+    "files": [
+      "scripts/ResultFactory.php"
+    ]
+  },
+  "config": {
+    "preferred-install": {
+      "mimmi20/browser-detector": "source",
+      "*": "dist"
     },
-    "autoload": {
-        "files": ["scripts/ResultFactory.php"]
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }

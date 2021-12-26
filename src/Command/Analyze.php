@@ -89,14 +89,14 @@ class Analyze extends Command
             if ($run === null) {
                 $output->writeln('<error>No valid test run found</error>');
 
-                return 1;
+                return self::FAILURE;
             }
         }
 
         if (!file_exists($this->runDir . '/' . $run)) {
             $output->writeln(sprintf('<error>No run directory found with that id (%s)</error>', $run));
 
-            return 1;
+            return self::FAILURE;
         }
 
         $metaDataFile = $this->runDir . '/' . $run . '/metadata.json';
@@ -104,7 +104,7 @@ class Analyze extends Command
         if (!file_exists($metaDataFile)) {
             $output->writeln(sprintf('<error>No options file found for run (%s)</error>', $run));
 
-            return 2;
+            return self::INVALID;
         }
 
         try {
@@ -112,7 +112,7 @@ class Analyze extends Command
         } catch (Exception $e) {
             $output->writeln(sprintf('<error>Could not read file (%s)</error>', $metaDataFile));
 
-            return 2;
+            return self::INVALID;
         }
 
         try {
@@ -120,7 +120,7 @@ class Analyze extends Command
         } catch (Exception $e) {
             $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
 
-            return 2;
+            return self::INVALID;
         }
 
         $output->writeln(sprintf('<info>Analyzing data from test run: %s</info>', $run));
@@ -135,7 +135,7 @@ class Analyze extends Command
         } else {
             $output->writeln(sprintf('<error>Error in options file for run (%s)</error>', $run));
 
-            return 3;
+            return self::FAILURE;
         }
 
         $this->summaryTable = new Table($output);
@@ -379,7 +379,7 @@ class Analyze extends Command
 
         $this->showMenu();
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function showSummary(): void

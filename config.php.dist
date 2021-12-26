@@ -1,0 +1,31 @@
+<?php
+/*
+ * Version number for output folder!
+ */
+define('COMPARISON_VERSION', 7);
+
+$basePath = '../gh-pages/v' . COMPARISON_VERSION;
+
+if (false) {
+    $dbname   = '<db>';
+    $host     = '<host>';
+    $port     = 3306;
+    $charset  = 'utf8mb4';
+    $user     = '<username>';
+    $password = '<password>';
+
+    $driverOptions = [
+        \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\'',
+        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+        \PDO::MYSQL_ATTR_DIRECT_QUERY => false,
+        \PDO::ATTR_EMULATE_PREPARES => false,
+        \PDO::ATTR_PERSISTENT => true,
+    ];
+
+    $pdo = new \PDO(
+        sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
+        $user,
+        $password,
+        $driverOptions
+    );
+}

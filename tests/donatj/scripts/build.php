@@ -14,26 +14,38 @@ if ($content === '' || $content === PHP_EOL) {
 $provider = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
 foreach ($provider as $ua => $data) {
-    if (!empty($ua)) {
-        $expected = [
-            'browser' => [
-                'name'    => $data['browser'],
-                'version' => $data['version'],
-            ],
-            'platform' => [
-                'name'    => $data['platform'],
-                'version' => null,
-            ],
-            'device' => [
-                'name'     => null,
-                'brand'    => null,
-                'type'     => null,
-                'ismobile' => null,
-            ],
-        ];
-
-        $tests[$ua] = $expected;
+    if (empty($ua)) {
+        continue;
     }
+
+    $tests[] = [
+        'headers' => [
+            'user-agent' => $ua,
+        ],
+        'client' => [
+            'name'    => $data['browser'],
+            'version' => $data['version'],
+            'isBot'   => null,
+            'type'    => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'platform' => [
+            'name'    => $data['platform'],
+            'version' => null,
+        ],
+        'device' => [
+            'name'     => null,
+            'brand'    => null,
+            'type'     => null,
+            'ismobile' => null,
+            'istouch'  => null,
+        ],
+        'raw' => $data,
+        'file' => null,
+    ];
 }
 
 echo json_encode([

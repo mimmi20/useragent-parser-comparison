@@ -1,0 +1,17 @@
+{
+  "require": {
+    "php": "^8.1.0",
+    "composer-runtime-api": "^2.0",
+    "whichbrowser/parser": "^v2.1.2",
+    "symfony/yaml": "^v5.3.11 || ^v6.0.1"
+  },
+  "config": {
+    "preferred-install": {
+      "whichbrowser/parser": "source",
+      "*": "dist"
+    },
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}

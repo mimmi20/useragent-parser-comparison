@@ -1,0 +1,31 @@
+{
+  "name": "cbschuld/Browser.php",
+  "homepage": "https://github.com/cbschuld/browser.php",
+  "packageName": "cbschuld/browser.php",
+  "language": "PHP",
+  "local": true,
+  "api": false,
+  "detectionCapabilities": {
+    "client": {
+      "name": true,
+      "version": true,
+      "isBot": false,
+      "type": false
+    },
+    "renderingEngine": {
+      "name": false,
+      "version": false
+    },
+    "operatingSystem": {
+      "name": true,
+      "version": false
+    },
+    "device": {
+      "model": false,
+      "brand": false,
+      "type": true,
+      "isMobile": false,
+      "isTouch": false
+    }
+  }
+}

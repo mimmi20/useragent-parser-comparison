@@ -8,17 +8,37 @@ $uas = [];
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$finder = new \Symfony\Component\Finder\Finder();
-$finder->files();
-$finder->name('*.yaml');
-$finder->ignoreDotFiles(true);
-$finder->ignoreVCS(true);
-$finder->sortByName();
-$finder->ignoreUnreadableDirs();
-$finder->in(__DIR__ . '/../vendor/endorphin-studio/browser-detector/tests/yaml');
+$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/../vendor/endorphin-studio/browser-detector-tests-data/data'));
+$files = new class($iterator, 'yaml') extends \FilterIterator {
+    private string $extension;
+
+    public function __construct(\Iterator $iterator , string $extension)
+    {
+        parent::__construct($iterator);
+        $this->extension = $extension;
+    }
+
+    public function accept(): bool
+    {
+        $file = $this->getInnerIterator()->current();
+
+        assert($file instanceof \SplFileInfo);
+
+        return $file->isFile() && $file->getExtension() === $this->extension;
+    }
+};
 
 $defaultExpected = [
-    'browser' => [
+    'headers' => [
+        'user-agent' => null,
+    ],
+    'client' => [
+        'name'    => null,
+        'version' => null,
+        'isBot'   => null,
+        'type'    => null,
+    ],
+    'engine' => [
         'name'    => null,
         'version' => null,
     ],
@@ -31,22 +51,28 @@ $defaultExpected = [
         'type'     => null,
         'brand'    => null,
         'ismobile' => null,
+        'istouch'  => null,
     ],
+    'bot' => [
+        'isbot' => null,
+    ],
+    'raw' => null,
+    'file' => null,
 ];
 
-foreach ($finder as $fixture) {
-    /** @var \Symfony\Component\Finder\SplFileInfo $fixture */
-    if (!$fixture->isFile() || $fixture->getExtension() !== 'yaml') {
-        continue;
-    }
+foreach ($files as $fixture) {
+    /** @var \SplFileInfo $fixture */
+    $pathName = $fixture->getPathname();
+    $pathName = str_replace('\\', '/', $pathName);
 
-    $provider = Yaml::parse(file_get_contents($fixture->getPathname()));
+    $provider = Spyc::YAMLLoad($pathName);
 
-    if (isset($provider['checkList']['name']) && mb_strpos($fixture->getPathname(), '/browser/') !== false) {
+    if (isset($provider['checkList']['name']) && mb_strpos($pathName, '/browser/') !== false) {
         $expected = [
-            'browser' => [
+            'client' => [
                 'name' => $provider['checkList']['name'],
             ],
+            'raw' => $provider['checkList'],
         ];
 
         if (isset($provider['checkList']['type'])) {
@@ -54,11 +80,12 @@ foreach ($finder as $fixture) {
                 'type' => $provider['checkList']['type'],
             ];
         }
-    } elseif (isset($provider['checkList']['name']) && mb_strpos($fixture->getPathname(), '/device/') !== false) {
+    } elseif (isset($provider['checkList']['name']) && mb_strpos($pathName, '/device/') !== false) {
         $expected = [
             'device' => [
                 'name' => $provider['checkList']['name'],
             ],
+            'raw' => $provider['checkList'],
         ];
 
         if (isset($provider['checkList']['type'])) {
@@ -66,8 +93,8 @@ foreach ($finder as $fixture) {
                 'type' => $provider['checkList']['type'],
             ];
         }
-    } elseif (isset($provider['checkList']['name']) && mb_strpos($fixture->getPathname(), '/os/') !== false) {
-        if ($provider['checkList']['name'] === 'Windows') {
+    } elseif (isset($provider['checkList']['name']) && mb_strpos($pathName, '/os/') !== false) {
+        if ($provider['checkList']['name'] === 'Windows' && isset($provider['checkList']['version'])) {
             $name = $provider['checkList']['name'] . $provider['checkList']['version'];
         } else {
             $name = $provider['checkList']['name'];
@@ -76,12 +103,15 @@ foreach ($finder as $fixture) {
             'platform' => [
                 'name' => $name,
             ],
+            'raw' => $provider['checkList'],
         ];
-    } elseif (isset($provider['checkList']['name']) && mb_strpos($fixture->getPathname(), '/robot/') !== false) {
+    } elseif (isset($provider['checkList']['name']) && mb_strpos($pathName, '/robot/') !== false) {
         $expected = [
-            'browser' => [
+            'client' => [
                 'name' => $provider['checkList']['name'],
+                'isbot' => true,
             ],
+            'raw' => $provider['checkList'],
         ];
     } else {
         $expected = [];
@@ -95,10 +125,25 @@ foreach ($finder as $fixture) {
         $agent = (string) $ua;
 
         if (isset($uas[$agent])) {
-            $uas[$agent] = array_merge($uas[$agent], $expected);
-        //continue;
+            $uas[$agent] = array_merge(
+                $uas[$agent],
+                [
+                    'headers' => [
+                        'user-agent' => $agent,
+                    ],
+                ],
+                $expected
+            );
         } else {
-            $uas[$agent] = array_merge($defaultExpected, $expected);
+            $uas[$agent] = array_merge(
+                $defaultExpected,
+                [
+                    'headers' => [
+                        'user-agent' => $agent,
+                    ],
+                ],
+                $expected
+            );
         }
     }
 }

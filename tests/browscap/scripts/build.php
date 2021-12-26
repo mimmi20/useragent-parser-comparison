@@ -5,37 +5,47 @@ $tests = [];
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$finder = new \Symfony\Component\Finder\Finder();
-$finder->files();
-$finder->name('*.php');
-$finder->ignoreDotFiles(true);
-$finder->ignoreVCS(true);
-$finder->sortByName();
-$finder->ignoreUnreadableDirs();
-$finder->in(__DIR__ . '/../vendor/browscap/browscap/tests/issues');
+$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/../vendor/browscap/browscap/tests/issues'));
+$files = new class($iterator, 'php') extends \FilterIterator {
+    private string $extension;
 
-foreach ($finder as $fixture) {
-    /** @var \Symfony\Component\Finder\SplFileInfo $fixture */
-    if (!$fixture->isFile() || $fixture->getExtension() !== 'php') {
-        continue;
+    public function __construct(\Iterator $iterator , string $extension)
+    {
+        parent::__construct($iterator);
+        $this->extension = $extension;
     }
 
+    public function accept(): bool
+    {
+        $file = $this->getInnerIterator()->current();
+
+        assert($file instanceof \SplFileInfo);
+
+        return $file->isFile() && $file->getExtension() === $this->extension;
+    }
+};
+
+foreach ($files as $fixture) {
+    /** @var \SplFileInfo $fixture */
     if (in_array($fixture->getFilename(), ['issue-000-invalids.php', 'issue-000-invalid-versions.php'])) {
         continue;
     }
 
-    $provider = include $fixture->getPathname();
+    $pathName = $fixture->getPathname();
+    $pathName = str_replace('\\', '/', $pathName);
+
+    $provider = include $pathName;
 
     foreach ($provider as $testName => $data) {
-        if ($data['full'] === false) {
+        if ($data['full'] === false || empty($data['ua'])) {
             continue;
         }
 
         $ua = $data['ua'];
 
-        if (!empty($ua)) {
-            $isMobile = false;
+        $isMobile = false;
 
+        if (isset($data['properties']['Device_Type'])) {
             switch ($data['properties']['Device_Type']) {
                 case 'Mobile Phone':
                 case 'Tablet':
@@ -47,26 +57,36 @@ foreach ($finder as $fixture) {
 
                     break;
             }
-
-            $expected = [
-                'browser' => [
-                    'name'    => $data['properties']['Browser'],
-                    'version' => ($data['properties']['Version'] === '0.0' ? null : $data['properties']['Version']),
-                ],
-                'platform' => [
-                    'name'    => $data['properties']['Platform'] ?? 'unknown',
-                    'version' => ($data['properties']['Platform_Version'] === '0.0' ? null : $data['properties']['Platform_Version']),
-                ],
-                'device' => [
-                    'name'     => $data['properties']['Device_Name'],
-                    'brand'    => $data['properties']['Device_Brand_Name'],
-                    'type'     => $data['properties']['Device_Type'],
-                    'ismobile' => $isMobile,
-                ],
-            ];
-
-            $tests[$ua] = $expected;
         }
+
+        $tests[] = [
+            'headers' => [
+                'user-agent' => $ua,
+            ],
+            'client' => [
+                'name'    => $data['properties']['Browser'] ?? null,
+                'version' => (isset($data['properties']['Version']) && $data['properties']['Version'] !== '0.0' ? $data['properties']['Version'] : null),
+                'isBot'   => isset($data['properties']['Crawler']) && $data['properties']['Crawler'],
+                'type'    => $data['properties']['Browser_Type'] ?? null,
+            ],
+            'engine' => [
+                'name'    => $data['properties']['RenderingEngine_Name'] ?? null,
+                'version' => (isset($data['properties']['RenderingEngine_Version']) && $data['properties']['RenderingEngine_Version'] !== '0.0' ? $data['properties']['RenderingEngine_Version'] : null),
+            ],
+            'platform' => [
+                'name'    => $data['properties']['Platform'] ?? null,
+                'version' => (isset($data['properties']['Platform_Version']) && $data['properties']['Platform_Version'] !== '0.0' ? $data['properties']['Platform_Version'] : null),
+            ],
+            'device' => [
+                'name'     => $data['properties']['Device_Name'] ?? null,
+                'brand'    => $data['properties']['Device_Brand_Name'] ?? null,
+                'type'     => $data['properties']['Device_Type'] ?? null,
+                'ismobile' => $isMobile,
+                'istouch'  => isset($data['properties']['Device_Pointing_Method']) && $data['properties']['Device_Pointing_Method'] === 'touchscreen',
+            ],
+            'raw' => $data,
+            'file' => $pathName,
+        ];
     }
 }
 

@@ -1,4 +1,31 @@
 {
-    "name": "DonatJ",
-    "data_source": "donatj"
+  "name": "DonatJ",
+  "homepage": "https://github.com/donatj/PhpUserAgent",
+  "packageName": "donatj/phpuseragentparser",
+  "language": "PHP",
+  "local": true,
+  "api": false,
+  "detectionCapabilities": {
+    "client": {
+      "name": true,
+      "version": true,
+      "isBot": false,
+      "type": false
+    },
+    "renderingEngine": {
+      "name": false,
+      "version": false
+    },
+    "operatingSystem": {
+      "name": false,
+      "version": false
+    },
+    "device": {
+      "model": false,
+      "brand": false,
+      "type": false,
+      "isMobile": false,
+      "isTouch": false
+    }
+  }
 }

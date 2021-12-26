@@ -8,35 +8,46 @@ $allTests = [];
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $logger     = new \Psr\Log\NullLogger();
-$jsonParser = new \JsonClass\Json();
 
-$companyLoaderFactory = new \BrowserDetector\Loader\CompanyLoaderFactory($jsonParser, new \BrowserDetector\Loader\Helper\Filter());
+$companyLoaderFactory = new \BrowserDetector\Loader\CompanyLoaderFactory();
 
 /** @var \BrowserDetector\Loader\CompanyLoader $companyLoader */
 $companyLoader = $companyLoaderFactory();
 $resultFactory = new \ResultFactory($companyLoader);
 
-$finder = new \Symfony\Component\Finder\Finder();
-$finder->files();
-$finder->name('*.json');
-$finder->ignoreDotFiles(true);
-$finder->ignoreVCS(true);
-$finder->sortByName();
-$finder->ignoreUnreadableDirs();
-$finder->in(__DIR__ . '/../vendor/mimmi20/browser-detector/tests/data/');
+$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/../vendor/mimmi20/browser-detector/tests/data/'));
+$files = new class($iterator, 'json') extends \FilterIterator {
+    private string $extension;
 
-foreach ($finder as $file) {
-    $filepath = $file->getPathname();
+    public function __construct(\Iterator $iterator , string $extension)
+    {
+        parent::__construct($iterator);
+        $this->extension = $extension;
+    }
 
-    $content = $file->getContents();
+    public function accept(): bool
+    {
+        $file = $this->getInnerIterator()->current();
 
-    if ($content === '' || $content === PHP_EOL) {
+        assert($file instanceof \SplFileInfo);
+
+        return $file->isFile() && $file->getExtension() === $this->extension;
+    }
+};
+
+foreach ($files as $file) {
+    $pathName = $file->getPathname();
+    $pathName = str_replace('\\', '/', $pathName);
+
+    $content = file_get_contents($pathName);
+
+    if (false === $content || $content === '' || $content === PHP_EOL) {
         continue;
     }
 
     try {
-        $data = $jsonParser->decode($content, true);
-    } catch (\ExceptionalJSON\DecodeErrorException $e) {
+        $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+    } catch (\JsonException $e) {
         continue;
     }
 
@@ -49,19 +60,7 @@ foreach ($finder as $file) {
             continue;
         }
 
-        if (count($test['headers']) > 1) {
-            // Ignoring the ones that have the additional headers since we can't guarantee the expected value
-            // for those cases (assuming that whichbrowser changes some data based on those headers).
-            continue;
-        }
-
         if ($test['headers']['user-agent'] === 'this is a fake ua to trigger the fallback') {
-            continue;
-        }
-
-        $agent = trim($test['headers']['user-agent']);
-
-        if (array_key_exists($agent, $allTests)) {
             continue;
         }
 
@@ -69,10 +68,17 @@ foreach ($finder as $file) {
         $browserVersion = $expectedResult->getBrowser()->getVersion()->getVersion();
         $osVersion      = $expectedResult->getOs()->getVersion()->getVersion();
 
-        $allTests[$agent] = [
-            'browser' => [
+        $allTests[] = [
+            'headers' => $test['headers'],
+            'client' => [
                 'name'    => $expectedResult->getBrowser()->getName(),
                 'version' => ($browserVersion === '0.0.0' ? null : $browserVersion),
+                'isBot'   => $expectedResult->getBrowser()->getType()->isBot(),
+                'type'    => $expectedResult->getBrowser()->getType()->getType(),
+            ],
+            'engine' => [
+                'name'    => $expectedResult->getEngine()->getName(),
+                'version' => $expectedResult->getEngine()->getVersion()->getVersion(),
             ],
             'platform' => [
                 'name'    => $expectedResult->getOs()->getName(),
@@ -83,7 +89,10 @@ foreach ($finder as $file) {
                 'brand'    => $expectedResult->getDevice()->getBrand()->getBrandName(),
                 'type'     => $expectedResult->getDevice()->getType()->getName(),
                 'ismobile' => $expectedResult->getDevice()->getType()->isMobile(),
+                'istouch'  => $expectedResult->getDevice()->getDisplay()->hasTouch(),
             ],
+            'raw' => $test,
+            'file' => $pathName,
         ];
     }
 }

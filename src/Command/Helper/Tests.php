@@ -23,7 +23,8 @@ class Tests extends Helper
     /**
      * @var string
      */
-    private $testDir = __DIR__ . '/../../../data/test-runs';
+    private $testResultDir = __DIR__ . '/../../../data/test-runs';
+    private $testDir = __DIR__ . '/../../../tests';
 
     public function getName(): string
     {
@@ -37,13 +38,16 @@ class Tests extends Helper
         $tests = [];
 
         /** @var SplFileInfo $testDir */
-        foreach (new FilesystemIterator($this->testDir) as $testDir) {
+        foreach (new FilesystemIterator($this->testResultDir) as $testDir) {
             if (!is_dir($testDir->getPathname())) {
                 continue;
             }
 
-            if (!file_exists($testDir->getPathname() . '/metadata.json')) {
-                $output->writeln('<error>metadata file for test in ' . $testDir->getPathname() . ' does not exist</error>');
+            $pathName = $testDir->getPathname();
+            $pathName = str_replace('\\', '/', $pathName);
+
+            if (!file_exists($pathName . '/metadata.json')) {
+                $output->writeln('<error>metadata file for test in ' . $pathName . ' does not exist</error>');
                 continue;
             }
 
@@ -54,17 +58,20 @@ class Tests extends Helper
 
         /** @var SplFileInfo $testDir */
         foreach ($tests as $testDir) {
+            $pathName = $testDir->getPathname();
+            $pathName = str_replace('\\', '/', $pathName);
+
             try {
-                $contents = file_get_contents($testDir->getPathname() . '/metadata.json');
+                $contents = file_get_contents($pathName . '/metadata.json');
 
                 try {
                     $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Exception $e) {
-                    $output->writeln('<error>An error occured while parsing metadata for test ' . $testDir->getPathname() . '</error>');
+                    $output->writeln('<error>An error occured while parsing metadata for test ' . $pathName . '</error>');
                     continue;
                 }
             } catch (Exception $e) {
-                $output->writeln('<error>Could not read metadata file for test in ' . $testDir->getPathname() . '</error>');
+                $output->writeln('<error>Could not read metadata file for test in ' . $pathName . '</error>');
                 continue;
             }
 
@@ -144,5 +151,208 @@ class Tests extends Helper
         $answer = $helper->ask($input, $output, $question);
 
         return $names[$answer];
+    }
+
+    public function collectTests(OutputInterface $output): iterable
+    {
+        $tests = [];
+
+        /** @var SplFileInfo $testDir */
+        foreach (new FilesystemIterator($this->testDir) as $testDir) {
+            $metadata = [];
+            $pathName = $testDir->getPathname();
+            $pathName = str_replace('\\', '/', $pathName);
+
+            if (file_exists($pathName . '/metadata.json')) {
+                $contents = @file_get_contents($pathName . '/metadata.json');
+
+                if (false === $contents) {
+                    $output->writeln('<error>Could not read metadata file for testsuite in ' . $testDir->getFilename() . '</error>');
+                } else {
+                    try {
+                        $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $e) {
+                        $output->writeln('<error>An error occured while parsing metadata for testsuite ' . $testDir->getFilename() . '</error>');
+                    }
+                }
+            }
+
+            $language = $metadata['language'] ?? '';
+            $local    = $metadata['local'] ?? false;
+            $api      = $metadata['api'] ?? false;
+
+            if (is_string($metadata['packageName'])) {
+                switch ($language) {
+                    case 'PHP':
+                        $metadata['version'] = $this->getVersionPHP($pathName, $metadata['packageName']);
+                        $metadata['release-date'] = $this->getUpdateDatePHP($pathName, $metadata['packageName']);
+                        break;
+                    case 'JavaScript':
+                        $metadata['version'] = $this->getVersionJS($pathName, $metadata['packageName']);
+                        $metadata['release-date'] = $this->getUpdateDateJS($pathName, $metadata['packageName']);
+                        break;
+                    default:
+                        $output->writeln('<error>could not detect version and release date for testsuite ' . $testDir->getFilename() . '</error>');
+                }
+            }
+
+            $tests[$testDir->getFilename()] = [
+                'path'     => $pathName,
+                'metadata' => $metadata,
+                'build'    => static function () use ($testDir, $output, $language, $pathName): iterable {
+                    switch ($language) {
+                        case 'PHP':
+                            switch ($pathName) {
+                                case 'browser-detector':
+                                    $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
+                                    break;
+                                default:
+                                    $command = 'php ' . $pathName . '/scripts/build.php';
+                                    break;
+                            }
+                            break;
+                        case 'JavaScript':
+                            $command = 'php ' . $pathName . '/scripts/build.php';
+                            break;
+//                        case 'JavaScript':
+//                            $command = 'node ' . $pathName . '/scripts/build.js';
+//                            break;
+                        default:
+                            return null;
+                    }
+
+                    $testName = $testDir->getFilename();
+                    $message = sprintf('test suite <fg=yellow>%s</>', $testName);
+
+                    $output->write("\r" . $message . ' <info>building test suite</info>');
+
+                    $testOutput = trim((string) shell_exec($command));
+
+                    if (null === $testOutput || false === $testOutput) {
+                        return null;
+                    }
+
+                    $testOutput = trim($testOutput);
+
+                    try {
+                        $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $e) {
+                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! json_decode failed.</error>');
+
+                        return null;
+                    }
+
+                    if ($tests['tests'] === null || !is_array($tests['tests']) || $tests['tests'] === []) {
+                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! No tests were found.</error>');
+
+                        return null;
+                    }
+
+                    yield from $tests['tests'];
+                },
+            ];
+        }
+
+        ksort($tests);
+
+        yield from $tests;
+    }
+
+    /**
+     * Return the version of the provider
+     *
+     * @return string|null
+     */
+    private function getVersionPHP(string $path, string $packageName): ?string
+    {
+        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        $filtered = array_filter(
+            $installed['packages'],
+            function (array $value) use ($packageName): bool {
+                return array_key_exists('name', $value) && $packageName === $value['name'];
+            }
+        );
+
+        if ([] === $filtered) {
+            return null;
+        }
+
+        $filtered = reset($filtered);
+
+        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+            return null;
+        }
+
+        return $filtered['version'];
+    }
+
+    /**
+     * Get the last change date of the provider
+     *
+     * @return \DateTimeImmutable|null
+     */
+    private function getUpdateDatePHP(string $path, string $packageName): ?\DateTimeImmutable
+    {
+        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        $filtered = array_filter(
+            $installed['packages'],
+            function (array $value) use ($packageName): bool {
+                return array_key_exists('name', $value) && $packageName === $value['name'];
+            }
+        );
+
+        if ([] === $filtered) {
+            return null;
+        }
+
+        $filtered = reset($filtered);
+
+        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+            return null;
+        }
+
+        return new \DateTimeImmutable($filtered['time']);
+    }
+
+    /**
+     * Return the version of the provider
+     *
+     * @return string|null
+     */
+    private function getVersionJS(string $path, string $packageName): ?string
+    {
+        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
+            return $installed['packages']['node_modules/' . $packageName]['version'];
+        }
+
+        if (isset($installed['dependencies'][$packageName]['version'])) {
+            return $installed['dependencies'][$packageName]['version'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the last change date of the provider
+     *
+     * @return \DateTimeImmutable|null
+     */
+    private function getUpdateDateJS(string $path, string $packageName): ?\DateTimeImmutable
+    {
+        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+
+        if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {
+            return new \DateTimeImmutable($installed['packages']['node_modules/' . $packageName]['time']);
+        }
+
+        if (isset($installed['dependencies'][$packageName]['time'])) {
+            return new \DateTimeImmutable($installed['dependencies'][$packageName]['time']);
+        }
+
+        return null;
     }
 }

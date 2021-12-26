@@ -1,0 +1,31 @@
+{
+  "name": "MobileDetect",
+  "homepage": "https://github.com/serbanghita/Mobile-Detect",
+  "packageName": "mobiledetect/mobiledetectlib",
+  "language": "PHP",
+  "local": true,
+  "api": false,
+  "detectionCapabilities": {
+    "client": {
+      "name": false,
+      "version": false,
+      "isBot": false,
+      "type": false
+    },
+    "renderingEngine": {
+      "name": false,
+      "version": false
+    },
+    "operatingSystem": {
+      "name": false,
+      "version": false
+    },
+    "device": {
+      "model": true,
+      "brand": false,
+      "type": false,
+      "isMobile": true,
+      "isTouch": false
+    }
+  }
+}

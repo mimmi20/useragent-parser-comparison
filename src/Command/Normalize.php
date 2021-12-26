@@ -47,13 +47,13 @@ class Normalize extends Command
             // @todo Show user the available runs, perhaps limited to 10 or something, for now, throw an error
             $output->writeln('<error>run argument is required</error>');
 
-            return 1;
+            return self::FAILURE;
         }
 
         if (!file_exists($this->runDir . '/' . $run)) {
             $output->writeln('<error>No run directory found with that id</error>');
 
-            return 1;
+            return self::FAILURE;
         }
 
         $output->writeln('<comment>Normalizing data from test run: ' . $run . '</comment>');
@@ -68,12 +68,12 @@ class Normalize extends Command
                 } catch (Exception $e) {
                     $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
 
-                    return 2;
+                    return self::INVALID;
                 }
             } catch (Exception $e) {
                 $output->writeln('<error>Could not read metadata file for run ' . $run . '</error>');
 
-                return 2;
+                return self::INVALID;
             }
         }
 
@@ -95,8 +95,11 @@ class Normalize extends Command
 
                 $output->write($message . '<info> parsing result</info>');
 
+                $pathName = $testFile->getPathname();
+                $pathName = str_replace('\\', '/', $pathName);
+
                 try {
-                    $contents = file_get_contents($testFile->getPathname());
+                    $contents = file_get_contents($pathName);
                 } catch (Exception $e) {
                     continue;
                 }
@@ -205,7 +208,7 @@ class Normalize extends Command
 
         $output->writeln('<comment>Normalized files written to the test run\'s directory</comment>');
 
-        return 0;
+        return self::SUCCESS;
     }
 
     private function normalize(array $parsed): array

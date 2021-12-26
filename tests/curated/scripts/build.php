@@ -5,25 +5,49 @@ $tests = [];
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-$finder = new \Symfony\Component\Finder\Finder();
-$finder->files();
-$finder->name('*.php');
-$finder->ignoreDotFiles(true);
-$finder->ignoreVCS(true);
-$finder->sortByName();
-$finder->ignoreUnreadableDirs();
-$finder->in(__DIR__ . '/../files');
+$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/../files'));
+$files = new class($iterator, 'php') extends \FilterIterator {
+    private string $extension;
 
-foreach ($finder as $file) {
-    /** @var \Symfony\Component\Finder\SplFileInfo $file */
-    if (!$file->isFile() || $file->getExtension() !== 'php') {
-        continue;
+    public function __construct(\Iterator $iterator , string $extension)
+    {
+        parent::__construct($iterator);
+        $this->extension = $extension;
     }
 
-    $provider = include $file->getPathname();
+    public function accept(): bool
+    {
+        $file = $this->getInnerIterator()->current();
+
+        assert($file instanceof \SplFileInfo);
+
+        return $file->isFile() && $file->getExtension() === $this->extension;
+    }
+};
+
+foreach ($files as $file) {
+    /** @var \SplFileInfo $file */
+    $pathName = $file->getPathname();
+    $pathName = str_replace('\\', '/', $pathName);
+
+    $provider = include $pathName;
 
     foreach ($provider as $ua => $properties) {
-        $tests[$ua] = $properties;
+        $tests[] = array_merge(
+            [
+                'headers' => [
+                    'user-agent' => $ua,
+                ],
+            ],
+            $properties,
+            [
+                'bot' => [
+                    'isbot' => null,
+                ],
+                'raw' => null,
+                'file' => $pathName,
+            ]
+        );
     }
 }
 

@@ -23,10 +23,19 @@ foreach ($provider->strings as $string) {
 
         $device = (string) $field->field[4];
 
-        $uas[$ua] = [
-            'browser' => [
+        $uas[] = [
+            'headers' => [
+                'user-agent' => $ua,
+            ],
+            'client' => [
                 'name'    => $browser,
                 'version' => $browserVersion,
+                'isBot'   => null,
+                'type'    => null,
+            ],
+            'engine' => [
+                'name'    => null,
+                'version' => null,
             ],
             'platform' => [
                 'name'    => $platform,
@@ -37,7 +46,10 @@ foreach ($provider->strings as $string) {
                 'brand'    => null,
                 'type'     => null,
                 'ismobile' => null,
+                'istouch'  => null,
             ],
+            'raw' => $field->asXML(),
+            'file' => null,
         ];
     }
 }

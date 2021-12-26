@@ -34,39 +34,52 @@ $provider = include __DIR__ . '/../vendor/zsxsoft/php-useragent/tests/UserAgentL
 $tests = [];
 
 foreach ($provider as $data) {
-    $ua = $data[0][0];
-    if (!empty($ua)) {
-        $brand = null;
-        $model = null;
-
-        foreach ($brands as $brand) {
-            if (mb_strpos($data[1][8], $brand) !== false) {
-                $model = trim(str_replace($brand, '', $data[1][8]));
-
-                break;
-            }
-            $brand = null;
-        }
-
-        $expected = [
-            'browser' => [
-                'name'    => empty($data[1][2]) ? null : $data[1][2],
-                'version' => empty($data[1][3]) ? null : $data[1][3],
-            ],
-            'platform' => [
-                'name'    => empty($data[1][5]) ? null : $data[1][5],
-                'version' => empty($data[1][6]) ? null : $data[1][6],
-            ],
-            'device' => [
-                'name'     => empty($model) ? null : $model,
-                'brand'    => empty($brand) ? null : $brand,
-                'type'     => null,
-                'ismobile' => null,
-            ],
-        ];
-
-        $tests[$ua] = $expected;
+    if (empty($data[0][0])) {
+        continue;
     }
+
+    $ua = $data[0][0];
+
+    $brand = null;
+    $model = null;
+
+    foreach ($brands as $brand) {
+        if (mb_strpos($data[1][8], $brand) !== false) {
+            $model = trim(str_replace($brand, '', $data[1][8]));
+
+            break;
+        }
+        $brand = null;
+    }
+
+    $tests[] =  [
+        'headers' => [
+            'user-agent' => $ua,
+        ],
+        'client' => [
+            'name'    => empty($data[1][2]) ? null : $data[1][2],
+            'version' => empty($data[1][3]) ? null : $data[1][3],
+            'isBot'   => null,
+            'type'    => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'platform' => [
+            'name'    => empty($data[1][5]) ? null : $data[1][5],
+            'version' => empty($data[1][6]) ? null : $data[1][6],
+        ],
+        'device' => [
+            'name'     => empty($model) ? null : $model,
+            'brand'    => empty($brand) ? null : $brand,
+            'type'     => null,
+            'ismobile' => null,
+            'istouch'  => null,
+        ],
+        'raw' => $data,
+        'file' => null,
+    ];
 }
 
 echo json_encode([

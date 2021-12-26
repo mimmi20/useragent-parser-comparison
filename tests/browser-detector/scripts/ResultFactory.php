@@ -51,15 +51,16 @@ final class ResultFactory
             new Company('Unknown', null, null),
             new Company('Unknown', null, null),
             new Unknown(),
-            new Display(null, new \UaDisplaySize\Unknown(), null)
+            new Display(null, null, null, null)
         );
         if (array_key_exists('device', $data)) {
             $deviceFactory = new DeviceFactory(
                 $this->companyLoader,
                 new \UaDeviceType\TypeLoader(),
-                new DisplayFactory(new \UaDisplaySize\TypeLoader())
+                new DisplayFactory(),
+                $logger
             );
-            $device = $deviceFactory->fromArray($logger, (array) $data['device'], $headers['user-agent'] ?? '');
+            $device = $deviceFactory->fromArray((array) $data['device'], $headers['user-agent'] ?? '');
         }
 
         $browser = new Browser(
@@ -71,7 +72,7 @@ final class ResultFactory
             null
         );
         if (array_key_exists('browser', $data)) {
-            $browser = (new BrowserFactory($this->companyLoader, $versionFactory, new TypeLoader()))->fromArray($logger, (array) $data['browser'], $headers['user-agent'] ?? '');
+            $browser = (new BrowserFactory($this->companyLoader, $versionFactory, new TypeLoader(), $logger))->fromArray((array) $data['browser'], $headers['user-agent'] ?? '');
         }
 
         $os = new Os(
@@ -82,7 +83,7 @@ final class ResultFactory
             null
         );
         if (array_key_exists('os', $data)) {
-            $os = (new PlatformFactory($this->companyLoader, $versionFactory))->fromArray($logger, (array) $data['os'], $headers['user-agent'] ?? '');
+            $os = (new PlatformFactory($this->companyLoader, $versionFactory, $logger))->fromArray((array) $data['os'], $headers['user-agent'] ?? '');
         }
 
         $engine = new Engine(
@@ -90,8 +91,9 @@ final class ResultFactory
             new Company('Unknown', null, null),
             new Version('0')
         );
+
         if (array_key_exists('engine', $data)) {
-            $engine = (new EngineFactory($this->companyLoader, $versionFactory))->fromArray($logger, (array) $data['engine'], $headers['user-agent'] ?? '');
+            $engine = (new EngineFactory($this->companyLoader, $versionFactory, $logger))->fromArray((array) $data['engine'], $headers['user-agent'] ?? '');
         }
 
         return new Result($headers, $device, $os, $browser, $engine);

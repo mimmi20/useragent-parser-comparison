@@ -1,0 +1,31 @@
+{
+  "name": "device-detector-js-3",
+  "version": "1.0.0",
+  "lockfileVersion": 2,
+  "requires": true,
+  "packages": {
+    "": {
+      "name": "device-detector-js-3",
+      "version": "1.0.0",
+      "license": "ISC",
+      "dependencies": {
+        "device-detector-js": "^3.0.0"
+      }
+    },
+    "node_modules/device-detector-js": {
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/device-detector-js/-/device-detector-js-3.0.0.tgz",
+      "integrity": "sha512-bmdq9JZano9y2uor1VT4/g0rfN29hVnU1q0g8sgxtMGF9/UBaEBEeN/o0K4sEy8LIga9yIdmyXSaa04ncUBsoQ==",
+      "engines": {
+        "node": ">= 8.11.4"
+      }
+    }
+  },
+  "dependencies": {
+    "device-detector-js": {
+      "version": "3.0.0",
+      "resolved": "https://registry.npmjs.org/device-detector-js/-/device-detector-js-3.0.0.tgz",
+      "integrity": "sha512-bmdq9JZano9y2uor1VT4/g0rfN29hVnU1q0g8sgxtMGF9/UBaEBEeN/o0K4sEy8LIga9yIdmyXSaa04ncUBsoQ=="
+    }
+  }
+}

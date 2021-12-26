@@ -5,19 +5,22 @@
     "type": "library",
     "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
     "require": {
-        "php": "^7.4.3 || ^8.0.0",
+        "php": "^8.1.0",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "ext-pdo": "*",
         "ext-simplexml": "*",
-        "symfony/console": "^v5.3.11"
+        "composer-runtime-api": "^2.0",
+        "ramsey/uuid": "^4.2.3",
+        "symfony/console": "^v6.0.1"
     },
     "require-dev": {
-        "maglnet/composer-require-checker": "^3.7.0",
-        "mimmi20/coding-standard": "^2.6",
+        "maglnet/composer-require-checker": "^4.0.0",
+        "mimmi20/coding-standard": "^2.6.0",
         "phpstan/extension-installer": "^1.1.0",
         "phpstan/phpstan": "^1.2.0",
         "phpstan/phpstan-deprecation-rules": "^1.0.0",
-        "vimeo/psalm": "^4.14.0"
+        "vimeo/psalm": "^v4.15.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
