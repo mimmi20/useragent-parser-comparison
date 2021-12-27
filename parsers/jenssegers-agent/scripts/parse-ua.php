@@ -36,7 +36,9 @@ if ($hasUa) {
     $isMobile        = $agent->isMobile();
     $browserVersion  = $agent->version($browser);
     $platformVersion = $agent->version($platform);
-    $type            = '';
+    $type            = null;
+    $isBot           = false;
+
     if ($agent->isDesktop()) {
         $type = 'desktop';
     } elseif ($agent->isPhone()) {
@@ -44,9 +46,10 @@ if ($hasUa) {
     } elseif ($agent->isTablet()) {
         $type = 'tablet';
     } elseif ($agent->isBot()) {
-        $type           = 'crawler';
-        $browser        = $agent->robot() . ' Bot';
-        $browserVersion = '';
+        $type           = null;
+        $isBot          = true;
+        $browser        = $agent->robot();
+        $browserVersion = null;
     }
     $end = microtime(true) - $start;
 
@@ -54,20 +57,20 @@ if ($hasUa) {
         'useragent' => $agentString,
         'parsed'    => [
             'client' => [
-                'name'    => $browser,
-                'version' => $browserVersion ?? null,
-                'isBot'   => null,
-                'type'    => null,
+                'name'    => (isset($browser) && false !== $browser) ? $browser : null,
+                'version' => (isset($browserVersion) && false !== $browserVersion) ? $browserVersion : null,
+                'isBot'   => $isBot ? true : null,
+                'type'    => $isBot ? 'crawler' : null,
             ],
             'platform' => [
-                'name'    => $platform,
-                'version' => $platformVersion ?? null,
+                'name'    => (isset($platform) && false !== $platform) ? $platform : null,
+                'version' => (isset($platformVersion) && false !== $platformVersion) ? $platformVersion : null,
             ],
             'device' => [
-                'name'     => ($device !== false ? $device : null),
+                'name'     => (isset($device) && false !== $device) ? $device : null,
                 'brand'    => null,
                 'type'     => $type,
-                'ismobile' => $isMobile ? true : false,
+                'ismobile' => $isMobile ? true : null,
                 'istouch'  => null,
             ],
             'engine' => [

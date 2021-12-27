@@ -200,9 +200,11 @@ class Tests extends Helper
                 'path'     => $pathName,
                 'metadata' => $metadata,
                 'build'    => static function () use ($testDir, $output, $language, $pathName): iterable {
+                    $testName = $testDir->getFilename();
+
                     switch ($language) {
                         case 'PHP':
-                            switch ($pathName) {
+                            switch ($testName) {
                                 case 'browser-detector':
                                     $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
                                     break;
@@ -210,6 +212,7 @@ class Tests extends Helper
                                     $command = 'php ' . $pathName . '/scripts/build.php';
                                     break;
                             }
+
                             break;
                         case 'JavaScript':
                             $command = 'php ' . $pathName . '/scripts/build.php';
@@ -221,7 +224,6 @@ class Tests extends Helper
                             return null;
                     }
 
-                    $testName = $testDir->getFilename();
                     $message = sprintf('test suite <fg=yellow>%s</>', $testName);
 
                     $output->write("\r" . $message . ' <info>building test suite</info>');

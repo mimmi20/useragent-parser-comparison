@@ -47,7 +47,7 @@ if (hasUa) {
                 name: null,
                 brand: null,
                 type: null,
-                ismobile: r.mobile,
+                ismobile: r.mobile ? true : null,
                 istouch: null
             },
             engine: {

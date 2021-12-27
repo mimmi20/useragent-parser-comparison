@@ -2,9 +2,7 @@
 /*
  * Version number for output folder!
  */
-define('COMPARISON_VERSION', 7);
-
-$basePath = '../gh-pages/v' . COMPARISON_VERSION;
+define('COMPARISON_VERSION', 8);
 
 if (false) {
     $dbname   = '<db>';

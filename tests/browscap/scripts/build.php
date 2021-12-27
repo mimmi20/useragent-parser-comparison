@@ -66,7 +66,7 @@ foreach ($files as $fixture) {
             'client' => [
                 'name'    => $data['properties']['Browser'] ?? null,
                 'version' => (isset($data['properties']['Version']) && $data['properties']['Version'] !== '0.0' ? $data['properties']['Version'] : null),
-                'isBot'   => isset($data['properties']['Crawler']) && $data['properties']['Crawler'],
+                'isBot'   => (isset($data['properties']['Crawler']) && $data['properties']['Crawler']) ? true : null,
                 'type'    => $data['properties']['Browser_Type'] ?? null,
             ],
             'engine' => [
@@ -81,8 +81,8 @@ foreach ($files as $fixture) {
                 'name'     => $data['properties']['Device_Name'] ?? null,
                 'brand'    => $data['properties']['Device_Brand_Name'] ?? null,
                 'type'     => $data['properties']['Device_Type'] ?? null,
-                'ismobile' => $isMobile,
-                'istouch'  => isset($data['properties']['Device_Pointing_Method']) && $data['properties']['Device_Pointing_Method'] === 'touchscreen',
+                'ismobile' => $isMobile ? true : null,
+                'istouch'  => (isset($data['properties']['Device_Pointing_Method']) && $data['properties']['Device_Pointing_Method'] === 'touchscreen') ? true : null,
             ],
             'raw' => $data,
             'file' => $pathName,

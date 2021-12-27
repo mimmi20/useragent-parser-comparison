@@ -164,7 +164,7 @@ foreach ($uas as $ua => $data) {
         'client' => [
             'name'    => $browserName,
             'version' => $browserVersion,
-            'isBot'   => isset($data['result']['device']['type']) && 'bot' === $data['result']['device']['type'],
+            'isBot'   => (isset($data['result']['device']['type']) && 'bot' === $data['result']['device']['type']) ? true : null,
             'type'    => $data['result']['browser']['type'] ?? null,
         ],
         'engine' => [
@@ -179,7 +179,7 @@ foreach ($uas as $ua => $data) {
             'name'     => $data['result']['device']['model'] ?? null,
             'brand'    => $data['result']['device']['manufacturer'] ?? null,
             'type'     => $data['result']['device']['type'] ?? null,
-            'ismobile' => isMobile($data['result']),
+            'ismobile' => isMobile($data['result']) ? true : null,
             'istouch'  => null,
         ],
         'raw' => $data,

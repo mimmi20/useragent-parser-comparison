@@ -32,7 +32,7 @@ if ($hasUa) {
             'client' => [
                 'name'    => $r->browser,
                 'version' => $r->version,
-                'isBot'   => isset($r->crawler) && $r->crawler,
+                'isBot'   => (isset($r->crawler) && $r->crawler) ? true : null,
                 'type'    => $r->browser_type ?? null,
             ],
             'platform' => [
@@ -43,8 +43,8 @@ if ($hasUa) {
                 'name'     => $r->device_name ?? null,
                 'brand'    => $r->device_maker ?? null,
                 'type'     => $r->device_type ?? null,
-                'ismobile' => $r->ismobiledevice ? true : false,
-                'istouch'  => isset($r->device_pointing_method) && $r->device_pointing_method === 'touchscreen',
+                'ismobile' => $r->ismobiledevice ? true : null,
+                'istouch'  => (isset($r->device_pointing_method) && $r->device_pointing_method === 'touchscreen') ? true : null,
             ],
             'engine' => [
                 'name'    => $r->renderingengine_name ?? null,

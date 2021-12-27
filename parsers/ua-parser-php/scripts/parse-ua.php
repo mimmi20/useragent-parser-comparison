@@ -35,18 +35,18 @@ if ($hasUa) {
         'useragent' => $agentString,
         'parsed'    => [
             'client' => [
-                'name'    => $r->ua->family,
-                'version' => $browserVersion,
+                'name'    => $r->ua->family === 'Other' ? null : $r->ua->family,
+                'version' => $browserVersion !== '' ? $browserVersion : null,
                 'isBot'   => null,
                 'type'    => null,
             ],
             'platform' => [
-                'name'    => $r->os->family,
-                'version' => $platformVersion,
+                'name'    => $r->os->family === 'Other' ? null : $r->os->family,
+                'version' => $platformVersion !== '' ? $platformVersion : null,
             ],
             'device' => [
-                'name'     => $r->device->model === null ? '' : $r->device->model,
-                'brand'    => $r->device->brand === null ? '' : $r->device->brand,
+                'name'     => $r->device->model === null ? null : $r->device->model,
+                'brand'    => $r->device->brand === null ? null : $r->device->brand,
                 'type'     => null,
                 'ismobile' => null,
                 'istouch'  => null,

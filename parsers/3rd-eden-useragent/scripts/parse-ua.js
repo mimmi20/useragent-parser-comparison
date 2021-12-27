@@ -52,14 +52,14 @@ if (hasUa) {
         useragent: line,
         parsed: {
             client: {
-                name: r.family,
-                version: r.toVersion() === '0.0.0' ? '' : r.toVersion(),
+                name: r.family === 'Other' ? null : r.family,
+                version: (r.family === 'Other' || r.toVersion() === '0.0.0') ? null : r.toVersion(),
                 isBot: null,
                 type: null
             },
             platform: {
-                name: os.family,
-                version: r.os.toVersion()
+                name: os.family === 'Other' ? null : os.family,
+                version: (os.family === 'Other' || r.os.toVersion() === '0.0.0') ? null : r.os.toVersion()
             },
             device: outputDevice,
             engine: {

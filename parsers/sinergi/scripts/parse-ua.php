@@ -39,20 +39,20 @@ if ($hasUa) {
         'useragent' => $agentString,
         'parsed'    => [
             'client' => [
-                'name'    => $browser->getName(),
-                'version' => $browser->getVersion(),
+                'name'    => ($browser->getName() !== 'unknown') ? $browser->getName() : null,
+                'version' => ($browser->getVersion() !== 'unknown') ? $browser->getVersion() : null,
                 'isBot'   => null,
                 'type'    => null,
             ],
             'platform' => [
-                'name'    => $os->getName(),
-                'version' => $os->getVersion(),
+                'name'    => ($os->getName() !== 'unknown') ? $os->getName() : null,
+                'version' => ($os->getVersion() !== 'unknown') ? $os->getVersion() : null,
             ],
             'device' => [
-                'name'     => $device->getName(),
+                'name'     => ($device->getName() !== 'unknown') ? $device->getName() : null,
                 'brand'    => null,
                 'type'     => null,
-                'ismobile' => $os->isMobile() ? true : false,
+                'ismobile' => $os->isMobile() ? true : null,
                 'istouch'  => null,
             ],
             'engine' => [

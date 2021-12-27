@@ -53,7 +53,7 @@ if (hasUa) {
                     r.platform.type === 'tablet' ||
                     r.platform.type === 'wearable'
                         ? true
-                        : false,
+                        : null,
                 istouch: null
             },
             engine: {

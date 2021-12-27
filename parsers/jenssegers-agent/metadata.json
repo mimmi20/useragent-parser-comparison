@@ -9,7 +9,7 @@
     "client": {
       "name": true,
       "version": true,
-      "isBot": false,
+      "isBot": true,
       "type": false
     },
     "renderingEngine": {

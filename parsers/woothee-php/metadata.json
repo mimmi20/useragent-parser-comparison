@@ -22,7 +22,7 @@
     },
     "device": {
       "model": false,
-      "brand": false,
+      "brand": true,
       "type": true,
       "isMobile": false,
       "isTouch": false

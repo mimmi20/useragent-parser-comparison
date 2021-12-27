@@ -30,11 +30,14 @@ $application->add(new \UserAgentParserComparison\Command\Compare());
 if (file_exists('config.php')) {
     include 'config.php';
 
+    $basePath = '../gh-pages/v' . COMPARISON_VERSION;
+
     if (isset($pdo) && $pdo instanceof \PDO) {
         $application->add(new \UserAgentParserComparison\Command\InitDb($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitProvider($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitUseragents($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitResults($pdo));
+        $application->add(new \UserAgentParserComparison\Command\GenerateIndexPage($pdo, $basePath));
     }
 }
 

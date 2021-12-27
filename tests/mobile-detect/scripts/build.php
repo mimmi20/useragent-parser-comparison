@@ -62,7 +62,7 @@ foreach ($files as $fixture) {
                     'name'     => $testData['model'] ?? null,
                     'brand'    => null,
                     'type'     => null,
-                    'ismobile' => $testData['isMobile'] ?? false,
+                    'ismobile' => (isset($testData['isMobile']) && $testData['isMobile']) ? true : null,
                     'istouch'  => null,
                 ],
                 'raw' => $testData,

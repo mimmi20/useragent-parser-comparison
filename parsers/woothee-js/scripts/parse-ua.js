@@ -35,19 +35,19 @@ if (hasUa) {
         useragent: line,
         parsed: {
             client: {
-                name: r.name,
-                version: r.version,
+                name: (r.name && r.name !== 'UNKNOWN') ? r.name : null,
+                version: (r.version && r.version !== 'UNKNOWN') ? r.version : null,
                 isBot: null,
                 type: null
             },
             platform: {
-                name: r.os,
-                version: r.os_version
+                name: (r.os && r.os !== 'UNKNOWN') ? r.os : null,
+                version: (r.os_version && r.os_version !== 'UNKNOWN') ? r.os_version : null
             },
             device: {
                 name: null,
-                brand: null,
-                type: r.category,
+                brand: (r.vendor && r.vendor !== 'UNKNOWN') ? r.vendor : null,
+                type: (r.category && r.category !== 'UNKNOWN') ? r.category : null,
                 ismobile: null,
                 istouch: null
             },

@@ -33,19 +33,19 @@ if ($hasUa) {
         'useragent' => $agentString,
         'parsed'    => [
             'client' => [
-                'name'    => $r['name'],
-                'version' => $r['version'],
+                'name'    => (isset($r['name']) && $r['name'] !== 'UNKNOWN') ? $r['name'] : null,
+                'version' => (isset($r['version']) && $r['version'] !== 'UNKNOWN') ? $r['version'] : null,
                 'isBot'   => null,
                 'type'    => null,
             ],
             'platform' => [
-                'name'    => $r['os'],
-                'version' => $r['os_version'],
+                'name'    => (isset($r['os']) && $r['os'] !== 'UNKNOWN') ? $r['os'] : null,
+                'version' => (isset($r['os_version']) && $r['os_version'] !== 'UNKNOWN') ? $r['os_version'] : null,
             ],
             'device' => [
                 'name'     => null,
-                'brand'    => null,
-                'type'     => $r['category'],
+                'brand'    => (isset($r['vendor']) && $r['vendor'] !== 'UNKNOWN') ? $r['vendor'] : null,
+                'type'     => (isset($r['category']) && $r['category'] !== 'UNKNOWN') ? $r['category'] : null,
                 'ismobile' => null,
                 'istouch'  => null,
             ],

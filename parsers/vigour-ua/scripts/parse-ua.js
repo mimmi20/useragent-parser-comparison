@@ -86,7 +86,7 @@ if (hasUa) {
                         r.device === 'tablet' ||
                         r.device === 'wearable'
                             ? true
-                            : false,
+                            : null,
                     istouch: null
                 },
                 engine: {

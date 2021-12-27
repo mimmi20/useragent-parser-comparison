@@ -145,15 +145,12 @@ class Parsers extends Helper
             yield $parserDir->getFilename() => [
                 'path'     => $pathName,
                 'metadata' => $metadata,
-                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language): ?array {
+                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir): ?array {
                     switch ($language) {
                         case 'PHP':
-                            switch ($pathName) {
+                            switch ($parserDir->getFilename()) {
                                 case 'php-get-browser':
                                     $command = 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
-                                    break;
-                                case 'browser-detector':
-                                    $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
                                     break;
                                 default:
                                     $command = 'php ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);

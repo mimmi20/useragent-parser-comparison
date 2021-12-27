@@ -97,6 +97,8 @@ class InitDb extends Command
   `userAgent_id` CHAR(36) COLLATE utf8_unicode_ci DEFAULT NULL COMMENT \'(DC2Type:uuid)\',
   `resFilename` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
   `resParseTime` DECIMAL(20,5) DEFAULT NULL,
+  `resInitTime` DECIMAL(20,5) DEFAULT NULL,
+  `resMemoryUsed` INT DEFAULT NULL,
   `resLastChangeDate` DATETIME NOT NULL,
   `resResultFound` TINYINT(1) NOT NULL,
   `resClientName` VARCHAR(255) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -123,7 +125,12 @@ class InitDb extends Command
   KEY `result_resDeviceModel` (`resDeviceModel`),
   KEY `result_resDeviceBrand` (`resDeviceBrand`),
   KEY `result_resDeviceType` (`resDeviceType`),
-  KEY `result_resBotType` (`resClientType`),
+  KEY `result_resClientIsBot` (`resClientIsBot`),
+  KEY `result_resClientType` (`resClientType`),
+  KEY `result_resParseTime` (`resParseTime`),
+  KEY `result_resInitTime` (`resInitTime`),
+  KEY `result_resMemoryUsed` (`resMemoryUsed`),
+  KEY `result_resResultFound` (`resResultFound`),
   CONSTRAINT `FK_136AC113A53A8AA` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`proId`),
   CONSTRAINT `FK_136AC113E127EC2A` FOREIGN KEY (`userAgent_id`) REFERENCES `useragent` (`uaId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
@@ -244,7 +251,7 @@ class InitDb extends Command
   `botNameHarmonizedMaxSameResultCount` int(11) NOT NULL,
   `botTypes` LONGTEXT COLLATE utf8_unicode_ci NOT NULL COMMENT \'(DC2Type:object)\',
   `botTypesHarmonized` LONGTEXT COLLATE utf8_unicode_ci NOT NULL COMMENT \'(DC2Type:object)\',
-  `botTypeFound` int(11) NOT NULL,
+  `clientTypeFound` int(11) NOT NULL,
   `botTypeFoundUnique` int(11) NOT NULL,
   `botTypeMaxSameResultCount` int(11) NOT NULL,
   `botTypeHarmonizedFoundUnique` int(11) NOT NULL,
@@ -263,29 +270,36 @@ class InitDb extends Command
             
                 SUM(`resResultFound`) AS `resultFound`,
             
-                COUNT(`resClientName`) AS `browserFound`,
-                COUNT(DISTINCT `resClientName`) AS `browserFoundUnique`,
+                COUNT(`resClientName`) AS `clientNameFound`,
+                COUNT(DISTINCT `resClientName`) AS `clientNameFoundUnique`,
+                COUNT(`resClientVersion`) AS `clientVersionFound`,
+                COUNT(`resClientIsBot`) AS `asBotDetected`,
+                COUNT(`resClientType`) AS `clientTypeFound`,
+                COUNT(DISTINCT `resClientType`) AS `clientTypeFoundUnique`,
             
-                COUNT(`resEngineName`) AS `engineFound`,
-                COUNT(DISTINCT `resEngineName`) AS `engineFoundUnique`,
+                COUNT(`resEngineName`) AS `engineNameFound`,
+                COUNT(DISTINCT `resEngineName`) AS `engineNameFoundUnique`,
+                COUNT(`resEngineVersion`) AS `engineVersionFound`,
             
-                COUNT(`resOsName`) AS `osFound`,
-                COUNT(DISTINCT `resOsName`) AS `osFoundUnique`,
-            
-                COUNT(`resDeviceModel`) AS `deviceModelFound`,
-                COUNT(DISTINCT `resDeviceModel`) AS `deviceModelFoundUnique`,
+                COUNT(`resOsName`) AS `osNameFound`,
+                COUNT(DISTINCT `resOsName`) AS `osNameFoundUnique`,
+                COUNT(`resOsVersion`) AS `osVersionFound`,
             
                 COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
                 COUNT(DISTINCT `resDeviceBrand`) AS `deviceBrandFoundUnique`,
+            
+                COUNT(`resDeviceModel`) AS `deviceModelFound`,
+                COUNT(DISTINCT `resDeviceModel`) AS `deviceModelFoundUnique`,
             
                 COUNT(`resDeviceType`) AS `deviceTypeFound`,
                 COUNT(DISTINCT `resDeviceType`) AS `deviceTypeFoundUnique`,
             
                 COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
+                COUNT(`resDeviceIsTouch`) AS `asTouchDeviceDetected`,
             
-                COUNT(`resClientIsBot`) AS `asBotDetected`,
-            
-                AVG(`resParseTime`) AS `avgParseTime`
+                AVG(`resInitTime`) AS `avgInitTime`,
+                AVG(`resParseTime`) AS `avgParseTime`,
+                AVG(`resMemoryUsed`) AS `avgMemoryUsed`
             FROM `result`
             INNER JOIN `real-provider`
                 ON `proId` = `provider_id`
@@ -302,13 +316,13 @@ class InitDb extends Command
             GROUP BY `proId`
             ORDER BY `proName`')->execute();
 
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-browser-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-browser-names` AS SELECT 
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT 
         `resClientName` AS `name`,
         `uaId`,
         `uaString`,
         COUNT(`resClientName`) AS `detectionCount`
-    FROM `list-found-general-browser-names`
+    FROM `list-found-general-client-names`
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resClientName`')->execute();
@@ -363,24 +377,19 @@ class InitDb extends Command
         ON `uaId` = `userAgent_id`
     GROUP BY `resDeviceType`')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-device-ismobile` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceIsMobile` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-bot-isbot` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientIsBot` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-bot-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-bot-types` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientType` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-bot-types` AS SELECT
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-isbot` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientIsBot` IS NOT NULL')->execute();
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-types` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientType` IS NOT NULL')->execute();
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-types` AS SELECT
         `resClientType` AS `name`,
         `uaId`,
         `uaString`,
         COUNT(`resClientType`) AS `detectionCount`
-    FROM `list-found-general-bot-types`
+    FROM `list-found-general-client-types`
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resClientType`')->execute();
 
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-results` AS SELECT * FROM `result` WHERE `resResultFound` = 1 AND `provider_id` IN (SELECT `proId` FROM `real-provider`)')->execute();
-
-        //$this->pdo->prepare('CREATE OR REPLACE VIEW `useragentevaluation`')->execute();
-        //$this->pdo->prepare('CREATE OR REPLACE VIEW `useragentevaluation`')->execute();
-        //$this->pdo->prepare('CREATE OR REPLACE VIEW `useragentevaluation`')->execute();
 
         return self::SUCCESS;
     }

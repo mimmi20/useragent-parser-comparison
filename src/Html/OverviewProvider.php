@@ -1,0 +1,669 @@
+<?php
+namespace UserAgentParserComparison\Html;
+
+class OverviewProvider extends AbstractHtml
+{
+
+    private array $provider;
+
+    public function __construct(\PDO $pdo, array $provider, ?string $title = null)
+    {
+        $this->pdo = $pdo;
+        $this->provider = $provider;
+        $this->title = $title;
+    }
+
+    private function getResult(): array
+    {
+        $sql = "
+            SELECT
+                SUM(`resResultFound`) AS `resultFound`,
+            
+                COUNT(`resClientName`) AS `clientNameFound`,
+                COUNT(`resClientVersion`) AS `clientVersionFound`,
+                COUNT(`resClientIsBot`) AS `asBotDetected`,
+                COUNT(`resClientType`) AS `clientTypeFound`,
+            
+                COUNT(`resEngineName`) AS `engineNameFound`,
+                COUNT(`resEngineVersion`) AS `engineVersionFound`,
+            
+                COUNT(`resOsName`) AS `osNameFound`,
+                COUNT(`resOsVersion`) AS `osVersionFound`,
+            
+                COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
+            
+                COUNT(`resDeviceModel`) AS `deviceModelFound`,
+            
+                COUNT(`resDeviceType`) AS `deviceTypeFound`,
+            
+                COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
+                COUNT(`resDeviceIsTouch`) AS `asTouchDeviceDetected`,
+            
+                AVG(`resInitTime`) AS `avgInitTime`,
+                AVG(`resParseTime`) AS `avgParseTime`,
+                AVG(`resMemoryUsed`) AS `avgMemoryUsed`
+            FROM `result`
+            INNER JOIN `real-provider` ON `proId` = `provider_id`
+            WHERE
+                `provider_id` = :proId
+            GROUP BY
+                `proId`
+        ";
+
+        $statement = $this->pdo->prepare($sql);
+
+        $statement->bindValue(':proId', $this->provider['proId'], \PDO::PARAM_STR);
+
+        $statement->execute();
+        
+        return $statement->fetch();
+    }
+
+    private function getTable(): string
+    {
+        $provider = $this->provider;
+        
+        $html = '<table class="striped">';
+        
+        /*
+         * Header
+         */
+        $html .= '
+            <thead>
+                <tr>
+                    <th colspan="2"></th>
+                    <th>Total</th>
+                    <th>Percent</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        ';
+        
+        /*
+         * body
+         */
+        $totalUserAgentsOnePercent = $this->getUserAgentCount() / 100;
+        
+        $row = $this->getResult();
+        
+        $html .= '<tbody>';
+        
+        /*
+         * Results found
+         */
+        $html .= '
+            <tr>
+            <th colspan="2">Results found</th>
+            <td>' . $row['resultFound'] . '</td>
+            <td>
+                ' . $this->calculatePercent($row['resultFound'], $totalUserAgentsOnePercent) . '%
+                <div class="progress">
+                    <div class="determinate" style="width: ' . $this->calculatePercent($row['resultFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                </div>
+            </td>
+            <td>
+                <a href="not-detected/' . $provider['proName'] . '/no-result-found.html" class="btn waves-effect waves-light">
+                    Not detected
+                </a>
+            </td>
+            </tr>
+        ';
+        
+        /*
+         * Client
+         */
+        $html .= '
+                <tr>
+                <th rowspan="4">Client</th>
+                <th>Name</th>
+            ';
+        if ($provider['proCanDetectClientName']) {
+            $html .= '
+                <td>' . $row['clientNameFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['clientNameFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['clientNameFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Version</th>
+            ';
+        if ($provider['proCanDetectClientVersion']) {
+            $html .= '
+                <td>' . $row['clientVersionFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['clientVersionFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['clientVersionFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                <!--
+                    <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                    -->
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Type</th>
+            ';
+        if ($provider['proCanDetectClientType']) {
+            $html .= '
+                <td>' . $row['clientTypeFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['clientTypeFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['clientTypeFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                <!--
+                    <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                    -->
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Is bot</th>
+            ';
+        if ($provider['proCanDetectClientIsBot']) {
+            $html .= '
+                <td>' . $row['asBotDetected'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['asBotDetected'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['asBotDetected'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                <!--
+                    <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                    -->
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+        
+        /*
+         * engine
+         */
+        $html .= '
+                <tr>
+                <th rowspan="2">Rendering Engine</th>
+                <th>Name</th>
+            ';
+        if ($provider['proCanDetectEngineName']) {
+            $html .= '
+                <td>' . $row['engineNameFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['engineNameFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['engineNameFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="detected/' . $provider['proName'] . '/rendering-engines.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/rendering-engines.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Version</th>
+            ';
+        if ($provider['proCanDetectEngineVersion']) {
+            $html .= '
+                <td>' . $row['engineVersionFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['engineVersionFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['engineVersionFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                <!--
+                    <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                    -->
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+        
+        /*
+         * os
+         */
+        $html .= '
+                <tr>
+                <th rowspan="2">Operating System</th>
+                <th>Name</th>
+            ';
+        if ($provider['proCanDetectOsName']) {
+            $html .= '
+                <td>' . $row['osNameFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['osNameFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['osNameFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="detected/' . $provider['proName'] . '/operating-systems.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/operating-systems.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Version</th>
+            ';
+        if ($provider['proCanDetectOsVersion']) {
+            $html .= '
+                <td>' . $row['osVersionFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['osVersionFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['osVersionFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                <!--
+                    <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                    -->
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+        
+        /*
+         * device
+         */
+        $html .= '
+                <tr>
+                <th rowspan="5">Device</th>
+                <th>Brand</th>
+            ';
+        if ($provider['proCanDetectDeviceBrand']) {
+            $html .= '
+                <td>' . $row['deviceBrandFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['deviceBrandFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['deviceBrandFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="detected/' . $provider['proName'] . '/device-brands.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/device-brands.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Model</th>
+            ';
+        if ($provider['proCanDetectDeviceModel']) {
+            $html .= '
+                <td>' . $row['deviceModelFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['deviceModelFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['deviceModelFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="detected/' . $provider['proName'] . '/device-models.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/device-models.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Type</th>
+            ';
+        if ($provider['proCanDetectDeviceType']) {
+            $html .= '
+                <td>' . $row['deviceTypeFound'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['deviceTypeFound'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['deviceTypeFound'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="detected/' . $provider['proName'] . '/device-types.html" class="btn waves-effect waves-light">
+                        Detected
+                    </a>
+                    <a href="not-detected/' . $provider['proName'] . '/device-types.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Is mobile</th>
+            ';
+        if ($provider['proCanDetectDeviceIsMobile']) {
+            $html .= '
+                <td>' . $row['asMobileDetected'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['asMobileDetected'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['asMobileDetected'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                    <a href="not-detected/' . $provider['proName'] . '/device-is-mobile.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        $html .= '
+                <tr>
+                <th>Is touch</th>
+            ';
+        if ($provider['proCanDetectDeviceIsTouch']) {
+            $html .= '
+                <td>' . $row['asTouchDeviceDetected'] . '</td>
+                <td>
+                    ' . $this->calculatePercent($row['asTouchDeviceDetected'], $totalUserAgentsOnePercent) . '%
+                    <div class="progress">
+                        <div class="determinate" style="width: ' . $this->calculatePercent($row['asTouchDeviceDetected'], $totalUserAgentsOnePercent, 0) . '"></div>
+                    </div>
+                </td>
+                <td>
+                <!--
+                    <a href="not-detected/' . $provider['proName'] . '/device-is-mobile.html" class="btn waves-effect waves-light">
+                        Not detected
+                    </a>
+                    -->
+                </td>
+                </tr>
+            ';
+        } else {
+            $html .= '
+                <td colspan="3" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            ';
+        }
+        $html .= '
+                </tr>
+            ';
+
+        /*
+         * Parse time
+         */
+        $html .= '
+            <tr>
+            <th colspan="2">Parse time [ms]</th>
+            <td>' . number_format(round($row['avgParseTime'] * 1000, 3), 3) . '</td>
+            <td></td>
+            <td></td>
+            </tr>
+        ';
+
+        /*
+         * Required memory
+         */
+        $html .= '
+            <tr>
+            <th colspan="2">Required memory</th>
+            <td>' . number_format(round($row['avgMemoryUsed'], 2), 2) . '</td>
+            <td></td>
+            <td></td>
+            </tr>
+        ';
+        
+        $html .= '</tbody>';
+        
+        $html .= '</table>';
+        
+        return $html;
+    }
+
+    public function getHtml(): string
+    {
+        $body = '
+<div class="section">
+    <h1 class="header center orange-text">' . $this->provider['proName'] . ' overview</h1>
+
+    <div class="row center">
+        <h5 class="header light">
+            We took <strong>' . $this->getUserAgentCount() . '</strong> different user agents and analyzed them with this provider<br />
+        </h5>
+    </div>
+</div>
+
+<div class="section">
+    ';
+        if ($this->provider['proLocal']) {
+            $body .= '<div><span class="material-icons">public_off</span>';
+
+            switch ($this->provider['proLanguage']) {
+                case 'PHP':
+                    $body .= '<span class="material-icons">php</span>';
+                    break;
+                case 'JavaScript':
+                    $body .= '<span class="material-icons">javascript</span>';
+                    break;
+            }
+
+            $body .= '</div>';
+
+            $body .= '<div>';
+            if ($this->provider['proPackageName']) {
+                $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+            } else {
+                $body .= $this->provider['proName'];
+            }
+
+            $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
+            if (null !== $this->provider['proLastReleaseDate']) {
+                $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
+            }
+            $body .= '</div>';
+        } elseif ($this->provider['proApi']) {
+            $body .= '<div><span class="material-icons">public</span></div>';
+
+            $body .= '<div>';
+            if ($this->provider['proHomepage']) {
+                $body .= '<a href="' . $this->provider['proHomepage'] . '">' . $this->provider['proName'] . '</a>';
+            } else {
+                $body .= $this->provider['proName'];
+            }
+            $body .= '</div>';
+        }
+        $body .= '
+</div>
+
+<div class="section">
+    ' . $this->getTable() . '
+</div>
+';
+        
+        return parent::getHtmlCombined($body);
+    }
+}

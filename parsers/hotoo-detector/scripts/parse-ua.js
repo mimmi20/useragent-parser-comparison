@@ -33,25 +33,25 @@ if (hasUa) {
         useragent: line,
         parsed: {
             client: {
-                name: r.browser.name ? r.browser.name : null,
-                version: r.browser.fullVersion ? r.browser.fullVersion : null,
+                name: (r.browser.name && r.browser.name !== 'na') ? r.browser.name : null,
+                version: (r.browser.fullVersion && r.browser.fullVersion !== '-1') ? r.browser.fullVersion : null,
                 isBot: null,
                 type: null
             },
             platform: {
-                name: r.os.name ? r.os.name : null,
-                version: r.os.fullVersion ? r.os.fullVersion : null
+                name: (r.os.name && r.os.name !== 'na') ? r.os.name : null,
+                version: (r.os.fullVersion && r.os.fullVersion !== '-1') ? r.os.fullVersion : null
             },
             device: {
-                name: r.device.model ? r.device.model : null,
+                name: (r.device.name && r.device.name !== 'na') ? r.device.name : null,
                 brand: null,
                 type: null,
                 ismobile: null,
                 istouch: null
             },
             engine: {
-                name: null,
-                version: null
+                name: (r.engine.name && r.engine.name !== 'na') ? r.engine.name : null,
+                version: (r.engine.fullVersion && r.engine.fullVersion !== '-1') ? r.engine.fullVersion : null
             },
             raw: r
         },

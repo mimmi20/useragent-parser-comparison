@@ -34,20 +34,20 @@ if (hasUa) {
         useragent: line,
         parsed: {
             client: {
-                name: r.browser ? r.browser : null,
-                version: r.version ? r.version : null,
+                name: (r.browser && r.browser !== 'unknown') ? r.browser : null,
+                version: (r.version && r.version !== 'unknown') ? r.version : null,
                 isBot: null,
                 type: null
             },
             platform: {
-                name: r.os ? r.os : null,
+                name: (r.os && r.os !== 'unknown') ? r.os : null,
                 version: null
             },
             device: {
                 name: null,
                 brand: null,
                 type: null,
-                ismobile: r.isMobile,
+                ismobile: r.isMobile ? true : null,
                 istouch: null,
             },
             engine: {

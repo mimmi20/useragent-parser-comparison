@@ -94,7 +94,7 @@ if (hasUa) {
                         mobileDeviceTypes.indexOf(r.device.type) !== -1 ||
                         (r.device.subtype && r.device.subtype === 'portable')
                             ? true
-                            : false,
+                            : null,
                     istouch: null
                 },
                 engine: {

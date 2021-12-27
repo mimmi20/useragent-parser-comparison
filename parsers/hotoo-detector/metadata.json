@@ -13,8 +13,8 @@
       "type": false
     },
     "renderingEngine": {
-      "name": false,
-      "version": false
+      "name": true,
+      "version": true
     },
     "operatingSystem": {
       "name": true,

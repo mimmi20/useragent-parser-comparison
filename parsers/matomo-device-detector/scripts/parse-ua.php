@@ -61,7 +61,7 @@ if ($hasUa) {
                 'name'     => $model ?? null,
                 'brand'    => $brand ?? null,
                 'type'     => $device ?? null,
-                'ismobile' => $isMobile ? true : false,
+                'ismobile' => $isMobile ? true : null,
                 'istouch'  => null,
             ],
             'engine' => [

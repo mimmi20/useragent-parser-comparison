@@ -32,13 +32,13 @@ if ($hasUa) {
         'useragent' => $agentString,
         'parsed'    => [
             'client' => [
-                'name'    => $browser->getBrowser(),
-                'version' => $browser->getVersion(),
+                'name'    => $browser->getBrowser() === 'unknown' ? null : $browser->getBrowser(),
+                'version' => $browser->getVersion() === 'unknown' ? null : $browser->getVersion(),
                 'isBot'   => null,
                 'type'    => null,
             ],
             'platform' => [
-                'name'    => $browser->getPlatform(),
+                'name'    => $browser->getPlatform() === 'unknown' ? null : $browser->getPlatform(),
                 'version' => null,
             ],
             'device' => [

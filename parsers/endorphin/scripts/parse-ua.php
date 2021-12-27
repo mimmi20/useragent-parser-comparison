@@ -38,21 +38,21 @@ if ($hasUa) {
         'useragent' => $agentString,
         'parsed'    => [
             'client' => [
-                'name'    => $r->isRobot ? (isset($r->robot) ? $r->robot->name : null) : (isset($r->browser) ? $r->browser->name : null),
-                'version' => isset($r->browser) ? $r->browser->version : null,
-                'isBot'   => $r->isRobot,
+                'name'    => $r->isRobot ? (isset($r->robot) ? $r->robot->name : null) : ((isset($r->browser->name) && $r->browser->name !== 'not available') ? $r->browser->name : null),
+                'version' => (isset($r->browser->version) && $r->browser->version !== 'not available') ? $r->browser->version : null,
+                'isBot'   => $r->isRobot ? true : null,
                 'type'    => null,
             ],
             'platform' => [
-                'name'    => isset($r->os) ? $r->os->name : null,
-                'version' => isset($r->os) ? $r->os->version : null,
+                'name'    => (isset($r->os->name) && $r->os->name !== 'not available') ? $r->os->name : null,
+                'version' => (isset($r->os->version) && $r->os->version !== 'not available') ? $r->os->version : null,
             ],
             'device' => [
-                'name'     => isset($r->device) ? $r->device->name : null,
-                'brand'    => null,
-                'type'     => isset($r->device) ? $r->device->type : null,
-                'ismobile' => $r->isMobile ? true : false,
-                'istouch'  => null,
+                'name'     => isset($r->device->model) ? $r->device->model : null,
+                'brand'    => isset($r->device->name) ? $r->device->name : null,
+                'type'     => isset($r->device->type) ? $r->device->type : null,
+                'ismobile' => $r->isMobile ? true : null,
+                'istouch'  => $r->isTouch ? true : null,
             ],
             'engine' => [
                 'name'    => null,

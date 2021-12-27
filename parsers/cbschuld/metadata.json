@@ -1,5 +1,5 @@
 {
-  "name": "cbschuld/Browser.php",
+  "name": "cbschuld",
   "homepage": "https://github.com/cbschuld/browser.php",
   "packageName": "cbschuld/browser.php",
   "language": "PHP",
@@ -23,7 +23,7 @@
     "device": {
       "model": false,
       "brand": false,
-      "type": true,
+      "type": false,
       "isMobile": false,
       "isTouch": false
     }

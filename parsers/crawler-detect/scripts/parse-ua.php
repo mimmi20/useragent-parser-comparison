@@ -37,7 +37,7 @@ if ($hasUa) {
             'client' => [
                 'name'    => null,
                 'version' => null,
-                'isBot'   => $isbot,
+                'isBot'   => $isbot ? true : null,
                 'type'    => null,
             ],
             'platform' => [
