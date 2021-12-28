@@ -860,7 +860,7 @@ class GenerateIndexPage extends Command
         /*
          * detected - clientNames
          */
-        $statement = $this->pdo->prepare('SELECT * FROM `found-general-browser-names`');
+        $statement = $this->pdo->prepare('SELECT * FROM `found-general-client-names`');
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected client names');

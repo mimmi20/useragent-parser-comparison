@@ -237,7 +237,7 @@ class InitResults extends Command
                             $statementInsertResult->bindValue(':resOsVersion', null);
                         }
 
-                        if (array_key_exists('resDeviceModel', $row2) && !in_array($row2['resDeviceModel'], ['UNKNOWN', 'unknown', ''], true)) {
+                        if (array_key_exists('resDeviceModel', $row2) && is_string($row2['resDeviceModel']) && !in_array($row2['resDeviceModel'], ['UNKNOWN', 'unknown', ''], true)) {
                             $statementInsertResult->bindValue(':resDeviceModel', $row2['resDeviceModel']);
                         } else {
                             $statementInsertResult->bindValue(':resDeviceModel', null);
@@ -327,7 +327,7 @@ class InitResults extends Command
                             $statementUpdateResult->bindValue(':resOsVersion', null);
                         }
 
-                        if (array_key_exists('resDeviceModel', $row2) && !in_array($row2['resDeviceModel'], ['UNKNOWN', 'unknown', ''], true)) {
+                        if (array_key_exists('resDeviceModel', $row2) && is_string($row2['resDeviceModel']) && !in_array($row2['resDeviceModel'], ['UNKNOWN', 'unknown', ''], true)) {
                             $statementUpdateResult->bindValue(':resDeviceModel', $row2['resDeviceModel']);
                         } else {
                             $statementUpdateResult->bindValue(':resDeviceModel', null);
