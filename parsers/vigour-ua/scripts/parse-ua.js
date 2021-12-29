@@ -36,8 +36,13 @@ if (hasUa) {
     try {
         r = ua(line);
     } catch (err) {
-        output.result.err = err.toString();
+        output.result.err = [
+            err.name,
+            err.message,
+            err.stack
+        ];
     }
+
     const end = process.hrtime(start)[1] / 1000000000;
 
     if (r !== null) {

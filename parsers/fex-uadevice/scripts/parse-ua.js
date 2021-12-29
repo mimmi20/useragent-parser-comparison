@@ -34,9 +34,14 @@ if (hasUa) {
     let r = null;
     try {
         r = new parser(line);
-    } catch (e) {
-        output.result.err = e.toString();
+    } catch (err) {
+        output.result.err = [
+            err.name,
+            err.message,
+            err.stack
+        ];
     }
+
     const end = process.hrtime(start)[1] / 1000000000;
 
     if (r !== null) {

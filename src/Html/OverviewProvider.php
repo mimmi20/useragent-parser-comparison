@@ -18,6 +18,7 @@ class OverviewProvider extends AbstractHtml
         $sql = "
             SELECT
                 SUM(`resResultFound`) AS `resultFound`,
+                SUM(`resResultError`) AS `resultError`,
             
                 COUNT(`resClientName`) AS `clientNameFound`,
                 COUNT(`resClientVersion`) AS `clientVersionFound`,
@@ -635,7 +636,16 @@ class OverviewProvider extends AbstractHtml
 
             $body .= '<div>';
             if ($this->provider['proPackageName']) {
-                $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+                switch ($this->provider['proLanguage']) {
+                    case 'PHP':
+                        $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+                        break;
+                    case 'JavaScript':
+                        $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+                        break;
+                    default:
+                        $body .= $this->provider['proName'];
+                }
             } else {
                 $body .= $this->provider['proName'];
             }

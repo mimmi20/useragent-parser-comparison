@@ -57,8 +57,8 @@ class InitUseragents extends Command
         $statementUpdateUa       = $this->pdo->prepare('UPDATE `useragent` SET `uaHash` = :uaHash, `uaString` = :uaString, `uaAdditionalHeaders` = :uaAdditionalHeaders WHERE `uaId` = :uaId');
 
         $statementSelectResult   = $this->pdo->prepare('SELECT * FROM `result` WHERE `provider_id` = :proId AND `userAgent_id` = :uaId');
-        $statementInsertResult   = $this->pdo->prepare('INSERT INTO `result` (`provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resClientName`, `resClientVersion`, `resEngineName`, `resEngineVersion`, `resOsName`, `resOsVersion`, `resDeviceModel`, `resDeviceBrand`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceIsTouch`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resClientName, :resClientVersion, :resEngineName, :resEngineVersion, :resOsName, :resOsVersion, :resDeviceModel, :resDeviceBrand, :resDeviceType, :resDeviceIsMobile, :resDeviceIsTouch, :resClientIsBot, :resClientType, :resRawResult)');
-        $statementUpdateResult   = $this->pdo->prepare('UPDATE `result` SET `provider_id` = :proId, `userAgent_id` = :uaId, `resProviderVersion` = :resProviderVersion, `resFilename` = :resFilename, `resParseTime` = :resParseTime, `resInitTime` = :resInitTime, `resMemoryUsed` = :resMemoryUsed, `resLastChangeDate` = :resLastChangeDate, `resResultFound` = :resResultFound, `resClientName` = :resClientName, `resClientVersion` = :resClientVersion, `resEngineName` = :resEngineName, `resEngineVersion` = :resEngineVersion, `resOsName` = :resOsName, `resOsVersion` = :resOsVersion, `resDeviceModel` = :resDeviceModel, `resDeviceBrand` = :resDeviceBrand, `resDeviceType` = :resDeviceType, `resDeviceIsMobile` = :resDeviceIsMobile, `resDeviceIsTouch` = :resDeviceIsTouch, `resClientIsBot` = :resClientIsBot, `resClientType` = :resClientType, `resRawResult` = :resRawResult WHERE `resId` = :resId');
+        $statementInsertResult   = $this->pdo->prepare('INSERT INTO `result` (`provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resResultError`, `resClientName`, `resClientVersion`, `resEngineName`, `resEngineVersion`, `resOsName`, `resOsVersion`, `resDeviceModel`, `resDeviceBrand`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceIsTouch`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resResultError, :resClientName, :resClientVersion, :resEngineName, :resEngineVersion, :resOsName, :resOsVersion, :resDeviceModel, :resDeviceBrand, :resDeviceType, :resDeviceIsMobile, :resDeviceIsTouch, :resClientIsBot, :resClientType, :resRawResult)');
+        $statementUpdateResult   = $this->pdo->prepare('UPDATE `result` SET `provider_id` = :proId, `userAgent_id` = :uaId, `resProviderVersion` = :resProviderVersion, `resFilename` = :resFilename, `resParseTime` = :resParseTime, `resInitTime` = :resInitTime, `resMemoryUsed` = :resMemoryUsed, `resLastChangeDate` = :resLastChangeDate, `resResultFound` = :resResultFound, `resResultError` = :resResultError, `resClientName` = :resClientName, `resClientVersion` = :resClientVersion, `resEngineName` = :resEngineName, `resEngineVersion` = :resEngineVersion, `resOsName` = :resOsName, `resOsVersion` = :resOsVersion, `resDeviceModel` = :resDeviceModel, `resDeviceBrand` = :resDeviceBrand, `resDeviceType` = :resDeviceType, `resDeviceIsMobile` = :resDeviceIsMobile, `resDeviceIsTouch` = :resDeviceIsTouch, `resClientIsBot` = :resClientIsBot, `resClientType` = :resClientType, `resRawResult` = :resRawResult WHERE `resId` = :resId');
 
         $output->writeln('~~~ Load all UAs ~~~');
 
@@ -118,7 +118,7 @@ class InitUseragents extends Command
                         $statementUpdateUa->bindValue(':uaId', $uaId, \PDO::PARAM_STR);
                         $statementUpdateUa->bindValue(':uaHash', $uaHash, \PDO::PARAM_STR);
                         $statementUpdateUa->bindValue(':uaString', $agent, \PDO::PARAM_STR);
-                        $statementUpdateUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders));
+                        $statementUpdateUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
                         $statementUpdateUa->execute();
                     }
@@ -128,7 +128,7 @@ class InitUseragents extends Command
                     $statementInsertUa->bindValue(':uaId', $uaId, \PDO::PARAM_STR);
                     $statementInsertUa->bindValue(':uaHash', $uaHash, \PDO::PARAM_STR);
                     $statementInsertUa->bindValue(':uaString', $agent, \PDO::PARAM_STR);
-                    $statementInsertUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders));
+                    $statementInsertUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
                     $statementInsertUa->execute();
                 }
@@ -157,6 +157,7 @@ class InitUseragents extends Command
                     $statementUpdateResult->bindValue(':resMemoryUsed', null);
                     $statementUpdateResult->bindValue(':resLastChangeDate', $date->format('Y-m-d H:i:s'), \PDO::PARAM_STR);
                     $statementUpdateResult->bindValue(':resResultFound', 1, \PDO::PARAM_INT);
+                    $statementUpdateResult->bindValue(':resResultError', 0, \PDO::PARAM_INT);
 
                     if (isset($singleTestData['client']['name']) && !in_array($singleTestData['client']['name'], ['UNKNOWN', 'unknown', ''], true)) {
                         $statementUpdateResult->bindValue(':resClientName', $singleTestData['client']['name']);
@@ -228,7 +229,7 @@ class InitUseragents extends Command
                     $statementUpdateResult->bindValue(':resDeviceIsTouch', $singleTestData['device']['istouch'] ?? null);
 
                     if (array_key_exists('raw', $singleTestData)) {
-                        $statementUpdateResult->bindValue(':resRawResult', json_encode($singleTestData['raw'], JSON_THROW_ON_ERROR));
+                        $statementUpdateResult->bindValue(':resRawResult', json_encode($singleTestData['raw'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
                     } else {
                         $statementUpdateResult->bindValue(':resRawResult', null);
                     }
@@ -247,6 +248,7 @@ class InitUseragents extends Command
                     $statementInsertResult->bindValue(':resMemoryUsed', null);
                     $statementInsertResult->bindValue(':resLastChangeDate', $date->format('Y-m-d H:i:s'), \PDO::PARAM_STR);
                     $statementInsertResult->bindValue(':resResultFound', 1, \PDO::PARAM_INT);
+                    $statementInsertResult->bindValue(':resResultError', 0, \PDO::PARAM_INT);
 
                     if (isset($singleTestData['client']['name']) && !in_array($singleTestData['client']['name'], ['UNKNOWN', 'unknown', ''], true)) {
                         $statementInsertResult->bindValue(':resClientName', $singleTestData['client']['name']);
@@ -318,7 +320,7 @@ class InitUseragents extends Command
                     $statementInsertResult->bindValue(':resDeviceIsTouch', $singleTestData['device']['istouch'] ?? null);
 
                     if (array_key_exists('raw', $singleTestData)) {
-                        $statementInsertResult->bindValue(':resRawResult', json_encode($singleTestData['raw'], JSON_THROW_ON_ERROR));
+                        $statementInsertResult->bindValue(':resRawResult', json_encode($singleTestData['raw'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
                     } else {
                         $statementInsertResult->bindValue(':resRawResult', null);
                     }

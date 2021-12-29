@@ -124,7 +124,16 @@ class UserAgentDetail extends AbstractHtml
 
             $html .= '<div>';
             if ($result['proPackageName']) {
-                $html .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
+                switch ($result['proLanguage']) {
+                    case 'PHP':
+                        $html .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
+                        break;
+                    case 'JavaScript':
+                        $html .= '<a href="https://www.npmjs.com/package/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
+                        break;
+                    default:
+                        $html .= $result['proName'];
+                }
             } else {
                 $html .= $result['proName'];
             }
@@ -150,106 +159,106 @@ class UserAgentDetail extends AbstractHtml
         
         if (!$result['resResultFound']) {
             $html .= '
-                    <td colspan="16" class="center-align red lighten-1">
+                    <td colspan="13" class="center-align red lighten-1">
                         <strong>No result found</strong>
                     </td>
                 ';
-            
-            $html .= '</tr>';
-            
-            return $html;
-        }
-        
-        /*
-         * General
-         */
-        if ($result['proCanDetectClientName']) {
-            $html .= '<td>' . $result['resClientName'] . '</td>';
         } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-
-        if ($result['proCanDetectClientVersion']) {
-            $html .= '<td>' . $result['resClientVersion'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-
-        if ($result['proCanDetectClientType']) {
-            $html .= '<td>' . $result['resClientType'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-
-        if ($result['proCanDetectClientIsBot']) {
-            $html .= '<td>' . $result['resClientIsBot'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-        
-        if ($result['proCanDetectEngineName']) {
-            $html .= '<td>' . $result['resEngineName'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-
-        if ($result['proCanDetectEngineVersion']) {
-            $html .= '<td>' . $result['resEngineVersion'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-        
-        if ($result['proCanDetectOsName']) {
-            $html .= '<td>' . $result['resOsName'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-
-        if ($result['proCanDetectOsVersion']) {
-            $html .= '<td>' . $result['resOsVersion'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-        
-        /*
-         * Device
-         */
-        if ($result['proCanDetectDeviceBrand']) {
-            $html .= '<td>' . $result['resDeviceBrand'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-        
-        if ($result['proCanDetectDeviceModel']) {
-            $html .= '<td>' . $result['resDeviceModel'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-        
-        if ($result['proCanDetectDeviceType']) {
-            $html .= '<td>' . $result['resDeviceType'] . '</td>';
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-        
-        if ($result['proCanDetectDeviceIsMobile']) {
-            if ($result['resDeviceIsMobile']) {
-                $html .= '<td>yes</td>';
+            /*
+             * General
+             */
+            if ($result['proCanDetectClientName']) {
+                $html .= '<td>' . $result['resClientName'] . '</td>';
             } else {
-                $html .= '<td></td>';
+                $html .= '<td class="center-align">x</td>';
             }
-        } else {
-            $html .= '<td class="center-align">x</td>';
-        }
-        
-        if ($result['proCanDetectDeviceIsTouch']) {
-            if ($result['resDeviceIsTouch']) {
-                $html .= '<td>yes</td>';
+
+            if ($result['proCanDetectClientVersion']) {
+                $html .= '<td>' . $result['resClientVersion'] . '</td>';
             } else {
-                $html .= '<td></td>';
+                $html .= '<td class="center-align">x</td>';
             }
-        } else {
-            $html .= '<td class="center-align">x</td>';
+
+            if ($result['proCanDetectClientType']) {
+                $html .= '<td>' . $result['resClientType'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectClientIsBot']) {
+                if ($result['resClientIsBot']) {
+                    $html .= '<td>yes</td>';
+                } else {
+                    $html .= '<td></td>';
+                }
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectEngineName']) {
+                $html .= '<td>' . $result['resEngineName'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectEngineVersion']) {
+                $html .= '<td>' . $result['resEngineVersion'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectOsName']) {
+                $html .= '<td>' . $result['resOsName'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectOsVersion']) {
+                $html .= '<td>' . $result['resOsVersion'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            /*
+             * Device
+             */
+            if ($result['proCanDetectDeviceBrand']) {
+                $html .= '<td>' . $result['resDeviceBrand'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectDeviceModel']) {
+                $html .= '<td>' . $result['resDeviceModel'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectDeviceType']) {
+                $html .= '<td>' . $result['resDeviceType'] . '</td>';
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectDeviceIsMobile']) {
+                if ($result['resDeviceIsMobile']) {
+                    $html .= '<td>yes</td>';
+                } else {
+                    $html .= '<td></td>';
+                }
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
+
+            if ($result['proCanDetectDeviceIsTouch']) {
+                if ($result['resDeviceIsTouch']) {
+                    $html .= '<td>yes</td>';
+                } else {
+                    $html .= '<td></td>';
+                }
+            } else {
+                $html .= '<td class="center-align">x</td>';
+            }
         }
 
         $html .= '<td>' . number_format(round($result['resParseTime'] * 1000, 3), 3) . '</td>';

@@ -92,7 +92,16 @@ class OverviewGeneral extends AbstractHtml
 
                 $html .= '<div>';
                 if ($row['proPackageName']) {
-                    $html .= '<a href="https://packagist.org/packages/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>';
+                    switch ($row['proLanguage']) {
+                        case 'PHP':
+                            $html .= '<a href="https://packagist.org/packages/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>';
+                            break;
+                        case 'JavaScript':
+                            $html .= '<a href="https://www.npmjs.com/package/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>';
+                            break;
+                        default:
+                            $html .= $row['proName'];
+                    }
                 } else {
                     $html .= $row['proName'];
                 }

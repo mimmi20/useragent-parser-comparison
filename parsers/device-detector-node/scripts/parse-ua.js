@@ -37,7 +37,11 @@ if (hasUa) {
     try {
         r = detector.detect(line);
     } catch (err) {
-        output.result.err = err.toString();
+        output.result.err = [
+            err.name,
+            err.message,
+            err.stack
+        ];
     }
     const end = process.hrtime(start)[1] / 1000000000;
 
