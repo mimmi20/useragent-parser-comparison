@@ -25,48 +25,53 @@ $parser->isMobile();
 
 $initTime = microtime(true) - $start;
 
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('mobiledetect/mobiledetectlib'),
+];
+
 if ($hasUa) {
     $start = microtime(true);
     $parser->setUserAgent($agentString);
     $ismobile = $parser->isMobile();
     $end = microtime(true) - $start;
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => null,
-                'version' => null,
-                'isBot'   => null,
-                'type'    => null,
-            ],
-            'platform' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'device' => [
-                'name'     => null,
-                'brand'    => null,
-                'type'     => null,
-                'ismobile' => $ismobile ? true : null,
-                'istouch'  => null,
-            ],
-            'engine' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'raw' => null,
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => null,
+            'version' => null,
+            'isBot'   => null,
+            'type'    => null,
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'device' => [
+            'name'     => null,
+            'brand'    => null,
+            'type'     => null,
+            'ismobile' => $ismobile ? true : null,
+            'istouch'  => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'raw' => null,
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => memory_get_peak_usage(),
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('mobiledetect/mobiledetectlib'),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+$output['memory_used'] = memory_get_peak_usage();
+
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

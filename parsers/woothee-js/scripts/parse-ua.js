@@ -19,7 +19,12 @@ if (uaPos >= 0) {
 }
 
 const output = {
-    result: null,
+    hasUa: hasUa,
+    ua: line,
+    result: {
+        parsed: null,
+        err: null
+    },
     parse_time: 0,
     init_time: initTime,
     memory_used: 0,
@@ -31,33 +36,29 @@ if (hasUa) {
     const r = parser.parse(line);
     const end = process.hrtime(start)[1] / 1000000000;
 
-    output.result = {
-        useragent: line,
-        parsed: {
-            client: {
-                name: (r.name && r.name !== 'UNKNOWN') ? r.name : null,
-                version: (r.version && r.version !== 'UNKNOWN') ? r.version : null,
-                isBot: null,
-                type: null
-            },
-            platform: {
-                name: (r.os && r.os !== 'UNKNOWN') ? r.os : null,
-                version: (r.os_version && r.os_version !== 'UNKNOWN') ? r.os_version : null
-            },
-            device: {
-                name: null,
-                brand: (r.vendor && r.vendor !== 'UNKNOWN') ? r.vendor : null,
-                type: (r.category && r.category !== 'UNKNOWN') ? r.category : null,
-                ismobile: null,
-                istouch: null
-            },
-            engine: {
-                name: null,
-                version: null
-            },
-            raw: r
+    output.result.parsed = {
+        client: {
+            name: (r.name && r.name !== 'UNKNOWN') ? r.name : null,
+            version: (r.version && r.version !== 'UNKNOWN') ? r.version : null,
+            isBot: null,
+            type: null
         },
-        time: end
+        platform: {
+            name: (r.os && r.os !== 'UNKNOWN') ? r.os : null,
+            version: (r.os_version && r.os_version !== 'UNKNOWN') ? r.os_version : null
+        },
+        device: {
+            name: null,
+            brand: (r.vendor && r.vendor !== 'UNKNOWN') ? r.vendor : null,
+            type: (r.category && r.category !== 'UNKNOWN') ? r.category : null,
+            ismobile: null,
+            istouch: null
+        },
+        engine: {
+            name: null,
+            version: null
+        },
+        raw: r
     };
     output.parse_time = end;
 }

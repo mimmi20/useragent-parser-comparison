@@ -23,51 +23,52 @@ $browser = new Browser();
 $browser->setUserAgent('Test String');
 $initTime = microtime(true) - $start;
 
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('cbschuld/browser.php'),
+];
+
 if ($hasUa) {
     $start = microtime(true);
     $browser->setUserAgent($agentString);
     $end   = microtime(true) - $start;
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => $browser->getBrowser() === 'unknown' ? null : $browser->getBrowser(),
-                'version' => $browser->getVersion() === 'unknown' ? null : $browser->getVersion(),
-                'isBot'   => null,
-                'type'    => null,
-            ],
-            'platform' => [
-                'name'    => $browser->getPlatform() === 'unknown' ? null : $browser->getPlatform(),
-                'version' => null,
-            ],
-            'device' => [
-                'name'     => null,
-                'brand'    => null,
-                'type'     => null,
-                'ismobile' => null,
-                'istouch'  => null,
-            ],
-            'engine' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'raw' => $browser,
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => $browser->getBrowser() === 'unknown' ? null : $browser->getBrowser(),
+            'version' => $browser->getVersion() === 'unknown' ? null : $browser->getVersion(),
+            'isBot'   => null,
+            'type'    => null,
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => $browser->getPlatform() === 'unknown' ? null : $browser->getPlatform(),
+            'version' => null,
+        ],
+        'device' => [
+            'name'     => null,
+            'brand'    => null,
+            'type'     => null,
+            'ismobile' => null,
+            'istouch'  => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'raw' => $browser,
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-$file = null;
+$output['memory_used'] = memory_get_peak_usage();
 
-$memory = memory_get_peak_usage();
-
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => $memory,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('cbschuld/browser.php'),
-], JSON_UNESCAPED_SLASHES);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

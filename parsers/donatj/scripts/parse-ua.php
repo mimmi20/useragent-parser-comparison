@@ -23,49 +23,52 @@ require_once __DIR__ . '/../vendor/autoload.php';
 \donatj\UserAgent\parse_user_agent('Test String');
 $initTime = microtime(true) - $start;
 
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('donatj/phpuseragentparser'),
+];
+
 if ($hasUa) {
     $start = microtime(true);
     $r     = \donatj\UserAgent\parse_user_agent($agentString);
     $end   = microtime(true) - $start;
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => $r['browser'] ?? null,
-                'version' => $r['version'] ?? null,
-                'isBot'   => null,
-                'type'    => null,
-            ],
-            'platform' => [
-                'name'    => $r['platform'] ?? null,
-                'version' => null,
-            ],
-            'device' => [
-                'name'     => null,
-                'brand'    => null,
-                'type'     => null,
-                'ismobile' => null,
-                'istouch'  => null,
-            ],
-            'engine' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'raw' => $r,
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => $r['browser'] ?? null,
+            'version' => $r['version'] ?? null,
+            'isBot'   => null,
+            'type'    => null,
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => $r['platform'] ?? null,
+            'version' => null,
+        ],
+        'device' => [
+            'name'     => null,
+            'brand'    => null,
+            'type'     => null,
+            'ismobile' => null,
+            'istouch'  => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'raw' => $r,
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-$memory = memory_get_peak_usage();
+$output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => $memory,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('donatj/phpuseragentparser'),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

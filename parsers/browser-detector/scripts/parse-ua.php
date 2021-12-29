@@ -30,51 +30,52 @@ $detector  = $factory();
 $detector('Test String');
 $initTime = microtime(true) - $start;
 
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('mimmi20/browser-detector'),
+];
+
 if ($hasUa) {
     $start = microtime(true);
     $r     = $detector($agentString);
     $end   = microtime(true) - $start;
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => $r->getBrowser()->getName(),
-                'version' => $r->getBrowser()->getVersion()->getVersion(),
-                'isBot'   => $r->getBrowser()->getType()->isBot() ? true : null,
-                'type'    => $r->getBrowser()->getType()->getType(),
-            ],
-            'platform' => [
-                'name'    => $r->getOs()->getName(),
-                'version' => $r->getOs()->getVersion()->getVersion(),
-            ],
-            'device' => [
-                'name'     => $r->getDevice()->getDeviceName(),
-                'brand'    => $r->getDevice()->getBrand()->getBrandName(),
-                'type'     => $r->getDevice()->getType()->getName(),
-                'ismobile' => $r->getDevice()->getType()->isMobile() ? true : null,
-                'istouch'  => $r->getDevice()->getDisplay()->hasTouch() ? true : null,
-            ],
-            'engine' => [
-                'name'    => $r->getEngine()->getName(),
-                'version' => $r->getEngine()->getVersion()->getVersion(),
-            ],
-            'raw' => $r->toArray(),
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => $r->getBrowser()->getName(),
+            'version' => $r->getBrowser()->getVersion()->getVersion(),
+            'isBot'   => $r->getBrowser()->getType()->isBot() ? true : null,
+            'type'    => $r->getBrowser()->getType()->getType(),
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => $r->getOs()->getName(),
+            'version' => $r->getOs()->getVersion()->getVersion(),
+        ],
+        'device' => [
+            'name'     => $r->getDevice()->getDeviceName(),
+            'brand'    => $r->getDevice()->getBrand()->getBrandName(),
+            'type'     => $r->getDevice()->getType()->getName(),
+            'ismobile' => $r->getDevice()->getType()->isMobile() ? true : null,
+            'istouch'  => $r->getDevice()->getDisplay()->hasTouch() ? true : null,
+        ],
+        'engine' => [
+            'name'    => $r->getEngine()->getName(),
+            'version' => $r->getEngine()->getVersion()->getVersion(),
+        ],
+        'raw' => $r->toArray(),
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-$file = null;
+$output['memory_used'] = memory_get_peak_usage();
 
-$memory = memory_get_peak_usage();
-
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => $memory,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('mimmi20/browser-detector'),
-], JSON_UNESCAPED_SLASHES);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

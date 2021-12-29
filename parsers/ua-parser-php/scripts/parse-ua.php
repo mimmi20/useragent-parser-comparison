@@ -23,54 +23,57 @@ $parser = UAParser\Parser::create();
 $parser->parse('Test String');
 $initTime = microtime(true) - $start;
 
+$regexVersion = file_get_contents(__DIR__ . '/../version.txt');
+
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('ua-parser/uap-php') . '-' . $regexVersion,
+];
+
 if ($hasUa) {
     $start = microtime(true);
     $r     = $parser->parse($agentString);
-    $end   = microtime(true) - $start;
-
     $browserVersion  = $r->ua->toVersion();
     $platformVersion = $r->ua->toVersion();
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => $r->ua->family === 'Other' ? null : $r->ua->family,
-                'version' => $browserVersion !== '' ? $browserVersion : null,
-                'isBot'   => null,
-                'type'    => null,
-            ],
-            'platform' => [
-                'name'    => $r->os->family === 'Other' ? null : $r->os->family,
-                'version' => $platformVersion !== '' ? $platformVersion : null,
-            ],
-            'device' => [
-                'name'     => $r->device->model === null ? null : $r->device->model,
-                'brand'    => $r->device->brand === null ? null : $r->device->brand,
-                'type'     => null,
-                'ismobile' => null,
-                'istouch'  => null,
-            ],
-            'engine' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'raw' => $r,
+    $end   = microtime(true) - $start;
+
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => $r->ua->family === 'Other' ? null : $r->ua->family,
+            'version' => $browserVersion !== '' ? $browserVersion : null,
+            'isBot'   => null,
+            'type'    => null,
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => $r->os->family === 'Other' ? null : $r->os->family,
+            'version' => $platformVersion !== '' ? $platformVersion : null,
+        ],
+        'device' => [
+            'name'     => $r->device->model === null ? null : $r->device->model,
+            'brand'    => $r->device->brand === null ? null : $r->device->brand,
+            'type'     => null,
+            'ismobile' => null,
+            'istouch'  => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'raw' => $r,
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-$memory = memory_get_peak_usage();
+$output['memory_used'] = memory_get_peak_usage();
 
-$regexVersion = file_get_contents(__DIR__ . '/../version.txt');
-
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => $memory,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('ua-parser/uap-php') . '-' . $regexVersion,
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

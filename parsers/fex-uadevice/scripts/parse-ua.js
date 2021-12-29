@@ -17,7 +17,12 @@ if (uaPos >= 0) {
 }
 
 const output = {
-    result: null,
+    hasUa: hasUa,
+    ua: line,
+    result: {
+        parsed: null,
+        err: null
+    },
     parse_time: 0,
     init_time: initTime,
     memory_used: 0,
@@ -26,57 +31,53 @@ const output = {
 
 if (hasUa) {
     const start = process.hrtime();
-    let r;
+    let r = null;
     try {
         r = new parser(line);
     } catch (e) {
-        r = null;
+        output.result.err = e.toString();
     }
     const end = process.hrtime(start)[1] / 1000000000;
 
     if (r !== null) {
-        output.result = {
-            useragent: line,
-            parsed: {
-                client: {
-                    name: r.browser.name ? r.browser.name : null,
-                    version:
-                        typeof r.browser.version !== 'undefined' &&
-                        r.browser.version !== null &&
-                        typeof r.browser.version.original !== 'undefined'
-                            ? r.browser.version.original
-                            : null,
-                    isBot: null,
-                    type: null
-                },
-                platform: {
-                    name: r.os.name ? r.os.name : null,
-                    version:
-                        typeof r.os.version !== 'undefined' &&
-                        r.os.version !== null &&
-                        typeof r.os.version.original !== 'undefined'
-                            ? r.os.version.original
-                            : null
-                },
-                device: {
-                    name: r.device.model ? r.device.model : null,
-                    brand: r.device.manufacturer ? r.device.manufacturer : null,
-                    type: r.device.type ? r.device.type : null,
-                    ismobile:
-                        r.device.type === 'mobile' ||
-                        r.device.type === 'tablet' ||
-                        r.device.type === 'wearable'
-                            ? true
-                            : null,
-                    istouch: null
-                },
-                engine: {
-                    name: null,
-                    version: null
-                },
-                raw: r
+        output.result.parsed = {
+            client: {
+                name: r.browser.name ? r.browser.name : null,
+                version:
+                    typeof r.browser.version !== 'undefined' &&
+                    r.browser.version !== null &&
+                    typeof r.browser.version.original !== 'undefined'
+                        ? r.browser.version.original
+                        : null,
+                isBot: null,
+                type: null
             },
-            time: end
+            platform: {
+                name: r.os.name ? r.os.name : null,
+                version:
+                    typeof r.os.version !== 'undefined' &&
+                    r.os.version !== null &&
+                    typeof r.os.version.original !== 'undefined'
+                        ? r.os.version.original
+                        : null
+            },
+            device: {
+                name: r.device.model ? r.device.model : null,
+                brand: r.device.manufacturer ? r.device.manufacturer : null,
+                type: r.device.type ? r.device.type : null,
+                ismobile:
+                    r.device.type === 'mobile' ||
+                    r.device.type === 'tablet' ||
+                    r.device.type === 'wearable'
+                        ? true
+                        : null,
+                istouch: null
+            },
+            engine: {
+                name: null,
+                version: null
+            },
+            raw: r
         };
     }
     output.parse_time = end;

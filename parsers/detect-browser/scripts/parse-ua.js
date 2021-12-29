@@ -18,7 +18,12 @@ if (uaPos >= 0) {
 }
 
 const output = {
-    result: null,
+    hasUa: hasUa,
+    ua: line,
+    result: {
+        parsed: null,
+        err: null
+    },
     parse_time: 0,
     init_time: initTime,
     memory_used: 0,
@@ -30,33 +35,29 @@ if (hasUa) {
     const r = parseUserAgent(line);
     const end = process.hrtime(start)[1] / 1000000000;
 
-    output.result = {
-        useragent: line,
-        parsed: {
-            client: {
-                name: r !== null && r.name ? r.name : null,
-                version: r !== null && r.version ? r.version : null,
-                isBot: null,
-                type: null
-            },
-            platform: {
-                name: r !== null && r.os ? r.os : null,
-                version: null
-            },
-            device: {
-                name: null,
-                brand: null,
-                type: null,
-                ismobile: null,
-                istouch: null
-            },
-            engine: {
-                name: null,
-                version: null
-            },
-            raw: r
+    output.result.parsed = {
+        client: {
+            name: r !== null && r.name ? r.name : null,
+            version: r !== null && r.version ? r.version : null,
+            isBot: null,
+            type: null
         },
-        time: end
+        platform: {
+            name: r !== null && r.os ? r.os : null,
+            version: null
+        },
+        device: {
+            name: null,
+            brand: null,
+            type: null,
+            ismobile: null,
+            istouch: null
+        },
+        engine: {
+            name: null,
+            version: null
+        },
+        raw: r
     };
     output.parse_time = end;
 }

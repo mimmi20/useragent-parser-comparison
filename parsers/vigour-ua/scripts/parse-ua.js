@@ -18,7 +18,12 @@ if (uaPos >= 0) {
 }
 
 const output = {
-    result: null,
+    hasUa: hasUa,
+    ua: line,
+    result: {
+        parsed: null,
+        err: null
+    },
     parse_time: 0,
     init_time: initTime,
     memory_used: 0,
@@ -27,75 +32,44 @@ const output = {
 
 if (hasUa) {
     const start = process.hrtime();
+    let r = null;
     try {
-        const r = ua(line);
+        r = ua(line);
     } catch (err) {
-        output.result = {
-            useragent: line,
-            parsed: {
-                client: {
-                    name: null,
-                    version: null,
-                    isBot: null,
-                    type: null
-                },
-                platform: {
-                    name: null,
-                    version: null
-                },
-                device: {
-                    name: null,
-                    brand: null,
-                    type: null,
-                    ismobile: null,
-                    istouch: null
-                },
-                engine: {
-                    name: null,
-                    version: null
-                },
-                raw: null
-            },
-            error: err,
-            time: null
-        };
+        output.result.err = err.toString();
     }
     const end = process.hrtime(start)[1] / 1000000000;
 
-    if (typeof r !== 'undefined') {
-        output.result = {
-            useragent: line,
-            parsed: {
-                client: {
-                    name: r.browser ? r.browser : null,
-                    version: r.version ? r.version : null,
-                    isBot: null,
-                    type: null
-                },
-                platform: {
-                    name: r.platform,
-                    version: null
-                },
-                device: {
-                    name: null,
-                    brand: null,
-                    type: r.device,
-                    ismobile:
-                        r.device === 'phone' ||
-                        r.device === 'mobile' ||
-                        r.device === 'tablet' ||
-                        r.device === 'wearable'
-                            ? true
-                            : null,
-                    istouch: null
-                },
-                engine: {
-                    name: null,
-                    version: null
-                },
-                raw: r
+    if (r !== null) {
+        output.result.parsed = {
+            client: {
+                name: (r.browser && r.browser !== true) ? r.browser : null,
+                version: r.version ? r.version : null,
+                isBot: null,
+                type: null
             },
-            time: end
+            platform: {
+                name: r.platform,
+                version: null
+            },
+            device: {
+                name: null,
+                brand: null,
+                type: r.device,
+                ismobile:
+                    r.device === 'phone' ||
+                    r.device === 'mobile' ||
+                    r.device === 'tablet' ||
+                    r.device === 'wearable'
+                        ? true
+                        : null,
+                istouch: null
+            },
+            engine: {
+                name: null,
+                version: null
+            },
+            raw: r
         };
     }
     output.parse_time = end;

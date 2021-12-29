@@ -17,7 +17,12 @@ if (uaPos >= 0) {
 }
 
 const output = {
-    result: null,
+    hasUa: hasUa,
+    ua: line,
+    result: {
+        parsed: null,
+        err: null
+    },
     parse_time: 0,
     init_time: initTime,
     memory_used: 0,
@@ -29,33 +34,29 @@ if (hasUa) {
     const r = parser.parse(line);
     const end = process.hrtime(start)[1] / 1000000000;
 
-    output.result = {
-        useragent: line,
-        parsed: {
-            client: {
-                name: (r.browser.name && r.browser.name !== 'na') ? r.browser.name : null,
-                version: (r.browser.fullVersion && r.browser.fullVersion !== '-1') ? r.browser.fullVersion : null,
-                isBot: null,
-                type: null
-            },
-            platform: {
-                name: (r.os.name && r.os.name !== 'na') ? r.os.name : null,
-                version: (r.os.fullVersion && r.os.fullVersion !== '-1') ? r.os.fullVersion : null
-            },
-            device: {
-                name: (r.device.name && r.device.name !== 'na') ? r.device.name : null,
-                brand: null,
-                type: null,
-                ismobile: null,
-                istouch: null
-            },
-            engine: {
-                name: (r.engine.name && r.engine.name !== 'na') ? r.engine.name : null,
-                version: (r.engine.fullVersion && r.engine.fullVersion !== '-1') ? r.engine.fullVersion : null
-            },
-            raw: r
+    output.result.parsed = {
+        client: {
+            name: (r.browser.name && r.browser.name !== 'na') ? r.browser.name : null,
+            version: (r.browser.fullVersion && r.browser.fullVersion !== '-1') ? r.browser.fullVersion : null,
+            isBot: null,
+            type: null
         },
-        time: end
+        platform: {
+            name: (r.os.name && r.os.name !== 'na') ? r.os.name : null,
+            version: (r.os.fullVersion && r.os.fullVersion !== '-1') ? r.os.fullVersion : null
+        },
+        device: {
+            name: (r.device.name && r.device.name !== 'na') ? r.device.name : null,
+            brand: null,
+            type: null,
+            ismobile: null,
+            istouch: null
+        },
+        engine: {
+            name: (r.engine.name && r.engine.name !== 'na') ? r.engine.name : null,
+            version: (r.engine.fullVersion && r.engine.fullVersion !== '-1') ? r.engine.fullVersion : null
+        },
+        raw: r
     };
     output.parse_time = end;
 }

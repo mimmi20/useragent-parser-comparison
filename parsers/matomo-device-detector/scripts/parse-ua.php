@@ -26,16 +26,27 @@ $cache   = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
 
 $start = microtime(true);
 $dd = new DeviceDetector('Test String');
-$dd->skipBotDetection();
 $dd->parse();
 $initTime = microtime(true) - $start;
+
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('matomo/device-detector'),
+];
 
 if ($hasUa) {
     $dd->setUserAgent($agentString);
 
     $start = microtime(true);
     $dd->parse();
-    $end = microtime(true) - $start;
 
     $clientInfo = $dd->getClient();
     $osInfo     = $dd->getOs();
@@ -43,45 +54,39 @@ if ($hasUa) {
     $brand      = $dd->getBrandName();
     $device     = $dd->getDeviceName();
     $isMobile   = $dd->isMobile();
+    $isBot      = $dd->isBot();
+    $botInfo    = $dd->getBot();
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => $clientInfo['name'] ?? null,
-                'version' => $clientInfo['version'] ?? null,
-                'isBot' => null,
-                'type' => $clientInfo['type'] ?? null,
-            ],
-            'platform' => [
-                'name'    => $osInfo['name'] ?? null,
-                'version' => $osInfo['version'] ?? null,
-            ],
-            'device' => [
-                'name'     => $model ?? null,
-                'brand'    => $brand ?? null,
-                'type'     => $device ?? null,
-                'ismobile' => $isMobile ? true : null,
-                'istouch'  => null,
-            ],
-            'engine' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'raw' => null,
+    $end = microtime(true) - $start;
+
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
+            'version' => $isBot ? null : ($clientInfo['version'] ?? null),
+            'isBot' => $isBot ? true : null,
+            'type' => $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => $osInfo['name'] ?? null,
+            'version' => $osInfo['version'] ?? null,
+        ],
+        'device' => [
+            'name'     => $model ?? null,
+            'brand'    => $brand ?? null,
+            'type'     => $device ?? null,
+            'ismobile' => $isMobile ? true : null,
+            'istouch'  => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'raw' => null,
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-$file = null;
+$output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => memory_get_peak_usage(),
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('matomo/device-detector'),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

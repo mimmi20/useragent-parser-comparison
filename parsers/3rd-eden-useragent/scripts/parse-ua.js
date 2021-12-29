@@ -19,7 +19,12 @@ if (uaPos >= 0) {
 }
 
 const output = {
-    result: null,
+    hasUa: hasUa,
+    ua: line,
+    result: {
+        parsed: null,
+        err: null
+    },
     parse_time: 0,
     init_time: initTime,
     memory_used: 0,
@@ -48,27 +53,23 @@ if (hasUa) {
         outputDevice.name = device.family;
     }
 
-    output.result = {
-        useragent: line,
-        parsed: {
-            client: {
-                name: r.family === 'Other' ? null : r.family,
-                version: (r.family === 'Other' || r.toVersion() === '0.0.0') ? null : r.toVersion(),
-                isBot: null,
-                type: null
-            },
-            platform: {
-                name: os.family === 'Other' ? null : os.family,
-                version: (os.family === 'Other' || r.os.toVersion() === '0.0.0') ? null : r.os.toVersion()
-            },
-            device: outputDevice,
-            engine: {
-                name: null,
-                version: null
-            },
-            raw: r
+    output.result.parsed = {
+        client: {
+            name: r.family === 'Other' ? null : r.family,
+            version: (r.family === 'Other' || r.toVersion() === '0.0.0') ? null : r.toVersion(),
+            isBot: null,
+            type: null
         },
-        time: end
+        platform: {
+            name: os.family === 'Other' ? null : os.family,
+            version: (os.family === 'Other' || r.os.toVersion() === '0.0.0') ? null : r.os.toVersion()
+        },
+        device: outputDevice,
+        engine: {
+            name: null,
+            version: null
+        },
+        raw: r
     };
     output.parse_time = end;
 }

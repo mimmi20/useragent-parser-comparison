@@ -170,6 +170,8 @@ class InitResults extends Command
                         $row2 = $this->hydrateResult($row2, $singleResult['result']['parsed']);
                     }
 
+                    $row2['resRawResult'] = json_encode($singleResult);
+
                     /*
                      * Persist
                      */
@@ -359,11 +361,11 @@ class InitResults extends Command
 
                     $message .= '.';
 
-                    echo str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength);
+                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
                 }
 
                 // display "progress"
-                echo str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . '   ' . str_pad(' ', $nameLength), PHP_EOL;
+                $output->writeln(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . '   ' . str_pad(' ', $nameLength));
 
                 $currenUserAgent++;
             }
@@ -402,8 +404,6 @@ class InitResults extends Command
             'resDeviceType' => $result['device']['type'],
             'resDeviceIsMobile' => $result['device']['ismobile'],
             'resDeviceIsTouch' => $result['device']['istouch'],
-
-            'resRawResult' => json_encode($result)
         ];
 
         return array_merge($row2, $toHydrate);

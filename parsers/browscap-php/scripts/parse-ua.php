@@ -32,51 +32,54 @@ $start = microtime(true);
 $bc->getBrowser('Test String');
 $initTime = microtime(true) - $start;
 
+$bcCache = new \BrowscapPHP\Cache\BrowscapCache($cache, $logger);
+
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('browscap/browscap-php') . '-' . $bcCache->getVersion(),
+];
+
 if ($hasUa) {
     $start = microtime(true);
     $r     = $bc->getBrowser($agentString);
     $end   = microtime(true) - $start;
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => ($r->browser && $r->browser !== 'unknown') ? $r->browser : null,
-                'version' => ($r->version && $r->version !== 'unknown') ? $r->version : null,
-                'isBot'   => (isset($r->crawler) && $r->crawler) ? true : null,
-                'type'    => $r->browser_type ?? null,
-            ],
-            'platform' => [
-                'name'    => ($r->platform && $r->platform !== 'unknown') ? $r->platform : null,
-                'version' => ($r->platform_version && $r->platform_version !== 'unknown') ? $r->platform_version : null,
-            ],
-            'device' => [
-                'name'     => ($r->device_name && $r->device_name !== 'unknown') ? $r->device_name : null,
-                'brand'    => ($r->device_maker && $r->device_maker !== 'unknown') ? $r->device_maker : null,
-                'type'     => ($r->device_type && $r->device_type !== 'unknown') ? $r->device_type : null,
-                'ismobile' => $r->ismobiledevice ? true : null,
-                'istouch'  => (isset($r->device_pointing_method) && $r->device_pointing_method === 'touchscreen') ? true : null,
-            ],
-            'engine' => [
-                'name'    => ($r->renderingengine_name && $r->renderingengine_name !== 'unknown') ? $r->renderingengine_name : null,
-                'version' => ($r->renderingengine_version && $r->renderingengine_version !== 'unknown') ? $r->renderingengine_version : null,
-            ],
-            'raw' => $r,
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => ($r->browser && $r->browser !== 'unknown') ? $r->browser : null,
+            'version' => ($r->version && $r->version !== 'unknown') ? $r->version : null,
+            'isBot'   => (isset($r->crawler) && $r->crawler) ? true : null,
+            'type'    => $r->browser_type ?? null,
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => ($r->platform && $r->platform !== 'unknown') ? $r->platform : null,
+            'version' => ($r->platform_version && $r->platform_version !== 'unknown') ? $r->platform_version : null,
+        ],
+        'device' => [
+            'name'     => ($r->device_name && $r->device_name !== 'unknown') ? $r->device_name : null,
+            'brand'    => ($r->device_maker && $r->device_maker !== 'unknown') ? $r->device_maker : null,
+            'type'     => ($r->device_type && $r->device_type !== 'unknown') ? $r->device_type : null,
+            'ismobile' => $r->ismobiledevice ? true : null,
+            'istouch'  => (isset($r->device_pointing_method) && $r->device_pointing_method === 'touchscreen') ? true : null,
+        ],
+        'engine' => [
+            'name'    => ($r->renderingengine_name && $r->renderingengine_name !== 'unknown') ? $r->renderingengine_name : null,
+            'version' => ($r->renderingengine_version && $r->renderingengine_version !== 'unknown') ? $r->renderingengine_version : null,
+        ],
+        'raw' => $r,
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-$memory = memory_get_peak_usage();
+$output['memory_used'] = memory_get_peak_usage();
 
-$bcCache = new \BrowscapPHP\Cache\BrowscapCache($cache, $logger);
-
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => $memory,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('browscap/browscap-php') . '-' . $bcCache->getVersion(),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

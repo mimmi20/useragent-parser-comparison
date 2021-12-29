@@ -27,6 +27,19 @@ $agent->setUserAgent('Test String');
 $agent->isDesktop();
 $initTime = microtime(true) - $start;
 
+$output = [
+    'hasUa' => $hasUa,
+    'ua' => $agentString,
+    'result'      => [
+        'parsed' => null,
+        'err'    => null,
+    ],
+    'parse_time'  => 0,
+    'init_time'   => $initTime,
+    'memory_used' => 0,
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('jenssegers/agent'),
+];
+
 if ($hasUa) {
     $start = microtime(true);
     $agent->setUserAgent($agentString);
@@ -53,45 +66,34 @@ if ($hasUa) {
     }
     $end = microtime(true) - $start;
 
-    $result = [
-        'useragent' => $agentString,
-        'parsed'    => [
-            'client' => [
-                'name'    => (isset($browser) && false !== $browser) ? $browser : null,
-                'version' => (isset($browserVersion) && false !== $browserVersion) ? $browserVersion : null,
-                'isBot'   => $isBot ? true : null,
-                'type'    => $isBot ? 'crawler' : null,
-            ],
-            'platform' => [
-                'name'    => (isset($platform) && false !== $platform) ? $platform : null,
-                'version' => (isset($platformVersion) && false !== $platformVersion) ? $platformVersion : null,
-            ],
-            'device' => [
-                'name'     => (isset($device) && false !== $device) ? $device : null,
-                'brand'    => null,
-                'type'     => $type,
-                'ismobile' => $isMobile ? true : null,
-                'istouch'  => null,
-            ],
-            'engine' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'raw' => $browser,
+    $output['result']['parsed'] = [
+        'client' => [
+            'name'    => (isset($browser) && false !== $browser) ? $browser : null,
+            'version' => (isset($browserVersion) && false !== $browserVersion) ? $browserVersion : null,
+            'isBot'   => $isBot ? true : null,
+            'type'    => $isBot ? 'crawler' : null,
         ],
-        'time' => $end,
+        'platform' => [
+            'name'    => (isset($platform) && false !== $platform) ? $platform : null,
+            'version' => (isset($platformVersion) && false !== $platformVersion) ? $platformVersion : null,
+        ],
+        'device' => [
+            'name'     => (isset($device) && false !== $device) ? $device : null,
+            'brand'    => null,
+            'type'     => $type,
+            'ismobile' => $isMobile ? true : null,
+            'istouch'  => null,
+        ],
+        'engine' => [
+            'name'    => null,
+            'version' => null,
+        ],
+        'raw' => $browser,
     ];
 
-    $parseTime = $end;
+    $output['parse_time'] = $end;
 }
 
-$file   = null;
-$memory = memory_get_peak_usage();
+$output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode([
-    'result'      => $result,
-    'parse_time'  => $parseTime,
-    'init_time'   => $initTime,
-    'memory_used' => $memory,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('jenssegers/agent'),
-], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
