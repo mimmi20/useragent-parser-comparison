@@ -70,7 +70,7 @@ if ($hasUa) {
         'client' => [
             'name'    => (isset($browser) && false !== $browser) ? $browser : null,
             'version' => (isset($browserVersion) && false !== $browserVersion) ? $browserVersion : null,
-            'isBot'   => $isBot ? true : null,
+            'isBot'   => $isBot,
             'type'    => $isBot ? 'crawler' : null,
         ],
         'platform' => [
@@ -81,7 +81,7 @@ if ($hasUa) {
             'name'     => (isset($device) && false !== $device) ? $device : null,
             'brand'    => null,
             'type'     => $type,
-            'ismobile' => $isMobile ? true : null,
+            'ismobile' => $isMobile,
             'istouch'  => null,
         ],
         'engine' => [

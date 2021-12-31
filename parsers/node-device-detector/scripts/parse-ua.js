@@ -43,7 +43,7 @@ if (hasUa) {
         client: {
             name: bot === null ? (r.client.name ? r.client.name : null) : (bot.name ?? null),
             version: (bot !== null && r.client.version) ? r.client.version : null,
-            isBot: bot !== null ? true : null,
+            isBot: bot !== null,
             type: bot === null ? (r.client.type ?? null) : (bot.category ?? null)
         },
         platform: {
@@ -54,7 +54,7 @@ if (hasUa) {
             name: r.device.model ? r.device.model : null,
             brand: r.device.vendor ? r.device.vendor : null,
             type: r.device.type ? r.device.type : null,
-            ismobile: DeviceHelper.isMobile(r) ? true : null,
+            ismobile: DeviceHelper.isMobile(r),
             istouch: null
         },
         engine: {

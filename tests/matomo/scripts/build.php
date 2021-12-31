@@ -114,7 +114,7 @@ foreach ($files as $fixture) {
                 'client' => [
                     'name' => $data['client']['name'] ?? null,
                     'version' => $data['client']['version'] ?? null,
-                    'isBot'   => null,
+                    'isBot'   => false,
                     'type'    => $data['client']['type'] ?? null,
                 ],
                 'engine' => [
@@ -129,7 +129,7 @@ foreach ($files as $fixture) {
                     'name' => (string)$data['device']['model'],
                     'brand' => AbstractDeviceParser::getFullName($data['device']['brand']),
                     'type' => $data['device']['type'],
-                    'ismobile' => isMobile($data) ? true : null,
+                    'ismobile' => isMobile($data),
                     'istouch' => null,
                 ],
                 'raw' => $data,

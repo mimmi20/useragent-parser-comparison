@@ -55,7 +55,7 @@ if ($hasUa) {
             'name'     => null,
             'brand'    => null,
             'type'     => null,
-            'ismobile' => $result->isMobile() ? true : null,
+            'ismobile' => $result->isMobile(),
             'istouch'  => null,
         ],
         'engine' => [

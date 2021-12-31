@@ -5,6 +5,7 @@
   "language": "PHP",
   "local": true,
   "api": false,
+  "isActive": true,
   "detectionCapabilities": {
     "client": {
       "name": true,

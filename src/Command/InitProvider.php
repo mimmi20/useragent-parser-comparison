@@ -64,7 +64,6 @@ class InitProvider extends Command
                 $statementInsertProvider,
                 $statementUpdateProvider,
                 'real',
-                $parserPath,
                 $parserConfig
             );
         }
@@ -72,15 +71,14 @@ class InitProvider extends Command
         /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
         $testHelper = $this->getHelper('tests');
 
-        foreach ($testHelper->collectTests($output) as $testPath => $testData) {
+        foreach ($testHelper->collectTests($output) as $testPath => $testConfig) {
             $this->insertProvider(
                 $output,
                 $statementSelectProvider,
                 $statementInsertProvider,
                 $statementUpdateProvider,
                 'testSuite',
-                $testPath,
-                $testData
+                $testConfig
             );
         }
 
@@ -93,7 +91,6 @@ class InitProvider extends Command
         \PDOStatement   $statementInsertProvider,
         \PDOStatement   $statementUpdateProvider,
         string          $type,
-        string          $providerPath,
         array           $providerConfig
     ): void
     {
@@ -119,7 +116,7 @@ class InitProvider extends Command
         $proPackageName             = $providerConfig['metadata']['packageName'];
         $proLocal                   = $providerConfig['metadata']['local'];
         $proApi                     = $providerConfig['metadata']['api'];
-        $proIsActive                = $providerConfig['metadata']['active'] ?? 1;
+        $proIsActive                = $providerConfig['metadata']['isActive'] ?? 1;
         $proCanDetectBrowserName    = $providerConfig['metadata']['detectionCapabilities']['client']['name'];
         $proCanDetectBrowserVersion = $providerConfig['metadata']['detectionCapabilities']['client']['version'];
         $proCanDetectBotIsBot       = $providerConfig['metadata']['detectionCapabilities']['client']['isBot'];
@@ -139,9 +136,9 @@ class InitProvider extends Command
 
         $statementSelectProvider->execute();
 
-        $found = false;
+        $dbResultProvider = $statementSelectProvider->fetch(\PDO::FETCH_ASSOC);
 
-        while ($dbResultProvider = $statementSelectProvider->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+        if (is_array($dbResultProvider)) {
             // update!
             $statementUpdateProvider->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
             $statementUpdateProvider->bindValue(':proType', $type, \PDO::PARAM_STR);
@@ -174,14 +171,8 @@ class InitProvider extends Command
 
             $statementUpdateProvider->execute();
 
-            $found = true;
-
             $output->writeln('U');
-
-            break;
-        }
-
-        if (!$found) {
+        } else {
             $statementInsertProvider->bindValue(':proId', Uuid::uuid4()->toString(), \PDO::PARAM_STR);
             $statementInsertProvider->bindValue(':proType', $type, \PDO::PARAM_STR);
             $statementInsertProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);

@@ -952,14 +952,14 @@ class GenerateIndexPage extends Command
 
         file_put_contents($folder . '/bot-types.html', $generate->getHtml());
 
-        $output->writeln("\r" . 'generate overview pages for found elements  <info>done</info>  ');
+        $output->writeln("\r" . 'generate overview pages for found elements <info>done</info>  ');
 
         $output->write('generate useragent detail pages');
 
         $statementSelectUa = $this->pdo->prepare('SELECT * FROM `useragent`');
         $statementSelectUa->execute();
 
-        $statementSelectResults = $this->pdo->prepare('SELECT `result`.*, `provider`.* FROM `result` INNER JOIN `provider` ON `result`.`provider_id` = `provider`.`proId` WHERE `result`.`userAgent_id` = :uaId ORDER BY `provider`.`proName`');
+        $statementSelectResults = $this->pdo->prepare('SELECT `result`.*, `provider`.* FROM `result` INNER JOIN `provider` ON `result`.`provider_id` = `provider`.`proId` WHERE `result`.`userAgent_id` = :uaId AND `provider`.`proIsActive` = 1 ORDER BY `provider`.`proName`');
         $uaCount = 0;
 
         while ($dbResultUa = $statementSelectUa->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {

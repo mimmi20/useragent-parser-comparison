@@ -5,6 +5,7 @@
   "language": "JavaScript",
   "local": true,
   "api": false,
+  "isActive": true,
   "detectionCapabilities": {
     "client": {
       "name": true,

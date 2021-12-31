@@ -52,7 +52,7 @@ if ($hasUa) {
         'client' => [
             'name'    => $r->getBrowser()->getName(),
             'version' => $r->getBrowser()->getVersion()->getVersion(),
-            'isBot'   => $r->getBrowser()->getType()->isBot() ? true : null,
+            'isBot'   => $r->getBrowser()->getType()->isBot(),
             'type'    => $r->getBrowser()->getType()->getType(),
         ],
         'platform' => [
@@ -63,8 +63,8 @@ if ($hasUa) {
             'name'     => $r->getDevice()->getDeviceName(),
             'brand'    => $r->getDevice()->getBrand()->getBrandName(),
             'type'     => $r->getDevice()->getType()->getName(),
-            'ismobile' => $r->getDevice()->getType()->isMobile() ? true : null,
-            'istouch'  => $r->getDevice()->getDisplay()->hasTouch() ? true : null,
+            'ismobile' => $r->getDevice()->getType()->isMobile(),
+            'istouch'  => $r->getDevice()->getDisplay()->hasTouch(),
         ],
         'engine' => [
             'name'    => $r->getEngine()->getName(),

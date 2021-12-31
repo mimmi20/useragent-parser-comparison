@@ -59,7 +59,7 @@ if ($lines !== false) {
             'client' => [
                 'name' => null,
                 'version' => null,
-                'isBot'   => null,
+                'isBot'   => false,
                 'type'    => null,
             ],
             'engine' => [

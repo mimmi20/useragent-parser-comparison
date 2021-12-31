@@ -16,7 +16,7 @@ abstract class AbstractHtml
         $this->title = $title;
     }
 
-    protected function getUserAgentCount(): int
+    final protected function getUserAgentCount(): int
     {
         if ($this->userAgentCount === null) {
             $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent`');
@@ -28,25 +28,27 @@ abstract class AbstractHtml
         return $this->userAgentCount;
     }
 
-    protected function getPercentCircle(int $resultFound, ?int $uniqueFound = null): string
+    final protected function getPercentCircle(int $countOfUseragents, int $resultFound, ?int $resultFound2 = null): string
     {
-        $onePercent = $this->getUserAgentCount() / 100;
-        
         $html = '
-            <div class="c100 p' . $this->calculatePercent($resultFound, $onePercent, 0) . ' small green-circle">
-                <span>' . $this->calculatePercent($resultFound, $onePercent) . '%</span>
-                <div class="slice">
-                    <div class="bar"></div>
-                    <div class="fill"></div>
-                </div>
+            <div class="svg-item">
+                <svg width="100%" height="100%" viewBox="0 0 40 40" class="donut">
+                    <circle class="donut-ring"></circle>
+                    ';
+        if (null !== $resultFound2) {
+            $html .=    '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . ($this->calculatePercent($resultFound2, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . '"></circle>
+                    ';
+        }
+        $html .=    '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . ($this->calculatePercent($resultFound, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '"></circle>
+                    <g class="donut-text">
+                
+                        <text y="50%" transform="translate(0, 2)">
+                            <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent($resultFound, $countOfUseragents / 100,2) . '%</tspan>   
+                        </text>
+                    </g>
+                </svg>
             </div>
         ';
-        
-        $html .= 'Tot.' . $resultFound;
-        
-        if ($uniqueFound !== null) {
-            $html .= '<br />' . 'Unq.' . $uniqueFound;
-        }
         
         return $html;
     }
@@ -74,13 +76,57 @@ abstract class AbstractHtml
             
     <title>' . htmlspecialchars($this->title) . '</title>
         
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="../circle.css" rel="stylesheet">
+    <style type="text/css">
+        .svg-item {
+            width: 100px;
+            height: 100px;
+            font-size: 16px;
+            margin: 0 auto;
+        }
+        
+        .donut circle {
+            cx: 20;
+            cy: 20;
+            r: 15.91549430918954;
+            fill: transparent;
+            stroke-width: 8;
+        }
+        
+        .donut-ring {
+            stroke: #EBEBEB;
+        }
+        
+        .donut-segment {
+            transform-origin: center;
+            stroke-dashoffset: 25;
+        }
+        
+        .donut-segment-2 {
+            stroke: #D9E021;
+        }
+        
+        .donut-segment-3 {
+            stroke: #FF6200;
+        }
+        
+        .donut-percent {
+            font-size: 0.5em;
+            line-height: 1;
+            transform: translateY(0.5em);
+            font-weight: bold;
+        }
+        
+        .donut-text {
+            font-family: Arial, Helvetica, sans-serif;
+            fill: #d9e021;
+        }
+    </style>
 </head>
         
 <body>
-<div class="container">
+<div>
     ' . $body . '
         
     <div class="section">
@@ -111,9 +157,9 @@ abstract class AbstractHtml
                 
 </div>
                 
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.3/js/materialize.min.js"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/list.js/1.2.0/list.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
         
     <script>
     ' . $script . '

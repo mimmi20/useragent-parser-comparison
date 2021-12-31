@@ -73,7 +73,7 @@ foreach ($files as $file) {
             'client' => [
                 'name'    => $expectedResult->getBrowser()->getName(),
                 'version' => ($browserVersion === '0.0.0' ? null : $browserVersion),
-                'isBot'   => $expectedResult->getBrowser()->getType()->isBot() ? true : null,
+                'isBot'   => $expectedResult->getBrowser()->getType()->isBot(),
                 'type'    => $expectedResult->getBrowser()->getType()->getType(),
             ],
             'engine' => [
@@ -88,8 +88,8 @@ foreach ($files as $file) {
                 'name'     => $expectedResult->getDevice()->getMarketingName(),
                 'brand'    => $expectedResult->getDevice()->getBrand()->getBrandName(),
                 'type'     => $expectedResult->getDevice()->getType()->getName(),
-                'ismobile' => $expectedResult->getDevice()->getType()->isMobile() ? true : null,
-                'istouch'  => $expectedResult->getDevice()->getDisplay()->hasTouch() ? true : null,
+                'ismobile' => $expectedResult->getDevice()->getType()->isMobile(),
+                'istouch'  => $expectedResult->getDevice()->getDisplay()->hasTouch(),
             ],
             'raw' => $test,
             'file' => $pathName,

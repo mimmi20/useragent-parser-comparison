@@ -63,7 +63,7 @@ if ($hasUa) {
             'name'     => ($device->getName() !== 'unknown') ? $device->getName() : null,
             'brand'    => null,
             'type'     => null,
-            'ismobile' => $os->isMobile() ? true : null,
+            'ismobile' => $os->isMobile(),
             'istouch'  => null,
         ],
         'engine' => [

@@ -48,7 +48,7 @@ foreach ($files as $fixture) {
             'client' => [
                 'name'    => $data['name'] ?? null,
                 'version' => $data['version'] ?? null,
-                'isBot'   => (isset($data['category']) && 'crawler' === $data['category']) ? true : null,
+                'isBot'   => isset($data['category']) && 'crawler' === $data['category'],
                 'type'    => $data['category'] ?? null,
             ],
             'engine' => [

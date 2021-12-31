@@ -51,7 +51,7 @@ if ($hasUa) {
         'client' => [
             'name'    => $r->isRobot ? (isset($r->robot) ? $r->robot->name : null) : ((isset($r->browser->name) && $r->browser->name !== 'not available') ? $r->browser->name : null),
             'version' => (isset($r->browser->version) && $r->browser->version !== 'not available') ? $r->browser->version : null,
-            'isBot'   => $r->isRobot ? true : null,
+            'isBot'   => $r->isRobot,
             'type'    => null,
         ],
         'platform' => [
@@ -62,8 +62,8 @@ if ($hasUa) {
             'name'     => isset($r->device->model) ? $r->device->model : null,
             'brand'    => isset($r->device->name) ? $r->device->name : null,
             'type'     => isset($r->device->type) ? $r->device->type : null,
-            'ismobile' => $r->isMobile ? true : null,
-            'istouch'  => $r->isTouch ? true : null,
+            'ismobile' => $r->isMobile,
+            'istouch'  => $r->isTouch,
         ],
         'engine' => [
             'name'    => null,

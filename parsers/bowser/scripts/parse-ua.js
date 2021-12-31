@@ -54,9 +54,7 @@ if (hasUa) {
             ismobile:
                 r.platform.type === 'mobile' ||
                 r.platform.type === 'tablet' ||
-                r.platform.type === 'wearable'
-                    ? true
-                    : null,
+                r.platform.type === 'wearable',
             istouch: null
         },
         engine: {

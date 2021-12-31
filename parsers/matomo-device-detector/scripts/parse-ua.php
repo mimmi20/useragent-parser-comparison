@@ -63,7 +63,7 @@ if ($hasUa) {
         'client' => [
             'name'    => $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
             'version' => $isBot ? null : ($clientInfo['version'] ?? null),
-            'isBot' => $isBot ? true : null,
+            'isBot' => $isBot,
             'type' => $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
         ],
         'platform' => [
@@ -74,12 +74,12 @@ if ($hasUa) {
             'name'     => $model ?? null,
             'brand'    => $brand ?? null,
             'type'     => $device ?? null,
-            'ismobile' => $isMobile ? true : null,
+            'ismobile' => $isMobile,
             'istouch'  => null,
         ],
         'engine' => [
-            'name'    => null,
-            'version' => null,
+            'name'    => $isBot ? null : ($clientInfo['engine'] ?? null),
+            'version' => $isBot ? null : ($clientInfo['engine_version'] ?? null),
         ],
         'raw' => null,
     ];

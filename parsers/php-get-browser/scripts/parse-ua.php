@@ -43,7 +43,7 @@ if ($hasUa) {
         'client' => [
             'name'    => ($r->browser && $r->browser !== 'unknown') ? $r->browser : null,
             'version' => ($r->version && $r->version !== 'unknown') ? $r->version : null,
-            'isBot'   => (isset($r->crawler) && $r->crawler) ? true : null,
+            'isBot'   => property_exists($r, 'crawler') ? $r->crawler : null,
             'type'    => $r->browser_type ?? null,
         ],
         'platform' => [
@@ -54,8 +54,8 @@ if ($hasUa) {
             'name'     => ($r->device_name && $r->device_name !== 'unknown') ? $r->device_name : null,
             'brand'    => ($r->device_maker && $r->device_maker !== 'unknown') ? $r->device_maker : null,
             'type'     => ($r->device_type && $r->device_type !== 'unknown') ? $r->device_type : null,
-            'ismobile' => $r->ismobiledevice ? true : null,
-            'istouch'  => (isset($r->device_pointing_method) && $r->device_pointing_method === 'touchscreen') ? true : null,
+            'ismobile' => property_exists($r, 'ismobiledevice') ? $r->ismobiledevice : null,
+            'istouch'  => (isset($r->device_pointing_method) && $r->device_pointing_method === 'touchscreen'),
         ],
         'engine' => [
             'name'    => ($r->renderingengine_name && $r->renderingengine_name !== 'unknown') ? $r->renderingengine_name : null,

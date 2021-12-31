@@ -77,7 +77,7 @@ class InitDb extends Command
   `proCanDetectDeviceIsTouch` TINYINT(1) NOT NULL,
   PRIMARY KEY (`proId`),
   UNIQUE KEY `unique_provider_name` (`proType`,`proName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `useragent`')->execute();
         $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `useragent` (
@@ -87,7 +87,7 @@ class InitDb extends Command
   `uaAdditionalHeaders` JSON NULL DEFAULT NULL,
   PRIMARY KEY (`uaId`),
   UNIQUE KEY `userAgent_hash` (`uaHash`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `result`')->execute();
         $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `result` (
@@ -96,8 +96,8 @@ class InitDb extends Command
   `resProviderVersion` VARCHAR(255) DEFAULT NULL,
   `userAgent_id` CHAR(36) DEFAULT NULL COMMENT \'(DC2Type:uuid)\',
   `resFilename` VARCHAR(255) DEFAULT NULL,
-  `resParseTime` DECIMAL(20,5) DEFAULT NULL,
-  `resInitTime` DECIMAL(20,5) DEFAULT NULL,
+  `resParseTime` DECIMAL(20,10) DEFAULT NULL,
+  `resInitTime` DECIMAL(20,10) DEFAULT NULL,
   `resMemoryUsed` INT DEFAULT NULL,
   `resLastChangeDate` DATETIME NOT NULL,
   `resResultFound` TINYINT(1) NOT NULL,
@@ -115,7 +115,7 @@ class InitDb extends Command
   `resDeviceType` VARCHAR(255) DEFAULT NULL,
   `resDeviceIsMobile` TINYINT(1) DEFAULT NULL,
   `resDeviceIsTouch` TINYINT(1) DEFAULT NULL,
-  `resRawResult` JSON NULL DEFAULT NULL,
+  `resRawResult` JSON NULL DEFAULT NULL COLLATE \'utf8mb4_bin\',
   PRIMARY KEY (`resId`),
   UNIQUE KEY `unique_userAgent_provider` (`userAgent_id`,`provider_id`),
   KEY `IDX_136AC113E127EC2A` (`userAgent_id`),
@@ -135,7 +135,7 @@ class InitDb extends Command
   KEY `result_resResultError` (`resResultError`),
   CONSTRAINT `FK_136AC113A53A8AA` FOREIGN KEY (`provider_id`) REFERENCES `provider` (`proId`),
   CONSTRAINT `FK_136AC113E127EC2A` FOREIGN KEY (`userAgent_id`) REFERENCES `useragent` (`uaId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `resultevaluation`')->execute();
         $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `resultevaluation` (
@@ -170,7 +170,7 @@ class InitDb extends Command
   PRIMARY KEY (`revId`),
   UNIQUE KEY `UNIQ_2846B1657A7B643` (`result_id`),
   CONSTRAINT `FK_2846B1657A7B643` FOREIGN KEY (`result_id`) REFERENCES `result` (`resId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `useragentevaluation`')->execute();
         $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `useragentevaluation` (
@@ -262,62 +262,10 @@ class InitDb extends Command
   PRIMARY KEY (`uevId`),
   UNIQUE KEY `UNIQ_D98F3DB4E127EC2A` (`userAgent_id`),
   CONSTRAINT `FK_D98F3DB4E127EC2A` FOREIGN KEY (`userAgent_id`) REFERENCES `useragent` (`uaId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `real-provider` AS SELECT * FROM `provider` WHERE `proType` = \'real\'')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `test-provider` AS SELECT * FROM `provider` WHERE `proType` = \'testSuite\'')->execute();
-
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `providers-general-overview` AS SELECT
-                `real-provider`.*,
-            
-                SUM(`resResultFound`) AS `resultFound`,
-                SUM(`resResultError`) AS `resultError`,
-            
-                COUNT(`resClientName`) AS `clientNameFound`,
-                COUNT(DISTINCT `resClientName`) AS `clientNameFoundUnique`,
-                COUNT(`resClientVersion`) AS `clientVersionFound`,
-                COUNT(`resClientIsBot`) AS `asBotDetected`,
-                COUNT(`resClientType`) AS `clientTypeFound`,
-                COUNT(DISTINCT `resClientType`) AS `clientTypeFoundUnique`,
-            
-                COUNT(`resEngineName`) AS `engineNameFound`,
-                COUNT(DISTINCT `resEngineName`) AS `engineNameFoundUnique`,
-                COUNT(`resEngineVersion`) AS `engineVersionFound`,
-            
-                COUNT(`resOsName`) AS `osNameFound`,
-                COUNT(DISTINCT `resOsName`) AS `osNameFoundUnique`,
-                COUNT(`resOsVersion`) AS `osVersionFound`,
-            
-                COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
-                COUNT(DISTINCT `resDeviceBrand`) AS `deviceBrandFoundUnique`,
-            
-                COUNT(`resDeviceModel`) AS `deviceModelFound`,
-                COUNT(DISTINCT `resDeviceModel`) AS `deviceModelFoundUnique`,
-            
-                COUNT(`resDeviceType`) AS `deviceTypeFound`,
-                COUNT(DISTINCT `resDeviceType`) AS `deviceTypeFoundUnique`,
-            
-                COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
-                COUNT(`resDeviceIsTouch`) AS `asTouchDeviceDetected`,
-            
-                AVG(`resInitTime`) AS `avgInitTime`,
-                AVG(`resParseTime`) AS `avgParseTime`,
-                AVG(`resMemoryUsed`) AS `avgMemoryUsed`
-            FROM `result`
-            INNER JOIN `real-provider`
-                ON `proId` = `provider_id`
-            GROUP BY
-                `proId`
-            ORDER BY 
-                `proName`')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `useragents-general-overview` AS SELECT 
-                `proName`,
-                COUNT(*) AS `countNumber`
-            FROM `test-provider`
-            JOIN `result`
-                ON `provider_id` = `proId`
-            GROUP BY `proId`
-            ORDER BY `proName`')->execute();
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `real-provider` AS SELECT * FROM `provider` WHERE `proType` = \'real\' AND `proIsActive` = 1')->execute();
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `test-provider` AS SELECT * FROM `provider` WHERE `proType` = \'testSuite\' AND `proIsActive` = 1')->execute();
 
         $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT 

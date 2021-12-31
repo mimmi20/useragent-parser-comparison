@@ -63,7 +63,7 @@ if ($hasUa) {
             'name'     => !empty($parser->device->model) ? $parser->device->model : null,
             'brand'    => !empty($parser->device->manufacturer) ? $parser->device->manufacturer : null,
             'type'     => !empty($parser->device->type) ? $parser->device->type : null,
-            'ismobile' => $isMobile ? true : null,
+            'ismobile' => $isMobile,
             'istouch'  => null,
         ],
         'engine' => [

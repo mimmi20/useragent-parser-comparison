@@ -50,7 +50,7 @@ if (hasUa) {
             name: null,
             brand: null,
             type: null,
-            ismobile: r.mobile ? true : null,
+            ismobile: r.mobile,
             istouch: null
         },
         engine: {

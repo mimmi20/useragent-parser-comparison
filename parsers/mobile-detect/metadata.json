@@ -5,6 +5,7 @@
   "language": "PHP",
   "local": true,
   "api": false,
+  "isActive": true,
   "detectionCapabilities": {
     "client": {
       "name": false,
@@ -21,7 +22,7 @@
       "version": false
     },
     "device": {
-      "model": true,
+      "model": false,
       "brand": false,
       "type": false,
       "isMobile": true,

@@ -73,9 +73,7 @@ if (hasUa) {
                 type: r.device.type ? r.device.type : null,
                 ismobile:
                     mobileDeviceTypes.indexOf(r.device.type) !== -1 ||
-                    (r.device.subtype && r.device.subtype === 'portable')
-                        ? true
-                        : null,
+                    (r.device.subtype && r.device.subtype === 'portable'),
                 istouch: null
             },
             engine: {
