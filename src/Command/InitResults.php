@@ -111,7 +111,9 @@ class InitResults extends Command
                 $message = $baseMessage;
 
                 foreach ($providers as $proName => $provider) {
-                    [$parserPath, $parserConfig, $proId] = $provider;
+                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
+
+                    [, $parserConfig, $proId] = $provider;
 
                     $statementSelectResult->bindValue(':proId', $proId, \PDO::PARAM_STR);
                     $statementSelectResult->bindValue(':uaId', $row['uaId'], \PDO::PARAM_STR);

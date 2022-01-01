@@ -156,8 +156,14 @@ class UserAgentDetail extends AbstractHtml
         }
 
         $html .= '</th>';
-        
-        if (!$result['resResultFound']) {
+
+        if ($result['resResultError']) {
+            $html .= '
+                    <td colspan="13" class="center-align red lighten-1">
+                        <strong>Error during detection</strong>
+                    </td>
+                ';
+        } elseif (!$result['resResultFound']) {
             $html .= '
                     <td colspan="13" class="center-align red lighten-1">
                         <strong>No result found</strong>
@@ -185,11 +191,11 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($result['proCanDetectClientIsBot']) {
+            if (array_key_exists('proCanDetectClientIsBot', $result) && null !== $result['proCanDetectClientIsBot']) {
                 if ($result['resClientIsBot']) {
                     $html .= '<td>yes</td>';
                 } else {
-                    $html .= '<td></td>';
+                    $html .= '<td>no</td>';
                 }
             } else {
                 $html .= '<td class="center-align">x</td>';
@@ -240,21 +246,21 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($result['proCanDetectDeviceIsMobile']) {
+            if (array_key_exists('proCanDetectDeviceIsMobile', $result) && null !== $result['proCanDetectDeviceIsMobile']) {
                 if ($result['resDeviceIsMobile']) {
                     $html .= '<td>yes</td>';
                 } else {
-                    $html .= '<td></td>';
+                    $html .= '<td>no</td>';
                 }
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($result['proCanDetectDeviceIsTouch']) {
+            if (array_key_exists('proCanDetectDeviceIsTouch', $result) && null !== $result['proCanDetectDeviceIsTouch']) {
                 if ($result['resDeviceIsTouch']) {
                     $html .= '<td>yes</td>';
                 } else {
-                    $html .= '<td></td>';
+                    $html .= '<td>no</td>';
                 }
             } else {
                 $html .= '<td class="center-align">x</td>';
