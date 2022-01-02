@@ -36,7 +36,9 @@ $bcCache = new \BrowscapPHP\Cache\BrowscapCache($cache, $logger);
 
 $output = [
     'hasUa' => $hasUa,
-    'ua' => $agentString,
+    'headers' => [
+        'user-agent' => $agentString,
+    ],
     'result'      => [
         'parsed' => null,
         'err'    => null,

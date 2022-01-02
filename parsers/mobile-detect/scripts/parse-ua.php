@@ -27,7 +27,9 @@ $initTime = microtime(true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
-    'ua' => $agentString,
+    'headers' => [
+        'user-agent' => $agentString,
+    ],
     'result'      => [
         'parsed' => null,
         'err'    => null,

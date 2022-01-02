@@ -18,7 +18,9 @@ if (uaPos >= 0) {
 
 const output = {
     hasUa: hasUa,
-    ua: line,
+    headers: {
+        "user-agent": line
+    },
     result: {
         parsed: null,
         err: null

@@ -27,7 +27,9 @@ $regexVersion = file_get_contents(__DIR__ . '/../version.txt');
 
 $output = [
     'hasUa' => $hasUa,
-    'ua' => $agentString,
+    'headers' => [
+        'user-agent' => $agentString,
+    ],
     'result'      => [
         'parsed' => null,
         'err'    => null,

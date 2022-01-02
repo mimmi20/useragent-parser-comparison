@@ -41,9 +41,6 @@ foreach ($files as $file) {
             ],
             $properties,
             [
-                'bot' => [
-                    'isbot' => null,
-                ],
                 'raw' => null,
                 'file' => $pathName,
             ]

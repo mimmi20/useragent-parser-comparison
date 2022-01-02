@@ -7,7 +7,7 @@ parser.parse('Test String');
 const initTime = process.hrtime(initStart)[1] / 1000000000;
 
 const packageInfo = require(require('path').dirname(require.resolve('platform')) +
-    '/../package.json');
+    '/package.json');
 const version = packageInfo.version;
 
 let hasUa = false;
@@ -20,7 +20,9 @@ if (uaPos >= 0) {
 
 const output = {
     hasUa: hasUa,
-    ua: line,
+    headers: {
+        "user-agent": line
+    },
     result: {
         parsed: null,
         err: null
@@ -37,6 +39,7 @@ if (hasUa) {
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {
+
         client: {
             name: r.name ?? null,
             version: r.version ?? null,
@@ -44,12 +47,12 @@ if (hasUa) {
             type: null
         },
         platform: {
-            name: r.os ?? null,
-            version: null
+            name: r.os.family ?? null,
+            version: r.os.version ?? null
         },
         device: {
-            name: null,
-            brand: null,
+            name: r.product ?? null,
+            brand: r.manufacturer ?? null,
             type: null,
             ismobile: null,
             istouch: null

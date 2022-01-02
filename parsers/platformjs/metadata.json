@@ -19,11 +19,11 @@
     },
     "operatingSystem": {
       "name": true,
-      "version": false
+      "version": true
     },
     "device": {
-      "model": false,
-      "brand": false,
+      "model": true,
+      "brand": true,
       "type": false,
       "isMobile": true,
       "isTouch": false
