@@ -12,7 +12,7 @@
         "ext-simplexml": "*",
         "composer-runtime-api": "^2.0",
         "ramsey/uuid": "^4.2.3",
-        "symfony/console": "^v6.0.1"
+        "symfony/console": "^v6.0.2"
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^4.0.0",
