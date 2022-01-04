@@ -95,8 +95,6 @@ class Parsers extends Helper
             $selectedParsers[$names[$name]] = $parsers[$names[$name]];
         }
 
-        ksort($selectedParsers);
-
         return $selectedParsers;
     }
 
@@ -114,13 +112,22 @@ class Parsers extends Helper
 
                 if (false === $contents) {
                     $output->writeln('<error>Could not read metadata file for parser in ' . $pathName . '</error>');
-                } else {
-                    try {
-                        $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $e) {
-                        $output->writeln('<error>An error occured while parsing metadata for parser ' . $pathName . '</error>');
-                    }
+                    continue;
                 }
+
+                try {
+                    $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    $output->writeln('<error>An error occured while parsing metadata for parser ' . $pathName . '</error>');
+                    continue;
+                }
+            }
+
+            $isActive = $metadata['isActive'] ?? false;
+
+            if (!$isActive) {
+                $output->writeln('<error>parser ' . $pathName . ' is not active, skipping</error>');
+                continue;
             }
 
             $language = $metadata['language'] ?? '';
@@ -143,7 +150,8 @@ class Parsers extends Helper
             }
 
             yield $parserDir->getFilename() => [
-                'path'     => $pathName,
+                'name'     => $pathName,
+                'path'     => $parserDir->getFilename(),
                 'metadata' => $metadata,
                 'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir): ?array {
                     switch ($language) {
@@ -175,6 +183,7 @@ class Parsers extends Helper
                     try {
                         return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
                     } catch (\JsonException $e) {
+                        $output->writeln('<error>' . $result . '</error>');
                         $output->writeln('<error>' . $result . $e . '</error>');
                     }
 

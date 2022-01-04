@@ -19,6 +19,7 @@ class Compare extends Command
         $this->setName('compare')
             ->setDescription('Runs tests, normalizes the results then analyzes the results')
             ->addOption('run', 'r', InputOption::VALUE_OPTIONAL, 'The name of the test run, if omitted will be generated from date')
+            ->addOption('import', null, InputOption::VALUE_NONE, 'Whether to import providers and useragents')
             ->addArgument('file', InputArgument::OPTIONAL, 'Path to a file to use as the source of useragents rather than test suites')
             ->setHelp('This command is a "meta" command that will execute the Test, Normalize and Analyze commands in order');
     }
@@ -41,6 +42,38 @@ class Compare extends Command
 
         if (empty($name)) {
             $name = date('YmdHis');
+        }
+
+        $doImport = $input->getOption('import');
+
+        if ($doImport) {
+            $command   = $application->find('init-provider');
+            $arguments = [
+                'command'     => 'init-provider',
+            ];
+
+            $initProviderInput = new ArrayInput($arguments);
+            $returnCode = $command->run($initProviderInput, $output);
+
+            if ($returnCode > 0) {
+                $output->writeln('<error>There was an error executing the "init-provider" command, cannot continue.</error>');
+
+                return $returnCode;
+            }
+
+            $command = $application->find('init-useragents');
+            $arguments = [
+                'command' => 'init-useragents',
+            ];
+
+            $initProviderInput = new ArrayInput($arguments);
+            $returnCode = $command->run($initProviderInput, $output);
+
+            if ($returnCode > 0) {
+                $output->writeln('<error>There was an error executing the "init-useragents" command, cannot continue.</error>');
+
+                return $returnCode;
+            }
         }
 
         if ($file) {

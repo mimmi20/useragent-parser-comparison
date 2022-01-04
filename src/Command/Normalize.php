@@ -23,12 +23,12 @@ class Normalize extends Command
     /**
      * @var string
      */
-    private $runDir = __DIR__ . '/../../data/test-runs';
+    private string $runDir = __DIR__ . '/../../data/test-runs';
 
     /**
      * @var array
      */
-    private $options = [];
+    private array $options = [];
 
     protected function configure(): void
     {

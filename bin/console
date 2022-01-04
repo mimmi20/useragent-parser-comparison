@@ -33,6 +33,9 @@ if (file_exists('config.php')) {
     $basePath = '../gh-pages/v' . COMPARISON_VERSION;
 
     if (isset($pdo) && $pdo instanceof \PDO) {
+        $resultHelper = new \UserAgentParserComparison\Command\Helper\Result($pdo);
+        $application->getHelperSet()->set($resultHelper);
+
         $application->add(new \UserAgentParserComparison\Command\InitDb($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitProvider($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitUseragents($pdo));

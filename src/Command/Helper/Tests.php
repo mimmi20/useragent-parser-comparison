@@ -153,9 +153,9 @@ class Tests extends Helper
         return $names[$answer];
     }
 
-    public function collectTests(OutputInterface $output): iterable
+    public function collectTests(OutputInterface $output, ?string $thisRunDir): iterable
     {
-        $tests = [];
+        $expectedDir  = $thisRunDir === null ?  null : $thisRunDir . '/expected';
 
         /** @var SplFileInfo $testDir */
         foreach (new FilesystemIterator($this->testDir) as $testDir) {
@@ -196,10 +196,11 @@ class Tests extends Helper
                 }
             }
 
-            $tests[$testDir->getFilename()] = [
-                'path'     => $pathName,
+            yield $testDir->getFilename() => [
+                'name'     => $pathName,
+                'path'     => $testDir->getFilename(),
                 'metadata' => $metadata,
-                'build'    => static function () use ($testDir, $output, $language, $pathName): iterable {
+                'build'    => static function () use ($testDir, $output, $language, $pathName, $expectedDir): iterable {
                     $testName = $testDir->getFilename();
 
                     switch ($language) {
@@ -236,6 +237,10 @@ class Tests extends Helper
 
                     $testOutput = trim($testOutput);
 
+                    if (null !== $expectedDir) {
+                        file_put_contents($expectedDir . '/' . $testName . '.json', $testOutput);
+                    }
+
                     try {
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
                     } catch (\JsonException $e) {
@@ -254,10 +259,6 @@ class Tests extends Helper
                 },
             ];
         }
-
-        ksort($tests);
-
-        yield from $tests;
     }
 
     /**

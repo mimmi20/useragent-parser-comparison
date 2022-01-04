@@ -57,7 +57,7 @@ class InitProvider extends Command
         /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
 
-        foreach ($parserHelper->getAllParsers($output) as $parserPath => $parserConfig) {
+        foreach ($parserHelper->getAllParsers($output) as $parserConfig) {
             $this->insertProvider(
                 $output,
                 $statementSelectProvider,
@@ -71,7 +71,7 @@ class InitProvider extends Command
         /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
         $testHelper = $this->getHelper('tests');
 
-        foreach ($testHelper->collectTests($output) as $testPath => $testConfig) {
+        foreach ($testHelper->collectTests($output, null) as $testConfig) {
             $this->insertProvider(
                 $output,
                 $statementSelectProvider,
@@ -81,6 +81,8 @@ class InitProvider extends Command
                 $testConfig
             );
         }
+
+        $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
     }
@@ -97,22 +99,11 @@ class InitProvider extends Command
         $proName                    = $providerConfig['metadata']['name'];
         $proLanguage                = $providerConfig['metadata']['language'];
 
-        $output->write($proName . ' [' . $proLanguage . '/' . $type . ']: ');
+        $output->write('writing data for provider <fg=green;options=bold,underscore>' . $proName . '</> [' . $proLanguage . '/' . $type . '] into DB');
 
         $proHomepage                = $providerConfig['metadata']['homepage'];
-
-        if (isset($providerConfig['metadata']['version'])) {
-            $proVersion                 = $providerConfig['metadata']['version'];
-        } else {
-            $proVersion                 = null;
-        }
-
-        if (isset($providerConfig['metadata']['release-date'])) {
-            $proReleaseDate                 = $providerConfig['metadata']['release-date'];
-        } else {
-            $proReleaseDate                 = null;
-        }
-
+        $proVersion                 = $providerConfig['metadata']['version'] ?? null;
+        $proReleaseDate             = $providerConfig['metadata']['release-date'] ?? null;
         $proPackageName             = $providerConfig['metadata']['packageName'];
         $proLocal                   = $providerConfig['metadata']['local'];
         $proApi                     = $providerConfig['metadata']['api'];
@@ -171,40 +162,41 @@ class InitProvider extends Command
 
             $statementUpdateProvider->execute();
 
-            $output->writeln('U');
-        } else {
-            $statementInsertProvider->bindValue(':proId', Uuid::uuid4()->toString(), \PDO::PARAM_STR);
-            $statementInsertProvider->bindValue(':proType', $type, \PDO::PARAM_STR);
-            $statementInsertProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
-            $statementInsertProvider->bindValue(':proHomepage', $proHomepage, \PDO::PARAM_STR);
-            $statementInsertProvider->bindValue(':proVersion', $proVersion, \PDO::PARAM_STR);
-            if (null !== $proReleaseDate) {
-                $statementInsertProvider->bindValue(':proLastReleaseDate', $proReleaseDate->format('Y-m-d H:i:s'), \PDO::PARAM_STR);
-            } else {
-                $statementInsertProvider->bindValue(':proLastReleaseDate', null);
-            }
-            $statementInsertProvider->bindValue(':proPackageName', $proPackageName, \PDO::PARAM_STR);
-            $statementInsertProvider->bindValue(':proLanguage', $proLanguage, \PDO::PARAM_STR);
-            $statementInsertProvider->bindValue(':proLocal', $proLocal, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proApi', $proApi, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proIsActive', $proIsActive, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectClientName', $proCanDetectBrowserName, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectClientVersion', $proCanDetectBrowserVersion, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectClientIsBot', $proCanDetectBotIsBot, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectClientType', $proCanDetectBotType, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectEngineName', $proCanDetectEngineName, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectEngineVersion', $proCanDetectEngineVersion, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectOsName', $proCanDetectOsName, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectOsVersion', $proCanDetectOsVersion, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectDeviceModel', $proCanDetectDeviceModel, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectDeviceBrand', $proCanDetectDeviceBrand, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectDeviceType', $proCanDetectDeviceType, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectDeviceIsMobile', $proCanDetectDeviceIsMobile, \PDO::PARAM_INT);
-            $statementInsertProvider->bindValue(':proCanDetectDeviceIsTouch', $proCanDetectDeviceIsTouch, \PDO::PARAM_INT);
-
-            $statementInsertProvider->execute();
-
-            $output->writeln('I');
+            $output->writeln(' - <info>existing provider updated</info>');
+            return;
         }
+
+        $statementInsertProvider->bindValue(':proId', Uuid::uuid4()->toString(), \PDO::PARAM_STR);
+        $statementInsertProvider->bindValue(':proType', $type, \PDO::PARAM_STR);
+        $statementInsertProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
+        $statementInsertProvider->bindValue(':proHomepage', $proHomepage, \PDO::PARAM_STR);
+        $statementInsertProvider->bindValue(':proVersion', $proVersion, \PDO::PARAM_STR);
+        if (null !== $proReleaseDate) {
+            $statementInsertProvider->bindValue(':proLastReleaseDate', $proReleaseDate->format('Y-m-d H:i:s'), \PDO::PARAM_STR);
+        } else {
+            $statementInsertProvider->bindValue(':proLastReleaseDate', null);
+        }
+        $statementInsertProvider->bindValue(':proPackageName', $proPackageName, \PDO::PARAM_STR);
+        $statementInsertProvider->bindValue(':proLanguage', $proLanguage, \PDO::PARAM_STR);
+        $statementInsertProvider->bindValue(':proLocal', $proLocal, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proApi', $proApi, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proIsActive', $proIsActive, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectClientName', $proCanDetectBrowserName, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectClientVersion', $proCanDetectBrowserVersion, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectClientIsBot', $proCanDetectBotIsBot, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectClientType', $proCanDetectBotType, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectEngineName', $proCanDetectEngineName, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectEngineVersion', $proCanDetectEngineVersion, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectOsName', $proCanDetectOsName, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectOsVersion', $proCanDetectOsVersion, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectDeviceModel', $proCanDetectDeviceModel, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectDeviceBrand', $proCanDetectDeviceBrand, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectDeviceType', $proCanDetectDeviceType, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectDeviceIsMobile', $proCanDetectDeviceIsMobile, \PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(':proCanDetectDeviceIsTouch', $proCanDetectDeviceIsTouch, \PDO::PARAM_INT);
+
+        $statementInsertProvider->execute();
+
+        $output->writeln(' - <info>new provider inserted</info>');
     }
 }
