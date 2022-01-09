@@ -139,7 +139,7 @@ class Analyze extends Command
         }
 
         $this->summaryTable = new Table($output);
-        $this->summaryTable->setHeaders(['Parser', 'Version', 'Browser Results', 'Platform Results', 'Device Results', 'Time Taken', 'Accuracy Score']);
+        $this->summaryTable->setHeaders(['Parser', 'Version', 'Client Results', 'Platform Results', 'Device Results', 'Time Taken', 'Accuracy Score']);
         $rows   = [];
         $totals = [];
 

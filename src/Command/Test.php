@@ -60,10 +60,25 @@ class Test extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        // Prepare our test directory to store the data from this run
+        /** @var string|null $thisRunDirName */
+        $thisRunDirName = $input->getArgument('run');
+
+        if (empty($thisRunDirName)) {
+            $thisRunDirName = date('YmdHis');
+        }
+        $thisRunDir   = $this->runDir . '/' . $thisRunDirName;
+        $resultsDir   = $thisRunDir . '/results';
+        $expectedDir  = $thisRunDir . '/expected';
+
+        mkdir($thisRunDir);
+        mkdir($resultsDir);
+        mkdir($expectedDir);
+
         /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
         $testHelper = $this->getHelper('tests');
 
-        foreach ($testHelper->collectTests($output) as $testPath => $testData) {
+        foreach ($testHelper->collectTests($output, $thisRunDir) as $testPath => $testData) {
             $this->tests[$testPath] = $testData;
         }
 
@@ -113,23 +128,6 @@ class Test extends Command
         /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
         $parsers      = $parserHelper->getParsers($input, $output);
-
-        // Prepare our test directory to store the data from this run
-        /** @var string|null $thisRunDirName */
-        $thisRunDirName = $input->getArgument('run');
-
-        if (empty($thisRunDirName)) {
-            $thisRunDirName = date('YmdHis');
-        }
-        $thisRunDir   = $this->runDir . '/' . $thisRunDirName;
-        $testFilesDir = $thisRunDir . '/test-files';
-        $resultsDir   = $thisRunDir . '/results';
-        $expectedDir  = $thisRunDir . '/expected';
-
-        mkdir($thisRunDir);
-        mkdir($testFilesDir);
-        mkdir($resultsDir);
-        mkdir($expectedDir);
 
         $usedTests = [];
 
@@ -207,7 +205,12 @@ class Test extends Command
                         mkdir($resultsDir . '/' . $parserName);
                     }
 
-                    $result[$parserName]['results'][] = $singleResult['result'];
+                    $result[$parserName]['results'][] = [
+                        'headers' => $singleResult['headers'],
+                        'parsed'  => $singleResult['result']['parsed'],
+                        'err'     => $singleResult['result']['err'],
+                        'time'    => $singleResult['parse_time'],
+                    ];
 
                     if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
                         $result[$parserName]['init_time'] = $singleResult['init_time'];

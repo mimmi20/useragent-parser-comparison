@@ -28,7 +28,7 @@ class Normalize extends Helper
             $mappings = include self::MAP_FILE;
         }
 
-        $sections = ['browser', 'platform', 'device'];
+        $sections = ['client', 'platform', 'device', 'engine'];
 
         foreach ($sections as $section) {
             if (!array_key_exists($section, $parsed)) {
