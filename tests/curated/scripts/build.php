@@ -1,9 +1,11 @@
 <?php
 
 declare(strict_types = 1);
-$tests = [];
 
-require_once __DIR__ . '/../vendor/autoload.php';
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+chdir(dirname(__DIR__));
+
+require_once 'vendor/autoload.php';
 
 $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/../files'));
 $files = new class($iterator, 'php') extends \FilterIterator {
@@ -25,6 +27,8 @@ $files = new class($iterator, 'php') extends \FilterIterator {
     }
 };
 
+$tests = [];
+
 foreach ($files as $file) {
     /** @var \SplFileInfo $file */
     $pathName = $file->getPathname();
@@ -33,7 +37,9 @@ foreach ($files as $file) {
     $provider = include $pathName;
 
     foreach ($provider as $ua => $properties) {
-        $tests[] = array_merge(
+        $uid = \Ramsey\Uuid\Uuid::uuid4()->toString();
+
+        $tests[$uid] = array_merge(
             [
                 'headers' => [
                     'user-agent' => $ua,

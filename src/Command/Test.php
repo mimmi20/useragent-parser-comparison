@@ -147,27 +147,24 @@ class Test extends Command
                 }
 
                 $agent = addcslashes($agent, PHP_EOL);
+                $agentToShow = $agent;
 
-                $output->writeln(
-                    sprintf(
-                        '  [%s] UA: <fg=yellow>%s</>',
-                        $actualTest,
-                        $agent
-                    )
-                );
+                if (mb_strlen($agentToShow) > 100) {
+                    $agentToShow = mb_substr($agentToShow, 0, 96) . ' ...';
+                }
 
                 $basicTestMessage = sprintf(
-                    '  [%s] Testing',
-                    $actualTest
+                    '  [%s] UA: <fg=yellow>%s</>',
+                    $actualTest,
+                    $agentToShow
                 );
 
-                $output->write($basicTestMessage);
+                $output->write("\r" . $basicTestMessage);
                 $textLength = mb_strlen($basicTestMessage);
 
                 foreach ($parsers as $parserName => $parser) {
                     if (!array_key_exists($parserName, $result)) {
                         $result[$parserName] = [
-                            'results'     => [],
                             'parse_time'  => 0,
                             'init_time'   => 0,
                             'memory_used' => 0,
@@ -205,12 +202,25 @@ class Test extends Command
                         mkdir($resultsDir . '/' . $parserName);
                     }
 
-                    $result[$parserName]['results'][] = [
-                        'headers' => $singleResult['headers'],
-                        'parsed'  => $singleResult['result']['parsed'],
-                        'err'     => $singleResult['result']['err'],
-                        'time'    => $singleResult['parse_time'],
-                    ];
+                    if (!file_exists($resultsDir . '/' . $parserName . '/' . $testName)) {
+                        mkdir($resultsDir . '/' . $parserName . '/' . $testName);
+                    }
+
+                    file_put_contents(
+                        $resultsDir . '/' . $parserName . '/' . $testName . '/' . $singleTestName . '.json',
+                        json_encode(
+                            [
+                                'headers' => $singleResult['headers'],
+                                'parsed'  => $singleResult['result']['parsed'],
+                                'err'     => $singleResult['result']['err'],
+                                'version' => $singleResult['version'],
+                                'init'    => $singleResult['init_time'],
+                                'time'    => $singleResult['parse_time'],
+                                'memory'  => $singleResult['memory_used'],
+                            ],
+                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+                        )
+                    );
 
                     if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
                         $result[$parserName]['init_time'] = $singleResult['init_time'];
@@ -230,8 +240,10 @@ class Test extends Command
                     $textLength = mb_strlen($testMessage);
                 }
 
-                $output->writeln("\r" . str_pad($testMessage, $textLength));
+                $output->write("\r" . str_pad($testMessage, $textLength));
             }
+
+            $output->writeln('');
 
             foreach (array_keys($parsers) as $parserName) {
                 if (!array_key_exists($parserName, $result)) {
@@ -247,7 +259,7 @@ class Test extends Command
                 }
 
                 file_put_contents(
-                    $resultsDir . '/' . $parserName . '/' . $testName . '.json',
+                    $resultsDir . '/' . $parserName . '/' . $testName . '/metadata.json',
                     json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
                 );
 

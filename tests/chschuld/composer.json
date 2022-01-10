@@ -2,7 +2,8 @@
   "require": {
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0",
-    "cbschuld/browser.php": "^v1.9.6"
+    "cbschuld/browser.php": "^v1.9.6",
+    "mimmi20/browscap-helper-source": "^3.0.1"
   },
   "config": {
     "preferred-install": {

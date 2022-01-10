@@ -14,6 +14,15 @@ class Normalize extends Helper
      */
     private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
+    private array $mappings = [];
+
+    public function __construct()
+    {
+        if (file_exists(self::MAP_FILE)) {
+            $this->mappings = include self::MAP_FILE;
+        }
+    }
+
     public function getName(): string
     {
         return 'normalize';
@@ -22,13 +31,7 @@ class Normalize extends Helper
     public function normalize(array $parsed): array
     {
         $normalized = [];
-        $mappings   = [];
-
-        if (file_exists(self::MAP_FILE)) {
-            $mappings = include self::MAP_FILE;
-        }
-
-        $sections = ['client', 'platform', 'device', 'engine'];
+        $sections   = ['client', 'platform', 'device', 'engine'];
 
         foreach ($sections as $section) {
             if (!array_key_exists($section, $parsed)) {
@@ -39,48 +42,7 @@ class Normalize extends Helper
             $properties           = $parsed[$section];
 
             foreach ($properties as $key => $value) {
-                if ($value === null) {
-                    $normalized[$section][$key] = $value;
-                    continue;
-                }
-
-                if ($key === 'version') {
-                    $value = $this->truncateVersion(mb_strtolower((string) $value));
-                } elseif ($value === false) {
-                    $value = 'false';
-                } elseif ($value === true) {
-                    $value = 'true';
-                } else {
-                    $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
-                }
-
-                // Special Windows normalization for parsers that don't differntiate the version of windows
-                // in the name, but use the version.
-                if ($section === 'platform' && $key === 'name' && $value === 'windows') {
-                    if (!empty($parsed['platform']['version'])) {
-                        $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
-                    }
-                }
-
-                if ($section === 'platform' && $key === 'name' && $value === 'windowsphone') {
-                    if (!empty($parsed['platform']['version'])) {
-                        $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
-                    }
-                }
-
-                if (isset($mappings[$section][$key])
-                    && is_array($mappings[$section][$key])
-                ) {
-                    $v = $mappings[$section][$key];
-                } else {
-                    $v = [];
-                }
-
-                if (is_array($v) && array_key_exists($value, $v)) {
-                    $value = $v[$value];
-                }
-
-                $normalized[$section][$key] = $value;
+                $normalized[$section][$key] = $this->normalizeValue($section, $key, $value);
             }
         }
 
@@ -94,5 +56,63 @@ class Normalize extends Helper
         $versionParts = array_slice($versionParts, 0, 2);
 
         return implode('.', $versionParts);
+    }
+
+    private function normalizeValue(string $section, string $key, mixed $value): array|string|null
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if ($value === false) {
+            return 'false';
+        }
+
+        if ($value === true) {
+            return 'true';
+        }
+
+        if (is_array($value)) {
+            $list = [];
+            foreach ($value as $key2 => $value2) {
+                $list[$key2] = $this->normalizeValue($section, $key2, $value2);
+            }
+
+            return $list;
+        }
+
+        if ($key === 'version') {
+            $value = $this->truncateVersion(mb_strtolower((string) $value));
+        } else {
+            $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
+        }
+
+        // Special Windows normalization for parsers that don't differntiate the version of windows
+        // in the name, but use the version.
+        if ($section === 'platform' && $key === 'name' && $value === 'windows') {
+            if (!empty($parsed['platform']['version'])) {
+                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
+            }
+        }
+
+        if ($section === 'platform' && $key === 'name' && $value === 'windowsphone') {
+            if (!empty($parsed['platform']['version'])) {
+                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
+            }
+        }
+
+        if (isset($this->mappings[$section][$key])
+            && is_array($this->mappings[$section][$key])
+        ) {
+            $v = $this->mappings[$section][$key];
+        } else {
+            $v = [];
+        }
+
+        if (is_array($v) && array_key_exists($value, $v)) {
+            $value = $v[$value];
+        }
+
+        return $value;
     }
 }

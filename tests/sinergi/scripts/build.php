@@ -1,60 +1,24 @@
 <?php
 
 declare(strict_types = 1);
-$uas = [];
 
-require_once __DIR__ . '/../vendor/autoload.php';
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+chdir(dirname(__DIR__));
 
-$provider = simplexml_load_file(
-    __DIR__ . '/../vendor/sinergi/browser-detector/tests/BrowserDetector/Tests/_files/UserAgentStrings.xml'
-);
+require_once 'vendor/autoload.php';
 
-foreach ($provider->strings as $string) {
-    foreach ($string as $field) {
-        $ua = explode("\n", (string) $field->field[6]);
-        $ua = array_map('trim', $ua);
-        $ua = trim(implode(' ', $ua));
+$source = new \BrowscapHelper\Source\SinergiSource();
+$baseMessage = sprintf('reading from source %s ', $source->getName());
+$messageLength = 0;
+$tests = [];
 
-        $browser        = (string) $field->field[0];
-        $browserVersion = (string) $field->field[1];
-
-        $platform        = (string) $field->field[2];
-        $platformVersion = (string) $field->field[3];
-
-        $device = (string) $field->field[4];
-
-        $uas[] = [
-            'headers' => [
-                'user-agent' => $ua,
-            ],
-            'client' => [
-                'name'    => $browser,
-                'version' => $browserVersion,
-                'isBot'   => null,
-                'type'    => null,
-            ],
-            'engine' => [
-                'name'    => null,
-                'version' => null,
-            ],
-            'platform' => [
-                'name'    => $platform,
-                'version' => $platformVersion,
-            ],
-            'device' => [
-                'name'     => $device,
-                'brand'    => null,
-                'type'     => null,
-                'ismobile' => null,
-                'istouch'  => null,
-            ],
-            'raw' => $field->asXML(),
-            'file' => null,
-        ];
+if ($source->isReady($baseMessage)) {
+    foreach ($source->getProperties($baseMessage, $messageLength) as $uid => $test) {
+        $tests[$uid] = $test;
     }
 }
 
 echo json_encode([
-    'tests'   => $uas,
+    'tests'   => $tests,
     'version' => \Composer\InstalledVersions::getPrettyVersion('sinergi/browser-detector'),
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);

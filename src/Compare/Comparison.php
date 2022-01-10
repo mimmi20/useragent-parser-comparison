@@ -23,7 +23,11 @@ use Symfony\Component\Console\Question\Question;
 
 class Comparison
 {
-    private $data = [];
+    private array $data = [];
+
+    private ?string $testname = null;
+
+    private array $test = [];
 
     /**
      * Comparison constructor.
@@ -37,13 +41,52 @@ class Comparison
             $this->data[$compareKey] = [];
 
             foreach (array_keys($compareValues) as $compareSubKey) {
+                $expected = $compareValues[$compareSubKey];
+                $actual   = $actualData[$compareKey][$compareSubKey] ?? null;
+
+                if ((!is_string($expected) && !is_int($expected)) || (!is_string($actual) && !is_int($actual))) {
+                    continue;
+                }
+
                 $pair = new ValuePairs();
-                $pair->setExpected($expectedData[$compareKey][$compareSubKey]);
-                $pair->setActual($actualData[$compareKey][$compareSubKey] ?? null);
+                $pair->setExpected($expected);
+                $pair->setActual($actual);
 
                 $this->data[$compareKey][$compareSubKey] = $pair;
             }
         }
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTestname(): ?string
+    {
+        return $this->testname;
+    }
+
+    /**
+     * @param string|null $testname
+     */
+    public function setTestname(?string $testname): void
+    {
+        $this->testname = $testname;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTest(): array
+    {
+        return $this->test;
+    }
+
+    /**
+     * @param array $test
+     */
+    public function setTest(array $test): void
+    {
+        $this->test = $test;
     }
 
     public function getComparison(string $parserName, int $countUseragent): array

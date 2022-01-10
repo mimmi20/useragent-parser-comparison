@@ -1,74 +1,20 @@
 <?php
 
 declare(strict_types = 1);
+
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+chdir(dirname(__DIR__));
+
+require_once 'vendor/autoload.php';
+
+$source = new \BrowscapHelper\Source\MobileDetectSource();
+$baseMessage = sprintf('reading from source %s ', $source->getName());
+$messageLength = 0;
 $tests = [];
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-$iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/../vendor/mobiledetect/mobiledetectlib/tests/providers'));
-$files = new class($iterator, 'php') extends \FilterIterator {
-    private string $extension;
-
-    public function __construct(\Iterator $iterator , string $extension)
-    {
-        parent::__construct($iterator);
-        $this->extension = $extension;
-    }
-
-    public function accept(): bool
-    {
-        $file = $this->getInnerIterator()->current();
-
-        assert($file instanceof \SplFileInfo);
-
-        return $file->isFile() && $file->getExtension() === $this->extension;
-    }
-};
-
-$tests = [];
-
-foreach ($files as $fixture) {
-    /** @var \SplFileInfo $fixture */
-    $pathName = $fixture->getPathname();
-    $pathName = str_replace('\\', '/', $pathName);
-
-    $provider = include $pathName;
-
-    foreach ($provider as $vendor => $vendorData) {
-        foreach ($vendorData as $ua => $testData) {
-            if (is_int($ua)) {
-                continue;
-            }
-
-            $tests[] = [
-                'headers' => [
-                    'user-agent' => $ua,
-                ],
-                'client' => [
-                    'name'    => null,
-                    'version' => null,
-                    'isBot'   => null,
-                    'type'    => null,
-                ],
-                'engine' => [
-                    'name'    => null,
-                    'version' => null,
-                ],
-                'platform' => [
-                    'name'    => null,
-                    'version' => null,
-                ],
-                'device' => [
-                    'name'     => $testData['model'] ?? null,
-                    'brand'    => null,
-                    'type'     => null,
-                    'ismobile' => isset($testData['isMobile']) && $testData['isMobile'],
-                    'istouch'  => null,
-                ],
-                'raw' => $testData,
-                'file' => $pathName,
-            ];
-        }
+if ($source->isReady($baseMessage)) {
+    foreach ($source->getProperties($baseMessage, $messageLength) as $uid => $test) {
+        $tests[$uid] = $test;
     }
 }
 

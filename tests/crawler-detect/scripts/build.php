@@ -1,85 +1,20 @@
 <?php
 
 declare(strict_types = 1);
+
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+chdir(dirname(__DIR__));
+
+require_once 'vendor/autoload.php';
+
+$source = new \BrowscapHelper\Source\CrawlerDetectSource();
+$baseMessage = sprintf('reading from source %s ', $source->getName());
+$messageLength = 0;
 $tests = [];
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-$lines = file(__DIR__ . '/../vendor/jaybizzle/crawler-detect/tests/crawlers.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-if ($lines !== false) {
-    foreach ($lines as $ua) {
-        if (empty($ua)) {
-            continue;
-        }
-
-        $tests[] = [
-            'headers' => [
-                'user-agent' => $ua,
-            ],
-            'client' => [
-                'name' => null,
-                'version' => null,
-                'isBot'   => true,
-                'type'    => null,
-            ],
-            'engine' => [
-                'name' => null,
-                'version' => null,
-            ],
-            'platform' => [
-                'name' => null,
-                'version' => null,
-            ],
-            'device' => [
-                'name' => null,
-                'brand' => null,
-                'type' => null,
-                'ismobile' => null,
-                'istouch' => null,
-            ],
-            'raw' => null,
-            'file' => null,
-        ];
-    }
-}
-
-$lines = file(__DIR__ . '/../vendor/jaybizzle/crawler-detect/tests/devices.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-if ($lines !== false) {
-    foreach ($lines as $ua) {
-        if (empty($ua)) {
-            continue;
-        }
-
-        $tests[] = [
-            'headers' => [
-                'user-agent' => $ua,
-            ],
-            'client' => [
-                'name' => null,
-                'version' => null,
-                'isBot'   => false,
-                'type'    => null,
-            ],
-            'engine' => [
-                'name' => null,
-                'version' => null,
-            ],
-            'platform' => [
-                'name' => null,
-                'version' => null,
-            ],
-            'device' => [
-                'name' => null,
-                'brand' => null,
-                'type' => null,
-                'ismobile' => null,
-                'istouch' => null,
-            ],
-            'raw' => null,
-            'file' => null,
-        ];
+if ($source->isReady($baseMessage)) {
+    foreach ($source->getProperties($baseMessage, $messageLength) as $uid => $test) {
+        $tests[$uid] = $test;
     }
 }
 

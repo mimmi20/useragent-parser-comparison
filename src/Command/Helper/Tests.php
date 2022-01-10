@@ -229,7 +229,7 @@ class Tests extends Helper
 
                     $output->write("\r" . $message . ' <info>building test suite</info>');
 
-                    $testOutput = trim((string) shell_exec($command));
+                    $testOutput = shell_exec($command);
 
                     if (null === $testOutput || false === $testOutput) {
                         return null;
@@ -238,12 +238,15 @@ class Tests extends Helper
                     $testOutput = trim($testOutput);
 
                     if (null !== $expectedDir) {
-                        file_put_contents($expectedDir . '/' . $testName . '.json', $testOutput);
+                        if (!file_exists($expectedDir . '/' . $testName)) {
+                            mkdir($expectedDir . '/' . $testName);
+                        }
                     }
 
                     try {
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
                     } catch (\JsonException $e) {
+                        var_dump($testOutput);
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! json_decode failed.</error>');
 
                         return null;
@@ -255,7 +258,23 @@ class Tests extends Helper
                         return null;
                     }
 
-                    yield from $tests['tests'];
+                    foreach ($tests['tests'] as $singleTestName => $singleTestData) {
+                        if (null !== $expectedDir) {
+                            file_put_contents(
+                                $expectedDir . '/' . $testName . '/' . $singleTestName . '.json',
+                                json_encode(['test' => $singleTestData], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                            );
+                        }
+
+                        yield $singleTestName => $singleTestData;
+                    }
+
+                    if (null !== $expectedDir) {
+                        file_put_contents(
+                            $expectedDir . '/' . $testName . '/metadata.json',
+                            json_encode(['version' => $tests['version'] ?? null], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                        );
+                    }
                 },
             ];
         }
