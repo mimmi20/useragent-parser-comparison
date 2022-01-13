@@ -50,26 +50,43 @@ if ($hasUa) {
     $r = json_decode(json_encode($r));
 
     $output['result']['parsed'] = [
+        'device' => [
+            'deviceName'     => isset($r->device->model) ? $r->device->model : null,
+            'marketingName' => null,
+            'manufacturer' => null,
+            'brand'    => isset($r->device->name) ? $r->device->name : null,
+            'display' => [
+                'width' => null,
+                'height' => null,
+                'touch' => $r->isTouch,
+                'type' => null,
+                'size' => null,
+            ],
+            'dualOrientation' => null,
+            'type'     => isset($r->device->type) ? $r->device->type : null,
+            'simCount' => null,
+            'ismobile' => $r->isMobile,
+        ],
         'client' => [
             'name'    => $r->isRobot ? (isset($r->robot) ? $r->robot->name : null) : ((isset($r->browser->name) && $r->browser->name !== 'not available') ? $r->browser->name : null),
+            'modus' => null,
             'version' => (isset($r->browser->version) && $r->browser->version !== 'not available') ? $r->browser->version : null,
-            'isBot'   => $r->isRobot,
-            'type'    => null,
+            'manufacturer' => null,
+            'bits' => null,
+            'type' => null,
+            'isbot'   => $r->isRobot,
         ],
         'platform' => [
             'name'    => (isset($r->os->name) && $r->os->name !== 'not available') ? $r->os->name : null,
+            'marketingName' => null,
             'version' => (isset($r->os->version) && $r->os->version !== 'not available') ? $r->os->version : null,
-        ],
-        'device' => [
-            'name'     => isset($r->device->model) ? $r->device->model : null,
-            'brand'    => isset($r->device->name) ? $r->device->name : null,
-            'type'     => isset($r->device->type) ? $r->device->type : null,
-            'ismobile' => $r->isMobile,
-            'istouch'  => $r->isTouch,
+            'manufacturer' => null,
+            'bits' => null,
         ],
         'engine' => [
             'name'    => null,
             'version' => null,
+            'manufacturer' => null,
         ],
         'raw' => $r,
     ];

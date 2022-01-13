@@ -49,32 +49,49 @@ if (hasUa) {
 
     if (r !== null) {
         output.result.parsed = {
-            client: {
-                name: r.client && r.client.name ? r.client.name : null,
-                version:
-                    r.client && r.client.version ? r.client.version : null,
-                isBot: null,
-                type: null
-            },
-            platform: {
-                name: r.os && r.os.name ? r.os.name : null,
-                version: r.os && r.os.version ? r.os.version : null
-            },
             device: {
-                name: r.device && r.device.model ? r.device.model : null,
+                deviceName: r.device && r.device.model ? r.device.model : null,
+                marketingName: null,
+                manufacturer: null,
                 brand: r.device && r.device.brand ? r.device.brand : null,
+                display: {
+                    width: null,
+                    height: null,
+                    touch: null,
+                    type: null,
+                    size: null,
+                },
+                dualOrientation: null,
                 type: r.device && r.device.type ? r.device.type : null,
+                simCount: null,
                 ismobile:
                     r.device &&
                     (r.device.type === 'mobile' ||
                         r.device.type === 'mobilephone' ||
                         r.device.type === 'tablet' ||
-                        r.device.type === 'wearable'),
-                istouch: null
+                        r.device.type === 'wearable')
+            },
+            client: {
+                name: r.client && r.client.name ? r.client.name : null,
+                modus: null,
+                version:
+                    r.client && r.client.version ? r.client.version : null,
+                manufacturer: null,
+                bits: null,
+                type: null,
+                isbot: null
+            },
+            platform: {
+                name: r.os && r.os.name ? r.os.name : null,
+                marketingName: null,
+                version: r.os && r.os.version ? r.os.version : null,
+                manufacturer: null,
+                bits: null
             },
             engine: {
                 name: null,
-                version: null
+                version: null,
+                manufacturer: null
             },
             raw: r
         };

@@ -41,35 +41,52 @@ if (hasUa) {
     const end = process.hrtime(start)[1] / 1000000000;
 
     const outputDevice = {
-        name: null,
+        deviceName: null,
+        marketingName: null,
+        manufacturer: null,
         brand: null,
+        display: {
+            width: null,
+            height: null,
+            touch: null,
+            type: null,
+            size: null,
+        },
+        dualOrientation: null,
         type: null,
-        ismobile: null,
-        istouch: null
+        simCount: null,
+        ismobile: null
     };
 
     if (device.major !== '0') {
-        outputDevice.name = device.major;
+        outputDevice.deviceName = device.major;
         outputDevice.brand = device.family;
     } else if (device.family !== 'Other') {
-        outputDevice.name = device.family;
+        outputDevice.deviceName = device.family;
     }
 
     output.result.parsed = {
+        device: outputDevice,
         client: {
             name: r.family === 'Other' ? null : r.family,
+            modus: null,
             version: (r.family === 'Other' || r.toVersion() === '0.0.0') ? null : r.toVersion(),
-            isBot: null,
-            type: null
+            manufacturer: null,
+            bits: null,
+            type: null,
+            isbot: null
         },
         platform: {
             name: os.family === 'Other' ? null : os.family,
-            version: (os.family === 'Other' || r.os.toVersion() === '0.0.0') ? null : r.os.toVersion()
+            marketingName: null,
+            version: (os.family === 'Other' || r.os.toVersion() === '0.0.0') ? null : r.os.toVersion(),
+            manufacturer: null,
+            bits: null
         },
-        device: outputDevice,
         engine: {
             name: null,
-            version: null
+            version: null,
+            manufacturer: null
         },
         raw: r
     };

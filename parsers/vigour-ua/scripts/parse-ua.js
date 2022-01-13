@@ -49,30 +49,47 @@ if (hasUa) {
 
     if (r !== null) {
         output.result.parsed = {
-            client: {
-                name: (r.browser && r.browser !== true) ? r.browser : null,
-                version: r.version ? r.version : null,
-                isBot: null,
-                type: null
-            },
-            platform: {
-                name: r.platform,
-                version: null
-            },
             device: {
-                name: null,
+                deviceName: null,
+                marketingName: null,
+                manufacturer: null,
                 brand: null,
+                display: {
+                    width: null,
+                    height: null,
+                    touch: null,
+                    type: null,
+                    size: null,
+                },
+                dualOrientation: null,
                 type: r.device,
+                simCount: null,
                 ismobile:
                     r.device === 'phone' ||
                     r.device === 'mobile' ||
                     r.device === 'tablet' ||
-                    r.device === 'wearable',
-                istouch: null
+                    r.device === 'wearable'
+            },
+            client: {
+                name: (r.browser && r.browser !== true) ? r.browser : null,
+                modus: null,
+                version: r.version ? r.version : null,
+                manufacturer: null,
+                bits: null,
+                type: null,
+                isbot: null
+            },
+            platform: {
+                name: r.platform,
+                marketingName: null,
+                version: null,
+                manufacturer: null,
+                bits: null
             },
             engine: {
                 name: null,
-                version: null
+                version: null,
+                manufacturer: null
             },
             raw: r
         };

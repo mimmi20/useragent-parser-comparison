@@ -154,7 +154,8 @@ class Test extends Command
                 }
 
                 $basicTestMessage = sprintf(
-                    '  [%s] UA: <fg=yellow>%s</>',
+                    'test suite <fg=yellow>%s</> <info>parsing</info> [%s] UA: <fg=yellow>%s</>',
+                    $testName,
                     $actualTest,
                     $agentToShow
                 );

@@ -38,26 +38,43 @@ if (hasUa) {
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {
+        device: {
+            deviceName: null,
+            marketingName: null,
+            manufacturer: null,
+            brand: null,
+            display: {
+                width: null,
+                height: null,
+                touch: null,
+                type: null,
+                size: null,
+            },
+            dualOrientation: null,
+            type: null,
+            simCount: null,
+            ismobile: null
+        },
         client: {
             name: r !== null && r.name ? r.name : null,
+            modus: null,
             version: r !== null && r.version ? r.version : null,
-            isBot: null,
-            type: null
+            manufacturer: null,
+            bits: null,
+            type: null,
+            isbot: null
         },
         platform: {
             name: r !== null && r.os ? r.os : null,
-            version: null
-        },
-        device: {
-            name: null,
-            brand: null,
-            type: null,
-            ismobile: null,
-            istouch: null
+            marketingName: null,
+            version: null,
+            manufacturer: null,
+            bits: null
         },
         engine: {
             name: null,
-            version: null
+            version: null,
+            manufacturer: null
         },
         raw: r
     };

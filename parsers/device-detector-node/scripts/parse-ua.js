@@ -49,29 +49,46 @@ if (hasUa) {
 
     if (r !== null) {
         output.result.parsed = {
-            client: {
-                name: r.browser.name ? r.browser.name : null,
-                version: r.browser.version ? r.browser.version : null,
-                isBot: null,
-                type: null
-            },
-            platform: {
-                name: r.os.name ? r.os.name : null,
-                version: r.os.version ? r.os.version : null
-            },
             device: {
-                name: r.device.model ? r.device.model : null,
+                deviceName: r.device.model ? r.device.model : null,
+                marketingName: null,
+                manufacturer: null,
                 brand: r.device.vendor ? r.device.vendor : null,
+                display: {
+                    width: null,
+                    height: null,
+                    touch: null,
+                    type: null,
+                    size: null,
+                },
+                dualOrientation: null,
                 type: r.device.type ? r.device.type : null,
+                simCount: null,
                 ismobile:
                     r.device.type === 'mobile' ||
                     r.device.type === 'tablet' ||
-                    r.device.type === 'wearable',
-                istouch: null
+                    r.device.type === 'wearable'
+            },
+            client: {
+                name: r.browser.name ? r.browser.name : null,
+                modus: null,
+                version: r.browser.version ? r.browser.version : null,
+                manufacturer: null,
+                bits: null,
+                type: null,
+                isbot: null
+            },
+            platform: {
+                name: r.os.name ? r.os.name : null,
+                marketingName: null,
+                version: r.os.version ? r.os.version : null,
+                manufacturer: null,
+                bits: null
             },
             engine: {
                 name: null,
-                version: null
+                version: null,
+                manufacturer: null
             },
             raw: r
         };

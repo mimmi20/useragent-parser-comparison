@@ -44,26 +44,43 @@ if ($hasUa) {
     $end   = microtime(true) - $start;
 
     $output['result']['parsed'] = [
+        'device' => [
+            'deviceName'     => !empty($r->device['model']) ? $r->device['model'] : null,
+            'marketingName' => null,
+            'manufacturer' => null,
+            'brand'    => !empty($r->device['brand']) ? $r->device['brand'] : null,
+            'display' => [
+                'width' => null,
+                'height' => null,
+                'touch' => null,
+                'type' => null,
+                'size' => null,
+            ],
+            'dualOrientation' => null,
+            'type'     => null,
+            'simCount' => null,
+            'ismobile' => null,
+        ],
         'client' => [
             'name'    => (!empty($r->browser['name']) && 'Unknown' !== $r->browser['name']) ? $r->browser['name'] : null,
+            'modus' => null,
             'version' => !empty($r->browser['version']) ? $r->browser['version'] : null,
-            'isBot'   => null,
-            'type'    => null,
+            'manufacturer' => null,
+            'bits' => null,
+            'type' => null,
+            'isbot'    => null,
         ],
         'platform' => [
             'name'    => !empty($r->os['name']) ? $r->os['name'] : null,
+            'marketingName' => null,
             'version' => !empty($r->os['version']) ? $r->os['version'] : null,
-        ],
-        'device' => [
-            'name'     => !empty($r->device['model']) ? $r->device['model'] : null,
-            'brand'    => !empty($r->device['brand']) ? $r->device['brand'] : null,
-            'type'     => null,
-            'ismobile' => null,
-            'istouch'  => null,
+            'manufacturer' => null,
+            'bits' => null,
         ],
         'engine' => [
             'name'    => null,
             'version' => null,
+            'manufacturer' => null,
         ],
         'raw' => $r,
     ];

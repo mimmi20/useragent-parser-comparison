@@ -51,26 +51,43 @@ if ($hasUa) {
     $end   = microtime(true) - $start;
 
     $output['result']['parsed'] = [
+        'device' => [
+            'deviceName'     => !empty($parser->device->model) ? $parser->device->model : null,
+            'marketingName' => null,
+            'manufacturer' => null,
+            'brand'    => !empty($parser->device->manufacturer) ? $parser->device->manufacturer : null,
+            'display' => [
+                'width' => null,
+                'height' => null,
+                'touch' => null,
+                'type' => null,
+                'size' => null,
+            ],
+            'dualOrientation' => null,
+            'type'     => !empty($parser->device->type) ? $parser->device->type : null,
+            'simCount' => null,
+            'ismobile' => $isMobile,
+        ],
         'client' => [
             'name'    => !empty($parser->browser->name) ? $parser->browser->name : null,
+            'modus' => null,
             'version' => !empty($parser->browser->version) ? $parser->browser->version->value : null,
-            'isBot'   => null,
-            'type'    => null,
+            'manufacturer' => null,
+            'bits' => null,
+            'type' => null,
+            'isbot'    => null,
         ],
         'platform' => [
             'name'    => !empty($parser->os->name) ? $parser->os->name : null,
+            'marketingName' => null,
             'version' => !empty($parser->os->version->value) ? $parser->os->version->value : null,
-        ],
-        'device' => [
-            'name'     => !empty($parser->device->model) ? $parser->device->model : null,
-            'brand'    => !empty($parser->device->manufacturer) ? $parser->device->manufacturer : null,
-            'type'     => !empty($parser->device->type) ? $parser->device->type : null,
-            'ismobile' => $isMobile,
-            'istouch'  => null,
+            'manufacturer' => null,
+            'bits' => null,
         ],
         'engine' => [
             'name'    => null,
             'version' => null,
+            'manufacturer' => null,
         ],
         'raw' => $parser->toArray(),
     ];

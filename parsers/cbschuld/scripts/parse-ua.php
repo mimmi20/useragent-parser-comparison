@@ -44,26 +44,42 @@ if ($hasUa) {
     $end   = microtime(true) - $start;
 
     $output['result']['parsed'] = [
+        'device' => [
+            'deviceName'     => null,
+            'marketingName' => null,
+            'manufacturer' => null,
+            'brand'    => null,
+            'display' => [
+                'width' => null,
+                'height' => null,
+                'touch' => null,
+                'type' => null,
+                'size' => null,
+            ],
+            'dualOrientation' => null,
+            'type'     => null,
+            'simCount' => null,
+        ],
         'client' => [
             'name'    => $browser->getBrowser() === 'unknown' ? null : $browser->getBrowser(),
+            'modus' => null,
             'version' => $browser->getVersion() === 'unknown' ? null : $browser->getVersion(),
-            'isBot'   => null,
-            'type'    => null,
+            'manufacturer' => null,
+            'bits' => null,
+            'type' => null,
+            'isbot'    => null,
         ],
         'platform' => [
             'name'    => $browser->getPlatform() === 'unknown' ? null : $browser->getPlatform(),
+            'marketingName' => null,
             'version' => null,
-        ],
-        'device' => [
-            'name'     => null,
-            'brand'    => null,
-            'type'     => null,
-            'ismobile' => null,
-            'istouch'  => null,
+            'manufacturer' => null,
+            'bits' => null,
         ],
         'engine' => [
             'name'    => null,
             'version' => null,
+            'manufacturer' => null,
         ],
         'raw' => $browser,
     ];

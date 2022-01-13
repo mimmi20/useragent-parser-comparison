@@ -39,29 +39,46 @@ if (hasUa) {
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {
-        client: {
-            name: r.browser.name ? r.browser.name : null,
-            version: r.browser.version ? r.browser.version : null,
-            isBot: null,
-            type: null
-        },
-        platform: {
-            name: r.os.name ? r.os.name : null,
-            version: r.os.version ? r.os.version : null
-        },
         device: {
-            name: r.platform.model ? r.platform.model : null,
+            deviceName: r.platform.model ? r.platform.model : null,
+            marketingName: null,
+            manufacturer: null,
             brand: r.platform.vendor ? r.platform.vendor : null,
+            display: {
+                width: null,
+                height: null,
+                touch: null,
+                type: null,
+                size: null,
+            },
+            dualOrientation: null,
             type: r.platform.type ? r.platform.type : null,
+            simCount: null,
             ismobile:
                 r.platform.type === 'mobile' ||
                 r.platform.type === 'tablet' ||
-                r.platform.type === 'wearable',
-            istouch: null
+                r.platform.type === 'wearable'
+        },
+        client: {
+            name: r.browser.name ? r.browser.name : null,
+            modus: null,
+            version: r.browser.version ? r.browser.version : null,
+            manufacturer: null,
+            bits: null,
+            type: null,
+            isbot: null
+        },
+        platform: {
+            name: r.os.name ? r.os.name : null,
+            marketingName: null,
+            version: r.os.version ? r.os.version : null,
+            manufacturer: null,
+            bits: null
         },
         engine: {
             name: null,
-            version: null
+            version: null,
+            manufacturer: null
         },
         raw: r
     };

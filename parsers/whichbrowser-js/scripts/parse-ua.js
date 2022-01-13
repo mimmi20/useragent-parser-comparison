@@ -58,29 +58,44 @@ if (hasUa) {
 
     if (r !== null) {
         output.result.parsed = {
+            device: {
+                deviceName: r.device.model ? r.device.model : null,
+                marketingName: null,
+                manufacturer: null,
+                brand: r.device.manufacturer ? r.device.manufacturer : null,
+                display: {
+                    width: null,
+                    height: null,
+                    touch: null,
+                    type: null,
+                    size: null,
+                },
+                dualOrientation: null,
+                type: r.device.type ? r.device.type : null,
+                simCount: null,
+                ismobile:
+                    mobileDeviceTypes.indexOf(r.device.type) !== -1 ||
+                    (r.device.subtype && r.device.subtype === 'portable')
+            },
             client: {
                 name: r.browser.name ? r.browser.name : null,
+                modus: null,
                 version: r.browser.version ? r.browser.version.value : null,
-                isBot: null,
-                type: null
+                type: null,
+                isbot: null
             },
             platform: {
                 name: r.os.name ? r.os.name : null,
+                marketingName: null,
                 version:
-                    r.os.version && r.os.version.value ? r.os.version.value : null
-            },
-            device: {
-                name: r.device.model ? r.device.model : null,
-                brand: r.device.manufacturer ? r.device.manufacturer : null,
-                type: r.device.type ? r.device.type : null,
-                ismobile:
-                    mobileDeviceTypes.indexOf(r.device.type) !== -1 ||
-                    (r.device.subtype && r.device.subtype === 'portable'),
-                istouch: null
+                    r.os.version && r.os.version.value ? r.os.version.value : null,
+                manufacturer: null,
+                bits: null
             },
             engine: {
                 name: null,
-                version: null
+                version: null,
+                manufacturer: null
             },
             raw: r
         };

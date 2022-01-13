@@ -51,26 +51,43 @@ if ($hasUa) {
     $end   = microtime(true) - $start;
 
     $output['result']['parsed'] = [
+        'device' => [
+            'deviceName'     => $r->getDevice()->getDeviceName(),
+            'marketingName' => $r->getDevice()->getMarketingName(),
+            'manufacturer' => $r->getDevice()->getManufacturer()->getName(),
+            'brand'    => $r->getDevice()->getBrand()->getBrandName(),
+            'display' => [
+                'width' => $r->getDevice()->getDisplay()->getWidth(),
+                'height' => $r->getDevice()->getDisplay()->getHeight(),
+                'touch' => $r->getDevice()->getDisplay()->hasTouch(),
+                'type' => null,
+                'size' => $r->getDevice()->getDisplay()->getSize(),
+            ],
+            'dualOrientation' => null,
+            'type'     => $r->getDevice()->getType()->getName(),
+            'simCount' => null,
+            'ismobile' => $r->getDevice()->getType()->isMobile(),
+        ],
         'client' => [
             'name'    => $r->getBrowser()->getName(),
+            'modus' => $r->getBrowser()->getModus(),
             'version' => $r->getBrowser()->getVersion()->getVersion(),
-            'isBot'   => $r->getBrowser()->getType()->isBot(),
+            'manufacturer' => $r->getBrowser()->getManufacturer()->getName(),
+            'bits' => $r->getBrowser()->getBits(),
             'type'    => $r->getBrowser()->getType()->getType(),
+            'isbot'   => $r->getBrowser()->getType()->isBot(),
         ],
         'platform' => [
             'name'    => $r->getOs()->getName(),
+            'marketingName' => $r->getOs()->getMarketingName(),
             'version' => $r->getOs()->getVersion()->getVersion(),
-        ],
-        'device' => [
-            'name'     => $r->getDevice()->getDeviceName(),
-            'brand'    => $r->getDevice()->getBrand()->getBrandName(),
-            'type'     => $r->getDevice()->getType()->getName(),
-            'ismobile' => $r->getDevice()->getType()->isMobile(),
-            'istouch'  => $r->getDevice()->getDisplay()->hasTouch(),
+            'manufacturer' => $r->getOs()->getManufacturer()->getName(),
+            'bits' => $r->getOs()->getBits(),
         ],
         'engine' => [
             'name'    => $r->getEngine()->getName(),
             'version' => $r->getEngine()->getVersion()->getVersion(),
+            'manufacturer' => $r->getEngine()->getManufacturer()->getName(),
         ],
         'raw' => $r->toArray(),
     ];

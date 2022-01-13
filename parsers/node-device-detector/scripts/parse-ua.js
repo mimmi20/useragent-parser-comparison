@@ -42,26 +42,43 @@ if (hasUa) {
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {
+        device: {
+            deviceName: r.device.model ? r.device.model : null,
+            marketingName: null,
+            manufacturer: null,
+            brand: r.device.vendor ? r.device.vendor : null,
+            display: {
+                width: null,
+                height: null,
+                touch: null,
+                type: null,
+                size: null,
+            },
+            dualOrientation: null,
+            type: r.device.type ? r.device.type : null,
+            simCount: null,
+            ismobile: DeviceHelper.isMobile(r)
+        },
         client: {
             name: bot === null ? (r.client.name ? r.client.name : null) : (bot.name ?? null),
+            modus: null,
             version: (bot !== null && r.client.version) ? r.client.version : null,
+            manufacturer: null,
+            bits: null,
             isBot: bot !== null,
             type: bot === null ? (r.client.type ?? null) : (bot.category ?? null)
         },
         platform: {
             name: r.os.name ? r.os.name : null,
-            version: r.os.version ? r.os.version : null
-        },
-        device: {
-            name: r.device.model ? r.device.model : null,
-            brand: r.device.vendor ? r.device.vendor : null,
-            type: r.device.type ? r.device.type : null,
-            ismobile: DeviceHelper.isMobile(r),
-            istouch: null
+            marketingName: null,
+            version: r.os.version ? r.os.version : null,
+            manufacturer: null,
+            bits: null
         },
         engine: {
             name: null,
-            version: null
+            version: null,
+            manufacturer: null
         },
         raw: r
     };

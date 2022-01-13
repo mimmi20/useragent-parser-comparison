@@ -37,26 +37,43 @@ if (hasUa) {
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {
+        device: {
+            deviceName: (r.device.name && r.device.name !== 'na') ? r.device.name : null,
+            marketingName: null,
+            manufacturer: null,
+            brand: null,
+            display: {
+                width: null,
+                height: null,
+                touch: null,
+                type: null,
+                size: null,
+            },
+            dualOrientation: null,
+            type: null,
+            simCount: null,
+            ismobile: null
+        },
         client: {
             name: (r.browser.name && r.browser.name !== 'na') ? r.browser.name : null,
+            modus: null,
             version: (r.browser.fullVersion && r.browser.fullVersion !== '-1') ? r.browser.fullVersion : null,
-            isBot: null,
-            type: null
+            manufacturer: null,
+            bits: null,
+            type: null,
+            isbot: null
         },
         platform: {
             name: (r.os.name && r.os.name !== 'na') ? r.os.name : null,
-            version: (r.os.fullVersion && r.os.fullVersion !== '-1') ? r.os.fullVersion : null
-        },
-        device: {
-            name: (r.device.name && r.device.name !== 'na') ? r.device.name : null,
-            brand: null,
-            type: null,
-            ismobile: null,
-            istouch: null
+            marketingName: null,
+            version: (r.os.fullVersion && r.os.fullVersion !== '-1') ? r.os.fullVersion : null,
+            manufacturer: null,
+            bits: null
         },
         engine: {
             name: (r.engine.name && r.engine.name !== 'na') ? r.engine.name : null,
-            version: (r.engine.fullVersion && r.engine.fullVersion !== '-1') ? r.engine.fullVersion : null
+            version: (r.engine.fullVersion && r.engine.fullVersion !== '-1') ? r.engine.fullVersion : null,
+            manufacturer: null
         },
         raw: r
     };

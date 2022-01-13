@@ -48,39 +48,55 @@ if (hasUa) {
 
     if (r !== null) {
         output.result.parsed = {
+            device: {
+                deviceName: r.device.model ? r.device.model : null,
+                marketingName: null,
+                manufacturer: null,
+                brand: r.device.manufacturer ? r.device.manufacturer : null,
+                display: {
+                    width: null,
+                    height: null,
+                    touch: null,
+                    type: null,
+                    size: null,
+                },
+                dualOrientation: null,
+                type: r.device.type ? r.device.type : null,
+                simCount: null,
+                ismobile:
+                    r.device.type === 'mobile' ||
+                    r.device.type === 'tablet' ||
+                    r.device.type === 'wearable'
+            },
             client: {
                 name: r.browser.name ? r.browser.name : null,
+                modus: null,
                 version:
                     typeof r.browser.version !== 'undefined' &&
                     r.browser.version !== null &&
                     typeof r.browser.version.original !== 'undefined'
                         ? r.browser.version.original
                         : null,
-                isBot: null,
-                type: null
+                manufacturer: null,
+                bits: null,
+                isbot: null
             },
             platform: {
                 name: r.os.name ? r.os.name : null,
+                marketingName: null,
                 version:
                     typeof r.os.version !== 'undefined' &&
                     r.os.version !== null &&
                     typeof r.os.version.original !== 'undefined'
                         ? r.os.version.original
-                        : null
-            },
-            device: {
-                name: r.device.model ? r.device.model : null,
-                brand: r.device.manufacturer ? r.device.manufacturer : null,
-                type: r.device.type ? r.device.type : null,
-                ismobile:
-                    r.device.type === 'mobile' ||
-                    r.device.type === 'tablet' ||
-                    r.device.type === 'wearable',
-                istouch: null
+                        : null,
+                manufacturer: null,
+                bits: null
             },
             engine: {
                 name: null,
-                version: null
+                version: null,
+                manufacturer: null
             },
             raw: r
         };

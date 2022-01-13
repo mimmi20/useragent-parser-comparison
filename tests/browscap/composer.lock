@@ -139,12 +139,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/browscap/browscap.git",
-                "reference": "8b2fcba05a44874d69d8dbae9eebc992bb43104f"
+                "reference": "d459ece369b5525d5b5a452e5deff4265db62526"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/browscap/browscap/zipball/8b2fcba05a44874d69d8dbae9eebc992bb43104f",
-                "reference": "8b2fcba05a44874d69d8dbae9eebc992bb43104f",
+                "url": "https://api.github.com/repos/browscap/browscap/zipball/d459ece369b5525d5b5a452e5deff4265db62526",
+                "reference": "d459ece369b5525d5b5a452e5deff4265db62526",
                 "shasum": ""
             },
             "require": {
@@ -169,7 +169,7 @@
                 "matthiasmullie/scrapbook": "^1.4.8",
                 "mikey179/vfsstream": "^v1.6.10",
                 "phpstan/extension-installer": "^1.1.0",
-                "phpstan/phpstan": "^1.3.0",
+                "phpstan/phpstan": "^1.3.3",
                 "phpstan/phpstan-beberlei-assert": "^1.0.0",
                 "phpstan/phpstan-deprecation-rules": "^1.0.0",
                 "phpstan/phpstan-phpunit": "^1.0.0",
@@ -222,7 +222,7 @@
                 "issues": "https://github.com/browscap/browscap/issues",
                 "source": "https://github.com/browscap/browscap"
             },
-            "time": "2022-01-07T05:11:26+00:00"
+            "time": "2022-01-10T12:51:17+00:00"
         },
         {
             "name": "ergebnis/json-normalizer",

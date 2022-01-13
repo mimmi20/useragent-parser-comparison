@@ -232,6 +232,8 @@ class Tests extends Helper
                     $testOutput = shell_exec($command);
 
                     if (null === $testOutput || false === $testOutput) {
+                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! No content was sent.</error>');
+
                         return null;
                     }
 
@@ -253,6 +255,7 @@ class Tests extends Helper
                     }
 
                     if ($tests['tests'] === null || !is_array($tests['tests']) || $tests['tests'] === []) {
+                        var_dump($testOutput);
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! No tests were found.</error>');
 
                         return null;

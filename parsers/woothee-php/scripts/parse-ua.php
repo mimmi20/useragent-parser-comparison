@@ -45,26 +45,43 @@ if ($hasUa) {
     $end   = microtime(true) - $start;
 
     $output['result']['parsed'] = [
+        'device' => [
+            'deviceName'     => null,
+            'marketingName' => null,
+            'manufacturer' => null,
+            'brand'    => (isset($r['vendor']) && $r['vendor'] !== 'UNKNOWN') ? $r['vendor'] : null,
+            'display' => [
+                'width' => null,
+                'height' => null,
+                'touch' => null,
+                'type' => null,
+                'size' => null,
+            ],
+            'dualOrientation' => null,
+            'type'     => (isset($r['category']) && $r['category'] !== 'UNKNOWN') ? $r['category'] : null,
+            'simCount' => null,
+            'ismobile' => null,
+        ],
         'client' => [
             'name'    => (isset($r['name']) && $r['name'] !== 'UNKNOWN') ? $r['name'] : null,
+            'modus' => null,
             'version' => (isset($r['version']) && $r['version'] !== 'UNKNOWN') ? $r['version'] : null,
-            'isBot'   => null,
-            'type'    => null,
+            'manufacturer' => null,
+            'bits' => null,
+            'type' => null,
+            'isbot'    => null,
         ],
         'platform' => [
             'name'    => (isset($r['os']) && $r['os'] !== 'UNKNOWN') ? $r['os'] : null,
+            'marketingName' => null,
             'version' => (isset($r['os_version']) && $r['os_version'] !== 'UNKNOWN') ? $r['os_version'] : null,
-        ],
-        'device' => [
-            'name'     => null,
-            'brand'    => (isset($r['vendor']) && $r['vendor'] !== 'UNKNOWN') ? $r['vendor'] : null,
-            'type'     => (isset($r['category']) && $r['category'] !== 'UNKNOWN') ? $r['category'] : null,
-            'ismobile' => null,
-            'istouch'  => null,
+            'manufacturer' => null,
+            'bits' => null,
         ],
         'engine' => [
             'name'    => null,
             'version' => null,
+            'manufacturer' => null,
         ],
         'raw' => $r,
     ];
