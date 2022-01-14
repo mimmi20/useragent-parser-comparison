@@ -68,16 +68,16 @@
         },
         {
             "name": "matomo/device-detector",
-            "version": "5.0.2",
+            "version": "5.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/matomo-org/device-detector.git",
-                "reference": "15cc0ac69bced9d273f85dd7debf9d6aaea72517"
+                "reference": "42c06b9031048b90f7bc6c9d530dbe135bc3e381"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/15cc0ac69bced9d273f85dd7debf9d6aaea72517",
-                "reference": "15cc0ac69bced9d273f85dd7debf9d6aaea72517",
+                "url": "https://api.github.com/repos/matomo-org/device-detector/zipball/42c06b9031048b90f7bc6c9d530dbe135bc3e381",
+                "reference": "42c06b9031048b90f7bc6c9d530dbe135bc3e381",
                 "shasum": ""
             },
             "require": {
@@ -133,20 +133,20 @@
                 "source": "https://github.com/matomo-org/matomo",
                 "wiki": "https://dev.matomo.org/"
             },
-            "time": "2022-01-11T14:01:02+00:00"
+            "time": "2022-01-13T19:22:57+00:00"
         },
         {
             "name": "mimmi20/browscap-helper-source",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/browscap-helper-source.git",
-                "reference": "c6a34bf19ced581e34d3439f5229b1bad1318f1e"
+                "reference": "c0973c7a3a03ba8b38d5868d97945e7c42c109ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/browscap-helper-source/zipball/c6a34bf19ced581e34d3439f5229b1bad1318f1e",
-                "reference": "c6a34bf19ced581e34d3439f5229b1bad1318f1e",
+                "url": "https://api.github.com/repos/mimmi20/browscap-helper-source/zipball/c0973c7a3a03ba8b38d5868d97945e7c42c109ec",
+                "reference": "c0973c7a3a03ba8b38d5868d97945e7c42c109ec",
                 "shasum": ""
             },
             "require": {
@@ -222,9 +222,9 @@
             "description": "the source interface for the browscap helper",
             "support": {
                 "issues": "https://github.com/mimmi20/browscap-helper-source/issues",
-                "source": "https://github.com/mimmi20/browscap-helper-source/tree/3.0.3"
+                "source": "https://github.com/mimmi20/browscap-helper-source/tree/3.0.4"
             },
-            "time": "2022-01-09T20:59:39+00:00"
+            "time": "2022-01-14T20:17:00+00:00"
         },
         {
             "name": "mustangostang/spyc",

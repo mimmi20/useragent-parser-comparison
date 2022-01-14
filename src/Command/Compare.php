@@ -46,7 +46,7 @@ class Compare extends Command
 
         $doImport = $input->getOption('import');
 
-        if ($doImport) {
+        if ($doImport && !$file) {
             $command   = $application->find('init-provider');
             $arguments = [
                 'command'     => 'init-provider',
@@ -99,6 +99,10 @@ class Compare extends Command
                 'command' => 'test',
                 'run'     => $name,
             ];
+
+            if ($doImport) {
+                $arguments['--use-db'] = true;
+            }
 
             $testInput  = new ArrayInput($arguments);
             $returnCode = $command->run($testInput, $output);

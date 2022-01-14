@@ -49,6 +49,7 @@ class Test extends Command
     {
         $this->setName('test')
             ->setDescription('Runs test against the parsers')
+            ->addOption('use-db', null, InputOption::VALUE_NONE, 'Whether to use a database')
             ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run, if omitted will be generated from date')
             ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
     }
@@ -67,19 +68,26 @@ class Test extends Command
         if (empty($thisRunDirName)) {
             $thisRunDirName = date('YmdHis');
         }
-        $thisRunDir   = $this->runDir . '/' . $thisRunDirName;
-        $resultsDir   = $thisRunDir . '/results';
-        $expectedDir  = $thisRunDir . '/expected';
 
-        mkdir($thisRunDir);
-        mkdir($resultsDir);
-        mkdir($expectedDir);
+        $useDb = $input->getOption('use-db');
+
+        if ($useDb) {
+            $thisRunDir = null;
+        } else {
+            $thisRunDir = $this->runDir . '/' . $thisRunDirName;
+            $resultsDir = $thisRunDir . '/results';
+            $expectedDir = $thisRunDir . '/expected';
+
+            mkdir($thisRunDir);
+            mkdir($resultsDir);
+            mkdir($expectedDir);
+        }
 
         /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
         $testHelper = $this->getHelper('tests');
 
-        foreach ($testHelper->collectTests($output, $thisRunDir) as $testPath => $testData) {
-            $this->tests[$testPath] = $testData;
+        foreach ($testHelper->collectTests($output, $thisRunDir) as $testPath => $testConfig) {
+            $this->tests[$testPath] = $testConfig;
         }
 
         $rows = [];
@@ -131,11 +139,11 @@ class Test extends Command
 
         $usedTests = [];
 
-        foreach ($selectedTests as $testName => $testData) {
+        foreach ($selectedTests as $testName => $testConfig) {
             $result     = [];
             $actualTest = 0;
 
-            foreach ($testData['build']() as $singleTestName => $singleTestData) {
+            foreach ($testConfig['build']() as $singleTestName => $singleTestData) {
                 ++$actualTest;
 
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
@@ -264,7 +272,7 @@ class Test extends Command
                     json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
                 );
 
-                $usedTests[$testName] = $testData;
+                $usedTests[$testName] = $testConfig;
             }
         }
 

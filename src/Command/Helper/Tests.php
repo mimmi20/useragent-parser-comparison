@@ -196,43 +196,44 @@ class Tests extends Helper
                 }
             }
 
-            yield $testDir->getFilename() => [
-                'name'     => $pathName,
-                'path'     => $testDir->getFilename(),
-                'metadata' => $metadata,
-                'build'    => static function () use ($testDir, $output, $language, $pathName, $expectedDir): iterable {
-                    $testName = $testDir->getFilename();
+            $testName = $testDir->getFilename();
 
-                    switch ($language) {
-                        case 'PHP':
-                            switch ($testName) {
-                                case 'browser-detector':
-                                    $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
-                                    break;
-                                default:
-                                    $command = 'php ' . $pathName . '/scripts/build.php';
-                                    break;
-                            }
-
+            switch ($language) {
+                case 'PHP':
+                    switch ($testName) {
+                        case 'browser-detector':
+                        case 'crawler-detect':
+                            $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
                             break;
-                        case 'JavaScript':
+                        default:
                             $command = 'php ' . $pathName . '/scripts/build.php';
                             break;
-//                        case 'JavaScript':
-//                            $command = 'node ' . $pathName . '/scripts/build.js';
-//                            break;
-                        default:
-                            return null;
                     }
 
-                    $message = sprintf('test suite <fg=yellow>%s</>', $testName);
+                    break;
+                case 'JavaScript':
+                    $command = 'php ' . $pathName . '/scripts/build.php';
+                    break;
+                default:
+                    continue 2;
+            }
+
+            $testPath = $testDir->getFilename();
+
+            yield $testPath => [
+                'name'     => $pathName,
+                'path'     => $testPath,
+                'metadata' => $metadata,
+                'command'  => $command,
+                'build'    => static function () use ($testPath, $output, $language, $pathName, $expectedDir, $command): iterable {
+                    $message = sprintf('test suite <fg=yellow>%s</>', $testPath);
 
                     $output->write("\r" . $message . ' <info>building test suite</info>');
 
                     $testOutput = shell_exec($command);
 
                     if (null === $testOutput || false === $testOutput) {
-                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! No content was sent.</error>');
+                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No content was sent.</error>');
 
                         return null;
                     }
@@ -240,8 +241,8 @@ class Tests extends Helper
                     $testOutput = trim($testOutput);
 
                     if (null !== $expectedDir) {
-                        if (!file_exists($expectedDir . '/' . $testName)) {
-                            mkdir($expectedDir . '/' . $testName);
+                        if (!file_exists($expectedDir . '/' . $testPath)) {
+                            mkdir($expectedDir . '/' . $testPath);
                         }
                     }
 
@@ -249,14 +250,14 @@ class Tests extends Helper
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
                     } catch (\JsonException $e) {
                         var_dump($testOutput);
-                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! json_decode failed.</error>');
+                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
 
                         return null;
                     }
 
                     if ($tests['tests'] === null || !is_array($tests['tests']) || $tests['tests'] === []) {
                         var_dump($testOutput);
-                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testName . '! No tests were found.</error>');
+                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>');
 
                         return null;
                     }
@@ -264,7 +265,7 @@ class Tests extends Helper
                     foreach ($tests['tests'] as $singleTestName => $singleTestData) {
                         if (null !== $expectedDir) {
                             file_put_contents(
-                                $expectedDir . '/' . $testName . '/' . $singleTestName . '.json',
+                                $expectedDir . '/' . $testPath . '/' . $singleTestName . '.json',
                                 json_encode(['test' => $singleTestData], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
                             );
                         }
@@ -274,7 +275,7 @@ class Tests extends Helper
 
                     if (null !== $expectedDir) {
                         file_put_contents(
-                            $expectedDir . '/' . $testName . '/metadata.json',
+                            $expectedDir . '/' . $testPath . '/metadata.json',
                             json_encode(['version' => $tests['version'] ?? null], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
                         );
                     }

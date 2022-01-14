@@ -65,6 +65,10 @@ class InitUseragents extends Command
         $testHelper = $this->getHelper('tests');
 
         foreach ($testHelper->collectTests($output, null) as $testPath => $testConfig) {
+            if (!$testConfig['metadata']['isActive']) {
+                continue;
+            }
+
             $proName                    = $testConfig['metadata']['name'] ?? $testPath;
             $proVersion                 = $testConfig['metadata']['version'] ?? null;
 
@@ -78,9 +82,37 @@ class InitUseragents extends Command
             $messageLength = mb_strlen($message);
             $output->write($message);
 
-            $tests  = 0;
+            $message = sprintf('test suite <fg=yellow>%s</>', $testPath);
 
-            foreach ($testConfig['build']() as $singleTestData) {
+            $output->write("\r" . $message . ' <info>building test suite</info>');
+
+            $testOutput = shell_exec($testConfig['command']);
+
+            if (null === $testOutput || false === $testOutput) {
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No content was sent.</error>');
+
+                continue;
+            }
+
+            $testOutput = trim($testOutput);
+
+            try {
+                $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                var_dump($testOutput);
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
+
+                continue;
+            }
+
+            if ($tests['tests'] === null || !is_array($tests['tests']) || $tests['tests'] === []) {
+                var_dump($testOutput);
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>');
+
+                continue;
+            }
+
+            foreach ($tests['tests'] as $singleTestData) {
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if (null === $agent) {

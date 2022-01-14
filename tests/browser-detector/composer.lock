@@ -167,16 +167,16 @@
         },
         {
             "name": "mimmi20/browscap-helper-source",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/browscap-helper-source.git",
-                "reference": "c6a34bf19ced581e34d3439f5229b1bad1318f1e"
+                "reference": "c0973c7a3a03ba8b38d5868d97945e7c42c109ec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/browscap-helper-source/zipball/c6a34bf19ced581e34d3439f5229b1bad1318f1e",
-                "reference": "c6a34bf19ced581e34d3439f5229b1bad1318f1e",
+                "url": "https://api.github.com/repos/mimmi20/browscap-helper-source/zipball/c0973c7a3a03ba8b38d5868d97945e7c42c109ec",
+                "reference": "c0973c7a3a03ba8b38d5868d97945e7c42c109ec",
                 "shasum": ""
             },
             "require": {
@@ -252,9 +252,9 @@
             "description": "the source interface for the browscap helper",
             "support": {
                 "issues": "https://github.com/mimmi20/browscap-helper-source/issues",
-                "source": "https://github.com/mimmi20/browscap-helper-source/tree/3.0.3"
+                "source": "https://github.com/mimmi20/browscap-helper-source/tree/3.0.4"
             },
-            "time": "2022-01-09T20:59:39+00:00"
+            "time": "2022-01-14T20:17:00+00:00"
         },
         {
             "name": "mimmi20/browser-detector",
