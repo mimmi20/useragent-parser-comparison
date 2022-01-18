@@ -508,7 +508,7 @@ class OverviewProvider extends AbstractHtml
 
 <div class="section">
     ';
-        if ($this->provider['proLocal']) {
+        if ($this->provider['proIsLocal']) {
             $body .= '<div><span class="material-icons">public_off</span>';
 
             switch ($this->provider['proLanguage']) {
@@ -543,7 +543,7 @@ class OverviewProvider extends AbstractHtml
                 $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
             }
             $body .= '</div>';
-        } elseif ($this->provider['proApi']) {
+        } elseif ($this->provider['proIsApi']) {
             $body .= '<div><span class="material-icons">public</span></div>';
 
             $body .= '<div>';

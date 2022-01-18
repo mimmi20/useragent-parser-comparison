@@ -25,31 +25,22 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class Test extends Command
 {
-    /**
-     * @var array
-     */
-    private $tests = [];
+    private \PDO $pdo;
 
     /**
-     * @var string
+     * @param \PDO $pdo
      */
-    private $testsDir = __DIR__ . '/../../tests';
+    public function __construct(\PDO $pdo)
+    {
+        $this->pdo = $pdo;
 
-    /**
-     * @var string
-     */
-    private $runDir = __DIR__ . '/../../data/test-runs';
-
-    /**
-     * @var array
-     */
-    private $results = [];
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
         $this->setName('test')
             ->setDescription('Runs test against the parsers')
-            ->addOption('use-db', null, InputOption::VALUE_NONE, 'Whether to use a database')
             ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run, if omitted will be generated from date')
             ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
     }
@@ -62,49 +53,35 @@ class Test extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         // Prepare our test directory to store the data from this run
-        /** @var string|null $thisRunDirName */
-        $thisRunDirName = $input->getArgument('run');
+        /** @var string|null $thisRunName */
+        $thisRunName = $input->getArgument('run');
 
-        if (empty($thisRunDirName)) {
-            $thisRunDirName = date('YmdHis');
+        if (empty($thisRunName)) {
+            $thisRunName = date('YmdHis');
         }
 
-        $useDb = $input->getOption('use-db');
+        $statementCreateTempUas  = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT `userAgent`.* FROM `userAgent` INNER JOIN `result` ON `userAgent`.`uaId` = `result`.`userAgent_id` WHERE `result`.`provider_id` = :proId LIMIT :start, :count)');
+        $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
 
-        if ($useDb) {
-            $thisRunDir = null;
-        } else {
-            $thisRunDir = $this->runDir . '/' . $thisRunDirName;
-            $resultsDir = $thisRunDir . '/results';
-            $expectedDir = $thisRunDir . '/expected';
+        $statementSelectTestProvider = $this->pdo->prepare('SELECT * FROM `useragents-general-overview`');
+        $statementSelectTestProvider->execute();
 
-            mkdir($thisRunDir);
-            mkdir($resultsDir);
-            mkdir($expectedDir);
+        $tests = [];
+        $rows  = [];
+        $questions = [];
+
+        while ($row = $statementSelectTestProvider->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+            $tests[$row['proId']] = $row['proName'];
+            $questions[] = $row['proName'];
+            $rows[] = [$row['proName'], $row['countNumber']];
         }
-
-        /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
-        $testHelper = $this->getHelper('tests');
-
-        foreach ($testHelper->collectTests($output, $thisRunDir) as $testPath => $testConfig) {
-            $this->tests[$testPath] = $testConfig;
-        }
-
-        $rows = [];
 
         $output->writeln('These are all available test suites, choose which you would like to run');
 
-        $questions = array_keys($this->tests);
-        sort($questions, SORT_FLAG_CASE | SORT_NATURAL);
-
-        $i = 1;
-        foreach ($questions as $name) {
-            $rows[] = [$name];
-            ++$i;
-        }
+        $testnames = array_flip($tests);
 
         $table = new Table($output);
-        $table->setHeaders(['Test Suite']);
+        $table->setHeaders(['Test Suite', 'Count of tests']);
         $table->setRows($rows);
         $table->render();
 
@@ -123,177 +100,149 @@ class Test extends Command
 
         foreach ($answers as $name) {
             if ($name === 'All Suites') {
-                $selectedTests = $this->tests;
+                $selectedTests = $tests;
 
                 break;
             }
 
-            $selectedTests[$name] = $this->tests[$name];
+            $selectedTests[$testnames[$name]] = $name;
         }
 
         $output->writeln('Choose which parsers you would like to run this test suite against');
 
-        /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
+        /** @var Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
         $parsers      = $parserHelper->getParsers($input, $output);
 
-        $usedTests = [];
+        $providers  = [];
+        $nameLength = 0;
 
-        foreach ($selectedTests as $testName => $testConfig) {
-            $result     = [];
+        foreach ($parsers as $parserPath => $parserConfig) {
+            $proName = $parserConfig['metadata']['name'] ?? $parserPath;
+
+            $statementSelectProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
+            $statementSelectProvider->execute();
+
+            $proId = $statementSelectProvider->fetch(\PDO::FETCH_COLUMN);
+
+            if (!$proId) {
+                $output->writeln(sprintf('<error>no provider found with name %s</error>', $proName));
+                continue;
+            }
+
+            $nameLength = max($nameLength, mb_strlen($proName));
+
+            $providers[$proName] = [$parserPath, $parserConfig, $proId];
+        }
+
+        /** @var Helper\Result $resultHelper */
+        $resultHelper = $this->getHelper('result');
+
+        foreach ($selectedTests as $id => $testName) {
             $actualTest = 0;
+            $currenUserAgent = 1;
+            $count           = 100;
+            $start           = 0;
+            $textLength   = 0;
 
-            foreach ($testConfig['build']() as $singleTestName => $singleTestData) {
-                ++$actualTest;
+            $basicMessage = sprintf(
+                'test suite <fg=yellow>%s</>',
+                $testName
+            );
 
-                $agent = $singleTestData['headers']['user-agent'] ?? null;
+            if (mb_strlen($basicMessage) > $textLength) {
+                $textLength = mb_strlen($basicMessage);
+            }
 
-                if (null === $agent) {
-                    var_dump($singleTestData);
-                    $output->writeln("\r" . ' <error>There was no useragent header for the testsuite ' . $singleTestName . '.</error>');
-                    continue;
-                }
+            $output->write("\r" . str_pad($basicMessage, $textLength));
 
-                $agent = addcslashes($agent, PHP_EOL);
-                $agentToShow = $agent;
+            do {
+                $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 
-                if (mb_strlen($agentToShow) > 100) {
-                    $agentToShow = mb_substr($agentToShow, 0, 96) . ' ...';
-                }
+                $statementCreateTempUas->bindValue(':proId', $id, \PDO::PARAM_STR);
+                $statementCreateTempUas->bindValue(':start', $start, \PDO::PARAM_INT);
+                $statementCreateTempUas->bindValue(':count', $count, \PDO::PARAM_INT);
 
-                $basicTestMessage = sprintf(
-                    'test suite <fg=yellow>%s</> <info>parsing</info> [%s] UA: <fg=yellow>%s</>',
-                    $testName,
-                    $actualTest,
-                    $agentToShow
-                );
+                $statementCreateTempUas->execute();
 
-                $output->write("\r" . $basicTestMessage);
-                $textLength = mb_strlen($basicTestMessage);
+                /*
+                 * load userAgents...
+                 */
+                $statementSelectAllUa = $this->pdo->prepare('SELECT * FROM `temp_userAgent`');
+                $statementSelectAllUa->execute();
 
-                foreach ($parsers as $parserName => $parser) {
-                    if (!array_key_exists($parserName, $result)) {
-                        $result[$parserName] = [
-                            'parse_time'  => 0,
-                            'init_time'   => 0,
-                            'memory_used' => 0,
-                            'version'     => null,
-                        ];
+                $this->pdo->beginTransaction();
+
+                while ($row = $statementSelectAllUa->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+                    $agent = addcslashes($row['uaString'], PHP_EOL);
+                    $agentToShow = $agent;
+
+                    ++$actualTest;
+
+                    if (mb_strlen($agentToShow) > 100) {
+                        $agentToShow = mb_substr($agentToShow, 0, 96) . ' ...';
                     }
 
-                    $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser...';
+                    $basicTestMessage = sprintf(
+                        $basicMessage . ' <info>parsing</info> [%s] UA: <fg=yellow>%s</>',
+                        $actualTest,
+                        $agentToShow
+                    );
 
-                    if (mb_strlen($testMessage) > $textLength) {
-                        $textLength = mb_strlen($testMessage);
+                    if (mb_strlen($basicTestMessage) > $textLength) {
+                        $textLength = mb_strlen($basicTestMessage);
                     }
 
-                    $output->write("\r" . str_pad($testMessage, $textLength));
+                    $output->write("\r" . str_pad($basicTestMessage, $textLength));
 
-                    $singleResult = $parser['parse-ua']($agent);
+                    foreach ($providers as $parserName => $provider) {
 
-                    if (empty($singleResult)) {
-                        $testMessage = $basicTestMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>';
+                        [, $parserConfig, $proId] = $provider;
+
+                        $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser ...';
 
                         if (mb_strlen($testMessage) > $textLength) {
                             $textLength = mb_strlen($testMessage);
                         }
 
-                        $output->writeln("\r" . str_pad($testMessage, $textLength));
+                        $output->write("\r" . str_pad($testMessage, $textLength));
 
-                        continue;
+                        $singleResult = $parserConfig['parse-ua']($row['uaString']);
+
+                        if (empty($singleResult)) {
+                            $testMessage = $basicTestMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>';
+
+                            if (mb_strlen($testMessage) > $textLength) {
+                                $textLength = mb_strlen($testMessage);
+                            }
+
+                            $output->writeln("\r" . str_pad($testMessage, $textLength));
+
+                            continue;
+                        }
+
+                        $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $singleResult);
                     }
 
-                    if (!empty($singleResult['version'])) {
-                        $parsers[$parserName]['metadata']['version'] = $singleResult['version'];
-                    }
-
-                    if (!file_exists($resultsDir . '/' . $parserName)) {
-                        mkdir($resultsDir . '/' . $parserName);
-                    }
-
-                    if (!file_exists($resultsDir . '/' . $parserName . '/' . $testName)) {
-                        mkdir($resultsDir . '/' . $parserName . '/' . $testName);
-                    }
-
-                    file_put_contents(
-                        $resultsDir . '/' . $parserName . '/' . $testName . '/' . $singleTestName . '.json',
-                        json_encode(
-                            [
-                                'headers' => $singleResult['headers'],
-                                'parsed'  => $singleResult['result']['parsed'],
-                                'err'     => $singleResult['result']['err'],
-                                'version' => $singleResult['version'],
-                                'init'    => $singleResult['init_time'],
-                                'time'    => $singleResult['parse_time'],
-                                'memory'  => $singleResult['memory_used'],
-                            ],
-                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
-                        )
-                    );
-
-                    if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
-                        $result[$parserName]['init_time'] = $singleResult['init_time'];
-                    }
-
-                    if ($singleResult['memory_used'] > $result[$parserName]['memory_used']) {
-                        $result[$parserName]['memory_used'] = $singleResult['memory_used'];
-                    }
-
-                    $result[$parserName]['parse_time'] += $singleResult['parse_time'];
-                    $result[$parserName]['version'] = $singleResult['version'];
+                    $currenUserAgent++;
                 }
 
-                $testMessage = $basicTestMessage . ' <info>done!</info>';
+                $this->pdo->commit();
 
-                if (mb_strlen($testMessage) > $textLength) {
-                    $textLength = mb_strlen($testMessage);
-                }
+                $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `temp_userAgent`');
+                $statementCountAllResults->execute();
 
-                $output->write("\r" . str_pad($testMessage, $textLength));
-            }
+                $colCount = $statementCountAllResults->fetch(\PDO::FETCH_COLUMN);
 
-            $output->writeln('');
+                $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 
-            foreach (array_keys($parsers) as $parserName) {
-                if (!array_key_exists($parserName, $result)) {
-                    $output->writeln(
-                        '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>'
-                    );
+                $start += $count;
+            } while ($colCount > 0);
 
-                    continue;
-                }
-
-                if (!file_exists($resultsDir . '/' . $parserName)) {
-                    mkdir($resultsDir . '/' . $parserName);
-                }
-
-                file_put_contents(
-                    $resultsDir . '/' . $parserName . '/' . $testName . '/metadata.json',
-                    json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
-                );
-
-                $usedTests[$testName] = $testConfig;
-            }
+            $output->writeln("\r" . str_pad($basicMessage . ' <info>done!</info>', $textLength));
         }
 
-        try {
-            $encoded = json_encode(
-                ['tests' => $usedTests, 'parsers' => $parsers, 'date' => time()],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
-            );
-        } catch (Exception $e) {
-            $output->writeln('<error>Encoding result metadata failed for the ' . $thisRunDirName . ' directory</error>');
-
-            return self::FAILURE;
-        }
-
-        // write some test data to file
-        file_put_contents(
-            $thisRunDir . '/metadata.json',
-            $encoded
-        );
-
-        $output->writeln('<comment>Parsing complete, data stored in ' . $thisRunDirName . ' directory</comment>');
+        $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
     }

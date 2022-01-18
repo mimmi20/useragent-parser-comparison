@@ -20,11 +20,8 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class Tests extends Helper
 {
-    /**
-     * @var string
-     */
-    private $testResultDir = __DIR__ . '/../../../data/test-runs';
-    private $testDir = __DIR__ . '/../../../tests';
+    private string $testResultDir = __DIR__ . '/../../../data/test-runs';
+    private string $testDir = __DIR__ . '/../../../tests';
 
     public function getName(): string
     {
@@ -202,6 +199,8 @@ class Tests extends Helper
                 case 'PHP':
                     switch ($testName) {
                         case 'browser-detector':
+                            $command = 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php';
+                            break;
                         case 'crawler-detect':
                             $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
                             break;
@@ -249,7 +248,8 @@ class Tests extends Helper
                     try {
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
                     } catch (\JsonException $e) {
-                        var_dump($testOutput);
+                        //var_dump($testOutput);
+                        var_dump($e);
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
 
                         return null;

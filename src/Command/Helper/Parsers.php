@@ -149,30 +149,31 @@ class Parsers extends Helper
                 }
             }
 
+            switch ($language) {
+                case 'PHP':
+                    switch ($parserDir->getFilename()) {
+                        case 'php-get-browser':
+                            $command = 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php';
+                            break;
+                        default:
+                            $command = 'php ' . $pathName . '/scripts/parse-ua.php';
+                            break;
+                    }
+                    break;
+                case 'JavaScript':
+                    $command = 'node ' . $pathName . '/scripts/parse-ua.js';
+                    break;
+                default:
+                    continue 2;
+            }
+
             yield $parserDir->getFilename() => [
                 'name'     => $pathName,
                 'path'     => $parserDir->getFilename(),
                 'metadata' => $metadata,
-                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir): ?array {
-                    switch ($language) {
-                        case 'PHP':
-                            switch ($parserDir->getFilename()) {
-                                case 'php-get-browser':
-                                    $command = 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
-                                    break;
-                                default:
-                                    $command = 'php ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
-                                    break;
-                            }
-                            break;
-                        case 'JavaScript':
-                            $command = 'node ' . $pathName . '/scripts/parse-ua.js --ua ' . escapeshellarg($useragent);
-                            break;
-                        default:
-                            return null;
-                    }
-
-                    $result = shell_exec($command);
+                'command'  => $command,
+                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir, $command): ?array {
+                    $result = shell_exec($command . ' --ua ' . escapeshellarg($useragent));
 
                     if (null === $result) {
                         return null;
@@ -184,7 +185,7 @@ class Parsers extends Helper
                         return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
                     } catch (\JsonException $e) {
                         $output->writeln('<error>' . $result . '</error>');
-                        $output->writeln('<error>' . $result . $e . '</error>');
+                        $output->writeln('<error>' . $e . '</error>');
                     }
 
                     return null;

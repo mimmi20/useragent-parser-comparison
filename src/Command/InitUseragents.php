@@ -50,7 +50,7 @@ class InitUseragents extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `test-provider` WHERE `proName` = :proName');
+        $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `test-provider`');
 
         $statementSelectUa       = $this->pdo->prepare('SELECT * FROM `userAgent` WHERE `uaHash` = :uaHash');
         $statementInsertUa       = $this->pdo->prepare('INSERT INTO `useragent` (`uaId`, `uaHash`, `uaString`, `uaAdditionalHeaders`) VALUES (:uaId, :uaHash, :uaString, :uaAdditionalHeaders)');
@@ -61,35 +61,34 @@ class InitUseragents extends Command
         /** @var Helper\Result $resultHelper */
         $resultHelper = $this->getHelper('result');
 
-        /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
-        $testHelper = $this->getHelper('tests');
+        $statementSelectProvider->execute();
 
-        foreach ($testHelper->collectTests($output, null) as $testPath => $testConfig) {
-            if (!$testConfig['metadata']['isActive']) {
-                continue;
-            }
+        while ($row = $statementSelectProvider->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+            $proName    = $row['proName'];
+            $proVersion = $row['proVersion'];
+            $proId      = $row['proId'];
 
-            $proName                    = $testConfig['metadata']['name'] ?? $testPath;
-            $proVersion                 = $testConfig['metadata']['version'] ?? null;
-
-            $statementSelectProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
-
-            $statementSelectProvider->execute();
-
-            $proId = $statementSelectProvider->fetch(\PDO::FETCH_COLUMN);
-
-            $message  = sprintf('test suite <fg=yellow>%s</>', $testPath);
+            $message       = sprintf('test suite <fg=yellow>%s</>', $proName);
             $messageLength = mb_strlen($message);
-            $output->write($message);
-
-            $message = sprintf('test suite <fg=yellow>%s</>', $testPath);
 
             $output->write("\r" . $message . ' <info>building test suite</info>');
 
-            $testOutput = shell_exec($testConfig['command']);
+            if (!$row['proIsActive']) {
+                $output->writeln("\r" . $message . ' <fg=gray>testsuite ' . $proName . ' is not active</>');
+
+                continue;
+            }
+
+            if (!$row['proCommand']) {
+                $output->writeln("\r" . $message . ' <fg=gray>testsuite ' . $proName . ' has no command</>');
+
+                continue;
+            }
+
+            $testOutput = shell_exec($row['proCommand']);
 
             if (null === $testOutput || false === $testOutput) {
-                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No content was sent.</error>');
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! No content was sent.</error>');
 
                 continue;
             }
@@ -99,25 +98,29 @@ class InitUseragents extends Command
             try {
                 $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
             } catch (\JsonException $e) {
-                var_dump($testOutput);
-                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
+                //var_dump($testOutput);
+                var_dump($e->getMessage());
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! json_decode failed.</error>');
 
                 continue;
             }
 
             if ($tests['tests'] === null || !is_array($tests['tests']) || $tests['tests'] === []) {
                 var_dump($testOutput);
-                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>');
+                $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! No tests were found.</error>');
 
                 continue;
             }
+
+            $inserted = 0;
+            $updated  = 0;
 
             foreach ($tests['tests'] as $singleTestData) {
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if (null === $agent) {
                     var_dump($singleTestData);exit;
-                    $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $testName . '.</error>');
+                    $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $proName . '.</error>');
                     continue;
                 }
 
@@ -151,6 +154,8 @@ class InitUseragents extends Command
 
                         $statementUpdateUa->execute();
                     }
+
+                    ++$updated;
                 } else {
                     $uaId = Uuid::uuid4()->toString();
 
@@ -160,6 +165,8 @@ class InitUseragents extends Command
                     $statementInsertUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
                     $statementInsertUa->execute();
+
+                    ++$inserted;
                 }
 
                 /*
@@ -167,14 +174,12 @@ class InitUseragents extends Command
                  */
                 $resultHelper->storeResult('0', $proId, $uaId, $singleTestData, $proVersion);
 
-                ++$tests;
-
-                $updateMessage = $message . sprintf(' <info>importing</info> [tests imported: %d]', $tests);
+                $updateMessage = $message . sprintf(' <info>importing</info> [tests inserted: %d, updated: %d]', $inserted, $updated);
                 $messageLength = mb_strlen($updateMessage);
                 $output->write("\r" . $updateMessage);
             }
 
-            $output->writeln("\r" . $message . str_pad(' <info>done</info>', $messageLength));
+            $output->writeln("\r" . $message . str_pad(' <info>importing done</info>', $messageLength));
         }
 
         return self::SUCCESS;

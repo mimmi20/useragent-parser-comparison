@@ -126,7 +126,7 @@ class OverviewGeneral extends AbstractHtml
             
             $html .= '<th>';
             
-            if ($row['proLocal']) {
+            if ($row['proIsLocal']) {
                 $html .= '<div><span class="material-icons">public_off</span>';
 
                 switch ($row['proLanguage']) {
@@ -161,7 +161,7 @@ class OverviewGeneral extends AbstractHtml
                     $html .= '<br /><small>' . $row['proLastReleaseDate'] . '</small>';
                 }
                 $html .= '</div>';
-            } elseif ($row['proApi']) {
+            } elseif ($row['proIsApi']) {
                 $html .= '<div><span class="material-icons">public</span></div>';
 
                 $html .= '<div>';

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use Exception;
+use Ramsey\Uuid\Uuid;
 use function fclose;
 use function file_put_contents;
 use function fopen;
@@ -31,69 +32,73 @@ class Parse extends Command
      */
     private $runDir = __DIR__ . '/../../data/test-runs';
 
+    private \PDO $pdo;
+
+    /**
+     * @param \PDO $pdo
+     */
+    public function __construct(\PDO $pdo)
+    {
+        $this->pdo = $pdo;
+
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this->setName('parse')
             ->setDescription('Parses useragents in a file using the selected parser(s)')
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the file to parse')
             ->addArgument('run', InputArgument::OPTIONAL, 'Name of the run, for storing results')
-            ->addOption('normalize', null, InputOption::VALUE_NONE, 'Whether to normalize the output')
-            ->addOption('csv', null, InputOption::VALUE_NONE, 'Outputs CSV without showing CLI table')
-            ->addOption('no-output', null, InputOption::VALUE_NONE, 'Disables output after parsing, useful when chaining commands')
-            ->addOption('csv-file', null, InputOption::VALUE_OPTIONAL, 'File name to output CSV data to, implies the options "csv" and "no-output"')
-            ->setHelp('Parses the useragent strings (one per line) from the passed in file and outputs the parsed properties.');
+            ->setHelp('Parses the useragent strings (one per line) from the passed in file');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         /** @var string $filename */
         $filename  = $input->getArgument('file');
-        $normalize = $input->getOption('normalize');
-        $csv       = $input->getOption('csv');
 
-        /** @var string|null $name */
-        $name     = $input->getArgument('run');
-        $noOutput = $input->getOption('no-output');
+        /** @var string|null $thisRunName */
+        $thisRunName     = $input->getArgument('run');
 
-        /** @var string|null $csvFile */
-        $csvFile = $input->getOption('csv-file');
-
-        if ($csvFile) {
-            $noOutput = true;
-            $csv      = true;
-            $csvFile  = (string) $csvFile;
-        } elseif ($csv) {
-            $output->writeln(
-                '<error>csvFile parameter is required if csv parameter is specified</error>'
-            );
-
-            return self::FAILURE;
-        }
-
-        /** @var Helper\Normalize $normalizeHelper */
-        $normalizeHelper = $this->getHelper('normalize');
-        $questionHelper  = $this->getHelper('question');
-
-        $table = new Table($output);
-        $table->setHeaders([
-            [new TableCell('UserAgent', ['colspan' => '7']), 'Parse Time'],
-            ['browser_name', 'browser_version', 'platform_name', 'platform_version', 'device_name', 'device_brand', 'device_type', 'is_mobile'],
-        ]);
-
-        if ($name) {
-            mkdir($this->runDir . '/' . $name);
-            mkdir($this->runDir . '/' . $name . '/results');
-        }
-
+        $statementSelectUa       = $this->pdo->prepare('SELECT * FROM `userAgent` WHERE `uaHash` = :uaHash');
+        $statementInsertUa       = $this->pdo->prepare('INSERT INTO `useragent` (`uaId`, `uaHash`, `uaString`, `uaAdditionalHeaders`) VALUES (:uaId, :uaHash, :uaString, :uaAdditionalHeaders)');
+        $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
 
         /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
         $parsers      = $parserHelper->getParsers($input, $output);
         $actualTest   = 0;
 
-        $result = [];
         $file   = new \SplFileObject($filename);
         $file->setFlags(\SplFileObject::DROP_NEW_LINE);
+
+        $providers  = [];
+        $nameLength = 0;
+
+        foreach ($parsers as $parserPath => $parserConfig) {
+            $proName = $parserConfig['metadata']['name'] ?? $parserPath;
+
+            $statementSelectProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
+            $statementSelectProvider->execute();
+
+            $proId = $statementSelectProvider->fetch(\PDO::FETCH_COLUMN);
+
+            if (!$proId) {
+                $output->writeln(sprintf('<error>no provider found with name %s</error>', $proName));
+                continue;
+            }
+
+            $nameLength = max($nameLength, mb_strlen($proName));
+
+            $providers[$proName] = [$parserPath, $parserConfig, $proId];
+        }
+
+        /** @var Helper\Result $resultHelper */
+        $resultHelper = $this->getHelper('result');
+
+        $inserted = 0;
+        $updated  = 0;
 
         while (!$file->eof()) {
             $agentString = $file->fgets();
@@ -103,193 +108,98 @@ class Parse extends Command
                 continue;
             }
 
-            $message = sprintf(
-                '%s[%s] Parsing UA <fg=yellow>%s</> ',
-                '  ',
-                (string) $actualTest,
-                $agentString
+            $agent = addcslashes($agentString, PHP_EOL);
+            $agentToShow = $agent;
+
+            if (mb_strlen($agentToShow) > 100) {
+                $agentToShow = mb_substr($agentToShow, 0, 96) . ' ...';
+            }
+
+            $basicTestMessage = sprintf(
+                '<info>parsing</info> [%s] UA: <fg=yellow>%s</>',
+                $actualTest,
+                $agentToShow
             );
 
-            $output->write($message);
+            $output->write("\r" . $basicTestMessage);
+            $messageLength = mb_strlen($basicTestMessage);
 
-            foreach ($parsers as $parserName => $parser) {
-                if (!array_key_exists($parserName, $result)) {
-                    $result[$parserName] = [
-                        'results'     => [],
-                        'parse_time'  => 0,
-                        'init_time'   => 0,
-                        'memory_used' => 0,
-                        'version'     => null,
-                    ];
+            $uaHash = bin2hex(sha1($agentString, true));
+
+            /*
+             * insert UA itself
+             */
+            $statementSelectUa->bindValue(':uaHash', $uaHash, \PDO::PARAM_STR);
+
+            $statementSelectUa->execute();
+
+            $dbResultUa = $statementSelectUa->fetch(\PDO::FETCH_ASSOC);
+
+            if (false !== $dbResultUa) {
+                // update!
+                $uaId = $dbResultUa['uaId'];
+
+                ++$updated;
+            } else {
+                $uaId = Uuid::uuid4()->toString();
+
+                $additionalHeaders = null;
+
+                $statementInsertUa->bindValue(':uaId', $uaId, \PDO::PARAM_STR);
+                $statementInsertUa->bindValue(':uaHash', $uaHash, \PDO::PARAM_STR);
+                $statementInsertUa->bindValue(':uaString', $agent, \PDO::PARAM_STR);
+                $statementInsertUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+
+                $statementInsertUa->execute();
+
+                ++$inserted;
+            }
+
+            /*
+             * Result
+             */
+            $resultHelper->storeResult('0', $proId, $uaId, []);
+
+            foreach ($providers as $parserName => $provider) {
+
+                [, $parserConfig, $proId] = $provider;
+
+                $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser...';
+
+                if (mb_strlen($testMessage) > $messageLength) {
+                    $messageLength = mb_strlen($testMessage);
                 }
 
-                $output->write("\r" . str_pad($message . '<info>against the <fg=green;options=bold,underscore>' . $parserName . '</> parser... </info>', 285));
-                $singleResult = $parser['parse-ua']($agentString);
+                $output->write("\r" . str_pad($testMessage, $messageLength));
+
+                $singleResult = $parserConfig['parse-ua']($agentString);
 
                 if (empty($singleResult)) {
-                    $output->writeln("\r" . $message . '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>');
+                    $testMessage = $basicTestMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>';
+
+                    if (mb_strlen($testMessage) > $messageLength) {
+                        $messageLength = mb_strlen($testMessage);
+                    }
+
+                    $output->writeln("\r" . str_pad($testMessage, $messageLength));
 
                     continue;
                 }
 
-                if (isset($singleResult['version'])) {
-                    $parsers[$parserName]['metadata']['version'] = $singleResult['version'];
-                }
-
-                $result[$parserName]['results'][] = [
-                    'headers' => $singleResult['headers'],
-                    'parsed'  => $singleResult['result']['parsed'],
-                    'err'     => $singleResult['result']['err'],
-                    'time'    => $singleResult['parse_time'],
-                ];
-
-                if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
-                    $result[$parserName]['init_time'] = $singleResult['init_time'];
-                }
-
-                if ($singleResult['memory_used'] > $result[$parserName]['memory_used']) {
-                    $result[$parserName]['memory_used'] = $singleResult['memory_used'];
-                }
-
-                $result[$parserName]['parse_time'] += $singleResult['parse_time'];
-                $result[$parserName]['version'] = $singleResult['version'];
-
-                unset($singleResult);
+                $resultHelper->storeResult($thisRunName, $proId, $uaId, $singleResult);
             }
 
-            $output->writeln("\r" . str_pad($message . '<info>done!</info>', 245));
+            $testMessage = $basicTestMessage . ' <info>done!</info>';
 
-            foreach ($parsers as $parserName => $parser) {
-                if ($name) {
-                    if (!file_exists($this->runDir . '/' . $name . '/results/' . $parserName)) {
-                        mkdir($this->runDir . '/' . $name . '/results/' . $parserName);
-                    }
-
-                    file_put_contents(
-                        $this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($filename) . '.json',
-                        json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
-                    );
-                }
-
-                $rows = [];
-                foreach ($result[$parserName]['results'] as $singleResult) {
-                    if ($normalize) {
-                        $singleResult['parsed'] = $normalizeHelper->normalize($singleResult['parsed']);
-                    }
-
-                    $rows[] = [
-                        new TableCell('<fg=yellow>' . $singleResult['useragent'] . '</>', ['colspan' => '7']),
-                        round($singleResult['time'], 5) . 's',
-                    ];
-                    $rows[] = [
-                        $singleResult['parsed']['client']['name'],
-                        $singleResult['parsed']['client']['version'],
-                        $singleResult['parsed']['platform']['name'],
-                        $singleResult['parsed']['platform']['version'],
-                        $singleResult['parsed']['device']['name'],
-                        $singleResult['parsed']['device']['brand'],
-                        $singleResult['parsed']['device']['type'],
-                        $singleResult['parsed']['device']['ismobile'],
-                    ];
-                    $rows[] = new TableSeparator();
-                }
-
-                array_pop($rows);
-
-                $table->setRows($rows);
-
-                $answer = '';
-
-                if (!$csv && !$noOutput) {
-                    $table->render();
-
-                    $question = new ChoiceQuestion('What would you like to do?', ['Dump as CSV', 'Continue'], 1);
-
-                    $answer = $questionHelper->ask($input, $output, $question);
-                }
-
-                if ($csv || $answer === 'Dump as CSV') {
-                    $csvOutput = $this->putcsv(
-                        [
-                            'useragent',
-                            'browser_name',
-                            'browser_version',
-                            'platform_name',
-                            'platform_version',
-                            'device_name',
-                            'device_brand',
-                            'device_type',
-                            'ismobile',
-                            'time',
-                        ],
-                        $csvFile
-                    );
-
-                    $csvOutput .= "\n";
-
-                    foreach ($result[$parserName]['results'] as $singleResult) {
-                        $out = [
-                            $singleResult['useragent'],
-                            $singleResult['parsed']['client']['name'],
-                            $singleResult['parsed']['client']['version'],
-                            $singleResult['parsed']['platform']['name'],
-                            $singleResult['parsed']['platform']['version'],
-                            $singleResult['parsed']['device']['name'],
-                            $singleResult['parsed']['device']['brand'],
-                            $singleResult['parsed']['device']['type'],
-                            $singleResult['parsed']['device']['ismobile'],
-                            $singleResult['time'],
-                        ];
-
-                        $csvOutput .= $this->putcsv($out, $csvFile) . "\n";
-                    }
-
-                    if ($csvFile) {
-                        $output->writeln('Wrote CSV data to ' . $csvFile);
-                    } else {
-                        $output->writeln($csvOutput);
-                        $question = new Question('Press enter to continue', 'yes');
-                        $questionHelper->ask($input, $output, $question);
-                    }
-                }
+            if (mb_strlen($testMessage) > $messageLength) {
+                $messageLength = mb_strlen($testMessage);
             }
-        }
 
-        if ($name) {
-            file_put_contents(
-                $this->runDir . '/' . $name . '/metadata.json',
-                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($filename)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
-            );
+            $output->writeln("\r" . str_pad($testMessage, $messageLength));
         }
 
         $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
-    }
-
-    /**
-     * @throws \Exception if cannot open file stream
-     */
-    private function putcsv(array $input, string $csvFile): string
-    {
-        $delimiter = ',';
-        $enclosure = '"';
-
-        if ($csvFile) {
-            $fp = fopen($csvFile, 'a+');
-        } else {
-            $fp = fopen('php://temp', 'r+');
-        }
-
-        fputcsv($fp, $input, $delimiter, $enclosure);
-        rewind($fp);
-        $data = rtrim((string) stream_get_contents($fp), "\n");
-        fclose($fp);
-
-        if ($csvFile) {
-            return '';
-        }
-
-        return $data;
     }
 }

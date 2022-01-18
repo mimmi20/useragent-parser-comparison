@@ -82,7 +82,6 @@ class Compare extends Command
                 'command'     => 'parse',
                 'file'        => $file,
                 'run'         => $name,
-                '--no-output' => true,
             ];
 
             $parseInput = new ArrayInput($arguments);
@@ -113,6 +112,8 @@ class Compare extends Command
                 return $returnCode;
             }
         }
+
+        return self::SUCCESS;
 
         $command   = $application->find('normalize');
         $arguments = [

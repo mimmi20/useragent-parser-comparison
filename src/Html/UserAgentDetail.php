@@ -108,7 +108,7 @@ class UserAgentDetail extends AbstractHtml
 
         $html .= '<th>';
 
-        if ($result['proLocal']) {
+        if ($result['proIsLocal']) {
             $html .= '<div><span class="material-icons">public_off</span>';
 
             switch ($result['proLanguage']) {
@@ -143,7 +143,7 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<br /><small>' . $result['proLastReleaseDate'] . '</small>';
             }
             $html .= '</div>';
-        } elseif ($result['proApi']) {
+        } elseif ($result['proIsApi']) {
             $html .= '<div><span class="material-icons">public</span></div>';
 
             $html .= '<div>';
