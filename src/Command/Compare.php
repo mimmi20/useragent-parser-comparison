@@ -113,7 +113,20 @@ class Compare extends Command
             }
         }
 
-        return self::SUCCESS;
+        $command   = $application->find('generate-reports');
+        $arguments = [
+            'command' => 'generate-reports',
+            'run'     => $name,
+        ];
+
+        $generateInput = new ArrayInput($arguments);
+        $returnCode     = $command->run($generateInput, $output);
+
+        if ($returnCode > 0) {
+            $output->writeln('<error>There was an error executing the "generate-reports" command, cannot continue.</error>');
+
+            return $returnCode;
+        }
 
         $command   = $application->find('normalize');
         $arguments = [
@@ -129,6 +142,8 @@ class Compare extends Command
 
             return $returnCode;
         }
+
+        return self::SUCCESS;
 
         $command   = $application->find('analyze');
         $arguments = [

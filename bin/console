@@ -21,7 +21,6 @@ $application->getHelperSet()->set($normalizeHelper);
 $testsHelper = new \UserAgentParserComparison\Command\Helper\Tests();
 $application->getHelperSet()->set($testsHelper);
 
-$application->add(new \UserAgentParserComparison\Command\Analyze());
 $application->add(new \UserAgentParserComparison\Command\Compare());
 
 if (file_exists('config.php')) {
@@ -39,11 +38,12 @@ if (file_exists('config.php')) {
         $application->add(new \UserAgentParserComparison\Command\Test($pdo));
         $application->add(new \UserAgentParserComparison\Command\Parse($pdo));
         $application->add(new \UserAgentParserComparison\Command\Normalize($pdo));
+        $application->add(new \UserAgentParserComparison\Command\Analyze($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitDb($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitProvider($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitUseragents($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitResults($pdo));
-        $application->add(new \UserAgentParserComparison\Command\GenerateIndexPage($pdo, $basePath));
+        $application->add(new \UserAgentParserComparison\Command\GenerateReports($pdo, $basePath));
     }
 }
 

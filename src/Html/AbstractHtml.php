@@ -16,8 +16,16 @@ abstract class AbstractHtml
         $this->title = $title;
     }
 
-    final protected function getUserAgentCount(): int
+    final protected function getUserAgentCount(?string $run = null): int
     {
+        if ($run !== null) {
+            $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent` WHERE `uaId` IN (SELECT `result`.`userAgent_id` FROM `result` WHERE `result`.`run` = :run)');
+            $statementCountAllResults->bindValue(':run', $run, \PDO::PARAM_STR);
+            $statementCountAllResults->execute();
+
+            return $statementCountAllResults->fetch(\PDO::FETCH_COLUMN);
+        }
+
         if ($this->userAgentCount === null) {
             $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent`');
             $statementCountAllResults->execute();

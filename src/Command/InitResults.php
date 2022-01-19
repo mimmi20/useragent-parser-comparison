@@ -173,11 +173,11 @@ class InitResults extends Command
             'resOsName' => $result['platform']['name'],
             'resOsVersion' => $result['platform']['version'],
 
-            'resDeviceModel' => $result['device']['name'],
+            'resDeviceName' => $result['device']['name'],
             'resDeviceBrand' => $result['device']['brand'],
             'resDeviceType' => $result['device']['type'],
             'resDeviceIsMobile' => $result['device']['ismobile'],
-            'resDeviceIsTouch' => $result['device']['istouch'],
+            'resDeviceDisplayIsTouch' => $result['device']['istouch'],
         ];
 
         return array_merge($row2, $toHydrate);

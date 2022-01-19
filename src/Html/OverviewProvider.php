@@ -13,7 +13,7 @@ class OverviewProvider extends AbstractHtml
         $this->title = $title;
     }
 
-    private function getResult(): array
+    private function getResult(): array|false
     {
         $sql = "
             SELECT
@@ -33,12 +33,12 @@ class OverviewProvider extends AbstractHtml
             
                 COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
             
-                COUNT(`resDeviceModel`) AS `deviceModelFound`,
+                COUNT(`resDeviceName`) AS `deviceModelFound`,
             
                 COUNT(`resDeviceType`) AS `deviceTypeFound`,
             
                 COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
-                COUNT(`resDeviceIsTouch`) AS `asTouchDeviceDetected`,
+                COUNT(`resDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
             
                 AVG(`resInitTime`) AS `avgInitTime`,
                 AVG(`resParseTime`) AS `avgParseTime`,
@@ -52,9 +52,7 @@ class OverviewProvider extends AbstractHtml
         ";
 
         $statement = $this->pdo->prepare($sql);
-
         $statement->bindValue(':proId', $this->provider['proId'], \PDO::PARAM_STR);
-
         $statement->execute();
         
         return $statement->fetch();
@@ -88,6 +86,22 @@ class OverviewProvider extends AbstractHtml
         $row = $this->getResult();
         
         $html .= '<tbody>';
+
+        if (false === $row) {
+            $html .= '
+            <tr>
+                <td colspan="5" class="center-align red lighten-1">
+                    <strong>Not available with this provider</strong>
+                </td>
+            </tr>
+                
+            ';
+
+            $html .= '</tbody>';
+            $html .= '</table>';
+
+            return $html;
+        }
         
         /*
          * Results found
@@ -360,7 +374,7 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Model</th>
             ';
-        if ($provider['proCanDetectDeviceModel']) {
+        if ($provider['proCanDetectDeviceName']) {
             $html .= '
                 <td>' . $row['deviceModelFound'] . '</td>
                 <td>' . $this->getPercentCircle($countOfUseragents, $row['deviceModelFound'], $row['resultFound']) . '</td>
@@ -444,7 +458,7 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Is touch</th>
             ';
-        if ($provider['proCanDetectDeviceIsTouch']) {
+        if ($provider['proCanDetectDeviceDisplayIsTouch']) {
             $html .= '
                 <td>' . $row['asTouchDeviceDetected'] . '</td>
                 <td>' . $this->getPercentCircle($countOfUseragents, $row['asTouchDeviceDetected'], $row['resultFound']) . '</td>
@@ -487,13 +501,12 @@ class OverviewProvider extends AbstractHtml
         ';
         
         $html .= '</tbody>';
-        
         $html .= '</table>';
         
         return $html;
     }
 
-    public function getHtml(): string
+    public function getHtml(?string $run = null): string
     {
         $body = '
 <div class="section">
@@ -501,7 +514,7 @@ class OverviewProvider extends AbstractHtml
 
     <div class="row center">
         <h5 class="header light">
-            We took <strong>' . $this->getUserAgentCount() . '</strong> different user agents and analyzed them with this provider<br />
+            We took <strong>' . $this->getUserAgentCount($run) . '</strong> different user agents and analyzed them with this provider<br />
         </h5>
     </div>
 </div>

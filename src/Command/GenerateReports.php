@@ -28,25 +28,27 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class GenerateIndexPage extends Command
+class GenerateReports extends Command
 {
     private \PDO $pdo;
-    private string $basePath;
+    private string $version;
 
     /**
      * @param \PDO $pdo
      */
-    public function __construct(\PDO $pdo, string $basePath)
+    public function __construct(\PDO $pdo, string $version)
     {
         $this->pdo = $pdo;
-        $this->basePath = $basePath;
+        $this->version = $version;
 
         parent::__construct();
     }
 
     protected function configure(): void
     {
-        $this->setName('generate-index-page');
+        $this->setName('generate-reports')
+            ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run directory that you want to normalize')
+            ->setHelp('');
     }
 
     /**
@@ -56,18 +58,36 @@ class GenerateIndexPage extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (! file_exists($this->basePath)) {
-            mkdir($this->basePath, 0777, true);
+        /** @var string|null $thisRunName */
+        $thisRunName = $input->getArgument('run');
+        $basePath = '../gh-pages/';
+
+        if (empty($thisRunName)) {
+            $version = 'v' . $this->version;
+
+            $output->writeln(sprintf('<comment>Generate reports for version %s</comment>', $this->version));
+        } else {
+            $version = 'r' . $thisRunName;
+
+            $output->writeln(sprintf('<comment>Generate reports for test run: %s</comment>', $thisRunName));
         }
 
-        $output->write('generate index page ...');
-        $generate = new Index($this->pdo, 'UserAgentParserComparison comparison');
-        file_put_contents($this->basePath . '/../index.html', $generate->getHtml());
-        $output->writeln("\r" . 'generate index page <info>done</info>');
+        $basePath .= $version;
+
+        if (! file_exists($basePath)) {
+            mkdir($basePath, 0777, true);
+        }
+
+        if (empty($thisRunName)) {
+            $output->write('generate index page ...');
+            $generate = new Index($this->pdo, 'UserAgentParserComparison comparison');
+            file_put_contents($basePath . '/../index.html', $generate->getHtml());
+            $output->writeln("\r" . 'generate index page <info>done</info>');
+        }
 
         $output->write('generate general overview page ...');
         $generate = new OverviewGeneral($this->pdo, 'UserAgentParserComparison comparison overview');
-        file_put_contents($this->basePath . '/index.html', $generate->getHtml());
+        file_put_contents($basePath . '/index.html', $generate->getHtml($version, $thisRunName));
         $output->writeln("\r" . 'generate general overview page <info>done</info>');
 
         $baseMessage = 'generate overview page and found pages for';
@@ -85,10 +105,10 @@ class GenerateIndexPage extends Command
 
             $generate = new OverviewProvider($this->pdo, $dbResultProvider, 'Overview - ' . $dbResultProvider['proName']);
 
-            file_put_contents($this->basePath . '/' . $dbResultProvider['proName'] . '.html', $generate->getHtml());
+            file_put_contents($basePath . '/' . $dbResultProvider['proName'] . '.html', $generate->getHtml($thisRunName));
             $output->write('.');
 
-            $folder = $this->basePath . '/detected/' . $dbResultProvider['proName'];
+            $folder = $basePath . '/detected/' . $dbResultProvider['proName'];
             if (! file_exists($folder)) {
                 mkdir($folder, 0777, true);
             }
@@ -212,19 +232,19 @@ class GenerateIndexPage extends Command
             /*
              * detected - deviceModel
              */
-            if ($dbResultProvider['proCanDetectDeviceModel']) {
+            if ($dbResultProvider['proCanDetectDeviceName']) {
                 $sql = "
             SELECT
-                `resDeviceModel` AS `name`,
+                `resDeviceName` AS `name`,
                 `uaId`,
                 `uaString`,
-                COUNT(`resDeviceModel`) AS `detectionCount`
+                COUNT(`resDeviceName`) AS `detectionCount`
             FROM `list-found-general-device-models`
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
                 `provider_id` = :proId
-            GROUP BY `resDeviceModel`
+            GROUP BY `resDeviceName`
         ";
                 $statement = $this->pdo->prepare($sql);
                 $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
@@ -325,7 +345,7 @@ class GenerateIndexPage extends Command
                 $output->write('.');
             }
 
-            $folder = $this->basePath . '/not-detected/' . $dbResultProvider['proName'];
+            $folder = $basePath . '/not-detected/' . $dbResultProvider['proName'];
             if (! file_exists($folder)) {
                 mkdir($folder, 0777, true);
             }
@@ -587,17 +607,17 @@ class GenerateIndexPage extends Command
             /*
              * deviceModel
              */
-            if ($dbResultProvider['proCanDetectDeviceModel']) {
+            if ($dbResultProvider['proCanDetectDeviceName']) {
                 echo '.';
 
                 $sql = "
             SELECT
-                `found-results`.`resDeviceModel` AS `name`,
+                `found-results`.`resDeviceName` AS `name`,
                 `userAgent`.`uaId`,
                 `userAgent`.`uaString`,
                 (
                     SELECT
-                        COUNT(`list-found-general-device-models`.`resDeviceModel`)
+                        COUNT(`list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
                     WHERE 
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
@@ -605,7 +625,7 @@ class GenerateIndexPage extends Command
                 ) AS `detectionCount`,
                 (
                     SELECT
-                        COUNT(DISTINCT `list-found-general-device-models`.`resDeviceModel`)
+                        COUNT(DISTINCT `list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
                     WHERE 
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
@@ -613,7 +633,7 @@ class GenerateIndexPage extends Command
                 ) AS `detectionCountUnique`,
                 (
                     SELECT
-                        GROUP_CONCAT(DISTINCT `list-found-general-device-models`.`resDeviceModel`)
+                        GROUP_CONCAT(DISTINCT `list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
                     WHERE 
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
@@ -625,7 +645,7 @@ class GenerateIndexPage extends Command
             WHERE
                 `found-results`.`provider_id` = :proId
                 AND `found-results`.`resClientIsBot` IS NULL
-                AND `found-results`.`resDeviceModel` IS NULL
+                AND `found-results`.`resDeviceName` IS NULL
         ";
                 $statement = $this->pdo->prepare($sql);
                 $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
@@ -851,7 +871,7 @@ class GenerateIndexPage extends Command
 
         $output->writeln("\r" . str_pad($baseMessage . ' each provider <info>done</info>', $messageLength + 30));
 
-        $folder = $this->basePath . '/detected/general';
+        $folder = $basePath . '/detected/general';
         if (! file_exists($folder)) {
             mkdir($folder, 0777, true);
         }
@@ -978,7 +998,7 @@ class GenerateIndexPage extends Command
             /*
              * create the folder
              */
-            $folder = $this->basePath . '/user-agent-detail/' . substr($dbResultUa['uaId'], 0, 2) . '/' . substr($dbResultUa['uaId'], 2, 2);
+            $folder = $basePath . '/user-agent-detail/' . substr($dbResultUa['uaId'], 0, 2) . '/' . substr($dbResultUa['uaId'], 2, 2);
             if (! file_exists($folder)) {
                 mkdir($folder, 0777, true);
             }

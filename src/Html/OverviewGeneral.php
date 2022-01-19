@@ -4,9 +4,9 @@ namespace UserAgentParserComparison\Html;
 class OverviewGeneral extends AbstractHtml
 {
 
-    private function getProviders(): iterable
+    private function getProviders(?string $run = null): iterable
     {
-        $statement = $this->pdo->prepare('SELECT
+        $sql = 'SELECT
                 `real-provider`.*,
             
                 SUM(`result`.`resResultFound`) AS `resultFound`,
@@ -30,25 +30,36 @@ class OverviewGeneral extends AbstractHtml
                 COUNT(`result`.`resDeviceBrand`) AS `deviceBrandFound`,
                 COUNT(DISTINCT `result`.`resDeviceBrand`) AS `deviceBrandFoundUnique`,
             
-                COUNT(`result`.`resDeviceModel`) AS `deviceModelFound`,
-                COUNT(DISTINCT `result`.`resDeviceModel`) AS `deviceModelFoundUnique`,
+                COUNT(`result`.`resDeviceName`) AS `deviceModelFound`,
+                COUNT(DISTINCT `result`.`resDeviceName`) AS `deviceModelFoundUnique`,
             
                 COUNT(`result`.`resDeviceType`) AS `deviceTypeFound`,
                 COUNT(DISTINCT `result`.`resDeviceType`) AS `deviceTypeFoundUnique`,
             
                 COUNT(`result`.`resDeviceIsMobile`) AS `asMobileDetected`,
-                COUNT(`result`.`resDeviceIsTouch`) AS `asTouchDeviceDetected`,
+                COUNT(`result`.`resDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
             
                 AVG(`result`.`resInitTime`) AS `avgInitTime`,
                 AVG(`result`.`resParseTime`) AS `avgParseTime`,
                 AVG(`result`.`resMemoryUsed`) AS `avgMemoryUsed`
             FROM `result`
             INNER JOIN `real-provider`
-                ON `real-provider`.`proId` = `result`.`provider_id` AND `real-provider`.`proVersion` = `result`.`resProviderVersion` 
+                ON `real-provider`.`proId` = `result`.`provider_id` AND `real-provider`.`proVersion` = `result`.`resProviderVersion` ';
+        if (null !== $run) {
+            $sql .= ' WHERE `result`.`run` = :run';
+        }
+        $sql .= '
             GROUP BY
                 `real-provider`.`proId`,`real-provider`.`proVersion`
             ORDER BY 
-                `real-provider`.`proName`');
+                `real-provider`.`proName`';
+
+        $statement = $this->pdo->prepare($sql);
+
+        if (null !== $run) {
+            $statement->bindValue(':run', $run, \PDO::PARAM_STR);
+        }
+
         $statement->execute();
         
         yield from $statement->fetchAll(\PDO::FETCH_ASSOC);
@@ -71,7 +82,7 @@ class OverviewGeneral extends AbstractHtml
         yield from $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    private function getTableSummary(): string
+    private function getTableSummary(?string $run = null): string
     {
         $html = '<table class="striped">';
 
@@ -121,7 +132,7 @@ class OverviewGeneral extends AbstractHtml
          * body
          */
         $html .= '<tbody>';
-        foreach ($this->getProviders() as $row) {
+        foreach ($this->getProviders($run) as $row) {
             $html .= '<tr>';
             
             $html .= '<th>';
@@ -175,7 +186,7 @@ class OverviewGeneral extends AbstractHtml
             
             $html .= '</th>';
 
-            $countOfUseragents = $this->getUserAgentCount();
+            $countOfUseragents = $this->getUserAgentCount($run);
 
             /*
              * Result found?
@@ -283,7 +294,7 @@ class OverviewGeneral extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
             
-            if ($row['proCanDetectDeviceModel']) {
+            if ($row['proCanDetectDeviceName']) {
                 $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['deviceModelFound'], $row['resultFound']);
                 $html .= '<br />Tot.' . $row['deviceModelFound'];
                 $html .= '<br />Unq.' . $row['deviceModelFoundUnique'];
@@ -310,7 +321,7 @@ class OverviewGeneral extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectDeviceIsTouch']) {
+            if ($row['proCanDetectDeviceDisplayIsTouch']) {
                 $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['asTouchDeviceDetected'], $row['resultFound']);
                 $html .= '<br />Tot.' . $row['asTouchDeviceDetected'];
                 $html .= '<br />&nbsp;';
@@ -394,15 +405,15 @@ class OverviewGeneral extends AbstractHtml
         return $html;
     }
 
-    public function getHtml(): string
+    public function getHtml(string $version = '', ?string $run = null): string
     {
         $body = '
 <div class="section">
-    <h1 class="header center orange-text">Useragent parser comparison v' . COMPARISON_VERSION . '</h1>
+    <h1 class="header center orange-text">Useragent parser comparison ' . $version . '</h1>
 
     <div class="row center">
         <h5 class="header light">
-            We took <strong>' . number_format($this->getUserAgentCount()) . '</strong> different user agents and analyzed them with all providers below.<br />
+            We took <strong>' . number_format($this->getUserAgentCount($run)) . '</strong> different user agents and analyzed them with all providers below.<br />
             That way, it\'s possible to get a good overview of each provider
         </h5>
     </div>
@@ -413,7 +424,7 @@ class OverviewGeneral extends AbstractHtml
         Detected by all providers
     </h3>
                 
-    ' . $this->getTableSummary() . '
+    ' . $this->getTableSummary($run) . '
         
 </div>
         

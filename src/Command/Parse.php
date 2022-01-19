@@ -27,11 +27,6 @@ use Symfony\Component\Console\Question\Question;
 
 class Parse extends Command
 {
-    /**
-     * @var string
-     */
-    private $runDir = __DIR__ . '/../../data/test-runs';
-
     private \PDO $pdo;
 
     /**
@@ -59,7 +54,13 @@ class Parse extends Command
         $filename  = $input->getArgument('file');
 
         /** @var string|null $thisRunName */
-        $thisRunName     = $input->getArgument('run');
+        $thisRunName = $input->getArgument('run');
+
+        if (empty($thisRunName)) {
+            $thisRunName = date('YmdHis');
+        }
+
+        $output->writeln(sprintf('<comment>Parsing data for test run: %s</comment>', $thisRunName));
 
         $statementSelectUa       = $this->pdo->prepare('SELECT * FROM `userAgent` WHERE `uaHash` = :uaHash');
         $statementInsertUa       = $this->pdo->prepare('INSERT INTO `useragent` (`uaId`, `uaHash`, `uaString`, `uaAdditionalHeaders`) VALUES (:uaId, :uaHash, :uaString, :uaAdditionalHeaders)');

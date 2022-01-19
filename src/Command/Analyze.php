@@ -43,6 +43,18 @@ class Analyze extends Command
 
     private array $failures = [];
 
+    private \PDO $pdo;
+
+    /**
+     * @param \PDO $pdo
+     */
+    public function __construct(\PDO $pdo)
+    {
+        $this->pdo = $pdo;
+
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this->setName('analyze')
@@ -56,31 +68,31 @@ class Analyze extends Command
         $this->input  = $input;
         $this->output = $output;
 
-        /** @var string|null $run */
-        $run = $input->getArgument('run');
+        /** @var string|null $thisRunName */
+        $thisRunName = $input->getArgument('run');
 
-        if (empty($run)) {
+        if (empty($thisRunName)) {
             /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
             $testHelper = $this->getHelper('tests');
-            $run        = $testHelper->getTest($input, $output);
+            $thisRunName        = $testHelper->getTest($input, $output);
 
-            if ($run === null) {
+            if ($thisRunName === null) {
                 $output->writeln('<error>No valid test run found</error>');
 
                 return self::FAILURE;
             }
         }
 
-        if (!file_exists($this->runDir . '/' . $run)) {
-            $output->writeln(sprintf('<error>No run directory found with that id (%s)</error>', $run));
+        if (!file_exists($this->runDir . '/' . $thisRunName)) {
+            $output->writeln(sprintf('<error>No run directory found with that id (%s)</error>', $thisRunName));
 
             return self::FAILURE;
         }
 
-        $metaDataFile = $this->runDir . '/' . $run . '/metadata.json';
+        $metaDataFile = $this->runDir . '/' . $thisRunName . '/metadata.json';
 
         if (!file_exists($metaDataFile)) {
-            $output->writeln(sprintf('<error>No options file found for run (%s)</error>', $run));
+            $output->writeln(sprintf('<error>No options file found for run (%s)</error>', $thisRunName));
 
             return self::INVALID;
         }
@@ -96,15 +108,27 @@ class Analyze extends Command
         try {
             $this->options = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
         } catch (Exception $e) {
-            $output->writeln('<error>An error occured while parsing metadata for run ' . $run . '</error>');
+            $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
 
             return self::INVALID;
         }
 
-        $output->writeln(sprintf('<info>Analyzing data from test run: %s</info>', $run));
+        $statementSelectResultRun  = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run');
+        $statementSelectResultRun->bindValue(':run', $thisRunName, \PDO::PARAM_STR);
+        $statementSelectResultRun->execute();
+
+        $statementSelectResultSource  = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId');
+
+        /** @var Helper\Normalize $normalizeHelper */
+        $normalizeHelper = $this->getHelper('normalize');
+
+        /** @var Helper\NormalizedResult $resultHelper */
+        $resultHelper = $this->getHelper('normalized-result');
+
+        $output->writeln(sprintf('<info>Analyzing data from test run: %s</info>', $thisRunName));
 
         if (empty($this->options['tests']) && empty($this->options['file'])) {
-            $output->writeln(sprintf('<error>Error in options file for run (%s)</error>', $run));
+            $output->writeln(sprintf('<error>Error in options file for run (%s)</error>', $thisRunName));
 
             return self::FAILURE;
         }
@@ -198,16 +222,32 @@ class Analyze extends Command
             new TableCell('Accuracy', ['style' => $headerStyle]),
         ];
 
+        while ($runRow = $statementSelectResultRun->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+            $statementSelectResultSource->bindValue(':run', '0', \PDO::PARAM_STR);
+            $statementSelectResultSource->bindValue(':uaId', $runRow['userAgent_id'], \PDO::PARAM_STR);
+
+            $statementSelectResultSource->execute();
+
+            $sourceRow = $statementSelectResultSource->fetch(\PDO::FETCH_ASSOC);
+
+            if (false === $sourceRow) {
+                $output->writeln(sprintf('<error>Analyzing data from test run: %s - source for UA "%s" not found</error>', $thisRunName, $runRow['userAgent_id']));
+                continue;
+            }
+
+            $headerMessage   = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : ''));
+        }
+
         foreach ($this->options['tests'] as $testSuite => $testData) {
             $this->comparison[$testSuite] = [];
 
-            $expectedFilename = $this->runDir . '/' . $run . '/expected/normalized/' . $testSuite;
+            $expectedFilename = $this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite;
             $expectedResults = ['tests' => []];
 
             if (file_exists($expectedFilename)) {
                 // Process the test files (expected data)
                 /** @var \SplFileInfo $testFile */
-                foreach (new \FilesystemIterator($this->runDir . '/' . $run . '/expected/normalized/' . $testSuite) as $testFile) {
+                foreach (new \FilesystemIterator($this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite) as $testFile) {
                     if ($testFile->isDir() || 'metadata.json' === $testFile->getFilename()) {
                         continue;
                     }
@@ -234,7 +274,7 @@ class Analyze extends Command
             } else {
                 // When we aren't comparing to a test suite, the first parser's results become the expected results
 
-                $fileName        = $this->runDir . '/' . $run . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testSuite . '.json';
+                $fileName        = $this->runDir . '/' . $thisRunName . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testSuite . '.json';
                 try {
                     $contents = file_get_contents($fileName);
                 } catch (Exception $e) {
@@ -246,7 +286,7 @@ class Analyze extends Command
                     $testResult    = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                     $headerMessage = sprintf('<fg=yellow>Parser comparison for %s file, using %s results as expected</>', $testSuite, array_keys($this->options['parsers'])[0]);
                 } catch (Exception $e) {
-                    $this->output->writeln(sprintf('<error>An error occured while parsing metadata for run %s, skipping</error>', $run));
+                    $this->output->writeln(sprintf('<error>An error occured while parsing metadata for run %s, skipping</error>', $thisRunName));
                     continue;
                 }
 
@@ -284,7 +324,7 @@ class Analyze extends Command
                 $parseTime = 0.0;
                 $initTime  = 0.0;
 
-                foreach (new \FilesystemIterator($this->runDir . '/' . $run . '/results/' . $parserName . '/normalized/' . $testSuite) as $resultFile) {
+                foreach (new \FilesystemIterator($this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $testSuite) as $resultFile) {
                     try {
                         $contents = file_get_contents($resultFile->getPathname());
                     } catch (Exception $e) {

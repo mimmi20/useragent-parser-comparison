@@ -60,6 +60,8 @@ class Test extends Command
             $thisRunName = date('YmdHis');
         }
 
+        $output->writeln(sprintf('<comment>Testing data for test run: %s</comment>', $thisRunName));
+
         $statementCreateTempUas  = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT `userAgent`.* FROM `userAgent` INNER JOIN `result` ON `userAgent`.`uaId` = `result`.`userAgent_id` WHERE `result`.`provider_id` = :proId LIMIT :start, :count)');
         $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
 

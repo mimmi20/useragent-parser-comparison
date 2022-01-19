@@ -234,8 +234,8 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($result['proCanDetectDeviceModel']) {
-                $html .= '<td>' . $result['resDeviceModel'] . '</td>';
+            if ($result['proCanDetectDeviceName']) {
+                $html .= '<td>' . $result['resDeviceName'] . '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
@@ -256,8 +256,8 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if (array_key_exists('proCanDetectDeviceIsTouch', $result) && null !== $result['proCanDetectDeviceIsTouch']) {
-                if ($result['resDeviceIsTouch']) {
+            if (array_key_exists('proCanDetectDeviceDisplayIsTouch', $result) && null !== $result['proCanDetectDeviceDisplayIsTouch']) {
+                if ($result['resDeviceDisplayIsTouch']) {
                     $html .= '<td>yes</td>';
                 } else {
                     $html .= '<td>no</td>';
