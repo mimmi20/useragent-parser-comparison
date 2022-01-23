@@ -46,7 +46,7 @@ $output = [
     'parse_time'  => 0,
     'init_time'   => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('browscap/browscap-php') . '-' . $bcCache->getVersion(),
+    'version'     => \Composer\InstalledVersions::getPrettyVersion('browscap/browscap-php'),
 ];
 
 if ($hasUa) {
@@ -56,10 +56,10 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => ($r->device_name && $r->device_name !== 'unknown') ? $r->device_name : null,
+            'deviceName'     => $r->device_name ?? null,
             'marketingName' => null,
             'manufacturer' => null,
-            'brand'    => ($r->device_maker && $r->device_maker !== 'unknown') ? $r->device_maker : null,
+            'brand'    => $r->device_maker ?? null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -68,30 +68,30 @@ if ($hasUa) {
                 'size' => null,
             ],
             'dualOrientation' => null,
-            'type'     => ($r->device_type && $r->device_type !== 'unknown') ? $r->device_type : null,
+            'type'     => $r->device_type ?? null,
             'simCount' => null,
-            'ismobile' => property_exists($r, 'ismobiledevice') ? $r->ismobiledevice : null,
+            'ismobile' => $r->ismobiledevice ?? null,
         ],
         'client' => [
-            'name'    => ($r->browser && $r->browser !== 'unknown') ? $r->browser : null,
-            'modus' => ($r->browser_modus && $r->browser_modus !== 'unknown') ? $r->browser_modus : null,
-            'version' => ($r->version && $r->version !== 'unknown') ? $r->version : null,
-            'manufacturer' => ($r->browser_maker && $r->browser_maker !== 'unknown') ? $r->browser_maker : null,
-            'bits' => ($r->browser_bits && $r->browser_bits !== 'unknown') ? $r->browser_bits : null,
+            'name'    => $r->browser ?? null,
+            'modus' => $r->browser_modus ?? null,
+            'version' => $r->version ?? null,
+            'manufacturer' => $r->browser_maker ?? null,
+            'bits' => $r->browser_bits ?? null,
+            'isBot'   => $r->crawler ?? null,
             'type'    => $r->browser_type ?? null,
-            'isbot'   => property_exists($r, 'crawler') ? $r->crawler : null,
         ],
         'platform' => [
-            'name'    => ($r->platform && $r->platform !== 'unknown') ? $r->platform : null,
+            'name'    => $r->platform ?? null,
             'marketingName' => null,
-            'version' => ($r->platform_version && $r->platform_version !== 'unknown') ? $r->platform_version : null,
-            'manufacturer' => ($r->platform_maker && $r->platform_maker !== 'unknown') ? $r->platform_maker : null,
-            'bits' => ($r->platform_bits && $r->platform_bits !== 'unknown') ? $r->platform_bits : null,
+            'version' => $r->platform_version ?? null,
+            'manufacturer' => $r->platform_maker ?? null,
+            'bits' => $r->platform_bits ?? null,
         ],
         'engine' => [
-            'name'    => ($r->renderingengine_name && $r->renderingengine_name !== 'unknown') ? $r->renderingengine_name : null,
-            'version' => ($r->renderingengine_version && $r->renderingengine_version !== 'unknown') ? $r->renderingengine_version : null,
-            'manufacturer' => ($r->renderingengine_maker && $r->renderingengine_maker !== 'unknown') ? $r->renderingengine_maker : null,
+            'name'    => $r->renderingengine_name ?? null,
+            'version' => $r->renderingengine_version ?? null,
+            'manufacturer' => $r->renderingengine_maker ?? null,
         ],
         'raw' => $r,
     ];

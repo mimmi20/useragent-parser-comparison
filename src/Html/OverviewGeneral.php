@@ -44,7 +44,7 @@ class OverviewGeneral extends AbstractHtml
                 AVG(`result`.`resMemoryUsed`) AS `avgMemoryUsed`
             FROM `result`
             INNER JOIN `real-provider`
-                ON `real-provider`.`proId` = `result`.`provider_id` AND `real-provider`.`proVersion` = `result`.`resProviderVersion` ';
+                ON `real-provider`.`proId` = `result`.`provider_id` AND (`real-provider`.`proVersion` = `result`.`resProviderVersion` OR ISNULL(`real-provider`.`proVersion`)) ';
         if (null !== $run) {
             $sql .= ' WHERE `result`.`run` = :run';
         }

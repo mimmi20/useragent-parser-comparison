@@ -64,6 +64,7 @@ class Test extends Command
 
         $statementCreateTempUas  = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT `userAgent`.* FROM `userAgent` INNER JOIN `result` ON `userAgent`.`uaId` = `result`.`userAgent_id` WHERE `result`.`provider_id` = :proId LIMIT :start, :count)');
         $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
+        $statementSelectTestCountProvider = $this->pdo->prepare('SELECT `countNumber` FROM `useragents-general-overview` WHERE `proName` = :proName');
 
         $statementSelectTestProvider = $this->pdo->prepare('SELECT * FROM `useragents-general-overview`');
         $statementSelectTestProvider->execute();
@@ -145,18 +146,18 @@ class Test extends Command
             $currenUserAgent = 1;
             $count           = 100;
             $start           = 0;
-            $textLength   = 0;
 
             $basicMessage = sprintf(
                 'test suite <fg=yellow>%s</>',
                 $testName
             );
 
-            if (mb_strlen($basicMessage) > $textLength) {
-                $textLength = mb_strlen($basicMessage);
-            }
+            $output->writeln("\r" . $basicMessage);
 
-            $output->write("\r" . str_pad($basicMessage, $textLength));
+            $statementSelectTestCountProvider->bindValue(':proName', $testName, \PDO::PARAM_STR);
+            $statementSelectTestCountProvider->execute();
+
+            $testCount = $statementSelectTestCountProvider->fetch(\PDO::FETCH_COLUMN);
 
             do {
                 $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
@@ -181,21 +182,22 @@ class Test extends Command
 
                     ++$actualTest;
 
-                    if (mb_strlen($agentToShow) > 100) {
-                        $agentToShow = mb_substr($agentToShow, 0, 96) . ' ...';
+                    if (mb_strlen($agentToShow) > (100 - $nameLength)) {
+                        $agentToShow = mb_substr($agentToShow, 0, 96 - $nameLength) . ' ...';
                     }
 
+                    $actualTestToShow = str_pad((string) $actualTest, strlen((string) $testCount), ' ', STR_PAD_LEFT);
+
                     $basicTestMessage = sprintf(
-                        $basicMessage . ' <info>parsing</info> [%s] UA: <fg=yellow>%s</>',
-                        $actualTest,
+                        $basicMessage . ' <info>parsing</info> [%s/%s] UA: <fg=yellow>%s</>',
+                        $actualTestToShow,
+                        $testCount,
                         $agentToShow
                     );
 
-                    if (mb_strlen($basicTestMessage) > $textLength) {
-                        $textLength = mb_strlen($basicTestMessage);
-                    }
+                    $textLength = mb_strlen(strip_tags($basicTestMessage));
 
-                    $output->write("\r" . str_pad($basicTestMessage, $textLength));
+                    $output->write("\r" . $basicTestMessage);
 
                     foreach ($providers as $parserName => $provider) {
 
@@ -226,6 +228,14 @@ class Test extends Command
                         $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $singleResult);
                     }
 
+                    $testMessage = $basicTestMessage . ' <info>done!</info>';
+
+                    if (mb_strlen($testMessage) > $textLength) {
+                        $textLength = mb_strlen($testMessage);
+                    }
+
+                    $output->writeln("\r" . str_pad($testMessage, $textLength));
+
                     $currenUserAgent++;
                 }
 
@@ -241,7 +251,7 @@ class Test extends Command
                 $start += $count;
             } while ($colCount > 0);
 
-            $output->writeln("\r" . str_pad($basicMessage . ' <info>done!</info>', $textLength));
+            $output->writeln("\r" . $basicMessage . ' <info>done!</info>');
         }
 
         $output->writeln('<info>done!</info>');

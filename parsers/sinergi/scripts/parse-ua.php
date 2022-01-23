@@ -52,7 +52,7 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => ($device->getName() !== 'unknown') ? $device->getName() : null,
+            'deviceName'     => $device->getName() ?? null,
             'marketingName' => null,
             'manufacturer' => null,
             'brand'    => null,
@@ -69,18 +69,18 @@ if ($hasUa) {
             'ismobile' => $os->isMobile(),
         ],
         'client' => [
-            'name'    => ($browser->getName() !== 'unknown') ? $browser->getName() : null,
+            'name'    => $browser->getName() ?? null,
             'modus' => null,
-            'version' => ($browser->getVersion() !== 'unknown') ? $browser->getVersion() : null,
+            'version' => $browser->getVersion() ?? null,
             'manufacturer' => null,
             'bits' => null,
             'type' => null,
             'isbot'    => null,
         ],
         'platform' => [
-            'name'    => ($os->getName() !== 'unknown') ? $os->getName() : null,
+            'name'    => $os->getName() ?? null,
             'marketingName' => null,
-            'version' => ($os->getVersion() !== 'unknown') ? $os->getVersion() : null,
+            'version' => $os->getVersion() ?? null,
             'manufacturer' => null,
             'bits' => null,
         ],
