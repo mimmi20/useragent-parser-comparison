@@ -4,29 +4,15 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
-use Exception;
-use FilesystemIterator;
+use PDO;
 use Ramsey\Uuid\Uuid;
-use function file_get_contents;
-use function json_decode;
-use function ksort;
-use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableCell;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class NormalizedResult extends Helper
 {
-    private \PDO $pdo;
+    private PDO $pdo;
 
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
     }
@@ -39,27 +25,26 @@ class NormalizedResult extends Helper
     public function storeResult(
         string $resId,
         array $singleResult
-    ): void
-    {
-        $statementSelectResult   = $this->pdo->prepare('SELECT * FROM `result-normalized` WHERE `result_id` = :resId');
-        $statementInsertResult   = $this->pdo->prepare('INSERT INTO `result-normalized` (`resNormaId`, `result_id`, `resNormaClientName`, `resNormaClientModus`, `resNormaClientVersion`, `resNormaClientManufacturer`, `resNormaClientBits`, `resNormaEngineName`, `resNormaEngineVersion`, `resNormaEngineManufacturer`, `resNormaOsName`, `resNormaOsMarketingName`, `resNormaOsVersion`, `resNormaOsManufacturer`, `resNormaOsBits`, `resNormaDeviceName`, `resNormaDeviceMarketingName`, `resNormaDeviceManufacturer`, `resNormaDeviceBrand`, `resNormaDeviceDualOrientation`, `resNormaDeviceType`, `resNormaDeviceIsMobile`, `resNormaDeviceSimCount`, `resNormaDeviceDisplayWidth`, `resNormaDeviceDisplayHeight`, `resNormaDeviceDisplayIsTouch`, `resNormaDeviceDisplayType`, `resNormaDeviceDisplaySize`, `resNormaClientIsBot`, `resNormaClientType`) VALUES (:resNormaId, :resId, :resNormaClientName, :resNormaClientModus, :resNormaClientVersion, :resNormaClientManufacturer, :resNormaClientBits, :resNormaEngineName, :resNormaEngineVersion, :resNormaEngineManufacturer, :resNormaOsName, :resNormaOsMarketingName, :resNormaOsVersion, :resNormaOsManufacturer, :resNormaOsBits, :resNormaDeviceName, :resNormaDeviceMarketingName, :resNormaDeviceManufacturer, :resNormaDeviceBrand, :resNormaDeviceDualOrientation, :resNormaDeviceType, :resNormaDeviceIsMobile, :resNormaDeviceSimCount, :resNormaDeviceDisplayWidth, :resNormaDeviceDisplayHeight, :resNormaDeviceDisplayIsTouch, :resNormaDeviceDisplayType, :resNormaDeviceDisplaySize, :resNormaClientIsBot, :resNormaClientType)');
-        $statementUpdateResult   = $this->pdo->prepare('UPDATE `result-normalized` SET `resNormaClientName` = :resNormaClientName, `resNormaClientModus` = :resNormaClientModus, `resNormaClientVersion` = :resNormaClientVersion, `resNormaClientManufacturer` = :resNormaClientManufacturer, `resNormaClientBits` = :resNormaClientBits, `resNormaEngineName` = :resNormaEngineName, `resNormaEngineVersion` = :resNormaEngineVersion, `resNormaEngineManufacturer` = :resNormaEngineManufacturer, `resNormaOsName` = :resNormaOsName, `resNormaOsMarketingName` = :resNormaOsMarketingName, `resNormaOsVersion` = :resNormaOsVersion, `resNormaOsManufacturer` = :resNormaOsManufacturer, `resNormaOsBits` = :resNormaOsBits, `resNormaDeviceName` = :resNormaDeviceName, `resNormaDeviceMarketingName` = :resNormaDeviceMarketingName, `resNormaDeviceManufacturer` = :resNormaDeviceManufacturer, `resNormaDeviceBrand` = :resNormaDeviceBrand, `resNormaDeviceDualOrientation` = :resNormaDeviceDualOrientation, `resNormaDeviceType` = :resNormaDeviceType, `resNormaDeviceIsMobile` = :resNormaDeviceIsMobile, `resNormaDeviceSimCount` = :resNormaDeviceSimCount, `resNormaDeviceDisplayWidth` = :resNormaDeviceDisplayWidth, `resNormaDeviceDisplayHeight` = :resNormaDeviceDisplayHeight, `resNormaDeviceDisplayIsTouch` = :resNormaDeviceDisplayIsTouch, `resNormaDeviceDisplayType` = :resNormaDeviceDisplayType, `resNormaDeviceDisplaySize` = :resNormaDeviceDisplaySize, `resNormaClientIsBot` = :resNormaClientIsBot, `resNormaClientType` = :resNormaClientType WHERE `resNormaId` = :resNormaId');
+    ): void {
+        $statementSelectResult = $this->pdo->prepare('SELECT * FROM `result-normalized` WHERE `result_id` = :resId');
+        $statementInsertResult = $this->pdo->prepare('INSERT INTO `result-normalized` (`resNormaId`, `result_id`, `resNormaClientName`, `resNormaClientModus`, `resNormaClientVersion`, `resNormaClientManufacturer`, `resNormaClientBits`, `resNormaEngineName`, `resNormaEngineVersion`, `resNormaEngineManufacturer`, `resNormaOsName`, `resNormaOsMarketingName`, `resNormaOsVersion`, `resNormaOsManufacturer`, `resNormaOsBits`, `resNormaDeviceName`, `resNormaDeviceMarketingName`, `resNormaDeviceManufacturer`, `resNormaDeviceBrand`, `resNormaDeviceDualOrientation`, `resNormaDeviceType`, `resNormaDeviceIsMobile`, `resNormaDeviceSimCount`, `resNormaDeviceDisplayWidth`, `resNormaDeviceDisplayHeight`, `resNormaDeviceDisplayIsTouch`, `resNormaDeviceDisplayType`, `resNormaDeviceDisplaySize`, `resNormaClientIsBot`, `resNormaClientType`) VALUES (:resNormaId, :resId, :resNormaClientName, :resNormaClientModus, :resNormaClientVersion, :resNormaClientManufacturer, :resNormaClientBits, :resNormaEngineName, :resNormaEngineVersion, :resNormaEngineManufacturer, :resNormaOsName, :resNormaOsMarketingName, :resNormaOsVersion, :resNormaOsManufacturer, :resNormaOsBits, :resNormaDeviceName, :resNormaDeviceMarketingName, :resNormaDeviceManufacturer, :resNormaDeviceBrand, :resNormaDeviceDualOrientation, :resNormaDeviceType, :resNormaDeviceIsMobile, :resNormaDeviceSimCount, :resNormaDeviceDisplayWidth, :resNormaDeviceDisplayHeight, :resNormaDeviceDisplayIsTouch, :resNormaDeviceDisplayType, :resNormaDeviceDisplaySize, :resNormaClientIsBot, :resNormaClientType)');
+        $statementUpdateResult = $this->pdo->prepare('UPDATE `result-normalized` SET `resNormaClientName` = :resNormaClientName, `resNormaClientModus` = :resNormaClientModus, `resNormaClientVersion` = :resNormaClientVersion, `resNormaClientManufacturer` = :resNormaClientManufacturer, `resNormaClientBits` = :resNormaClientBits, `resNormaEngineName` = :resNormaEngineName, `resNormaEngineVersion` = :resNormaEngineVersion, `resNormaEngineManufacturer` = :resNormaEngineManufacturer, `resNormaOsName` = :resNormaOsName, `resNormaOsMarketingName` = :resNormaOsMarketingName, `resNormaOsVersion` = :resNormaOsVersion, `resNormaOsManufacturer` = :resNormaOsManufacturer, `resNormaOsBits` = :resNormaOsBits, `resNormaDeviceName` = :resNormaDeviceName, `resNormaDeviceMarketingName` = :resNormaDeviceMarketingName, `resNormaDeviceManufacturer` = :resNormaDeviceManufacturer, `resNormaDeviceBrand` = :resNormaDeviceBrand, `resNormaDeviceDualOrientation` = :resNormaDeviceDualOrientation, `resNormaDeviceType` = :resNormaDeviceType, `resNormaDeviceIsMobile` = :resNormaDeviceIsMobile, `resNormaDeviceSimCount` = :resNormaDeviceSimCount, `resNormaDeviceDisplayWidth` = :resNormaDeviceDisplayWidth, `resNormaDeviceDisplayHeight` = :resNormaDeviceDisplayHeight, `resNormaDeviceDisplayIsTouch` = :resNormaDeviceDisplayIsTouch, `resNormaDeviceDisplayType` = :resNormaDeviceDisplayType, `resNormaDeviceDisplaySize` = :resNormaDeviceDisplaySize, `resNormaClientIsBot` = :resNormaClientIsBot, `resNormaClientType` = :resNormaClientType WHERE `resNormaId` = :resNormaId');
 
-        $statementSelectResult->bindValue(':resId', $resId, \PDO::PARAM_STR);
+        $statementSelectResult->bindValue(':resId', $resId, PDO::PARAM_STR);
 
         $statementSelectResult->execute();
 
-        $dbResultResult = $statementSelectResult->fetch(\PDO::FETCH_ASSOC);
+        $dbResultResult = $statementSelectResult->fetch(PDO::FETCH_ASSOC);
 
         /*
          * Persist
          */
-        if ($dbResultResult === false) {
+        if (false === $dbResultResult) {
             $singleResult['resNormaId'] = Uuid::uuid4()->toString();
 
-            $statementInsertResult->bindValue(':resNormaId', $singleResult['resNormaId'], \PDO::PARAM_STR);
-            $statementInsertResult->bindValue(':resId', $resId, \PDO::PARAM_STR);
-            
+            $statementInsertResult->bindValue(':resNormaId', $singleResult['resNormaId'], PDO::PARAM_STR);
+            $statementInsertResult->bindValue(':resId', $resId, PDO::PARAM_STR);
+
             $statementInsertResult->bindValue(':resNormaClientName', $singleResult['resClientName'] ?? null);
             $statementInsertResult->bindValue(':resNormaClientModus', $singleResult['resClientModus'] ?? null);
             $statementInsertResult->bindValue(':resNormaClientVersion', $singleResult['resClientVersion'] ?? null);
@@ -91,7 +76,7 @@ class NormalizedResult extends Helper
 
             $statementInsertResult->execute();
         } else {
-            $statementUpdateResult->bindValue(':resNormaId', $dbResultResult['resNormaId'], \PDO::PARAM_STR);
+            $statementUpdateResult->bindValue(':resNormaId', $dbResultResult['resNormaId'], PDO::PARAM_STR);
             //$statementUpdateResult->bindValue(':resId', $dbResultResult['result_id'], \PDO::PARAM_STR);
 
             $statementUpdateResult->bindValue(':resNormaClientName', $singleResult['resClientName'] ?? null);

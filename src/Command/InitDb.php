@@ -4,33 +4,16 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
-use function file_get_contents;
-use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
-use function mkdir;
-use function sort;
-use function sprintf;
-use SplFileInfo;
+use PDO;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class InitDb extends Command
 {
-    private \PDO $pdo;
+    private PDO $pdo;
 
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
 
@@ -42,14 +25,9 @@ class InitDb extends Command
         $this->setName('init-db');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $message  = 'initialize database';
+        $message = 'initialize database';
 
         $output->write($message);
 

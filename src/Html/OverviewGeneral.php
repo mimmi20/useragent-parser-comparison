@@ -1,9 +1,22 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
+
+use PDO;
+
+use function extension_loaded;
+use function htmlspecialchars;
+use function number_format;
+use function phpversion;
+use function round;
+use function zend_version;
+
+use const PHP_OS;
 
 class OverviewGeneral extends AbstractHtml
 {
-
     private function getProviders(?string $run = null): iterable
     {
         $sql = 'SELECT
@@ -48,6 +61,7 @@ class OverviewGeneral extends AbstractHtml
         if (null !== $run) {
             $sql .= ' WHERE `result`.`run` = :run';
         }
+
         $sql .= '
             GROUP BY
                 `real-provider`.`proId`,`real-provider`.`proVersion`
@@ -57,12 +71,12 @@ class OverviewGeneral extends AbstractHtml
         $statement = $this->pdo->prepare($sql);
 
         if (null !== $run) {
-            $statement->bindValue(':run', $run, \PDO::PARAM_STR);
+            $statement->bindValue(':run', $run, PDO::PARAM_STR);
         }
 
         $statement->execute();
-        
-        yield from $statement->fetchAll(\PDO::FETCH_ASSOC);
+
+        yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function getUserAgentPerProviderCount(): iterable
@@ -79,7 +93,7 @@ class OverviewGeneral extends AbstractHtml
 
         $statement->execute();
 
-        yield from $statement->fetchAll(\PDO::FETCH_ASSOC);
+        yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function getTableSummary(?string $run = null): string
@@ -127,16 +141,16 @@ class OverviewGeneral extends AbstractHtml
 
         $html .= '</tr>';
         $html .= '</thead>';
-        
+
         /*
          * body
          */
         $html .= '<tbody>';
         foreach ($this->getProviders($run) as $row) {
             $html .= '<tr>';
-            
+
             $html .= '<th>';
-            
+
             if ($row['proIsLocal']) {
                 $html .= '<div><span class="material-icons">public_off</span>';
 
@@ -171,6 +185,7 @@ class OverviewGeneral extends AbstractHtml
                 if (null !== $row['proLastReleaseDate']) {
                     $html .= '<br /><small>' . $row['proLastReleaseDate'] . '</small>';
                 }
+
                 $html .= '</div>';
             } elseif ($row['proIsApi']) {
                 $html .= '<div><span class="material-icons">public</span></div>';
@@ -181,9 +196,10 @@ class OverviewGeneral extends AbstractHtml
                 } else {
                     $html .= $row['proName'];
                 }
+
                 $html .= '</div>';
             }
-            
+
             $html .= '</th>';
 
             $countOfUseragents = $this->getUserAgentCount($run);
@@ -200,7 +216,7 @@ class OverviewGeneral extends AbstractHtml
             $html .= '<br />Tot.' . $row['resultError'];
             $html .= '<br />&nbsp;';
             $html .= '</td>';
-            
+
             /*
              * Client
              */
@@ -260,7 +276,7 @@ class OverviewGeneral extends AbstractHtml
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
-            
+
             /*
              * OS
              */
@@ -281,7 +297,7 @@ class OverviewGeneral extends AbstractHtml
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
-            
+
             /*
              * device
              */
@@ -293,7 +309,7 @@ class OverviewGeneral extends AbstractHtml
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
-            
+
             if ($row['proCanDetectDeviceName']) {
                 $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['deviceModelFound'], $row['resultFound']);
                 $html .= '<br />Tot.' . $row['deviceModelFound'];
@@ -302,16 +318,16 @@ class OverviewGeneral extends AbstractHtml
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
-            
+
             if ($row['proCanDetectDeviceType']) {
-                $html .= '<td>'  . $this->getPercentCircle($countOfUseragents, $row['deviceTypeFound'], $row['resultFound']);
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['deviceTypeFound'], $row['resultFound']);
                 $html .= '<br />Tot.' . $row['deviceTypeFound'];
                 $html .= '<br />Unq.' . $row['deviceTypeFoundUnique'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
-            
+
             if ($row['proCanDetectDeviceIsMobile']) {
                 $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['asMobileDetected'], $row['resultFound']);
                 $html .= '<br />Tot.' . $row['asMobileDetected'];
@@ -334,6 +350,7 @@ class OverviewGeneral extends AbstractHtml
             if (extension_loaded('xdebug')) {
                 $info .= ' | with xdebug';
             }
+
             if (extension_loaded('zend opcache')) {
                 $info .= ' | with opcache';
             }
@@ -353,22 +370,23 @@ class OverviewGeneral extends AbstractHtml
                     </a>
                 </td>
             ';
-            
+
             $html .= '<td><a href="' . $row['proName'] . '.html" class="btn waves-effect waves-light">Details</a></td>';
-            
+
             $html .= '</tr>';
         }
+
         $html .= '</tbody>';
-        
+
         $html .= '</table>';
-        
+
         return $html;
     }
 
     private function getTableTests(): string
     {
         $html = '<table class="striped">';
-        
+
         /*
          * Header
          */
@@ -384,24 +402,25 @@ class OverviewGeneral extends AbstractHtml
                 </tr>
             </thead>
         ';
-        
+
         /*
          * Body
          */
         $html .= '<tbody>';
-        
+
         foreach ($this->getUserAgentPerProviderCount() as $row) {
             $html .= '<tr>';
-            
+
             $html .= '<td>' . $row['proName'] . '</td>';
             $html .= '<td class="right-align">' . number_format($row['countNumber']) . '</td>';
-            
+
             $html .= '</tr>';
         }
+
         $html .= '</tbody>';
-        
+
         $html .= '</table>';
-        
+
         return $html;
     }
 
@@ -483,7 +502,7 @@ class OverviewGeneral extends AbstractHtml
         
 </div>
 ';
-        
+
         return parent::getHtmlCombined($body);
     }
 }

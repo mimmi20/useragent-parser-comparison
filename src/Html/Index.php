@@ -1,19 +1,21 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
 
 class Index extends AbstractHtml
 {
-
     private function getButtons(): string
     {
         $html = '';
-        
-        for ($i = COMPARISON_VERSION; $i > 0; $i --) {
+
+        for ($i = COMPARISON_VERSION; $i > 0; $i--) {
             $txt = 'Version ' . $i;
-            if ($i === COMPARISON_VERSION) {
+            if (COMPARISON_VERSION === $i) {
                 $txt .= ' (latest)';
             }
-            
+
             $html .= '
                 <a class="modal-trigger btn waves-effect waves-light"
                     href="v' . $i . '/index.html">
@@ -21,7 +23,7 @@ class Index extends AbstractHtml
                 </a><br /><br />
             ';
         }
-        
+
         return $html;
     }
 
@@ -42,7 +44,7 @@ class Index extends AbstractHtml
     </div>
 </div>
 ';
-        
+
         return parent::getHtmlCombined($body);
     }
 }

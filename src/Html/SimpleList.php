@@ -1,12 +1,17 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
+
+use function count;
+use function htmlspecialchars;
 
 class SimpleList extends AbstractHtml
 {
-
     private array $elements = [];
 
-    public function setElements(array $elements)
+    public function setElements(array $elements): void
     {
         $this->elements = $elements;
     }
@@ -14,38 +19,40 @@ class SimpleList extends AbstractHtml
     private function getList(): string
     {
         $html = '<ul class="list collection">';
-        
+
         foreach ($this->elements as $element) {
             $html .= '<li class="collection-item">';
-            
+
             $html .= '<h4 class="searchable"><span class="name">' . $element['name'] . '</span>';
-            
+
             /*
              * Optional
              */
             if (isset($element['detectionCount'])) {
                 $html .= ' <small class="detectionCount">' . $element['detectionCount'] . 'x detected</small>';
             }
+
             if (isset($element['detectionCountUnique'])) {
                 $html .= ' <small class="detectionCountUnique">(' . $element['detectionCountUnique'] . 'x unique)</small>';
             }
+
             if (isset($element['detectionValuesDistinct'])) {
                 $html .= '<br /><small class="detectionValuesDistinct">' . $element['detectionValuesDistinct'] . '</small>';
             }
-            
+
             $html .= '</h4>';
-            
+
             $html .= '<strong>Example user agent</strong><br />';
-            
+
             $html .= '<span>';
             $html .= '<a href="' . $this->getUserAgentUrl($element['uaId']) . '" class="userAgent">' . htmlspecialchars($element['uaString']) . '</a>';
             $html .= '</span>';
-            
+
             $html .= '</li>';
         }
-        
+
         $html .= '</ul>';
-        
+
         return $html;
     }
 
@@ -75,7 +82,7 @@ class SimpleList extends AbstractHtml
     ' . $this->getList() . '
 </div>
 ';
-        
+
         $script = '
 var options = {
     page: 50000,
@@ -88,7 +95,7 @@ var options = {
 
 var hackerList = new List(\'simple-list\', options);    
 ';
-        
+
         return parent::getHtmlCombined($body, $script);
     }
 }

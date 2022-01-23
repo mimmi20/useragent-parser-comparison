@@ -4,34 +4,29 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
-use function file_get_contents;
-use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
-use function mkdir;
-use function sort;
-use function sprintf;
-use SplFileInfo;
+use PDO;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Ramsey\Uuid\Uuid;
+use UserAgentParserComparison\Command\Helper\Parsers;
+
+use function array_merge;
+use function assert;
+use function count;
+use function date;
+use function max;
+use function mb_strlen;
+use function sprintf;
+use function str_pad;
+
+use const STR_PAD_LEFT;
 
 class InitResults extends Command
 {
-    private \PDO $pdo;
+    private PDO $pdo;
 
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
 
@@ -44,11 +39,6 @@ class InitResults extends Command
             ->addOption('run', 'r', InputOption::VALUE_OPTIONAL, 'The name of the test run, if omitted will be generated from date');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getOption('run');
@@ -57,17 +47,17 @@ class InitResults extends Command
             $name = date('YmdHis');
         }
 
-        /** @var Helper\Result $resultHelper */
         $resultHelper = $this->getHelper('result');
+        assert($resultHelper instanceof Helper\Result);
 
         $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
 
-        $statementCreateTempUas  = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT * FROM `userAgent` LIMIT :start, :count)');
+        $statementCreateTempUas = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT * FROM `userAgent` LIMIT :start, :count)');
 
         $output->writeln('~~~ Detect all UAs ~~~');
 
-        /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
+        assert($parserHelper instanceof Parsers);
 
         $providers  = [];
         $nameLength = 0;
@@ -75,11 +65,11 @@ class InitResults extends Command
         foreach ($parserHelper->getAllParsers($output) as $parserPath => $parserConfig) {
             $proName = $parserConfig['metadata']['name'] ?? $parserPath;
 
-            $statementSelectProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
+            $statementSelectProvider->bindValue(':proName', $proName, PDO::PARAM_STR);
 
             $statementSelectProvider->execute();
 
-            $proId = $statementSelectProvider->fetch(\PDO::FETCH_COLUMN);
+            $proId = $statementSelectProvider->fetch(PDO::FETCH_COLUMN);
 
             if (!$proId) {
                 $output->writeln(sprintf('<error>no provider found with name %s</error>', $proName));
@@ -100,8 +90,8 @@ class InitResults extends Command
         do {
             $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 
-            $statementCreateTempUas->bindValue(':start', $start, \PDO::PARAM_INT);
-            $statementCreateTempUas->bindValue(':count', $count, \PDO::PARAM_INT);
+            $statementCreateTempUas->bindValue(':start', $start, PDO::PARAM_INT);
+            $statementCreateTempUas->bindValue(':count', $count, PDO::PARAM_INT);
 
             $statementCreateTempUas->execute();
 
@@ -113,7 +103,7 @@ class InitResults extends Command
 
             $this->pdo->beginTransaction();
 
-            while ($row = $statementSelectAllUa->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+            while ($row = $statementSelectAllUa->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
                 $message = $baseMessage;
 
                 foreach ($providers as $proName => $provider) {
@@ -149,7 +139,7 @@ class InitResults extends Command
             $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `temp_userAgent`');
             $statementCountAllResults->execute();
 
-            $colCount = $statementCountAllResults->fetch(\PDO::FETCH_COLUMN);
+            $colCount = $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
 
             $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 

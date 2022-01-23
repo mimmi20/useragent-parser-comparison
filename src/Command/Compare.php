@@ -12,6 +12,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function date;
+
 class Compare extends Command
 {
     protected function configure(): void
@@ -19,7 +21,6 @@ class Compare extends Command
         $this->setName('compare')
             ->setDescription('Runs tests, normalizes the results then analyzes the results')
             ->addOption('run', 'r', InputOption::VALUE_OPTIONAL, 'The name of the test run, if omitted will be generated from date')
-            ->addOption('import', null, InputOption::VALUE_NONE, 'Whether to import providers and useragents')
             ->addArgument('file', InputArgument::OPTIONAL, 'Path to a file to use as the source of useragents rather than test suites')
             ->setHelp('This command is a "meta" command that will execute the Test, Normalize and Analyze commands in order');
     }
@@ -36,44 +37,12 @@ class Compare extends Command
 
         $application = $this->getApplication();
 
-        if ($application === null) {
+        if (null === $application) {
             throw new Exception('Could not retrieve Symfony Application, aborting');
         }
 
         if (empty($name)) {
             $name = date('YmdHis');
-        }
-
-        $doImport = $input->getOption('import');
-
-        if ($doImport && !$file) {
-            $command   = $application->find('init-provider');
-            $arguments = [
-                'command'     => 'init-provider',
-            ];
-
-            $initProviderInput = new ArrayInput($arguments);
-            $returnCode = $command->run($initProviderInput, $output);
-
-            if ($returnCode > 0) {
-                $output->writeln('<error>There was an error executing the "init-provider" command, cannot continue.</error>');
-
-                return $returnCode;
-            }
-
-            $command = $application->find('init-useragents');
-            $arguments = [
-                'command' => 'init-useragents',
-            ];
-
-            $initProviderInput = new ArrayInput($arguments);
-            $returnCode = $command->run($initProviderInput, $output);
-
-            if ($returnCode > 0) {
-                $output->writeln('<error>There was an error executing the "init-useragents" command, cannot continue.</error>');
-
-                return $returnCode;
-            }
         }
 
         if ($file) {
@@ -82,6 +51,7 @@ class Compare extends Command
                 'command'     => 'parse',
                 'file'        => $file,
                 'run'         => $name,
+                '--no-output' => true,
             ];
 
             $parseInput = new ArrayInput($arguments);
@@ -99,10 +69,6 @@ class Compare extends Command
                 'run'     => $name,
             ];
 
-            if ($doImport) {
-                $arguments['--use-db'] = true;
-            }
-
             $testInput  = new ArrayInput($arguments);
             $returnCode = $command->run($testInput, $output);
 
@@ -111,21 +77,6 @@ class Compare extends Command
 
                 return $returnCode;
             }
-        }
-
-        $command   = $application->find('generate-reports');
-        $arguments = [
-            'command' => 'generate-reports',
-            'run'     => $name,
-        ];
-
-        $generateInput = new ArrayInput($arguments);
-        $returnCode     = $command->run($generateInput, $output);
-
-        if ($returnCode > 0) {
-            $output->writeln('<error>There was an error executing the "generate-reports" command, cannot continue.</error>');
-
-            return $returnCode;
         }
 
         $command   = $application->find('normalize');
@@ -142,8 +93,6 @@ class Compare extends Command
 
             return $returnCode;
         }
-
-        return self::SUCCESS;
 
         $command   = $application->find('analyze');
         $arguments = [

@@ -4,29 +4,25 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
-use Exception;
-use FilesystemIterator;
+use DateTimeImmutable;
+use PDO;
 use Ramsey\Uuid\Uuid;
-use function file_get_contents;
-use function json_decode;
-use function ksort;
-use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableCell;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
+
+use function array_merge;
+use function is_scalar;
+use function json_encode;
+use function str_replace;
+
+use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
 
 class Result extends Helper
 {
-    private \PDO $pdo;
+    private PDO $pdo;
 
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
     }
@@ -43,35 +39,34 @@ class Result extends Helper
         array $singleResult,
         ?string $version = null,
         ?string $resFilename = null
-    ): void
-    {
-        $statementSelectResult   = $this->pdo->prepare('SELECT * FROM `result` WHERE `provider_id` = :proId AND `userAgent_id` = :uaId AND `run` = :run');
-        $statementInsertResult   = $this->pdo->prepare('INSERT INTO `result` (`run`, `provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resResultError`, `resClientName`, `resClientModus`, `resClientVersion`, `resClientManufacturer`, `resClientBits`, `resEngineName`, `resEngineVersion`, `resEngineManufacturer`, `resOsName`, `resOsMarketingName`, `resOsVersion`, `resOsManufacturer`, `resOsBits`, `resDeviceName`, `resDeviceMarketingName`, `resDeviceManufacturer`, `resDeviceBrand`, `resDeviceDualOrientation`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceSimCount`, `resDeviceDisplayWidth`, `resDeviceDisplayHeight`, `resDeviceDisplayIsTouch`, `resDeviceDisplayType`, `resDeviceDisplaySize`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:run, :proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resResultError, :resClientName, :resClientModus, :resClientVersion, :resClientManufacturer, :resClientBits, :resEngineName, :resEngineVersion, :resEngineManufacturer, :resOsName, :resOsMarketingName, :resOsVersion, :resOsManufacturer, :resOsBits, :resDeviceName, :resDeviceMarketingName, :resDeviceManufacturer, :resDeviceBrand, :resDeviceDualOrientation, :resDeviceType, :resDeviceIsMobile, :resDeviceSimCount, :resDeviceDisplayWidth, :resDeviceDisplayHeight, :resDeviceDisplayIsTouch, :resDeviceDisplayType, :resDeviceDisplaySize, :resClientIsBot, :resClientType, :resRawResult)');
-        $statementUpdateResult   = $this->pdo->prepare('UPDATE `result` SET `resProviderVersion` = :resProviderVersion, `resFilename` = :resFilename, `resParseTime` = :resParseTime, `resInitTime` = :resInitTime, `resMemoryUsed` = :resMemoryUsed, `resLastChangeDate` = :resLastChangeDate, `resResultFound` = :resResultFound, `resResultError` = :resResultError, `resClientName` = :resClientName, `resClientModus` = :resClientModus, `resClientVersion` = :resClientVersion, `resClientManufacturer` = :resClientManufacturer, `resClientBits` = :resClientBits, `resEngineName` = :resEngineName, `resEngineVersion` = :resEngineVersion, `resEngineManufacturer` = :resEngineManufacturer, `resOsName` = :resOsName, `resOsMarketingName` = :resOsMarketingName, `resOsVersion` = :resOsVersion, `resOsManufacturer` = :resOsManufacturer, `resOsBits` = :resOsBits, `resDeviceName` = :resDeviceName, `resDeviceMarketingName` = :resDeviceMarketingName, `resDeviceManufacturer` = :resDeviceManufacturer, `resDeviceBrand` = :resDeviceBrand, `resDeviceDualOrientation` = :resDeviceDualOrientation, `resDeviceType` = :resDeviceType, `resDeviceIsMobile` = :resDeviceIsMobile, `resDeviceSimCount` = :resDeviceSimCount, `resDeviceDisplayWidth` = :resDeviceDisplayWidth, `resDeviceDisplayHeight` = :resDeviceDisplayHeight, `resDeviceDisplayIsTouch` = :resDeviceDisplayIsTouch, `resDeviceDisplayType` = :resDeviceDisplayType, `resDeviceDisplaySize` = :resDeviceDisplaySize, `resClientIsBot` = :resClientIsBot, `resClientType` = :resClientType, `resRawResult` = :resRawResult WHERE `resId` = :resId');
+    ): void {
+        $statementSelectResult = $this->pdo->prepare('SELECT * FROM `result` WHERE `provider_id` = :proId AND `userAgent_id` = :uaId AND `run` = :run');
+        $statementInsertResult = $this->pdo->prepare('INSERT INTO `result` (`run`, `provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resResultError`, `resClientName`, `resClientModus`, `resClientVersion`, `resClientManufacturer`, `resClientBits`, `resEngineName`, `resEngineVersion`, `resEngineManufacturer`, `resOsName`, `resOsMarketingName`, `resOsVersion`, `resOsManufacturer`, `resOsBits`, `resDeviceName`, `resDeviceMarketingName`, `resDeviceManufacturer`, `resDeviceBrand`, `resDeviceDualOrientation`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceSimCount`, `resDeviceDisplayWidth`, `resDeviceDisplayHeight`, `resDeviceDisplayIsTouch`, `resDeviceDisplayType`, `resDeviceDisplaySize`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:run, :proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resResultError, :resClientName, :resClientModus, :resClientVersion, :resClientManufacturer, :resClientBits, :resEngineName, :resEngineVersion, :resEngineManufacturer, :resOsName, :resOsMarketingName, :resOsVersion, :resOsManufacturer, :resOsBits, :resDeviceName, :resDeviceMarketingName, :resDeviceManufacturer, :resDeviceBrand, :resDeviceDualOrientation, :resDeviceType, :resDeviceIsMobile, :resDeviceSimCount, :resDeviceDisplayWidth, :resDeviceDisplayHeight, :resDeviceDisplayIsTouch, :resDeviceDisplayType, :resDeviceDisplaySize, :resClientIsBot, :resClientType, :resRawResult)');
+        $statementUpdateResult = $this->pdo->prepare('UPDATE `result` SET `resProviderVersion` = :resProviderVersion, `resFilename` = :resFilename, `resParseTime` = :resParseTime, `resInitTime` = :resInitTime, `resMemoryUsed` = :resMemoryUsed, `resLastChangeDate` = :resLastChangeDate, `resResultFound` = :resResultFound, `resResultError` = :resResultError, `resClientName` = :resClientName, `resClientModus` = :resClientModus, `resClientVersion` = :resClientVersion, `resClientManufacturer` = :resClientManufacturer, `resClientBits` = :resClientBits, `resEngineName` = :resEngineName, `resEngineVersion` = :resEngineVersion, `resEngineManufacturer` = :resEngineManufacturer, `resOsName` = :resOsName, `resOsMarketingName` = :resOsMarketingName, `resOsVersion` = :resOsVersion, `resOsManufacturer` = :resOsManufacturer, `resOsBits` = :resOsBits, `resDeviceName` = :resDeviceName, `resDeviceMarketingName` = :resDeviceMarketingName, `resDeviceManufacturer` = :resDeviceManufacturer, `resDeviceBrand` = :resDeviceBrand, `resDeviceDualOrientation` = :resDeviceDualOrientation, `resDeviceType` = :resDeviceType, `resDeviceIsMobile` = :resDeviceIsMobile, `resDeviceSimCount` = :resDeviceSimCount, `resDeviceDisplayWidth` = :resDeviceDisplayWidth, `resDeviceDisplayHeight` = :resDeviceDisplayHeight, `resDeviceDisplayIsTouch` = :resDeviceDisplayIsTouch, `resDeviceDisplayType` = :resDeviceDisplayType, `resDeviceDisplaySize` = :resDeviceDisplaySize, `resClientIsBot` = :resClientIsBot, `resClientType` = :resClientType, `resRawResult` = :resRawResult WHERE `resId` = :resId');
 
-        $statementSelectResult->bindValue(':proId', $proId, \PDO::PARAM_STR);
-        $statementSelectResult->bindValue(':uaId', $uaId, \PDO::PARAM_STR);
-        $statementSelectResult->bindValue(':run', $name, \PDO::PARAM_STR);
+        $statementSelectResult->bindValue(':proId', $proId, PDO::PARAM_STR);
+        $statementSelectResult->bindValue(':uaId', $uaId, PDO::PARAM_STR);
+        $statementSelectResult->bindValue(':run', $name, PDO::PARAM_STR);
 
         $statementSelectResult->execute();
 
-        $dbResultResult = $statementSelectResult->fetch(\PDO::FETCH_ASSOC);
+        $dbResultResult = $statementSelectResult->fetch(PDO::FETCH_ASSOC);
 
         if (false !== $dbResultResult) {
             $row2 = $dbResultResult;
         } else {
             $row2 = [
                 'provider_id'  => $proId,
-                'userAgent_id' => $uaId
+                'userAgent_id' => $uaId,
             ];
         }
 
         $row2['resProviderVersion'] = $singleResult['version'] ?? $version;
-        $row2['resParseTime'] = $singleResult['parse_time'] ?? null;
-        $row2['resInitTime'] = $singleResult['init_time'] ?? null;
-        $row2['resMemoryUsed'] = $singleResult['memory_used'] ?? null;
-        $date = new \DateTimeImmutable('now');
-        $row2['resLastChangeDate'] = $date->format('Y-m-d H:i:s');
+        $row2['resParseTime']       = $singleResult['parse_time'] ?? null;
+        $row2['resInitTime']        = $singleResult['init_time'] ?? null;
+        $row2['resMemoryUsed']      = $singleResult['memory_used'] ?? null;
+        $date                       = new DateTimeImmutable('now');
+        $row2['resLastChangeDate']  = $date->format('Y-m-d H:i:s');
 
         /*
          * Hydrate the result
@@ -91,11 +86,11 @@ class Result extends Helper
         if (! isset($row2['resId'])) {
             $row2['resId'] = Uuid::uuid4()->toString();
 
-            $statementInsertResult->bindValue(':resId', $row2['resId'], \PDO::PARAM_STR);
-            $statementInsertResult->bindValue(':proId', $proId, \PDO::PARAM_STR);
-            $statementInsertResult->bindValue(':uaId', $uaId, \PDO::PARAM_STR);
-            $statementInsertResult->bindValue(':run', $name, \PDO::PARAM_STR);
-            $statementInsertResult->bindValue(':resProviderVersion', $row2['resProviderVersion'], \PDO::PARAM_STR);
+            $statementInsertResult->bindValue(':resId', $row2['resId'], PDO::PARAM_STR);
+            $statementInsertResult->bindValue(':proId', $proId, PDO::PARAM_STR);
+            $statementInsertResult->bindValue(':uaId', $uaId, PDO::PARAM_STR);
+            $statementInsertResult->bindValue(':run', $name, PDO::PARAM_STR);
+            $statementInsertResult->bindValue(':resProviderVersion', $row2['resProviderVersion'], PDO::PARAM_STR);
 
             if (null !== $resFilename) {
                 $statementInsertResult->bindValue(':resFilename', str_replace('\\', '/', $resFilename));
@@ -106,9 +101,9 @@ class Result extends Helper
             $statementInsertResult->bindValue(':resParseTime', $row2['resParseTime']);
             $statementInsertResult->bindValue(':resInitTime', $row2['resInitTime']);
             $statementInsertResult->bindValue(':resMemoryUsed', $row2['resMemoryUsed']);
-            $statementInsertResult->bindValue(':resLastChangeDate', $row2['resLastChangeDate'], \PDO::PARAM_STR);
-            $statementInsertResult->bindValue(':resResultFound', $row2['resResultFound'], \PDO::PARAM_INT);
-            $statementInsertResult->bindValue(':resResultError', $row2['resResultError'], \PDO::PARAM_INT);
+            $statementInsertResult->bindValue(':resLastChangeDate', $row2['resLastChangeDate'], PDO::PARAM_STR);
+            $statementInsertResult->bindValue(':resResultFound', $row2['resResultFound'], PDO::PARAM_INT);
+            $statementInsertResult->bindValue(':resResultError', $row2['resResultError'], PDO::PARAM_INT);
             $statementInsertResult->bindValue(':resClientName', $row2['resClientName'] ?? null);
             $statementInsertResult->bindValue(':resClientModus', $row2['resClientModus'] ?? null);
             $statementInsertResult->bindValue(':resClientVersion', $row2['resClientVersion'] ?? null);
@@ -141,8 +136,8 @@ class Result extends Helper
 
             $statementInsertResult->execute();
         } else {
-            $statementUpdateResult->bindValue(':resId', $dbResultResult['resId'], \PDO::PARAM_STR);
-            $statementUpdateResult->bindValue(':resProviderVersion', $row2['resProviderVersion'], \PDO::PARAM_STR);
+            $statementUpdateResult->bindValue(':resId', $dbResultResult['resId'], PDO::PARAM_STR);
+            $statementUpdateResult->bindValue(':resProviderVersion', $row2['resProviderVersion'], PDO::PARAM_STR);
 
             if (null !== $resFilename) {
                 $statementUpdateResult->bindValue(':resFilename', str_replace('\\', '/', $resFilename));
@@ -153,9 +148,9 @@ class Result extends Helper
             $statementUpdateResult->bindValue(':resParseTime', $row2['resParseTime']);
             $statementUpdateResult->bindValue(':resInitTime', $row2['resInitTime']);
             $statementUpdateResult->bindValue(':resMemoryUsed', $row2['resMemoryUsed']);
-            $statementUpdateResult->bindValue(':resLastChangeDate', $row2['resLastChangeDate'], \PDO::PARAM_STR);
-            $statementUpdateResult->bindValue(':resResultFound', $row2['resResultFound'], \PDO::PARAM_INT);
-            $statementUpdateResult->bindValue(':resResultError', $row2['resResultError'], \PDO::PARAM_INT);
+            $statementUpdateResult->bindValue(':resLastChangeDate', $row2['resLastChangeDate'], PDO::PARAM_STR);
+            $statementUpdateResult->bindValue(':resResultFound', $row2['resResultFound'], PDO::PARAM_INT);
+            $statementUpdateResult->bindValue(':resResultError', $row2['resResultError'], PDO::PARAM_INT);
             $statementUpdateResult->bindValue(':resClientName', $row2['resClientName'] ?? null);
             $statementUpdateResult->bindValue(':resClientModus', $row2['resClientModus'] ?? null);
             $statementUpdateResult->bindValue(':resClientVersion', $row2['resClientVersion'] ?? null);

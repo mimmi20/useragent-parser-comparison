@@ -1,38 +1,48 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
+
+use PDO;
+
+use function date;
+use function htmlspecialchars;
+use function number_format;
+use function round;
+use function substr;
 
 abstract class AbstractHtml
 {
-
     protected ?string $title = null;
 
-    protected \PDO $pdo;
+    protected PDO $pdo;
 
     private ?int $userAgentCount = null;
 
-    public function __construct(\PDO $pdo, ?string $title = null)
+    public function __construct(PDO $pdo, ?string $title = null)
     {
-        $this->pdo = $pdo;
+        $this->pdo   = $pdo;
         $this->title = $title;
     }
 
     final protected function getUserAgentCount(?string $run = null): int
     {
-        if ($run !== null) {
+        if (null !== $run) {
             $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent` WHERE `uaId` IN (SELECT `result`.`userAgent_id` FROM `result` WHERE `result`.`run` = :run)');
-            $statementCountAllResults->bindValue(':run', $run, \PDO::PARAM_STR);
+            $statementCountAllResults->bindValue(':run', $run, PDO::PARAM_STR);
             $statementCountAllResults->execute();
 
-            return $statementCountAllResults->fetch(\PDO::FETCH_COLUMN);
+            return $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
         }
 
-        if ($this->userAgentCount === null) {
+        if (null === $this->userAgentCount) {
             $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent`');
             $statementCountAllResults->execute();
-            
-            $this->userAgentCount = $statementCountAllResults->fetch(\PDO::FETCH_COLUMN);
+
+            $this->userAgentCount = $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
         }
-        
+
         return $this->userAgentCount;
     }
 
@@ -47,17 +57,18 @@ abstract class AbstractHtml
             $html .=    '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . ($this->calculatePercent($resultFound2, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . '"></circle>
                     ';
         }
+
         $html .=    '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . ($this->calculatePercent($resultFound, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '"></circle>
                     <g class="donut-text">
                 
                         <text y="50%" transform="translate(0, 2)">
-                            <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent($resultFound, $countOfUseragents / 100,2) . '%</tspan>   
+                            <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '%</tspan>   
                         </text>
                     </g>
                 </svg>
             </div>
         ';
-        
+
         return $html;
     }
 
@@ -68,9 +79,9 @@ abstract class AbstractHtml
 
     protected function getUserAgentUrl(string $uaId): string
     {
-        $url = '../../user-agent-detail/' . substr($uaId, 0, 2) . '/' . substr($uaId, 2, 2);
+        $url  = '../../user-agent-detail/' . substr($uaId, 0, 2) . '/' . substr($uaId, 2, 2);
         $url .= '/' . $uaId . '.html';
-        
+
         return $url;
     }
 

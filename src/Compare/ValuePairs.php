@@ -4,23 +4,6 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Compare;
 
-use Exception;
-use function array_flip;
-use function file_get_contents;
-use function json_decode;
-use function ksort;
-use function sort;
-use function uasort;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableCell;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
-
 class ValuePairs
 {
     private $expected;
@@ -29,7 +12,7 @@ class ValuePairs
     /**
      * @param mixed $expected
      */
-    public function setExpected($expected) : void
+    public function setExpected($expected): void
     {
         $this->expected = $expected;
     }
@@ -37,7 +20,7 @@ class ValuePairs
     /**
      * @param mixed $actual
      */
-    public function setActual($actual) : void
+    public function setActual($actual): void
     {
         $this->actual = $actual;
     }

@@ -4,41 +4,34 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
+use PDO;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use UserAgentParserComparison\Html\Index;
 use UserAgentParserComparison\Html\OverviewGeneral;
 use UserAgentParserComparison\Html\OverviewProvider;
 use UserAgentParserComparison\Html\SimpleList;
-use UserAgentParserComparison\Html\UserAgentDetail;
-use function file_get_contents;
+
+use function assert;
+use function file_exists;
 use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
+use function is_string;
+use function max;
+use function mb_strlen;
 use function mkdir;
-use function sort;
 use function sprintf;
-use SplFileInfo;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
+use function str_pad;
 
 class GenerateReports extends Command
 {
-    private \PDO $pdo;
+    private PDO $pdo;
     private string $version;
 
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo, string $version)
+    public function __construct(PDO $pdo, string $version)
     {
-        $this->pdo = $pdo;
+        $this->pdo     = $pdo;
         $this->version = $version;
 
         parent::__construct();
@@ -51,15 +44,10 @@ class GenerateReports extends Command
             ->setHelp('');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string|null $thisRunName */
         $thisRunName = $input->getArgument('run');
+        assert(is_string($thisRunName) || null === $thisRunName);
         $basePath = '../gh-pages/';
 
         if (empty($thisRunName)) {
@@ -90,15 +78,15 @@ class GenerateReports extends Command
         file_put_contents($basePath . '/index.html', $generate->getHtml($version, $thisRunName));
         $output->writeln("\r" . 'generate general overview page <info>done</info>');
 
-        $baseMessage = 'generate overview page and found pages for';
+        $baseMessage   = 'generate overview page and found pages for';
         $messageLength = 0;
 
         $output->write($baseMessage . ' each provider ...');
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `real-provider`');
         $statementSelectProvider->execute();
 
-        while ($dbResultProvider = $statementSelectProvider->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
-            $message = $baseMessage . sprintf(' provider <fg=yellow>%s</> ', $dbResultProvider['proName']);
+        while ($dbResultProvider = $statementSelectProvider->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $message       = $baseMessage . sprintf(' provider <fg=yellow>%s</> ', $dbResultProvider['proName']);
             $messageLength = max($messageLength, mb_strlen($message));
 
             $output->write("\r" . str_pad($message, $messageLength));
@@ -117,7 +105,7 @@ class GenerateReports extends Command
              * detected - browserNames
              */
             if ($dbResultProvider['proCanDetectClientName']) {
-                $sql = "
+                $sql       = '
             SELECT 
                 `resClientName` AS `name`,
                 `uaId`,
@@ -129,14 +117,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resClientName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected browser names - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/client-names.html', $generate->getHtml());
                 $output->write('.');
@@ -146,7 +134,7 @@ class GenerateReports extends Command
              * detected - renderingEngines
              */
             if ($dbResultProvider['proCanDetectEngineName']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resEngineName` AS `name`,
                 `uaId`,
@@ -158,14 +146,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resEngineName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected rendering engines - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/rendering-engines.html', $generate->getHtml());
                 $output->write('.');
@@ -175,7 +163,7 @@ class GenerateReports extends Command
              * detected - OSnames
              */
             if ($dbResultProvider['proCanDetectOsName']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resOsName` AS `name`,
                 `uaId`,
@@ -187,14 +175,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resOsName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected operating systems - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/operating-systems.html', $generate->getHtml());
                 $output->write('.');
@@ -204,7 +192,7 @@ class GenerateReports extends Command
              * detected - deviceBrand
              */
             if ($dbResultProvider['proCanDetectDeviceBrand']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resDeviceBrand` AS `name`,
                 `uaId`,
@@ -216,14 +204,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resDeviceBrand`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected device brands - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-brands.html', $generate->getHtml());
                 $output->write('.');
@@ -233,7 +221,7 @@ class GenerateReports extends Command
              * detected - deviceModel
              */
             if ($dbResultProvider['proCanDetectDeviceName']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resDeviceName` AS `name`,
                 `uaId`,
@@ -245,14 +233,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resDeviceName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected device models - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-models.html', $generate->getHtml());
                 $output->write('.');
@@ -262,7 +250,7 @@ class GenerateReports extends Command
              * detected - deviceTypes
              */
             if ($dbResultProvider['proCanDetectDeviceType']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resDeviceType` AS `name`,
                 `uaId`,
@@ -274,14 +262,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resDeviceType`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected device types - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-types.html', $generate->getHtml());
                 $output->write('.');
@@ -291,7 +279,7 @@ class GenerateReports extends Command
              * detected - bots
              */
             if ($dbResultProvider['proCanDetectClientIsBot']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resClientName` AS `name`,
                 `uaId`,
@@ -303,14 +291,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resClientName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected as bot - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/bot-is-bot.html', $generate->getHtml());
                 $output->write('.');
@@ -320,7 +308,7 @@ class GenerateReports extends Command
              * detected - botTypes
              */
             if ($dbResultProvider['proCanDetectClientType']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resClientType` AS `name`,
                 `uaId`,
@@ -332,14 +320,14 @@ class GenerateReports extends Command
             WHERE
                 `provider_id` = :proId
             GROUP BY `resClientType`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected client types - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/bot-types.html', $generate->getHtml());
                 $output->write('.');
@@ -353,7 +341,7 @@ class GenerateReports extends Command
             /*
              * no result found
              */
-            $sql = "
+            $sql       = '
         SELECT
             `result`.`resClientName` AS `name`,
             `userAgent`.`uaId`,
@@ -372,14 +360,14 @@ class GenerateReports extends Command
         WHERE
             `result`.`provider_id` = :proId
             AND `result`.`resResultFound` = 0
-    ";
+    ';
             $statement = $this->pdo->prepare($sql);
-            $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+            $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
             $statement->execute();
 
             $generate = new SimpleList($this->pdo, 'Not detected - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-            $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+            $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
             file_put_contents($folder . '/no-result-found.html', $generate->getHtml());
             $output->write('.');
@@ -390,7 +378,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectClientName']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT 
                 `found-results`.`resClientName` AS `name`,
                 `userAgent`.`uaId`,
@@ -426,14 +414,14 @@ class GenerateReports extends Command
                 `found-results`.`provider_id` = :proId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resClientName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No browser name found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/client-names.html', $generate->getHtml());
                 $output->write('.');
@@ -445,7 +433,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectEngineName']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resEngineName` AS `name`,
                 `userAgent`.`uaId`,
@@ -481,14 +469,14 @@ class GenerateReports extends Command
                 `found-results`.`provider_id` = :proId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resEngineName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No rendering engine found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/rendering-engines.html', $generate->getHtml());
                 $output->write('.');
@@ -500,7 +488,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectOsName']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resOsName` AS `name`,
                 `userAgent`.`uaId`,
@@ -536,14 +524,14 @@ class GenerateReports extends Command
                 `found-results`.`provider_id` = :proId
                 AND `resClientIsBot` IS NULL
                 AND `resOsName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No operating system found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/operating-systems.html', $generate->getHtml());
                 $output->write('.');
@@ -555,7 +543,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceBrand']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceBrand` AS `name`,
                 `userAgent`.`uaId`,
@@ -591,14 +579,14 @@ class GenerateReports extends Command
                 `found-results`.`provider_id` = :proId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resDeviceBrand` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No device brands found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-brands.html', $generate->getHtml());
                 $output->write('.');
@@ -610,7 +598,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceName']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceName` AS `name`,
                 `userAgent`.`uaId`,
@@ -646,14 +634,14 @@ class GenerateReports extends Command
                 `found-results`.`provider_id` = :proId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resDeviceName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No device model found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-models.html', $generate->getHtml());
                 $output->write('.');
@@ -665,7 +653,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceType']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceType` AS `name`,
                 `userAgent`.`uaId`,
@@ -701,14 +689,14 @@ class GenerateReports extends Command
                 `found-results`.`provider_id` = :proId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resDeviceType` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No device type found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-types.html', $generate->getHtml());
                 $output->write('.');
@@ -720,7 +708,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceIsMobile']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resClientName` AS `name`,
                 `userAgent`.`uaId`,
@@ -747,14 +735,14 @@ class GenerateReports extends Command
                         ON `result`.`provider_id` = `test-provider`.`proId`
                         AND `result`.`resDeviceIsMobile` = 1
                 )
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Not detected as mobile - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-is-mobile.html', $generate->getHtml());
                 $output->write('.');
@@ -766,7 +754,7 @@ class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectClientIsBot']) {
                 echo '.';
 
-                $sql = "
+                $sql       = '
             SELECT
             	`found-results`.`resClientName` AS `name`,
             	`userAgent`.`uaId`,
@@ -793,14 +781,14 @@ class GenerateReports extends Command
                         ON `result`.`provider_id` = `test-provider`.`proId`
             			AND `result`.`resClientIsBot` = 1
                 )
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Not detected as bot - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/bot-is-bot.html', $generate->getHtml());
                 $output->write('.');
@@ -809,64 +797,66 @@ class GenerateReports extends Command
             /*
              * botTypes
              */
-            if ($dbResultProvider['proCanDetectClientType']) {
-                echo '.';
-
-                $sql = "
-            SELECT
-                `found-results`.`resClientType` AS `name`,
-                `userAgent`.`uaId`,
-                `userAgent`.`uaString`,
-                (
-                    SELECT
-                        COUNT(`list-found-general-client-types`.`resClientType`)
-                    FROM `list-found-general-client-types`
-                    WHERE
-                        `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
-                        AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
-                ) AS `detectionCount`,
-                (
-                    SELECT
-                        COUNT(DISTINCT `list-found-general-client-types`.`resClientType`)
-                    FROM `list-found-general-client-types`
-                    WHERE 
-                        `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
-                        AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
-                ) AS `detectionCountUnique`,
-                (
-                    SELECT
-                        GROUP_CONCAT(DISTINCT `list-found-general-client-types`.`resClientType`)
-                    FROM `list-found-general-client-types`
-                    WHERE 
-                         `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
-                        AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
-                ) AS `detectionValuesDistinct`
-            FROM `found-results`
-            INNER JOIN `userAgent`
-                ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
-            WHERE
-                `found-results`.`provider_id` = :proId
-                AND `found-results`.`resClientType` IS NULL
-                AND `userAgent`.`uaId` IN(
-                    SELECT
-                        `result`.`userAgent_id`
-                    FROM `test-provider`
-                    INNER JOIN `result` 
-                        ON `result`.`provider_id` = `test-provider`.`proId`
-                        AND `result`.`resClientType` IS NOT NULL
-                )
-        ";
-                $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
-
-                $statement->execute();
-
-                $generate = new SimpleList($this->pdo, 'No bot type found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
-
-                file_put_contents($folder . '/bot-types.html', $generate->getHtml());
-                $output->write('.');
+            if (!$dbResultProvider['proCanDetectClientType']) {
+                continue;
             }
+
+            echo '.';
+
+            $sql       = '
+        SELECT
+            `found-results`.`resClientType` AS `name`,
+            `userAgent`.`uaId`,
+            `userAgent`.`uaString`,
+            (
+                SELECT
+                    COUNT(`list-found-general-client-types`.`resClientType`)
+                FROM `list-found-general-client-types`
+                WHERE
+                    `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
+                    AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
+            ) AS `detectionCount`,
+            (
+                SELECT
+                    COUNT(DISTINCT `list-found-general-client-types`.`resClientType`)
+                FROM `list-found-general-client-types`
+                WHERE 
+                    `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
+                    AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
+            ) AS `detectionCountUnique`,
+            (
+                SELECT
+                    GROUP_CONCAT(DISTINCT `list-found-general-client-types`.`resClientType`)
+                FROM `list-found-general-client-types`
+                WHERE 
+                     `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
+                    AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
+            ) AS `detectionValuesDistinct`
+        FROM `found-results`
+        INNER JOIN `userAgent`
+            ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
+        WHERE
+            `found-results`.`provider_id` = :proId
+            AND `found-results`.`resClientType` IS NULL
+            AND `userAgent`.`uaId` IN(
+                SELECT
+                    `result`.`userAgent_id`
+                FROM `test-provider`
+                INNER JOIN `result` 
+                    ON `result`.`provider_id` = `test-provider`.`proId`
+                    AND `result`.`resClientType` IS NOT NULL
+            )
+    ';
+            $statement = $this->pdo->prepare($sql);
+            $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+
+            $statement->execute();
+
+            $generate = new SimpleList($this->pdo, 'No bot type found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
+            $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
+
+            file_put_contents($folder . '/bot-types.html', $generate->getHtml());
+            $output->write('.');
         }
 
         $output->writeln("\r" . str_pad($baseMessage . ' each provider <info>done</info>', $messageLength + 30));
@@ -884,7 +874,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected client names');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/client-names.html', $generate->getHtml());
         $output->write('.');
@@ -896,7 +886,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected rendering engines');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/rendering-engines.html', $generate->getHtml());
         $output->write('.');
@@ -908,7 +898,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected operating systems');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/operating-systems.html', $generate->getHtml());
         $output->write('.');
@@ -920,7 +910,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected device models');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/device-models.html', $generate->getHtml());
         $output->write('.');
@@ -932,7 +922,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected device brands');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/device-brands.html', $generate->getHtml());
         $output->write('.');
@@ -944,7 +934,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected device types');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/device-types.html', $generate->getHtml());
         $output->write('.');
@@ -956,7 +946,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected bot names');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/bot-names.html', $generate->getHtml());
         $output->write('.');
@@ -968,7 +958,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected bot types');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/bot-types.html', $generate->getHtml());
 

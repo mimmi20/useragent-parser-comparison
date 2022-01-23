@@ -1,30 +1,36 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
 
-use UserAgentParserComparison\Entity\UserAgentEvaluation;
-use UserAgentParserComparison\Entity\Result;
-use UserAgentParserComparison\Entity\UserAgent;
+use function array_key_exists;
+use function count;
+use function htmlspecialchars;
+use function is_array;
+use function json_decode;
+use function number_format;
+use function print_r;
+use function round;
+
+use const JSON_THROW_ON_ERROR;
 
 class UserAgentDetail extends AbstractHtml
 {
-
     private array $userAgent = [];
 
-    /**
-     * @var array[]
-     */
+    /** @var array[] */
     private array $results = [];
 
-    public function setUserAgent(array $userAgent)
+    public function setUserAgent(array $userAgent): void
     {
         $this->userAgent = $userAgent;
     }
 
     /**
-     *
      * @param array[] $results
      */
-    public function setResults(array $results)
+    public function setResults(array $results): void
     {
         $this->results = $results;
     }
@@ -69,7 +75,7 @@ class UserAgentDetail extends AbstractHtml
 
         $html .= '</tr>';
         $html .= '</thead>';
-        
+
         /*
          * Test suite
          */
@@ -77,28 +83,33 @@ class UserAgentDetail extends AbstractHtml
         $html .= '<tr><th colspan="17" class="green lighten-3">';
         $html .= 'Test suite';
         $html .= '</th></tr>';
-        
+
         foreach ($this->results as $result) {
-            if (array_key_exists('proType', $result) && $result['proType'] === 'testSuite') {
-                $html .= $this->getRow($result);
+            if (!array_key_exists('proType', $result) || 'testSuite' !== $result['proType']) {
+                continue;
             }
+
+            $html .= $this->getRow($result);
         }
-        
+
         /*
          * Providers
          */
         $html .= '<tr><th colspan="17" class="green lighten-3">';
         $html .= 'Providers';
         $html .= '</th></tr>';
-        
+
         foreach ($this->results as $result) {
-            if (array_key_exists('proType', $result) && $result['proType'] === 'real') {
-                $html .= $this->getRow($result);
+            if (!array_key_exists('proType', $result) || 'real' !== $result['proType']) {
+                continue;
             }
+
+            $html .= $this->getRow($result);
         }
+
         $html .= '</tbody>';
         $html .= '</table>';
-        
+
         return $html;
     }
 
@@ -142,6 +153,7 @@ class UserAgentDetail extends AbstractHtml
             if (null !== $result['proLastReleaseDate']) {
                 $html .= '<br /><small>' . $result['proLastReleaseDate'] . '</small>';
             }
+
             $html .= '</div>';
         } elseif ($result['proIsApi']) {
             $html .= '<div><span class="material-icons">public</span></div>';
@@ -152,6 +164,7 @@ class UserAgentDetail extends AbstractHtml
             } else {
                 $html .= $result['proName'];
             }
+
             $html .= '</div>';
         }
 
@@ -270,7 +283,7 @@ class UserAgentDetail extends AbstractHtml
         $html .= '<td>' . number_format(round($result['resParseTime'] * 1000, 3), 3) . '</td>';
 
         $html .= '<td>' . number_format(round($result['resMemoryUsed'], 2), 2) . '</td>';
-        
+
         $html .= '<td>
         
 <!-- Modal Trigger -->
@@ -288,16 +301,16 @@ class UserAgentDetail extends AbstractHtml
 </div>
         
                 </td>';
-        
+
         $html .= '</tr>';
-        
+
         return $html;
     }
 
     public function getHtml(): string
     {
         $addStr = '';
-        if ($this->userAgent['uaAdditionalHeaders'] !== null) {
+        if (null !== $this->userAgent['uaAdditionalHeaders']) {
             $addHeaders = json_decode($this->userAgent['uaAdditionalHeaders'], true, 512, JSON_THROW_ON_ERROR);
 
             if (is_array($addHeaders) && count($addHeaders) > 0) {
@@ -308,7 +321,7 @@ class UserAgentDetail extends AbstractHtml
                 }
             }
         }
-        
+
         $body = '
 <div class="section">
     <h1 class="header center orange-text">User agent detail</h1>
@@ -324,14 +337,14 @@ class UserAgentDetail extends AbstractHtml
     ' . $this->getProvidersTable() . '
 </div>
 ';
-        
+
         $script = '
 $(document).ready(function(){
     // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
     $(\'.modal-trigger\').leanModal();
 });
         ';
-        
+
         return parent::getHtmlCombined($body, $script);
     }
 }

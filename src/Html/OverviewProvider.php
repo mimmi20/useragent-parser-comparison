@@ -1,21 +1,28 @@
 <?php
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
+
+use PDO;
+
+use function number_format;
+use function round;
 
 class OverviewProvider extends AbstractHtml
 {
-
     private array $provider;
 
-    public function __construct(\PDO $pdo, array $provider, ?string $title = null)
+    public function __construct(PDO $pdo, array $provider, ?string $title = null)
     {
-        $this->pdo = $pdo;
+        $this->pdo      = $pdo;
         $this->provider = $provider;
-        $this->title = $title;
+        $this->title    = $title;
     }
 
     private function getResult(): array|false
     {
-        $sql = "
+        $sql = '
             SELECT
                 SUM(`resResultFound`) AS `resultFound`,
                 SUM(`resResultError`) AS `resultError`,
@@ -49,21 +56,21 @@ class OverviewProvider extends AbstractHtml
                 `provider_id` = :proId
             GROUP BY
                 `proId`
-        ";
+        ';
 
         $statement = $this->pdo->prepare($sql);
-        $statement->bindValue(':proId', $this->provider['proId'], \PDO::PARAM_STR);
+        $statement->bindValue(':proId', $this->provider['proId'], PDO::PARAM_STR);
         $statement->execute();
-        
+
         return $statement->fetch();
     }
 
     private function getTable(): string
     {
         $provider = $this->provider;
-        
+
         $html = '<table class="striped">';
-        
+
         /*
          * Header
          */
@@ -77,14 +84,14 @@ class OverviewProvider extends AbstractHtml
                 </tr>
             </thead>
         ';
-        
+
         /*
          * body
          */
         $countOfUseragents = $this->getUserAgentCount();
-        
+
         $row = $this->getResult();
-        
+
         $html .= '<tbody>';
 
         if (false === $row) {
@@ -102,7 +109,7 @@ class OverviewProvider extends AbstractHtml
 
             return $html;
         }
-        
+
         /*
          * Results found
          */
@@ -127,7 +134,7 @@ class OverviewProvider extends AbstractHtml
             <td></td>
             </tr>
         ';
-        
+
         /*
          * Client
          */
@@ -157,6 +164,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -179,6 +187,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -201,6 +210,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -223,10 +233,11 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
-        
+
         /*
          * engine
          */
@@ -256,6 +267,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -278,10 +290,11 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
-        
+
         /*
          * os
          */
@@ -311,6 +324,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -333,10 +347,11 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
-        
+
         /*
          * device
          */
@@ -366,6 +381,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -395,6 +411,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -424,6 +441,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -450,6 +468,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -472,6 +491,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -499,10 +519,10 @@ class OverviewProvider extends AbstractHtml
             <td></td>
             </tr>
         ';
-        
+
         $html .= '</tbody>';
         $html .= '</table>';
-        
+
         return $html;
     }
 
@@ -555,6 +575,7 @@ class OverviewProvider extends AbstractHtml
             if (null !== $this->provider['proLastReleaseDate']) {
                 $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
             }
+
             $body .= '</div>';
         } elseif ($this->provider['proIsApi']) {
             $body .= '<div><span class="material-icons">public</span></div>';
@@ -565,8 +586,10 @@ class OverviewProvider extends AbstractHtml
             } else {
                 $body .= $this->provider['proName'];
             }
+
             $body .= '</div>';
         }
+
         $body .= '
 </div>
 
@@ -574,7 +597,7 @@ class OverviewProvider extends AbstractHtml
     ' . $this->getTable() . '
 </div>
 ';
-        
+
         return parent::getHtmlCombined($body);
     }
 }
