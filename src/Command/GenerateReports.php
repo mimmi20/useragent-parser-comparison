@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -24,7 +30,7 @@ use function mkdir;
 use function sprintf;
 use function str_pad;
 
-class GenerateReports extends Command
+final class GenerateReports extends Command
 {
     private PDO $pdo;
     private string $version;
@@ -62,7 +68,7 @@ class GenerateReports extends Command
 
         $basePath .= $version;
 
-        if (! file_exists($basePath)) {
+        if (!file_exists($basePath)) {
             mkdir($basePath, 0777, true);
         }
 
@@ -97,7 +103,7 @@ class GenerateReports extends Command
             $output->write('.');
 
             $folder = $basePath . '/detected/' . $dbResultProvider['proName'];
-            if (! file_exists($folder)) {
+            if (!file_exists($folder)) {
                 mkdir($folder, 0777, true);
             }
 
@@ -106,7 +112,7 @@ class GenerateReports extends Command
              */
             if ($dbResultProvider['proCanDetectClientName']) {
                 $sql       = '
-            SELECT 
+            SELECT
                 `resClientName` AS `name`,
                 `uaId`,
                 `uaString`,
@@ -334,7 +340,7 @@ class GenerateReports extends Command
             }
 
             $folder = $basePath . '/not-detected/' . $dbResultProvider['proName'];
-            if (! file_exists($folder)) {
+            if (!file_exists($folder)) {
                 mkdir($folder, 0777, true);
             }
 
@@ -379,7 +385,7 @@ class GenerateReports extends Command
                 echo '.';
 
                 $sql       = '
-            SELECT 
+            SELECT
                 `found-results`.`resClientName` AS `name`,
                 `userAgent`.`uaId`,
                 `userAgent`.`uaString`,
@@ -387,7 +393,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-client-names`.`resClientName`)
                     FROM `list-found-general-client-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-client-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -395,7 +401,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-client-names`.`resClientName`)
                     FROM `list-found-general-client-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-client-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -403,7 +409,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-client-names`.`resClientName`)
                     FROM `list-found-general-client-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-client-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -442,7 +448,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-engine-names`.`resEngineName`)
                     FROM `list-found-general-engine-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-engine-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-engine-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -450,7 +456,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-engine-names`.`resEngineName`)
                     FROM `list-found-general-engine-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-engine-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-engine-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -458,7 +464,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-engine-names`.`resEngineName`)
                     FROM `list-found-general-engine-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-engine-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-engine-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -497,7 +503,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-os-names`.`resOsName`)
                     FROM `list-found-general-os-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-os-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-os-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -505,7 +511,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-os-names`.`resOsName`)
                     FROM `list-found-general-os-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-os-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-os-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -513,7 +519,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-os-names`.`resOsName`)
                     FROM `list-found-general-os-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-os-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-os-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -552,7 +558,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-device-brands`.`resDeviceBrand`)
                     FROM `list-found-general-device-brands`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-brands`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-brands`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -560,7 +566,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-device-brands`.`resDeviceBrand`)
                     FROM `list-found-general-device-brands`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-brands`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-brands`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -568,7 +574,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-device-brands`.`resDeviceBrand`)
                     FROM `list-found-general-device-brands`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-brands`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-brands`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -607,7 +613,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-models`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -615,7 +621,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-models`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -623,7 +629,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-models`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -662,7 +668,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-device-types`.`resDeviceType`)
                     FROM `list-found-general-device-types`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -670,7 +676,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-device-types`.`resDeviceType`)
                     FROM `list-found-general-device-types`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -678,7 +684,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-device-types`.`resDeviceType`)
                     FROM `list-found-general-device-types`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -820,7 +826,7 @@ class GenerateReports extends Command
                 SELECT
                     COUNT(DISTINCT `list-found-general-client-types`.`resClientType`)
                 FROM `list-found-general-client-types`
-                WHERE 
+                WHERE
                     `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
                     AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
             ) AS `detectionCountUnique`,
@@ -828,7 +834,7 @@ class GenerateReports extends Command
                 SELECT
                     GROUP_CONCAT(DISTINCT `list-found-general-client-types`.`resClientType`)
                 FROM `list-found-general-client-types`
-                WHERE 
+                WHERE
                      `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
                     AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
             ) AS `detectionValuesDistinct`
@@ -842,7 +848,7 @@ class GenerateReports extends Command
                 SELECT
                     `result`.`userAgent_id`
                 FROM `test-provider`
-                INNER JOIN `result` 
+                INNER JOIN `result`
                     ON `result`.`provider_id` = `test-provider`.`proId`
                     AND `result`.`resClientType` IS NOT NULL
             )
@@ -862,7 +868,7 @@ class GenerateReports extends Command
         $output->writeln("\r" . str_pad($baseMessage . ' each provider <info>done</info>', $messageLength + 30));
 
         $folder = $basePath . '/detected/general';
-        if (! file_exists($folder)) {
+        if (!file_exists($folder)) {
             mkdir($folder, 0777, true);
         }
 

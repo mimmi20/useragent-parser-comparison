@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -11,7 +17,7 @@ $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR
 $files = new class($iterator, 'php') extends \FilterIterator {
     private string $extension;
 
-    public function __construct(\Iterator $iterator , string $extension)
+    public function __construct(Iterator $iterator, string $extension)
     {
         parent::__construct($iterator);
         $this->extension = $extension;

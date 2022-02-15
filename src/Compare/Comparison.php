@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -8,7 +14,7 @@ use function array_keys;
 use function is_int;
 use function is_string;
 
-class Comparison
+final class Comparison
 {
     private array $data = [];
 
@@ -16,10 +22,6 @@ class Comparison
 
     private array $test = [];
 
-    /**
-     * @param array $expectedData
-     * @param array $actualData
-     */
     public function __construct(array $expectedData, array $actualData)
     {
         foreach ($expectedData as $compareKey => $compareValues) {
@@ -52,17 +54,11 @@ class Comparison
         $this->testname = $testname;
     }
 
-    /**
-     * @return array
-     */
     public function getTest(): array
     {
         return $this->test;
     }
 
-    /**
-     * @param array $test
-     */
     public function setTest(array $test): void
     {
         $this->test = $test;
@@ -82,8 +78,8 @@ class Comparison
 
                 if (!isset($comparison[$compareKey][$compareSubKey][$expectedValue])) {
                     $comparison[$compareKey][$compareSubKey][$expectedValue] = [
-                        'expected'  => [
-                            'count'  => 0,
+                        'expected' => [
+                            'count' => 0,
                             'agents' => [],
                         ],
                         $parserName => [],
@@ -95,7 +91,7 @@ class Comparison
 
                 if (!isset($comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue])) {
                     $comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue] = [
-                        'count'  => 0,
+                        'count' => 0,
                         'agents' => [],
                     ];
                 }

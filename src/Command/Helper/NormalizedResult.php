@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -8,7 +14,7 @@ use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
 
-class NormalizedResult extends Helper
+final class NormalizedResult extends Helper
 {
     private PDO $pdo;
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -19,10 +25,9 @@ use function is_bool;
 use function is_string;
 use function log;
 use function microtime;
-use function pow;
 use function round;
 
-class Benchmark extends Command
+final class Benchmark extends Command
 {
     protected function configure(): void
     {
@@ -65,10 +70,10 @@ class Benchmark extends Command
                 $result = $parser['parse']($file, true);
                 $end    = microtime(true) - $start;
 
-                $initTime  += $result['init_time'];
+                $initTime += $result['init_time'];
                 $parseTime += $result['parse_time'];
                 $totalTime += $end;
-                $memory    += $result['memory_used'];
+                $memory += $result['memory_used'];
 
                 $progress->advance();
             }
@@ -96,6 +101,6 @@ class Benchmark extends Command
         $base     = log($bytes, 1024);
         $suffixes = ['', 'K', 'M', 'G', 'T'];
 
-        return round(pow(1024, $base - floor($base)), $precision) . ' ' . $suffixes[(int) floor($base)];
+        return round(1024 ** ($base - floor($base)), $precision) . ' ' . $suffixes[(int) floor($base)];
     }
 }

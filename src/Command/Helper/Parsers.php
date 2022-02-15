@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -26,7 +32,7 @@ use function sort;
 use function shell_exec;
 use function trim;
 
-class Parsers extends Helper
+final class Parsers extends Helper
 {
     private string $parsersDir = __DIR__ . '/../../../parsers';
 
@@ -60,9 +66,9 @@ class Parsers extends Helper
             }
 
             $parsers[$parserDir->getFilename()] = [
-                'path'     => $parserDir->getPathname(),
+                'path' => $parserDir->getPathname(),
                 'metadata' => $metadata,
-                'parse'    => static function (string $file, bool $benchmark = false) use ($parserDir, $output): ?array {
+                'parse' => static function (string $file, bool $benchmark = false) use ($parserDir, $output): ?array {
                     $args = [
                         escapeshellarg($file),
                     ];

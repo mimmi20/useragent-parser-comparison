@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -22,7 +28,7 @@ use function str_pad;
 
 use const STR_PAD_LEFT;
 
-class InitResults extends Command
+final class InitResults extends Command
 {
     private PDO $pdo;
 
@@ -131,7 +137,7 @@ class InitResults extends Command
                 // display "progress"
                 $output->writeln(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . '   ' . str_pad(' ', $nameLength));
 
-                $currenUserAgent++;
+                ++$currenUserAgent;
             }
 
             $this->pdo->commit();
@@ -144,7 +150,7 @@ class InitResults extends Command
             $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 
             $start += $count;
-        } while ($colCount > 0);
+        } while (0 < $colCount);
 
         return self::SUCCESS;
     }

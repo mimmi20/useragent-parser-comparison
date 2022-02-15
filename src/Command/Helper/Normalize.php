@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -16,7 +22,7 @@ use function mb_strtolower;
 use function preg_replace;
 use function str_replace;
 
-class Normalize extends Helper
+final class Normalize extends Helper
 {
     private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 

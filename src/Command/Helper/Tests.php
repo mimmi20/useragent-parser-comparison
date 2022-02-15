@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -50,7 +56,7 @@ use const JSON_UNESCAPED_UNICODE;
 use const SORT_FLAG_CASE;
 use const SORT_NATURAL;
 
-class Tests extends Helper
+final class Tests extends Helper
 {
     private string $testResultDir = __DIR__ . '/../../../data/test-runs';
     private string $testDir       = __DIR__ . '/../../../tests';
@@ -132,7 +138,7 @@ class Tests extends Helper
                 new TableCell(empty($metadata['parsers']) ? '' : ($metadata['parsers'][$parserNames[0]]['metadata']['version'] ?? 'n/a')),
             ];
 
-            if ($countRows > 1) {
+            if (1 < $countRows) {
                 for ($i = 1, $max = $countRows; $i < $max; ++$i) {
                     $rows[] = [
                         new TableCell(empty($metadata['tests']) || !array_key_exists($i, $testNames) ? '' : $metadata['tests'][$testNames[$i]]['metadata']['name']),
@@ -152,7 +158,7 @@ class Tests extends Helper
             $names[$testDir->getFilename()] = $testDir->getFilename();
         }
 
-        if (count($rows) < 1) {
+        if (1 > count($rows)) {
             return null;
         }
 
@@ -186,7 +192,7 @@ class Tests extends Helper
 
     public function collectTests(OutputInterface $output, ?string $thisRunDir): iterable
     {
-        $expectedDir = null === $thisRunDir ?  null : $thisRunDir . '/expected';
+        $expectedDir = null === $thisRunDir ? null : $thisRunDir . '/expected';
 
         foreach (new FilesystemIterator($this->testDir) as $testDir) {
             assert($testDir instanceof SplFileInfo);
@@ -254,11 +260,11 @@ class Tests extends Helper
             $testPath = $testDir->getFilename();
 
             yield $testPath => [
-                'name'     => $pathName,
-                'path'     => $testPath,
+                'name' => $pathName,
+                'path' => $testPath,
                 'metadata' => $metadata,
-                'command'  => $command,
-                'build'    => static function () use ($testPath, $output, $expectedDir, $command): iterable {
+                'command' => $command,
+                'build' => static function () use ($testPath, $output, $expectedDir, $command): iterable {
                     $message = sprintf('test suite <fg=yellow>%s</>', $testPath);
 
                     $output->write("\r" . $message . ' <info>building test suite</info>');
