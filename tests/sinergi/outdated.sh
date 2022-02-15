@@ -9,5 +9,5 @@ command -v "$composer_command" >/dev/null 2>&1 || {
     composer_command="composer.phar"
 }
 
-$composer_command update --prefer-source --prefer-lowest
+$composer_command update --prefer-lowest --quiet --prefer-source
 $composer_command outdated --direct

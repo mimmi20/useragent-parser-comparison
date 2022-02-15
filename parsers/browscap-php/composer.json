@@ -2,12 +2,12 @@
   "require": {
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0.0",
-    "browscap/browscap-php": "^5.0.0 || ^6.0.0",
+    "browscap/browscap-php": "^5.0.0 || ^6.1.0",
     "psr/log": "^1.1.4 || ^3.0.0",
-    "symfony/console": "^v5.4.0 || ^6.0.1",
-    "symfony/filesystem": "^v5.4.0 || ^6.0.0",
+    "symfony/console": "^v5.4.3 || ^v6.0.3",
+    "symfony/filesystem": "^v5.4.3 || ^v6.0.3",
     "matthiasmullie/scrapbook": "^1.4.8",
-    "league/flysystem": "^2.3.2"
+    "league/flysystem": "^2.3.2 || ^3.0.7"
   },
   "config": {
     "preferred-install": "dist",
