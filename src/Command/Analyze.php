@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -41,17 +47,14 @@ use function ucfirst;
 
 use const PHP_ROUND_HALF_DOWN;
 
-class Analyze extends Command
+final class Analyze extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
 
-    /** @var array */
     private array $options = [];
 
-    /** @var array */
     private array $comparison = [];
 
-    /** @var array */
     private array $agents = [];
 
     private Table $summaryTable;
@@ -60,7 +63,6 @@ class Analyze extends Command
 
     private OutputInterface $output;
 
-    /** @var array */
     private array $failures = [];
 
     protected function configure(): void
@@ -214,7 +216,7 @@ class Analyze extends Command
                         if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue])) {
                             $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue] = [
                                 'expected' => [
-                                    'count'  => 0,
+                                    'count' => 0,
                                     'agents' => [],
                                 ],
                             ];
@@ -254,9 +256,9 @@ class Analyze extends Command
                 }
 
                 $passFail = [
-                    'browser'  => ['pass' => 0, 'fail' => 0],
+                    'browser' => ['pass' => 0, 'fail' => 0],
                     'platform' => ['pass' => 0, 'fail' => 0],
-                    'device'   => ['pass' => 0, 'fail' => 0],
+                    'device' => ['pass' => 0, 'fail' => 0],
                 ];
 
                 $parserScores[$parserName][$testName]   = 0;
@@ -291,7 +293,7 @@ class Analyze extends Command
 
                             if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue])) {
                                 $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue] = [
-                                    'count'  => 0,
+                                    'count' => 0,
                                     'agents' => [],
                                 ];
                             }
@@ -323,7 +325,7 @@ class Analyze extends Command
                         $passFail[$compareKey]['pass'] += $score;
                         $passFail[$compareKey]['fail'] += $possibleScore - $score;
 
-                        $parserScores[$parserName][$testName]   += $score;
+                        $parserScores[$parserName][$testName] += $score;
                         $possibleScores[$parserName][$testName] += $possibleScore;
                     }
 
@@ -374,29 +376,29 @@ class Analyze extends Command
 
                 if (!isset($totals[$parserName])) {
                     $totals[$parserName] = [
-                        'browser'  => ['pass' => 0, 'fail' => 0],
+                        'browser' => ['pass' => 0, 'fail' => 0],
                         'platform' => ['pass' => 0, 'fail' => 0],
-                        'device'   => ['pass' => 0, 'fail' => 0],
-                        'time'     => 0,
-                        'score'    => ['earned' => 0, 'possible' => 0],
+                        'device' => ['pass' => 0, 'fail' => 0],
+                        'time' => 0,
+                        'score' => ['earned' => 0, 'possible' => 0],
                     ];
                 }
 
-                $totals[$parserName]['browser']['pass']   += $passFail['browser']['pass'];
-                $totals[$parserName]['browser']['fail']   += $passFail['browser']['fail'];
-                $totals[$parserName]['platform']['pass']  += $passFail['platform']['pass'];
-                $totals[$parserName]['platform']['fail']  += $passFail['platform']['fail'];
-                $totals[$parserName]['device']['pass']    += $passFail['device']['pass'];
-                $totals[$parserName]['device']['fail']    += $passFail['device']['fail'];
-                $totals[$parserName]['time']              += $testResult['parse_time'] + $testResult['init_time'];
-                $totals[$parserName]['score']['earned']   += $parserScores[$parserName][$testName];
+                $totals[$parserName]['browser']['pass'] += $passFail['browser']['pass'];
+                $totals[$parserName]['browser']['fail'] += $passFail['browser']['fail'];
+                $totals[$parserName]['platform']['pass'] += $passFail['platform']['pass'];
+                $totals[$parserName]['platform']['fail'] += $passFail['platform']['fail'];
+                $totals[$parserName]['device']['pass'] += $passFail['device']['pass'];
+                $totals[$parserName]['device']['fail'] += $passFail['device']['fail'];
+                $totals[$parserName]['time'] += $testResult['parse_time'] + $testResult['init_time'];
+                $totals[$parserName]['score']['earned'] += $parserScores[$parserName][$testName];
                 $totals[$parserName]['score']['possible'] += $possibleScores[$parserName][$testName];
             }
 
             $rows[] = new TableSeparator();
         }
 
-        if (count($this->options['tests']) > 1) {
+        if (1 < count($this->options['tests'])) {
             $rows[] = [new TableCell('<fg=yellow>Total for all Test suites</>', ['colspan' => 6])];
             $rows[] = new TableSeparator();
 
@@ -462,7 +464,7 @@ class Analyze extends Command
     {
         $questionHelper = $this->getHelper('question');
 
-        if (count($this->options['tests']) > 1) {
+        if (1 < count($this->options['tests'])) {
             $question = new ChoiceQuestion(
                 'Which Test Suite?',
                 array_keys($this->options['tests'])
@@ -505,7 +507,7 @@ class Analyze extends Command
                 break;
         }
 
-        if (count($subs) > 1) {
+        if (1 < count($subs)) {
             $question = new ChoiceQuestion(
                 'Which Property?',
                 $subs
@@ -541,7 +543,7 @@ class Analyze extends Command
                 $answer = '';
                 do {
                     if (!isset($selectedTest) || 'Change Test Suite' === $answer) {
-                        if (count($this->options['tests']) > 1) {
+                        if (1 < count($this->options['tests'])) {
                             $question = new ChoiceQuestion(
                                 'Which test suite?',
                                 array_keys($this->options['tests'])
@@ -554,7 +556,7 @@ class Analyze extends Command
                     }
 
                     if (!isset($selectedParser) || 'Change Parser' === $answer) {
-                        if (count($this->options['parsers']) > 1) {
+                        if (1 < count($this->options['parsers'])) {
                             $question = new ChoiceQuestion(
                                 'Which parser?',
                                 array_keys($this->options['parsers'])
@@ -581,12 +583,12 @@ class Analyze extends Command
 
                     $questions = ['Change Test Suite', 'Change Parser', $justAgentsQuestion, 'Back to Main Menu'];
 
-                    if (count($this->options['tests']) <= 1) {
-                        unset($questions[array_search('Change Test Suite', $questions)]);
+                    if (1 >= count($this->options['tests'])) {
+                        unset($questions[array_search('Change Test Suite', $questions, true)]);
                     }
 
-                    if (count($this->options['parsers']) <= 1) {
-                        unset($questions[array_search('Change Parser', $questions)]);
+                    if (1 >= count($this->options['parsers'])) {
+                        unset($questions[array_search('Change Parser', $questions, true)]);
                     }
 
                     // Re-index
@@ -641,12 +643,12 @@ class Analyze extends Command
                         'Back to Main Menu',
                     ];
 
-                    if (count($this->options['tests']) <= 1) {
-                        unset($questions[array_search('Change Test Suite', $questions)]);
+                    if (1 >= count($this->options['tests'])) {
+                        unset($questions[array_search('Change Test Suite', $questions, true)]);
                     }
 
                     if ('browser' === $section || 'platform' === $section) {
-                        unset($questions[array_search('Change Property', $questions)]);
+                        unset($questions[array_search('Change Property', $questions, true)]);
                     }
 
                     $questions = array_values($questions);
@@ -825,7 +827,7 @@ class Analyze extends Command
                             $row[] = ' ';
                         }
                     } else {
-                        if (isset($compareRow[$parser]) && count($compareRow[$parser]) > 0) {
+                        if (isset($compareRow[$parser]) && 0 < count($compareRow[$parser])) {
                             $key      = current(array_keys($compareRow[$parser]));
                             $quantity = array_shift($compareRow[$parser]);
                             if ('[n/a]' === $expected || $key === $expected || '[n/a]' === $key) {
@@ -911,23 +913,23 @@ class Analyze extends Command
 
     private function colorByPercent(float $percent): string
     {
-        if ($percent >= 100.0) {
+        if (100.0 <= $percent) {
             return '<fg=green;bg=black;options=bold>';
         }
 
-        if ($percent >= 95.0) {
+        if (95.0 <= $percent) {
             return '<fg=green;bg=black>';
         }
 
-        if ($percent >= 90.0) {
+        if (90.0 <= $percent) {
             return '<fg=yellow;bg=black;options=bold>';
         }
 
-        if ($percent >= 85.0) {
+        if (85.0 <= $percent) {
             return '<fg=yellow;bg=black>';
         }
 
-        if ($percent < 50.0) {
+        if (50.0 > $percent) {
             return '<fg=red;bg=black>';
         }
 

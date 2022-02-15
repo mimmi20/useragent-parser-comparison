@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -41,16 +47,14 @@ use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
 
-class Test extends Command
+final class Test extends Command
 {
-    /** @var array */
     private array $tests = [];
 
     private string $testsDir = __DIR__ . '/../../tests';
 
     private string $runDir = __DIR__ . '/../../data/test-runs';
 
-    /** @var array */
     private array $results = [];
 
     protected function configure(): void
@@ -262,7 +266,7 @@ class Test extends Command
             }
 
             $this->tests[$testDir->getFilename()] = [
-                'path'     => $testDir->getPathname(),
+                'path' => $testDir->getPathname(),
                 'metadata' => $metadata,
             ];
         }

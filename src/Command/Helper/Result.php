@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -18,7 +24,7 @@ use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 
-class Result extends Helper
+final class Result extends Helper
 {
     private PDO $pdo;
 
@@ -56,7 +62,7 @@ class Result extends Helper
             $row2 = $dbResultResult;
         } else {
             $row2 = [
-                'provider_id'  => $proId,
+                'provider_id' => $proId,
                 'userAgent_id' => $uaId,
             ];
         }
@@ -83,7 +89,7 @@ class Result extends Helper
         /*
          * Persist
          */
-        if (! isset($row2['resId'])) {
+        if (!isset($row2['resId'])) {
             $row2['resId'] = Uuid::uuid4()->toString();
 
             $statementInsertResult->bindValue(':resId', $row2['resId'], PDO::PARAM_STR);

@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -15,7 +21,7 @@ use function round;
 
 use const JSON_THROW_ON_ERROR;
 
-class UserAgentDetail extends AbstractHtml
+final class UserAgentDetail extends AbstractHtml
 {
     private array $userAgent = [];
 
@@ -33,6 +39,47 @@ class UserAgentDetail extends AbstractHtml
     public function setResults(array $results): void
     {
         $this->results = $results;
+    }
+
+    public function getHtml(): string
+    {
+        $addStr = '';
+        if (null !== $this->userAgent['uaAdditionalHeaders']) {
+            $addHeaders = json_decode($this->userAgent['uaAdditionalHeaders'], true, 512, JSON_THROW_ON_ERROR);
+
+            if (is_array($addHeaders) && 0 < count($addHeaders)) {
+                $addStr = '<br /><strong>Additional headers</strong><br />';
+
+                foreach ($addHeaders as $key => $value) {
+                    $addStr .= '<strong>' . htmlspecialchars($key) . '</strong> ' . htmlspecialchars($value) . '<br />';
+                }
+            }
+        }
+
+        $body = '
+<div class="section">
+    <h1 class="header center orange-text">User agent detail</h1>
+    <div class="row center">
+        <h5 class="header light">
+            ' . htmlspecialchars($this->userAgent['uaString']) . '
+            ' . $addStr . '
+        </h5>
+    </div>
+</div>
+
+<div class="section">
+    ' . $this->getProvidersTable() . '
+</div>
+';
+
+        $script = '
+$(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $(\'.modal-trigger\').leanModal();
+});
+        ';
+
+        return parent::getHtmlCombined($body, $script);
     }
 
     private function getProvidersTable(): string
@@ -285,10 +332,10 @@ class UserAgentDetail extends AbstractHtml
         $html .= '<td>' . number_format(round($result['resMemoryUsed'], 2), 2) . '</td>';
 
         $html .= '<td>
-        
+
 <!-- Modal Trigger -->
 <a class="modal-trigger btn waves-effect waves-light" href="#modal-' . $result['proId'] . '">Detail</a>
-        
+
 <!-- Modal Structure -->
 <div id="modal-' . $result['proId'] . '" class="modal modal-fixed-footer">
     <div class="modal-content">
@@ -299,52 +346,11 @@ class UserAgentDetail extends AbstractHtml
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">close</a>
     </div>
 </div>
-        
+
                 </td>';
 
         $html .= '</tr>';
 
         return $html;
-    }
-
-    public function getHtml(): string
-    {
-        $addStr = '';
-        if (null !== $this->userAgent['uaAdditionalHeaders']) {
-            $addHeaders = json_decode($this->userAgent['uaAdditionalHeaders'], true, 512, JSON_THROW_ON_ERROR);
-
-            if (is_array($addHeaders) && count($addHeaders) > 0) {
-                $addStr = '<br /><strong>Additional headers</strong><br />';
-
-                foreach ($addHeaders as $key => $value) {
-                    $addStr .= '<strong>' . htmlspecialchars($key) . '</strong> ' . htmlspecialchars($value) . '<br />';
-                }
-            }
-        }
-
-        $body = '
-<div class="section">
-    <h1 class="header center orange-text">User agent detail</h1>
-    <div class="row center">
-        <h5 class="header light">
-            ' . htmlspecialchars($this->userAgent['uaString']) . '
-            ' . $addStr . '
-        </h5>
-    </div>
-</div>   
-
-<div class="section">
-    ' . $this->getProvidersTable() . '
-</div>
-';
-
-        $script = '
-$(document).ready(function(){
-    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $(\'.modal-trigger\').leanModal();
-});
-        ';
-
-        return parent::getHtmlCombined($body, $script);
     }
 }

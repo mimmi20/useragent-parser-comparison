@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -14,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function date;
 
-class Compare extends Command
+final class Compare extends Command
 {
     protected function configure(): void
     {
@@ -48,16 +54,16 @@ class Compare extends Command
         if ($file) {
             $command   = $application->find('parse');
             $arguments = [
-                'command'     => 'parse',
-                'file'        => $file,
-                'run'         => $name,
+                'command' => 'parse',
+                'file' => $file,
+                'run' => $name,
                 '--no-output' => true,
             ];
 
             $parseInput = new ArrayInput($arguments);
             $returnCode = $command->run($parseInput, $output);
 
-            if ($returnCode > 0) {
+            if (0 < $returnCode) {
                 $output->writeln('<error>There was an error executing the "parse" command, cannot continue.</error>');
 
                 return $returnCode;
@@ -66,13 +72,13 @@ class Compare extends Command
             $command   = $application->find('test');
             $arguments = [
                 'command' => 'test',
-                'run'     => $name,
+                'run' => $name,
             ];
 
             $testInput  = new ArrayInput($arguments);
             $returnCode = $command->run($testInput, $output);
 
-            if ($returnCode > 0) {
+            if (0 < $returnCode) {
                 $output->writeln('<error>There was an error executing the "test" command, cannot continue.</error>');
 
                 return $returnCode;
@@ -82,13 +88,13 @@ class Compare extends Command
         $command   = $application->find('normalize');
         $arguments = [
             'command' => 'normalize',
-            'run'     => $name,
+            'run' => $name,
         ];
 
         $normalizeInput = new ArrayInput($arguments);
         $returnCode     = $command->run($normalizeInput, $output);
 
-        if ($returnCode > 0) {
+        if (0 < $returnCode) {
             $output->writeln('<error>There was an error executing the "normalize" command, cannot continue.</error>');
 
             return $returnCode;
@@ -97,13 +103,13 @@ class Compare extends Command
         $command   = $application->find('analyze');
         $arguments = [
             'command' => 'analyze',
-            'run'     => $name,
+            'run' => $name,
         ];
 
         $analyzeInput = new ArrayInput($arguments);
         $returnCode   = $command->run($analyzeInput, $output);
 
-        if ($returnCode > 0) {
+        if (0 < $returnCode) {
             $output->writeln('<error>There was an error executing the "analyze" command, cannot continue.</error>');
 
             return $returnCode;

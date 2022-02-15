@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -16,7 +22,7 @@ use UserAgentParserComparison\Command\Helper\Tests;
 use function assert;
 use function is_array;
 
-class InitProvider extends Command
+final class InitProvider extends Command
 {
     private PDO $pdo;
 

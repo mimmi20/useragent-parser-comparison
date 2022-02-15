@@ -1,4 +1,10 @@
 <?php
+/**
+ * This file is part of the diablomedia/useragent-parser-comparison package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
@@ -9,7 +15,7 @@ use PDO;
 use function number_format;
 use function round;
 
-class OverviewProvider extends AbstractHtml
+final class OverviewProvider extends AbstractHtml
 {
     private array $provider;
 
@@ -20,33 +26,108 @@ class OverviewProvider extends AbstractHtml
         $this->title    = $title;
     }
 
-    private function getResult(): array|false
+    public function getHtml(?string $run = null): string
+    {
+        $body = '
+<div class="section">
+    <h1 class="header center orange-text">' . $this->provider['proName'] . ' overview</h1>
+
+    <div class="row center">
+        <h5 class="header light">
+            We took <strong>' . $this->getUserAgentCount($run) . '</strong> different user agents and analyzed them with this provider<br />
+        </h5>
+    </div>
+</div>
+
+<div class="section">
+    ';
+        if ($this->provider['proIsLocal']) {
+            $body .= '<div><span class="material-icons">public_off</span>';
+
+            switch ($this->provider['proLanguage']) {
+                case 'PHP':
+                    $body .= '<span class="material-icons">php</span>';
+                    break;
+                case 'JavaScript':
+                    $body .= '<span class="material-icons">javascript</span>';
+                    break;
+            }
+
+            $body .= '</div>';
+
+            $body .= '<div>';
+            if ($this->provider['proPackageName']) {
+                switch ($this->provider['proLanguage']) {
+                    case 'PHP':
+                        $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+                        break;
+                    case 'JavaScript':
+                        $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+                        break;
+                    default:
+                        $body .= $this->provider['proName'];
+                }
+            } else {
+                $body .= $this->provider['proName'];
+            }
+
+            $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
+            if (null !== $this->provider['proLastReleaseDate']) {
+                $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
+            }
+
+            $body .= '</div>';
+        } elseif ($this->provider['proIsApi']) {
+            $body .= '<div><span class="material-icons">public</span></div>';
+
+            $body .= '<div>';
+            if ($this->provider['proHomepage']) {
+                $body .= '<a href="' . $this->provider['proHomepage'] . '">' . $this->provider['proName'] . '</a>';
+            } else {
+                $body .= $this->provider['proName'];
+            }
+
+            $body .= '</div>';
+        }
+
+        $body .= '
+</div>
+
+<div class="section">
+    ' . $this->getTable() . '
+</div>
+';
+
+        return parent::getHtmlCombined($body);
+    }
+
+    private function getResult(): array | false
     {
         $sql = '
             SELECT
                 SUM(`resResultFound`) AS `resultFound`,
                 SUM(`resResultError`) AS `resultError`,
-            
+
                 COUNT(`resClientName`) AS `clientNameFound`,
                 COUNT(`resClientVersion`) AS `clientVersionFound`,
                 COUNT(`resClientIsBot`) AS `asBotDetected`,
                 COUNT(`resClientType`) AS `clientTypeFound`,
-            
+
                 COUNT(`resEngineName`) AS `engineNameFound`,
                 COUNT(`resEngineVersion`) AS `engineVersionFound`,
-            
+
                 COUNT(`resOsName`) AS `osNameFound`,
                 COUNT(`resOsVersion`) AS `osVersionFound`,
-            
+
                 COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
-            
+
                 COUNT(`resDeviceName`) AS `deviceModelFound`,
-            
+
                 COUNT(`resDeviceType`) AS `deviceTypeFound`,
-            
+
                 COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
                 COUNT(`resDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
-            
+
                 AVG(`resInitTime`) AS `avgInitTime`,
                 AVG(`resParseTime`) AS `avgParseTime`,
                 AVG(`resMemoryUsed`) AS `avgMemoryUsed`
@@ -101,7 +182,7 @@ class OverviewProvider extends AbstractHtml
                     <strong>Not available with this provider</strong>
                 </td>
             </tr>
-                
+
             ';
 
             $html .= '</tbody>';
@@ -524,80 +605,5 @@ class OverviewProvider extends AbstractHtml
         $html .= '</table>';
 
         return $html;
-    }
-
-    public function getHtml(?string $run = null): string
-    {
-        $body = '
-<div class="section">
-    <h1 class="header center orange-text">' . $this->provider['proName'] . ' overview</h1>
-
-    <div class="row center">
-        <h5 class="header light">
-            We took <strong>' . $this->getUserAgentCount($run) . '</strong> different user agents and analyzed them with this provider<br />
-        </h5>
-    </div>
-</div>
-
-<div class="section">
-    ';
-        if ($this->provider['proIsLocal']) {
-            $body .= '<div><span class="material-icons">public_off</span>';
-
-            switch ($this->provider['proLanguage']) {
-                case 'PHP':
-                    $body .= '<span class="material-icons">php</span>';
-                    break;
-                case 'JavaScript':
-                    $body .= '<span class="material-icons">javascript</span>';
-                    break;
-            }
-
-            $body .= '</div>';
-
-            $body .= '<div>';
-            if ($this->provider['proPackageName']) {
-                switch ($this->provider['proLanguage']) {
-                    case 'PHP':
-                        $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
-                        break;
-                    case 'JavaScript':
-                        $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
-                        break;
-                    default:
-                        $body .= $this->provider['proName'];
-                }
-            } else {
-                $body .= $this->provider['proName'];
-            }
-
-            $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
-            if (null !== $this->provider['proLastReleaseDate']) {
-                $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
-            }
-
-            $body .= '</div>';
-        } elseif ($this->provider['proIsApi']) {
-            $body .= '<div><span class="material-icons">public</span></div>';
-
-            $body .= '<div>';
-            if ($this->provider['proHomepage']) {
-                $body .= '<a href="' . $this->provider['proHomepage'] . '">' . $this->provider['proName'] . '</a>';
-            } else {
-                $body .= $this->provider['proName'];
-            }
-
-            $body .= '</div>';
-        }
-
-        $body .= '
-</div>
-
-<div class="section">
-    ' . $this->getTable() . '
-</div>
-';
-
-        return parent::getHtmlCombined($body);
     }
 }
