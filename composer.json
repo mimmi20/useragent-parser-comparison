@@ -20,7 +20,7 @@
         "phpstan/extension-installer": "^1.1.0",
         "phpstan/phpstan": "^1.6.3",
         "phpstan/phpstan-deprecation-rules": "^1.0.0",
-        "vimeo/psalm": "^v4.22.0"
+        "vimeo/psalm": "^v4.23.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
