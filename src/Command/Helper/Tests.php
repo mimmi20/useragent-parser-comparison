@@ -288,7 +288,7 @@ final class Tests extends Helper
                     try {
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
                     } catch (JsonException $e) {
-                        //var_dump($testOutput);
+                        // var_dump($testOutput);
                         var_dump($e);
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f08fd8500cfdd1c0cdd4780daf9245e7",
+    "content-hash": "05511cd3576393304536aca5c7606db9",
     "packages": [
         {
             "name": "sinergi/browser-detector",
@@ -65,10 +65,10 @@
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": true,
-    "prefer-lowest": true,
+    "prefer-lowest": false,
     "platform": {
         "php": "^8.1.0",
-        "composer-runtime-api": "^2.0"
+        "composer-runtime-api": "^2.0.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.2.0"

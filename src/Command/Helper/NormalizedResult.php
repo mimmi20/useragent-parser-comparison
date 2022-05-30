@@ -83,7 +83,7 @@ final class NormalizedResult extends Helper
             $statementInsertResult->execute();
         } else {
             $statementUpdateResult->bindValue(':resNormaId', $dbResultResult['resNormaId'], PDO::PARAM_STR);
-            //$statementUpdateResult->bindValue(':resId', $dbResultResult['result_id'], \PDO::PARAM_STR);
+            // $statementUpdateResult->bindValue(':resId', $dbResultResult['result_id'], \PDO::PARAM_STR);
 
             $statementUpdateResult->bindValue(':resNormaClientName', $singleResult['resClientName'] ?? null);
             $statementUpdateResult->bindValue(':resNormaClientModus', $singleResult['resClientModus'] ?? null);

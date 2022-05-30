@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "aa55bac9f6d84c753e9d187b6a8246c6",
+    "content-hash": "88a8e1e99ee77566a77734164fa61816",
     "packages": [
         {
             "name": "woothee/woothee",
@@ -61,10 +61,10 @@
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": true,
-    "prefer-lowest": true,
+    "prefer-lowest": false,
     "platform": {
         "php": "^8.1.0",
-        "composer-runtime-api": "^2.0"
+        "composer-runtime-api": "^2.0.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.2.0"
