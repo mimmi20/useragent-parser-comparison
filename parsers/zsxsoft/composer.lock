@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e45e491d3f2157683ef67580d6e86971",
+    "content-hash": "e8308b12630245441230f2daa4d85cfe",
     "packages": [
         {
             "name": "zsxsoft/php-useragent",
@@ -59,10 +59,10 @@
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": true,
-    "prefer-lowest": true,
+    "prefer-lowest": false,
     "platform": {
         "php": "^8.1.0",
-        "composer-runtime-api": "^2.0"
+        "composer-runtime-api": "^2.0.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.2.0"

@@ -26,6 +26,7 @@ jobs:
       matrix:
         operating-system:
           - "ubuntu-20.04"
+          - "ubuntu-22.04"
 
         php-version:
           - "8.1"
@@ -38,7 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.18.1"
+        uses: "shivammathur/setup-php@2.19.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "${{ env.PHP_EXTENSIONS }}"
@@ -64,6 +65,7 @@ jobs:
       matrix:
         operating-system:
           - "ubuntu-20.04"
+          - "ubuntu-22.04"
 
         php-version:
           - "8.1"
@@ -76,7 +78,7 @@ jobs:
           fetch-depth: 0
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.18.1"
+        uses: "shivammathur/setup-php@2.19.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "${{ env.PHP_EXTENSIONS }}"
@@ -103,6 +105,7 @@ jobs:
         operating-system:
           - "ubuntu-18.04"
           - "ubuntu-20.04"
+          - "ubuntu-22.04"
 
         php-version:
           - "8.1"
@@ -122,6 +125,14 @@ jobs:
             php-version: "8.2"
             dependencies: "lowest"
             experimental: true
+          - operating-system: "ubuntu-22.04"
+            php-version: "8.2"
+            dependencies: "highest"
+            experimental: true
+          - operating-system: "ubuntu-22.04"
+            php-version: "8.2"
+            dependencies: "lowest"
+            experimental: true
 
     steps:
       - name: "Checkout"
@@ -131,7 +142,7 @@ jobs:
           fetch-depth: 0
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.18.1"
+        uses: "shivammathur/setup-php@2.19.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "${{ env.PHP_EXTENSIONS }}"
@@ -163,6 +174,7 @@ jobs:
       matrix:
         operating-system:
           - "ubuntu-20.04"
+          - "ubuntu-22.04"
 
         php-version:
           - "8.1"
@@ -178,7 +190,7 @@ jobs:
           fetch-depth: 0
 
       - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.18.1"
+        uses: "shivammathur/setup-php@2.19.0"
         with:
           php-version: "${{ matrix.php-version }}"
           extensions: "${{ env.PHP_EXTENSIONS }}"
@@ -210,6 +222,7 @@ jobs:
 #      matrix:
 #        operating-system:
 #          - "ubuntu-20.04"
+#          - "ubuntu-22.04"
 #
 #        php-version:
 #          - "8.1"
@@ -225,7 +238,7 @@ jobs:
 #          fetch-depth: 0
 #
 #      - name: "Install PHP"
-#        uses: "shivammathur/setup-php@2.18.1"
+#        uses: "shivammathur/setup-php@2.19.0"
 #        with:
 #          php-version: "${{ matrix.php-version }}"
 #          extensions: "${{ env.PHP_EXTENSIONS }}"
@@ -255,6 +268,7 @@ jobs:
 #      matrix:
 #        operating-system:
 #          - "ubuntu-20.04"
+#          - "ubuntu-22.04"
 #
 #        php-version:
 #          - "8.1"
@@ -270,7 +284,7 @@ jobs:
 #          fetch-depth: 0
 #
 #      - name: "Install PHP"
-#        uses: "shivammathur/setup-php@2.18.1"
+#        uses: "shivammathur/setup-php@2.19.0"
 #        with:
 #          php-version: "${{ matrix.php-version }}"
 #          extensions: "${{ env.PHP_EXTENSIONS }}"
@@ -302,6 +316,7 @@ jobs:
 #      matrix:
 #        operating-system:
 #          - "ubuntu-20.04"
+#          - "ubuntu-22.04"
 #
 #        php-version:
 #          - "8.1"
@@ -317,7 +332,7 @@ jobs:
 #          fetch-depth: 0
 #
 #      - name: "Install PHP"
-#        uses: "shivammathur/setup-php@2.18.1"
+#        uses: "shivammathur/setup-php@2.19.0"
 #        with:
 #          php-version: "${{ matrix.php-version }}"
 #          extensions: "${{ env.PHP_EXTENSIONS }}"

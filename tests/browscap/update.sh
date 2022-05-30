@@ -11,5 +11,5 @@ command -v "$composer_command" >/dev/null 2>&1 || {
     composer_command="composer.phar"
 }
 
-$composer_command update
+$composer_command update $*
 

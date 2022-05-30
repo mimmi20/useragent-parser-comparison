@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "90ccde2f5631bce8fe5bd3cb0a8777b1",
+    "content-hash": "aac4e42ae3e3f78fd6b8c1a92bc82383",
     "packages": [
         {
             "name": "brick/math",
@@ -55,16 +55,16 @@
         },
         {
             "name": "mimmi20/browscap-helper-source",
-            "version": "3.0.8",
+            "version": "3.0.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/browscap-helper-source.git",
-                "reference": "0b161413688bc7f2eb9dfc5ad2b15de140ed08af"
+                "reference": "484c38c0fe14ca589f26f9c636bc65c8614253d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/browscap-helper-source/zipball/0b161413688bc7f2eb9dfc5ad2b15de140ed08af",
-                "reference": "0b161413688bc7f2eb9dfc5ad2b15de140ed08af",
+                "url": "https://api.github.com/repos/mimmi20/browscap-helper-source/zipball/484c38c0fe14ca589f26f9c636bc65c8614253d6",
+                "reference": "484c38c0fe14ca589f26f9c636bc65c8614253d6",
                 "shasum": ""
             },
             "require": {
@@ -73,9 +73,9 @@
                 "psr/log": "^1.1.4 || ^2.0.0 || ^3.0.0",
                 "psr/simple-cache": "^1.0.1 || ^2.0.0 || ^3.0.0",
                 "ramsey/uuid": "^4.2.3",
-                "symfony/console": "^v6.0.2",
-                "symfony/finder": "^v6.0.2",
-                "symfony/yaml": "^v6.0.2"
+                "symfony/console": "^v6.0.5",
+                "symfony/finder": "^v6.0.3",
+                "symfony/yaml": "^v6.0.3"
             },
             "require-dev": {
                 "browscap/browscap": "^6.0.x-dev",
@@ -86,13 +86,13 @@
                 "ext-json": "*",
                 "ext-pdo": "*",
                 "ext-simplexml": "*",
-                "jaybizzle/crawler-detect": "^v1.2.110",
+                "jaybizzle/crawler-detect": "^v1.2.111",
                 "matomo/device-detector": "dev-master",
                 "mimmi20/browser-detector": "^7.0.2",
-                "mimmi20/coding-standard": "^2.6.2",
-                "mobiledetect/mobiledetectlib": "^2.8.37",
+                "mimmi20/coding-standard": "^2.6.3",
+                "mobiledetect/mobiledetectlib": "^2.8.39",
                 "phpstan/extension-installer": "^1.1.0",
-                "phpstan/phpstan": "^1.4.2",
+                "phpstan/phpstan": "^1.4.10",
                 "phpstan/phpstan-deprecation-rules": "^1.0.0",
                 "sinergi/browser-detector": "^6.1.4",
                 "squizlabs/php_codesniffer": "^3.6.2",
@@ -140,9 +140,9 @@
             "description": "the source interface for the browscap helper",
             "support": {
                 "issues": "https://github.com/mimmi20/browscap-helper-source/issues",
-                "source": "https://github.com/mimmi20/browscap-helper-source/tree/3.0.8"
+                "source": "https://github.com/mimmi20/browscap-helper-source/tree/3.0.12"
             },
-            "time": "2022-01-22T14:08:48+00:00"
+            "time": "2022-03-16T19:34:02+00:00"
         },
         {
             "name": "psr/container",
@@ -436,12 +436,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Ramsey\\Uuid\\": "src/"
-                },
                 "files": [
                     "src/functions.php"
-                ]
+                ],
+                "psr-4": {
+                    "Ramsey\\Uuid\\": "src/"
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -471,16 +471,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v6.0.2",
+            "version": "v6.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "dd434fa8d69325e5d210f63070014d889511fcb3"
+                "reference": "3bebf4108b9e07492a2a4057d207aa5a77d146b1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/dd434fa8d69325e5d210f63070014d889511fcb3",
-                "reference": "dd434fa8d69325e5d210f63070014d889511fcb3",
+                "url": "https://api.github.com/repos/symfony/console/zipball/3bebf4108b9e07492a2a4057d207aa5a77d146b1",
+                "reference": "3bebf4108b9e07492a2a4057d207aa5a77d146b1",
                 "shasum": ""
             },
             "require": {
@@ -546,7 +546,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v6.0.2"
+                "source": "https://github.com/symfony/console/tree/v6.0.5"
             },
             "funding": [
                 {
@@ -562,20 +562,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-12-27T21:05:08+00:00"
+            "time": "2022-02-25T10:48:52+00:00"
         },
         {
             "name": "symfony/finder",
-            "version": "v6.0.2",
+            "version": "v6.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "03d2833e677d48317cac852f9c0287fb048c3c5c"
+                "reference": "8661b74dbabc23223f38c9b99d3f8ade71170430"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/03d2833e677d48317cac852f9c0287fb048c3c5c",
-                "reference": "03d2833e677d48317cac852f9c0287fb048c3c5c",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/8661b74dbabc23223f38c9b99d3f8ade71170430",
+                "reference": "8661b74dbabc23223f38c9b99d3f8ade71170430",
                 "shasum": ""
             },
             "require": {
@@ -607,7 +607,7 @@
             "description": "Finds files and directories via an intuitive fluent interface",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/finder/tree/v6.0.2"
+                "source": "https://github.com/symfony/finder/tree/v6.0.3"
             },
             "funding": [
                 {
@@ -623,7 +623,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-12-20T16:21:45+00:00"
+            "time": "2022-01-26T17:23:29+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -649,12 +649,12 @@
                 }
             },
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Polyfill\\Ctype\\": ""
-                },
                 "files": [
                     "bootstrap.php"
-                ]
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -1041,12 +1041,12 @@
             },
             "type": "library",
             "autoload": {
-                "psr-4": {
-                    "Symfony\\Component\\String\\": ""
-                },
                 "files": [
                     "Resources/functions.php"
                 ],
+                "psr-4": {
+                    "Symfony\\Component\\String\\": ""
+                },
                 "exclude-from-classmap": [
                     "/Tests/"
                 ]
@@ -1096,16 +1096,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v6.0.2",
+            "version": "v6.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "ed602f38b8636a2ea21af760d2578f3d2f92fc60"
+                "reference": "e77f3ea0b21141d771d4a5655faa54f692b34af5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/ed602f38b8636a2ea21af760d2578f3d2f92fc60",
-                "reference": "ed602f38b8636a2ea21af760d2578f3d2f92fc60",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/e77f3ea0b21141d771d4a5655faa54f692b34af5",
+                "reference": "e77f3ea0b21141d771d4a5655faa54f692b34af5",
                 "shasum": ""
             },
             "require": {
@@ -1150,7 +1150,7 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/yaml/tree/v6.0.2"
+                "source": "https://github.com/symfony/yaml/tree/v6.0.3"
             },
             "funding": [
                 {
@@ -1166,7 +1166,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-12-16T22:13:01+00:00"
+            "time": "2022-01-26T17:23:29+00:00"
         }
     ],
     "packages-dev": [],

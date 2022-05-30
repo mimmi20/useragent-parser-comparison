@@ -1,9 +1,9 @@
 {
   "require": {
-    "php": "^8.1.0",
-    "composer-runtime-api": "^2.0",
-    "browscap/browscap": "6.0.x-dev",
-    "mimmi20/browscap-helper-source": "^3.0.8"
+    "browscap/browscap": "6.1.x-dev",
+    "composer-runtime-api": "^2.0.0",
+    "mimmi20/browscap-helper-source": "^3.0.12",
+    "php": "^8.1.0"
   },
   "config": {
     "preferred-install": "dist",

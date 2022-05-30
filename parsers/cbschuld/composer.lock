@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ef7e7b9bb44933bed9fb57fe8dd415a1",
+    "content-hash": "d9d08788e5c69d7e2cecc2ddceda2f02",
     "packages": [
         {
             "name": "cbschuld/browser.php",
@@ -67,10 +67,10 @@
     "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": true,
-    "prefer-lowest": true,
+    "prefer-lowest": false,
     "platform": {
         "php": "^8.1.0",
-        "composer-runtime-api": "^2.0"
+        "composer-runtime-api": "^2.0.0"
     },
     "platform-dev": [],
     "plugin-api-version": "2.2.0"
