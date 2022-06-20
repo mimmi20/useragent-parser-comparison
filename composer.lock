@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4eb1207c1aa5a976ef3aeda31de06d57",
+    "content-hash": "44035328e119541ed810f917fc0666bc",
     "packages": [
         {
             "name": "brick/math",
@@ -2081,16 +2081,16 @@
         },
         {
             "name": "mimmi20/coding-standard",
-            "version": "2.8.1",
+            "version": "2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/coding-standard.git",
-                "reference": "40b001280cecf33a4b605b6db2c11842f9f08c9c"
+                "reference": "05d3336470ed20e991a23cb64c8a6d9c5bd29450"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/coding-standard/zipball/40b001280cecf33a4b605b6db2c11842f9f08c9c",
-                "reference": "40b001280cecf33a4b605b6db2c11842f9f08c9c",
+                "url": "https://api.github.com/repos/mimmi20/coding-standard/zipball/05d3336470ed20e991a23cb64c8a6d9c5bd29450",
+                "reference": "05d3336470ed20e991a23cb64c8a6d9c5bd29450",
                 "shasum": ""
             },
             "require": {
@@ -2098,8 +2098,8 @@
                 "doctrine/coding-standard": "^9.0.0",
                 "friendsofphp/php-cs-fixer": "^3.8.0",
                 "php": "^7.4.3 || ^8.0.0",
-                "slevomat/coding-standard": "^7.2.1",
-                "squizlabs/php_codesniffer": "^3.6.2"
+                "slevomat/coding-standard": "^7.2.1 || ^8.0.0",
+                "squizlabs/php_codesniffer": "^3.7.1"
             },
             "type": "phpcodesniffer-standard",
             "notification-url": "https://packagist.org/downloads/",
@@ -2134,7 +2134,7 @@
                 "issues": "https://github.com/mimmi20/coding-standard/issues",
                 "source": "https://github.com/mimmi20/coding-standard"
             },
-            "time": "2022-05-31T08:28:30+00:00"
+            "time": "2022-06-19T09:21:18+00:00"
         },
         {
             "name": "netresearch/jsonmapper",
@@ -2555,16 +2555,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.5.1",
+            "version": "1.6.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "981cc368a216c988e862a75e526b6076987d1b50"
+                "reference": "4a07085f74cb1f3fc7103efa537d9f00ebb74ec7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/981cc368a216c988e862a75e526b6076987d1b50",
-                "reference": "981cc368a216c988e862a75e526b6076987d1b50",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/4a07085f74cb1f3fc7103efa537d9f00ebb74ec7",
+                "reference": "4a07085f74cb1f3fc7103efa537d9f00ebb74ec7",
                 "shasum": ""
             },
             "require": {
@@ -2574,6 +2574,7 @@
                 "php-parallel-lint/php-parallel-lint": "^1.2",
                 "phpstan/extension-installer": "^1.0",
                 "phpstan/phpstan": "^1.5",
+                "phpstan/phpstan-phpunit": "^1.1",
                 "phpstan/phpstan-strict-rules": "^1.0",
                 "phpunit/phpunit": "^9.5",
                 "symfony/process": "^5.2"
@@ -2593,9 +2594,9 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.5.1"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.6.3"
             },
-            "time": "2022-05-05T11:32:40+00:00"
+            "time": "2022-06-14T11:40:08+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -2984,16 +2985,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.6.2",
+            "version": "3.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a"
+                "reference": "1359e176e9307e906dc3d890bcc9603ff6d90619"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/5e4e71592f69da17871dba6e80dd51bce74a351a",
-                "reference": "5e4e71592f69da17871dba6e80dd51bce74a351a",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/1359e176e9307e906dc3d890bcc9603ff6d90619",
+                "reference": "1359e176e9307e906dc3d890bcc9603ff6d90619",
                 "shasum": ""
             },
             "require": {
@@ -3036,7 +3037,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2021-12-12T21:44:58+00:00"
+            "time": "2022-06-18T07:21:10+00:00"
         },
         {
             "name": "symfony/event-dispatcher",
