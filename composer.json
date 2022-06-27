@@ -18,7 +18,7 @@
         "maglnet/composer-require-checker": "^4.0.0",
         "mimmi20/coding-standard": "^2.9.0",
         "phpstan/extension-installer": "^1.1.0",
-        "phpstan/phpstan": "^1.7.14",
+        "phpstan/phpstan": "^1.7.15",
         "phpstan/phpstan-deprecation-rules": "^1.0.0",
         "vimeo/psalm": "^v4.23.0"
     },
