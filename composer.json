@@ -15,7 +15,7 @@
         "symfony/console": "^v6.1.2"
     },
     "require-dev": {
-        "maglnet/composer-require-checker": "^4.0.0",
+        "maglnet/composer-require-checker": "^4.1.0",
         "mimmi20/coding-standard": "^3.0.0",
         "phpstan/extension-installer": "^1.1.0",
         "phpstan/phpstan": "^1.8.0",
