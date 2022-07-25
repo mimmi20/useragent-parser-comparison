@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "db619872a163259220c6908f62efe1a0",
+    "content-hash": "d831ba5b67e127926ea520b4e38e9215",
     "packages": [
         {
             "name": "brick/math",
@@ -1912,16 +1912,16 @@
         },
         {
             "name": "friendsofphp/php-cs-fixer",
-            "version": "v3.9.4",
+            "version": "v3.9.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/FriendsOfPHP/PHP-CS-Fixer.git",
-                "reference": "093466b1c3ff3e3b469bdbc9827bb2362de6b2fa"
+                "reference": "4465d70ba776806857a1ac2a6f877e582445ff36"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/093466b1c3ff3e3b469bdbc9827bb2362de6b2fa",
-                "reference": "093466b1c3ff3e3b469bdbc9827bb2362de6b2fa",
+                "url": "https://api.github.com/repos/FriendsOfPHP/PHP-CS-Fixer/zipball/4465d70ba776806857a1ac2a6f877e582445ff36",
+                "reference": "4465d70ba776806857a1ac2a6f877e582445ff36",
                 "shasum": ""
             },
             "require": {
@@ -1989,7 +1989,7 @@
             "description": "A tool to automatically fix PHP code style",
             "support": {
                 "issues": "https://github.com/FriendsOfPHP/PHP-CS-Fixer/issues",
-                "source": "https://github.com/FriendsOfPHP/PHP-CS-Fixer/tree/v3.9.4"
+                "source": "https://github.com/FriendsOfPHP/PHP-CS-Fixer/tree/v3.9.5"
             },
             "funding": [
                 {
@@ -1997,7 +1997,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2022-07-15T21:04:49+00:00"
+            "time": "2022-07-22T08:43:51+00:00"
         },
         {
             "name": "maglnet/composer-require-checker",
@@ -2081,22 +2081,22 @@
         },
         {
             "name": "mimmi20/coding-standard",
-            "version": "3.0.1",
+            "version": "3.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/coding-standard.git",
-                "reference": "54c98237419cf38ad8e16431dc7fc94ada908822"
+                "reference": "85fed725e75efa8f270e91fff9c92ec8b052f518"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/coding-standard/zipball/54c98237419cf38ad8e16431dc7fc94ada908822",
-                "reference": "54c98237419cf38ad8e16431dc7fc94ada908822",
+                "url": "https://api.github.com/repos/mimmi20/coding-standard/zipball/85fed725e75efa8f270e91fff9c92ec8b052f518",
+                "reference": "85fed725e75efa8f270e91fff9c92ec8b052f518",
                 "shasum": ""
             },
             "require": {
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7.2",
                 "doctrine/coding-standard": "^9.0.0",
-                "friendsofphp/php-cs-fixer": "^v3.9.4",
+                "friendsofphp/php-cs-fixer": "^v3.9.5",
                 "php": "^8.1.0",
                 "slevomat/coding-standard": "^7.2.1 || ^8.3.0",
                 "squizlabs/php_codesniffer": "^3.7.1"
@@ -2134,7 +2134,7 @@
                 "issues": "https://github.com/mimmi20/coding-standard/issues",
                 "source": "https://github.com/mimmi20/coding-standard"
             },
-            "time": "2022-07-16T18:44:58+00:00"
+            "time": "2022-07-23T09:22:23+00:00"
         },
         {
             "name": "netresearch/jsonmapper",

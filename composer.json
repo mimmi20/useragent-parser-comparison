@@ -16,7 +16,7 @@
     },
     "require-dev": {
         "maglnet/composer-require-checker": "^4.1.0",
-        "mimmi20/coding-standard": "^3.0.1",
+        "mimmi20/coding-standard": "^3.0.2",
         "phpstan/extension-installer": "^1.1.0",
         "phpstan/phpstan": "^1.8.1",
         "phpstan/phpstan-deprecation-rules": "^1.0.0",
