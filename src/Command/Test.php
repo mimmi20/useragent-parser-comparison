@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -90,14 +90,14 @@ final class Test extends Command
         $questions[] = 'All Suites';
 
         $questionHelper = $this->getHelper('question');
-        $question       = new ChoiceQuestion(
+        $question = new ChoiceQuestion(
             'Choose which test suites to run, separate multiple with commas (press enter to use all)',
             $questions,
             count($questions) - 1
         );
         $question->setMultiselect(true);
 
-        $answers       = $questionHelper->ask($input, $output, $question);
+        $answers = $questionHelper->ask($input, $output, $question);
         $selectedTests = [];
 
         foreach ($answers as $name) {
@@ -112,7 +112,7 @@ final class Test extends Command
 
         $output->writeln('Choose which parsers you would like to run this test suite against');
         $parserHelper = $this->getHelper('parsers');
-        $parsers      = $parserHelper->getParsers($input, $output);
+        $parsers = $parserHelper->getParsers($input, $output);
 
         $thisRunName = $input->getArgument('run');
         assert(is_string($thisRunName) || null === $thisRunName);
@@ -121,10 +121,10 @@ final class Test extends Command
             $thisRunName = date('YmdHis');
         }
 
-        $thisRunDir   = $this->runDir . '/' . $thisRunName;
+        $thisRunDir = $this->runDir . '/' . $thisRunName;
         $testFilesDir = $thisRunDir . '/test-files';
-        $resultsDir   = $thisRunDir . '/results';
-        $expectedDir  = $thisRunDir . '/expected';
+        $resultsDir = $thisRunDir . '/results';
+        $expectedDir = $thisRunDir . '/expected';
 
         mkdir($thisRunDir);
         mkdir($testFilesDir);
@@ -139,7 +139,7 @@ final class Test extends Command
             $output->write($message . '<info> building test suite</info>');
             $this->results[$testName] = [];
 
-            $testOutput = trim((string) shell_exec($testData['path'] . '/build.sh'));
+            $testOutput = trim((string)shell_exec($testData['path'] . '/build.sh'));
 
             $output->write("\r" . $message . '<info> writing test suite</info>    ');
 

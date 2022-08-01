@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Html;
 
@@ -21,9 +21,9 @@ final class OverviewProvider extends AbstractHtml
 
     public function __construct(PDO $pdo, array $provider, ?string $title = null)
     {
-        $this->pdo      = $pdo;
+        $this->pdo = $pdo;
         $this->provider = $provider;
-        $this->title    = $title;
+        $this->title = $title;
     }
 
     public function getHtml(?string $run = null): string
@@ -101,7 +101,7 @@ final class OverviewProvider extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
-    private function getResult(): array | false
+    private function getResult(): array|false
     {
         $sql = '
             SELECT

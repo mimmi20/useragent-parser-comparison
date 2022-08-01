@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -66,11 +66,11 @@ final class InitUseragents extends Command
         $statementSelectProvider->execute();
 
         while ($row = $statementSelectProvider->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            $proName    = $row['proName'];
+            $proName = $row['proName'];
             $proVersion = $row['proVersion'];
-            $proId      = $row['proId'];
+            $proId = $row['proId'];
 
-            $message       = sprintf('test suite <fg=yellow>%s</>', $proName);
+            $message = sprintf('test suite <fg=yellow>%s</>', $proName);
             $messageLength = mb_strlen($message);
 
             $output->write("\r" . $message . ' <info>building test suite</info>');
@@ -115,7 +115,7 @@ final class InitUseragents extends Command
             }
 
             $inserted = 0;
-            $updated  = 0;
+            $updated = 0;
 
             foreach ($tests['tests'] as $singleTestData) {
                 $agent = $singleTestData['headers']['user-agent'] ?? null;

@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Compare;
 
@@ -29,7 +29,7 @@ final class Comparison
 
             foreach (array_keys($compareValues) as $compareSubKey) {
                 $expected = $compareValues[$compareSubKey];
-                $actual   = $actualData[$compareKey][$compareSubKey] ?? null;
+                $actual = $actualData[$compareKey][$compareSubKey] ?? null;
 
                 if ((!is_string($expected) && !is_int($expected)) || (!is_string($actual) && !is_int($actual))) {
                     continue;
@@ -74,7 +74,7 @@ final class Comparison
             foreach ($compareValues as $compareSubKey => $pair) {
                 /** @var ValuePairs $pair */
                 $expectedValue = $pair->getExpected() ?? '[n/a]';
-                $actualValue   = $pair->getActual() ?? '[n/a]';
+                $actualValue = $pair->getActual() ?? '[n/a]';
 
                 if (!isset($comparison[$compareKey][$compareSubKey][$expectedValue])) {
                     $comparison[$compareKey][$compareSubKey][$expectedValue] = [
@@ -124,7 +124,7 @@ final class Comparison
             foreach ($compareValues as $compareSubKey => $pair) {
                 /** @var ValuePairs $pair */
                 $expectedValue = $pair->getExpected();
-                $actualValue   = $pair->getActual();
+                $actualValue = $pair->getActual();
 
                 if (null === $expectedValue || null === $actualValue || $expectedValue === $actualValue) {
                     continue;

@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -65,7 +65,7 @@ final class Parse extends Command
         $filename = $input->getArgument('file');
         assert(is_string($filename));
         $normalize = $input->getOption('normalize');
-        $csv       = $input->getOption('csv');
+        $csv = $input->getOption('csv');
 
         $thisRunName = $input->getArgument('run');
         assert(is_string($thisRunName) || null === $thisRunName);
@@ -76,8 +76,8 @@ final class Parse extends Command
 
         if ($csvFile) {
             $noOutput = true;
-            $csv      = true;
-            $csvFile  = (string) $csvFile;
+            $csv = true;
+            $csvFile = (string)$csvFile;
         } elseif ($csv) {
             $output->writeln(
                 '<error>csvFile parameter is required if csv parameter is specified</error>'
@@ -260,7 +260,7 @@ final class Parse extends Command
 
         fputcsv($fp, $input, $delimiter, $enclosure);
         rewind($fp);
-        $data = rtrim((string) stream_get_contents($fp), "\n");
+        $data = rtrim((string)stream_get_contents($fp), "\n");
         fclose($fp);
 
         if ($csvFile) {

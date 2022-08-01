@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
@@ -59,7 +59,7 @@ use const SORT_NATURAL;
 final class Tests extends Helper
 {
     private string $testResultDir = __DIR__ . '/../../../data/test-runs';
-    private string $testDir       = __DIR__ . '/../../../tests';
+    private string $testDir = __DIR__ . '/../../../tests';
 
     public function getName(): string
     {
@@ -68,7 +68,7 @@ final class Tests extends Helper
 
     public function getTest(InputInterface $input, OutputInterface $output): ?string
     {
-        $rows  = [];
+        $rows = [];
         $names = [];
         $tests = [];
 
@@ -110,10 +110,10 @@ final class Tests extends Helper
                 continue;
             }
 
-            $countRows   = max(count($metadata['tests']), count($metadata['parsers']));
-            $testNames   = array_keys($metadata['tests']);
+            $countRows = max(count($metadata['tests']), count($metadata['parsers']));
+            $testNames = array_keys($metadata['tests']);
             $parserNames = array_keys($metadata['parsers']);
-            $valid       = true;
+            $valid = true;
 
             if (0 === $countRows) {
                 $valid = false;
@@ -175,7 +175,7 @@ final class Tests extends Helper
         $table->setRows($rows);
         $table->render();
 
-        $questions    = array_keys($names);
+        $questions = array_keys($names);
         $questionText = 'Select the test run to use';
 
         $question = new ChoiceQuestion(
@@ -215,17 +215,17 @@ final class Tests extends Helper
             }
 
             $language = $metadata['language'] ?? '';
-            $local    = $metadata['local'] ?? false;
-            $api      = $metadata['api'] ?? false;
+            $local = $metadata['local'] ?? false;
+            $api = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
                     case 'PHP':
-                        $metadata['version']      = $this->getVersionPHP($pathName, $metadata['packageName']);
+                        $metadata['version'] = $this->getVersionPHP($pathName, $metadata['packageName']);
                         $metadata['release-date'] = $this->getUpdateDatePHP($pathName, $metadata['packageName']);
                         break;
                     case 'JavaScript':
-                        $metadata['version']      = $this->getVersionJS($pathName, $metadata['packageName']);
+                        $metadata['version'] = $this->getVersionJS($pathName, $metadata['packageName']);
                         $metadata['release-date'] = $this->getUpdateDateJS($pathName, $metadata['packageName']);
                         break;
                     default:
@@ -335,7 +335,7 @@ final class Tests extends Helper
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
+            static fn(array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
         );
 
         if ([] === $filtered) {
@@ -360,7 +360,7 @@ final class Tests extends Helper
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
+            static fn(array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
         );
 
         if ([] === $filtered) {

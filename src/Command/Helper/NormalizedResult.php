@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
@@ -30,8 +30,9 @@ final class NormalizedResult extends Helper
 
     public function storeResult(
         string $resId,
-        array $singleResult
-    ): void {
+        array  $singleResult
+    ): void
+    {
         $statementSelectResult = $this->pdo->prepare('SELECT * FROM `result-normalized` WHERE `result_id` = :resId');
         $statementInsertResult = $this->pdo->prepare('INSERT INTO `result-normalized` (`resNormaId`, `result_id`, `resNormaClientName`, `resNormaClientModus`, `resNormaClientVersion`, `resNormaClientManufacturer`, `resNormaClientBits`, `resNormaEngineName`, `resNormaEngineVersion`, `resNormaEngineManufacturer`, `resNormaOsName`, `resNormaOsMarketingName`, `resNormaOsVersion`, `resNormaOsManufacturer`, `resNormaOsBits`, `resNormaDeviceName`, `resNormaDeviceMarketingName`, `resNormaDeviceManufacturer`, `resNormaDeviceBrand`, `resNormaDeviceDualOrientation`, `resNormaDeviceType`, `resNormaDeviceIsMobile`, `resNormaDeviceSimCount`, `resNormaDeviceDisplayWidth`, `resNormaDeviceDisplayHeight`, `resNormaDeviceDisplayIsTouch`, `resNormaDeviceDisplayType`, `resNormaDeviceDisplaySize`, `resNormaClientIsBot`, `resNormaClientType`) VALUES (:resNormaId, :resId, :resNormaClientName, :resNormaClientModus, :resNormaClientVersion, :resNormaClientManufacturer, :resNormaClientBits, :resNormaEngineName, :resNormaEngineVersion, :resNormaEngineManufacturer, :resNormaOsName, :resNormaOsMarketingName, :resNormaOsVersion, :resNormaOsManufacturer, :resNormaOsBits, :resNormaDeviceName, :resNormaDeviceMarketingName, :resNormaDeviceManufacturer, :resNormaDeviceBrand, :resNormaDeviceDualOrientation, :resNormaDeviceType, :resNormaDeviceIsMobile, :resNormaDeviceSimCount, :resNormaDeviceDisplayWidth, :resNormaDeviceDisplayHeight, :resNormaDeviceDisplayIsTouch, :resNormaDeviceDisplayType, :resNormaDeviceDisplaySize, :resNormaClientIsBot, :resNormaClientType)');
         $statementUpdateResult = $this->pdo->prepare('UPDATE `result-normalized` SET `resNormaClientName` = :resNormaClientName, `resNormaClientModus` = :resNormaClientModus, `resNormaClientVersion` = :resNormaClientVersion, `resNormaClientManufacturer` = :resNormaClientManufacturer, `resNormaClientBits` = :resNormaClientBits, `resNormaEngineName` = :resNormaEngineName, `resNormaEngineVersion` = :resNormaEngineVersion, `resNormaEngineManufacturer` = :resNormaEngineManufacturer, `resNormaOsName` = :resNormaOsName, `resNormaOsMarketingName` = :resNormaOsMarketingName, `resNormaOsVersion` = :resNormaOsVersion, `resNormaOsManufacturer` = :resNormaOsManufacturer, `resNormaOsBits` = :resNormaOsBits, `resNormaDeviceName` = :resNormaDeviceName, `resNormaDeviceMarketingName` = :resNormaDeviceMarketingName, `resNormaDeviceManufacturer` = :resNormaDeviceManufacturer, `resNormaDeviceBrand` = :resNormaDeviceBrand, `resNormaDeviceDualOrientation` = :resNormaDeviceDualOrientation, `resNormaDeviceType` = :resNormaDeviceType, `resNormaDeviceIsMobile` = :resNormaDeviceIsMobile, `resNormaDeviceSimCount` = :resNormaDeviceSimCount, `resNormaDeviceDisplayWidth` = :resNormaDeviceDisplayWidth, `resNormaDeviceDisplayHeight` = :resNormaDeviceDisplayHeight, `resNormaDeviceDisplayIsTouch` = :resNormaDeviceDisplayIsTouch, `resNormaDeviceDisplayType` = :resNormaDeviceDisplayType, `resNormaDeviceDisplaySize` = :resNormaDeviceDisplaySize, `resNormaClientIsBot` = :resNormaClientIsBot, `resNormaClientType` = :resNormaClientType WHERE `resNormaId` = :resNormaId');

@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -156,7 +156,7 @@ final class Normalize extends Command
                     }
 
                     $testName = str_replace('.json', '', $resultFile->getFilename());
-                    $message  = sprintf('%sProcessing results from the <fg=yellow>%s</> test suite... ', '  ', $testName);
+                    $message = sprintf('%sProcessing results from the <fg=yellow>%s</> test suite... ', '  ', $testName);
 
                     $output->write($message . '<info> parsing result</info>');
 
@@ -186,7 +186,7 @@ final class Normalize extends Command
                             $output->writeLn('<error>There was no "parsed" property for the ' . $testName . ' test suite </error>');
                         } else {
                             $result['parsed'] = $this->normalize($result['parsed']);
-                            $normalized[]     = $result;
+                            $normalized[] = $result;
                         }
                     }
 

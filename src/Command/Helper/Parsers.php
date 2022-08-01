@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
@@ -43,8 +43,8 @@ final class Parsers extends Helper
 
     public function getParsers(InputInterface $input, OutputInterface $output, bool $multiple = true): array
     {
-        $rows    = [];
-        $names   = [];
+        $rows = [];
+        $names = [];
         $parsers = [];
 
         foreach (new FilesystemIterator($this->parsersDir) as $parserDir) {
@@ -117,10 +117,10 @@ final class Parsers extends Helper
 
         if (true === $multiple) {
             $questionText = 'Choose which parsers to use, separate multiple with commas (press enter to use all)';
-            $default      = count($questions) - 1;
+            $default = count($questions) - 1;
         } else {
             $questionText = 'Select the parser to use';
-            $default      = null;
+            $default = null;
         }
 
         $question = new ChoiceQuestion(
@@ -133,10 +133,10 @@ final class Parsers extends Helper
             $question->setMultiselect(true);
         }
 
-        $helper  = $this->helperSet->get('question');
+        $helper = $this->helperSet->get('question');
         $answers = $helper->ask($input, $output, $question);
 
-        $answers         = (array) $answers;
+        $answers = (array)$answers;
         $selectedParsers = [];
 
         foreach ($answers as $name) {

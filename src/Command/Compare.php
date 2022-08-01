@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -52,7 +52,7 @@ final class Compare extends Command
         }
 
         if ($file) {
-            $command   = $application->find('parse');
+            $command = $application->find('parse');
             $arguments = [
                 'command' => 'parse',
                 'file' => $file,
@@ -69,13 +69,13 @@ final class Compare extends Command
                 return $returnCode;
             }
         } else {
-            $command   = $application->find('test');
+            $command = $application->find('test');
             $arguments = [
                 'command' => 'test',
                 'run' => $name,
             ];
 
-            $testInput  = new ArrayInput($arguments);
+            $testInput = new ArrayInput($arguments);
             $returnCode = $command->run($testInput, $output);
 
             if (0 < $returnCode) {
@@ -85,14 +85,14 @@ final class Compare extends Command
             }
         }
 
-        $command   = $application->find('normalize');
+        $command = $application->find('normalize');
         $arguments = [
             'command' => 'normalize',
             'run' => $name,
         ];
 
         $normalizeInput = new ArrayInput($arguments);
-        $returnCode     = $command->run($normalizeInput, $output);
+        $returnCode = $command->run($normalizeInput, $output);
 
         if (0 < $returnCode) {
             $output->writeln('<error>There was an error executing the "normalize" command, cannot continue.</error>');
@@ -100,14 +100,14 @@ final class Compare extends Command
             return $returnCode;
         }
 
-        $command   = $application->find('analyze');
+        $command = $application->find('analyze');
         $arguments = [
             'command' => 'analyze',
             'run' => $name,
         ];
 
         $analyzeInput = new ArrayInput($arguments);
-        $returnCode   = $command->run($analyzeInput, $output);
+        $returnCode = $command->run($analyzeInput, $output);
 
         if (0 < $returnCode) {
             $output->writeln('<error>There was an error executing the "analyze" command, cannot continue.</error>');
