@@ -267,100 +267,100 @@ jobs:
       - name: "Run friendsofphp/php-cs-fixer"
         run: "vendor/bin/php-cs-fixer fix --dry-run --format=checkstyle | cs2pr"
 
-  phpcs:
-    name: "Check Coding Standards with PHPCS"
-
-    needs:
-      - "mega-lint"
-      - "php-lint"
-
-    runs-on: "${{ matrix.operating-system }}"
-
-    continue-on-error: false
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        operating-system:
-          - "ubuntu-20.04"
-          - "ubuntu-22.04"
-
-        php-version:
-          - "8.1"
-
-        dependencies:
-          - "highest"
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v3"
-        with:
-          # Disabling shallow clone is recommended for improving relevancy of reporting
-          fetch-depth: 0
-
-      - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.21.1"
-        with:
-          php-version: "${{ matrix.php-version }}"
-          extensions: "${{ env.PHP_EXTENSIONS }}"
-          ini-values: "${{ env.PHP_INI_VALUES }}"
-          coverage: "none"
-          tools: "${{ env.TOOLS }}, cs2pr"
-
-      - name: "Update dependencies with composer"
-        uses: "ramsey/composer-install@v1"
-        with:
-          dependency-versions: "${{ matrix.dependencies }}"
-          composer-options: "${{ env.COMPOSER_OPTIONS }}"
-
-      - name: "Run squizlabs/php_codesniffer"
-        run: "vendor/bin/phpcs --report=checkstyle -q | cs2pr"
-
-  static-code-analysis:
-    name: "Static Code Analysis with PHPStan"
-
-    needs:
-      - "mega-lint"
-      - "php-lint"
-
-    runs-on: "${{ matrix.operating-system }}"
-
-    strategy:
-      fail-fast: false
-
-      matrix:
-        operating-system:
-          - "ubuntu-20.04"
-          - "ubuntu-22.04"
-
-        php-version:
-          - "8.1"
-
-        dependencies:
-          - "highest"
-
-    steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v3"
-        with:
-          # Disabling shallow clone is recommended for improving relevancy of reporting
-          fetch-depth: 0
-
-      - name: "Install PHP"
-        uses: "shivammathur/setup-php@2.21.1"
-        with:
-          php-version: "${{ matrix.php-version }}"
-          extensions: "${{ env.PHP_EXTENSIONS }}"
-          ini-values: "${{ env.PHP_INI_VALUES }}"
-          coverage: "none"
-          tools: "${{ env.TOOLS }}"
-
-      - name: "Update dependencies with composer"
-        uses: "ramsey/composer-install@v1"
-        with:
-          dependency-versions: "${{ matrix.dependencies }}"
-          composer-options: "${{ env.COMPOSER_OPTIONS }}"
-
-      - name: "Run phpstan/phpstan"
-        run: "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress"
+#  phpcs:
+#    name: "Check Coding Standards with PHPCS"
+#
+#    needs:
+#      - "mega-lint"
+#      - "php-lint"
+#
+#    runs-on: "${{ matrix.operating-system }}"
+#
+#    continue-on-error: false
+#
+#    strategy:
+#      fail-fast: false
+#
+#      matrix:
+#        operating-system:
+#          - "ubuntu-20.04"
+#          - "ubuntu-22.04"
+#
+#        php-version:
+#          - "8.1"
+#
+#        dependencies:
+#          - "highest"
+#
+#    steps:
+#      - name: "Checkout"
+#        uses: "actions/checkout@v3"
+#        with:
+#          # Disabling shallow clone is recommended for improving relevancy of reporting
+#          fetch-depth: 0
+#
+#      - name: "Install PHP"
+#        uses: "shivammathur/setup-php@2.21.1"
+#        with:
+#          php-version: "${{ matrix.php-version }}"
+#          extensions: "${{ env.PHP_EXTENSIONS }}"
+#          ini-values: "${{ env.PHP_INI_VALUES }}"
+#          coverage: "none"
+#          tools: "${{ env.TOOLS }}, cs2pr"
+#
+#      - name: "Update dependencies with composer"
+#        uses: "ramsey/composer-install@v1"
+#        with:
+#          dependency-versions: "${{ matrix.dependencies }}"
+#          composer-options: "${{ env.COMPOSER_OPTIONS }}"
+#
+#      - name: "Run squizlabs/php_codesniffer"
+#        run: "vendor/bin/phpcs --report=checkstyle -q | cs2pr"
+#
+#  static-code-analysis:
+#    name: "Static Code Analysis with PHPStan"
+#
+#    needs:
+#      - "mega-lint"
+#      - "php-lint"
+#
+#    runs-on: "${{ matrix.operating-system }}"
+#
+#    strategy:
+#      fail-fast: false
+#
+#      matrix:
+#        operating-system:
+#          - "ubuntu-20.04"
+#          - "ubuntu-22.04"
+#
+#        php-version:
+#          - "8.1"
+#
+#        dependencies:
+#          - "highest"
+#
+#    steps:
+#      - name: "Checkout"
+#        uses: "actions/checkout@v3"
+#        with:
+#          # Disabling shallow clone is recommended for improving relevancy of reporting
+#          fetch-depth: 0
+#
+#      - name: "Install PHP"
+#        uses: "shivammathur/setup-php@2.21.1"
+#        with:
+#          php-version: "${{ matrix.php-version }}"
+#          extensions: "${{ env.PHP_EXTENSIONS }}"
+#          ini-values: "${{ env.PHP_INI_VALUES }}"
+#          coverage: "none"
+#          tools: "${{ env.TOOLS }}"
+#
+#      - name: "Update dependencies with composer"
+#        uses: "ramsey/composer-install@v1"
+#        with:
+#          dependency-versions: "${{ matrix.dependencies }}"
+#          composer-options: "${{ env.COMPOSER_OPTIONS }}"
+#
+#      - name: "Run phpstan/phpstan"
+#        run: "vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress"
