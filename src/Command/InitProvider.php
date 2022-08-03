@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -38,6 +38,9 @@ final class InitProvider extends Command
         $this->setName('init-provider');
     }
 
+    /**
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `provider` WHERE `proName` = :proName AND `proType` = :proType');
@@ -77,56 +80,58 @@ final class InitProvider extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * @param mixed[][] $providerConfig
+     */
     private function insertProvider(
         OutputInterface $output,
-        PDOStatement    $statementSelectProvider,
-        PDOStatement    $statementInsertProvider,
-        PDOStatement    $statementUpdateProvider,
-        string          $type,
-        array           $providerConfig
-    ): void
-    {
-        $proName = $providerConfig['metadata']['name'];
+        PDOStatement $statementSelectProvider,
+        PDOStatement $statementInsertProvider,
+        PDOStatement $statementUpdateProvider,
+        string $type,
+        array $providerConfig
+    ): void {
+        $proName     = $providerConfig['metadata']['name'];
         $proLanguage = $providerConfig['metadata']['language'];
 
         $output->write('writing data for provider <fg=green;options=bold,underscore>' . $proName . '</> [' . $proLanguage . '/' . $type . '] into DB');
 
-        $proHomepage = $providerConfig['metadata']['homepage'];
-        $proVersion = $providerConfig['metadata']['version'] ?? null;
-        $proReleaseDate = $providerConfig['metadata']['release-date'] ?? null;
-        $proPackageName = $providerConfig['metadata']['packageName'];
-        $proIsLocal = $providerConfig['metadata']['local'];
-        $proIsApi = $providerConfig['metadata']['api'];
-        $proIsActive = $providerConfig['metadata']['isActive'] ?? 1;
-        $proCanDetectClientName = $providerConfig['metadata']['detectionCapabilities']['client']['name'];
-        $proCanDetectClientModus = $providerConfig['metadata']['detectionCapabilities']['client']['modus'];
-        $proCanDetectClientVersion = $providerConfig['metadata']['detectionCapabilities']['client']['version'];
-        $proCanDetectClientManufacturer = $providerConfig['metadata']['detectionCapabilities']['client']['manufacturer'];
-        $proCanDetectClientBits = $providerConfig['metadata']['detectionCapabilities']['client']['bits'];
-        $proCanDetectClientIsBot = $providerConfig['metadata']['detectionCapabilities']['client']['isBot'];
-        $proCanDetectClientType = $providerConfig['metadata']['detectionCapabilities']['client']['type'];
-        $proCanDetectEngineName = $providerConfig['metadata']['detectionCapabilities']['renderingEngine']['name'];
-        $proCanDetectEngineVersion = $providerConfig['metadata']['detectionCapabilities']['renderingEngine']['version'];
-        $proCanDetectEngineManufacturer = $providerConfig['metadata']['detectionCapabilities']['renderingEngine']['manufacturer'];
-        $proCanDetectOsName = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['name'];
-        $proCanDetectOsMarketingName = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['marketing-name'];
-        $proCanDetectOsVersion = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['version'];
-        $proCanDetectOsManufacturer = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['manufacturer'];
-        $proCanDetectOsBits = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['bits'];
-        $proCanDetectDeviceName = $providerConfig['metadata']['detectionCapabilities']['device']['name'];
-        $proCanDetectDeviceMarketingName = $providerConfig['metadata']['detectionCapabilities']['device']['marketing-name'];
-        $proCanDetectDeviceManufacturer = $providerConfig['metadata']['detectionCapabilities']['device']['manufacturer'];
-        $proCanDetectDeviceBrand = $providerConfig['metadata']['detectionCapabilities']['device']['brand'];
+        $proHomepage                       = $providerConfig['metadata']['homepage'];
+        $proVersion                        = $providerConfig['metadata']['version'] ?? null;
+        $proReleaseDate                    = $providerConfig['metadata']['release-date'] ?? null;
+        $proPackageName                    = $providerConfig['metadata']['packageName'];
+        $proIsLocal                        = $providerConfig['metadata']['local'];
+        $proIsApi                          = $providerConfig['metadata']['api'];
+        $proIsActive                       = $providerConfig['metadata']['isActive'] ?? 1;
+        $proCanDetectClientName            = $providerConfig['metadata']['detectionCapabilities']['client']['name'];
+        $proCanDetectClientModus           = $providerConfig['metadata']['detectionCapabilities']['client']['modus'];
+        $proCanDetectClientVersion         = $providerConfig['metadata']['detectionCapabilities']['client']['version'];
+        $proCanDetectClientManufacturer    = $providerConfig['metadata']['detectionCapabilities']['client']['manufacturer'];
+        $proCanDetectClientBits            = $providerConfig['metadata']['detectionCapabilities']['client']['bits'];
+        $proCanDetectClientIsBot           = $providerConfig['metadata']['detectionCapabilities']['client']['isBot'];
+        $proCanDetectClientType            = $providerConfig['metadata']['detectionCapabilities']['client']['type'];
+        $proCanDetectEngineName            = $providerConfig['metadata']['detectionCapabilities']['renderingEngine']['name'];
+        $proCanDetectEngineVersion         = $providerConfig['metadata']['detectionCapabilities']['renderingEngine']['version'];
+        $proCanDetectEngineManufacturer    = $providerConfig['metadata']['detectionCapabilities']['renderingEngine']['manufacturer'];
+        $proCanDetectOsName                = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['name'];
+        $proCanDetectOsMarketingName       = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['marketing-name'];
+        $proCanDetectOsVersion             = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['version'];
+        $proCanDetectOsManufacturer        = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['manufacturer'];
+        $proCanDetectOsBits                = $providerConfig['metadata']['detectionCapabilities']['operatingSystem']['bits'];
+        $proCanDetectDeviceName            = $providerConfig['metadata']['detectionCapabilities']['device']['name'];
+        $proCanDetectDeviceMarketingName   = $providerConfig['metadata']['detectionCapabilities']['device']['marketing-name'];
+        $proCanDetectDeviceManufacturer    = $providerConfig['metadata']['detectionCapabilities']['device']['manufacturer'];
+        $proCanDetectDeviceBrand           = $providerConfig['metadata']['detectionCapabilities']['device']['brand'];
         $proCanDetectDeviceDualOrientation = $providerConfig['metadata']['detectionCapabilities']['device']['dual-orientation'];
-        $proCanDetectDeviceType = $providerConfig['metadata']['detectionCapabilities']['device']['type'];
-        $proCanDetectDeviceIsMobile = $providerConfig['metadata']['detectionCapabilities']['device']['isMobile'];
-        $proCanDetectDeviceSimCount = $providerConfig['metadata']['detectionCapabilities']['device']['sim-count'];
-        $proCanDetectDeviceDisplayWidth = $providerConfig['metadata']['detectionCapabilities']['device']['display-width'];
-        $proCanDetectDeviceDisplayHeight = $providerConfig['metadata']['detectionCapabilities']['device']['display-height'];
-        $proCanDetectDeviceDisplayIsTouch = $providerConfig['metadata']['detectionCapabilities']['device']['isTouch'];
-        $proCanDetectDeviceDisplayType = $providerConfig['metadata']['detectionCapabilities']['device']['display-type'];
-        $proCanDetectDeviceDisplaySize = $providerConfig['metadata']['detectionCapabilities']['device']['display-size'];
-        $proCommand = $providerConfig['command'] ?? null;
+        $proCanDetectDeviceType            = $providerConfig['metadata']['detectionCapabilities']['device']['type'];
+        $proCanDetectDeviceIsMobile        = $providerConfig['metadata']['detectionCapabilities']['device']['isMobile'];
+        $proCanDetectDeviceSimCount        = $providerConfig['metadata']['detectionCapabilities']['device']['sim-count'];
+        $proCanDetectDeviceDisplayWidth    = $providerConfig['metadata']['detectionCapabilities']['device']['display-width'];
+        $proCanDetectDeviceDisplayHeight   = $providerConfig['metadata']['detectionCapabilities']['device']['display-height'];
+        $proCanDetectDeviceDisplayIsTouch  = $providerConfig['metadata']['detectionCapabilities']['device']['isTouch'];
+        $proCanDetectDeviceDisplayType     = $providerConfig['metadata']['detectionCapabilities']['device']['display-type'];
+        $proCanDetectDeviceDisplaySize     = $providerConfig['metadata']['detectionCapabilities']['device']['display-size'];
+        $proCommand                        = $providerConfig['command'] ?? null;
 
         $statementSelectProvider->bindValue(':proName', $proName, PDO::PARAM_STR);
         $statementSelectProvider->bindValue(':proType', $type, PDO::PARAM_STR);

@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -65,7 +65,7 @@ final class InitResults extends Command
         $parserHelper = $this->getHelper('parsers');
         assert($parserHelper instanceof Parsers);
 
-        $providers = [];
+        $providers  = [];
         $nameLength = 0;
 
         foreach ($parserHelper->getAllParsers($output) as $parserPath => $parserConfig) {
@@ -79,6 +79,7 @@ final class InitResults extends Command
 
             if (!$proId) {
                 $output->writeln(sprintf('<error>no provider found with name %s</error>', $proName));
+
                 continue;
             }
 
@@ -88,10 +89,10 @@ final class InitResults extends Command
         }
 
         $currenUserAgent = 1;
-        $count = 100;
-        $start = 0;
-        $providerCount = count($providers);
-        $baseMessage = "\r";
+        $count           = 100;
+        $start           = 0;
+        $providerCount   = count($providers);
+        $baseMessage     = "\r";
 
         do {
             $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
@@ -113,7 +114,7 @@ final class InitResults extends Command
                 $message = $baseMessage;
 
                 foreach ($providers as $proName => $provider) {
-                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string)$currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
+                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
 
                     [, $parserConfig, $proId] = $provider;
 
@@ -122,7 +123,7 @@ final class InitResults extends Command
                     if (null === $singleResult) {
                         $message .= 'E';
 
-                        $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string)$currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
+                        $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
 
                         continue;
                     }
@@ -131,11 +132,11 @@ final class InitResults extends Command
 
                     $message .= '.';
 
-                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string)$currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
+                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
                 }
 
                 // display "progress"
-                $output->writeln(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string)$currenUserAgent, 8, ' ', STR_PAD_LEFT) . '   ' . str_pad(' ', $nameLength));
+                $output->writeln(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . '   ' . str_pad(' ', $nameLength));
 
                 ++$currenUserAgent;
             }
@@ -155,6 +156,12 @@ final class InitResults extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * @param mixed[]   $row2
+     * @param mixed[][] $result
+     *
+     * @return mixed[]
+     */
     private function hydrateResult(array $row2, array $result): array
     {
         $toHydrate = [

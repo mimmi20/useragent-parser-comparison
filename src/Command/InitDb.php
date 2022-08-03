@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -31,6 +31,9 @@ final class InitDb extends Command
         $this->setName('init-db');
     }
 
+    /**
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $message = 'initialize database';

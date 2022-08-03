@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
@@ -31,10 +31,15 @@ final class Normalize extends Helper
         return 'normalize';
     }
 
-    public function normalize(array $parsed): array
+    /**
+     * @param mixed[][] $parsed
+     *
+     * @return mixed[]
+     */
+    public function normalizeParsed(array $parsed): array
     {
         $normalized = [];
-        $mappings = [];
+        $mappings   = [];
 
         if (file_exists(self::MAP_FILE)) {
             $mappings = include self::MAP_FILE;
@@ -48,22 +53,23 @@ final class Normalize extends Helper
             }
 
             $normalized[$section] = [];
-            $properties = $parsed[$section];
+            $properties           = $parsed[$section];
 
             foreach ($properties as $key => $value) {
                 if (null === $value) {
                     $normalized[$section][$key] = $value;
+
                     continue;
                 }
 
                 if ('version' === $key) {
-                    $value = $this->truncateVersion(mb_strtolower((string)$value));
+                    $value = $this->truncateVersion(mb_strtolower((string) $value));
                 } elseif (false === $value) {
                     $value = 'false';
                 } elseif (true === $value) {
                     $value = 'true';
                 } else {
-                    $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string)$value));
+                    $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
                 }
 
                 // Special Windows normalization for parsers that don't differntiate the version of windows
@@ -102,7 +108,7 @@ final class Normalize extends Helper
 
     private function truncateVersion(string $version): string
     {
-        $version = str_replace('_', '.', $version);
+        $version      = str_replace('_', '.', $version);
         $versionParts = explode('.', $version);
         $versionParts = array_slice($versionParts, 0, 2);
 

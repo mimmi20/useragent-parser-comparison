@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -40,10 +40,10 @@ final class Benchmark extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $file = $input->getArgument('file');
+        $file       = $input->getArgument('file');
         $iterations = $input->getOption('iterations');
         assert(is_bool($iterations) || is_string($iterations) || null === $iterations);
-        $iterations = (int)$iterations;
+        $iterations = (int) $iterations;
 
         $parserHelper = $this->getHelper('parsers');
         assert($parserHelper instanceof Parsers);
@@ -55,10 +55,10 @@ final class Benchmark extends Command
         $rows = [];
 
         foreach ($parsers as $parserName => $parser) {
-            $initTime = 0;
+            $initTime  = 0;
             $parseTime = 0;
             $totalTime = 0;
-            $memory = 0;
+            $memory    = 0;
 
             $output->writeln('Running against the ' . $parserName . ' parser... ');
 
@@ -66,14 +66,14 @@ final class Benchmark extends Command
             $progress->start();
 
             for ($i = 0; $i < $iterations; ++$i) {
-                $start = microtime(true);
+                $start  = microtime(true);
                 $result = $parser['parse']($file, true);
-                $end = microtime(true) - $start;
+                $end    = microtime(true) - $start;
 
-                $initTime += $result['init_time'];
+                $initTime  += $result['init_time'];
                 $parseTime += $result['parse_time'];
                 $totalTime += $end;
-                $memory += $result['memory_used'];
+                $memory    += $result['memory_used'];
 
                 $progress->advance();
             }
@@ -98,9 +98,9 @@ final class Benchmark extends Command
 
     private function formatBytes(float $bytes, int $precision = 2): string
     {
-        $base = log($bytes, 1024);
+        $base     = log($bytes, 1024);
         $suffixes = ['', 'K', 'M', 'G', 'T'];
 
-        return round(1024 ** ($base - floor($base)), $precision) . ' ' . $suffixes[(int)floor($base)];
+        return round(1024 ** ($base - floor($base)), $precision) . ' ' . $suffixes[(int) floor($base)];
     }
 }

@@ -6,10 +6,11 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
+use Generator;
 use PDO;
 
 use function extension_loaded;
@@ -19,6 +20,7 @@ use function round;
 use function zend_version;
 
 use const PHP_OS;
+use const PHP_VERSION;
 
 final class OverviewGeneral extends AbstractHtml
 {
@@ -104,6 +106,9 @@ final class OverviewGeneral extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
+    /**
+     * @return mixed[]|Generator
+     */
     private function getProviders(?string $run = null): iterable
     {
         $sql = 'SELECT
@@ -166,6 +171,9 @@ final class OverviewGeneral extends AbstractHtml
         yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @return mixed[]|Generator
+     */
     private function getUserAgentPerProviderCount(): iterable
     {
         $statement = $this->pdo->prepare('SELECT
@@ -244,9 +252,11 @@ final class OverviewGeneral extends AbstractHtml
                 switch ($row['proLanguage']) {
                     case 'PHP':
                         $html .= '<span class="material-icons">php</span>';
+
                         break;
                     case 'JavaScript':
                         $html .= '<span class="material-icons">javascript</span>';
+
                         break;
                 }
 
@@ -257,9 +267,11 @@ final class OverviewGeneral extends AbstractHtml
                     switch ($row['proLanguage']) {
                         case 'PHP':
                             $html .= '<a href="https://packagist.org/packages/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>';
+
                             break;
                         case 'JavaScript':
                             $html .= '<a href="https://www.npmjs.com/package/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>';
+
                             break;
                         default:
                             $html .= $row['proName'];

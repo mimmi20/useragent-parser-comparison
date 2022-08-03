@@ -6,10 +6,11 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -25,17 +26,17 @@ use Throwable;
 use function array_pop;
 use function assert;
 use function basename;
-use function file_exists;
-use function is_string;
-use function round;
-use function rtrim;
 use function fclose;
+use function file_exists;
 use function file_put_contents;
 use function fopen;
 use function fputcsv;
+use function is_string;
 use function json_encode;
 use function mkdir;
 use function rewind;
+use function round;
+use function rtrim;
 use function stream_get_contents;
 use function time;
 
@@ -65,7 +66,7 @@ final class Parse extends Command
         $filename = $input->getArgument('file');
         assert(is_string($filename));
         $normalize = $input->getOption('normalize');
-        $csv = $input->getOption('csv');
+        $csv       = $input->getOption('csv');
 
         $thisRunName = $input->getArgument('run');
         assert(is_string($thisRunName) || null === $thisRunName);
@@ -76,8 +77,8 @@ final class Parse extends Command
 
         if ($csvFile) {
             $noOutput = true;
-            $csv = true;
-            $csvFile = (string)$csvFile;
+            $csv      = true;
+            $csvFile  = (string) $csvFile;
         } elseif ($csv) {
             $output->writeln(
                 '<error>csvFile parameter is required if csv parameter is specified</error>'
@@ -143,7 +144,7 @@ final class Parse extends Command
                 }
 
                 if ($normalize) {
-                    $parsed['parsed'] = $normalizeHelper->normalize($parsed['parsed']);
+                    $parsed['parsed'] = $normalizeHelper->normalizeParsed($parsed['parsed']);
                 }
 
                 $rows[] = [
@@ -245,6 +246,8 @@ final class Parse extends Command
     }
 
     /**
+     * @param mixed[][] $input
+     *
      * @throws Exception if cannot open file stream
      */
     private function putcsv(array $input, string $csvFile): string
@@ -260,7 +263,7 @@ final class Parse extends Command
 
         fputcsv($fp, $input, $delimiter, $enclosure);
         rewind($fp);
-        $data = rtrim((string)stream_get_contents($fp), "\n");
+        $data = rtrim((string) stream_get_contents($fp), "\n");
         fclose($fp);
 
         if ($csvFile) {

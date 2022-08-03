@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
@@ -14,6 +14,7 @@ use PDO;
 
 use function date;
 use function htmlspecialchars;
+use function mb_substr;
 use function number_format;
 use function round;
 
@@ -27,7 +28,7 @@ abstract class AbstractHtml
 
     public function __construct(PDO $pdo, ?string $title = null)
     {
-        $this->pdo = $pdo;
+        $this->pdo   = $pdo;
         $this->title = $title;
     }
 
@@ -61,11 +62,11 @@ abstract class AbstractHtml
                     <circle class="donut-ring"></circle>
                     ';
         if (null !== $resultFound2) {
-            $html .= '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . ($this->calculatePercent($resultFound2, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . '"></circle>
+            $html .= '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . ' ' . 100 - $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . '"></circle>
                     ';
         }
 
-        $html .= '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . ($this->calculatePercent($resultFound, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '"></circle>
+        $html .= '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . ' ' . 100 - $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '"></circle>
                     <g class="donut-text">
 
                         <text y="50%" transform="translate(0, 2)">
@@ -86,7 +87,7 @@ abstract class AbstractHtml
 
     protected function getUserAgentUrl(string $uaId): string
     {
-        $url = '../../user-agent-detail/' . mb_substr($uaId, 0, 2) . '/' . mb_substr($uaId, 2, 2);
+        $url  = '../../user-agent-detail/' . mb_substr($uaId, 0, 2) . '/' . mb_substr($uaId, 2, 2);
         $url .= '/' . $uaId . '.html';
 
         return $url;

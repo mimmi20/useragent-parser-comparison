@@ -6,12 +6,13 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use FilesystemIterator;
+use Generator;
 use JsonException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
@@ -59,7 +60,7 @@ use const SORT_NATURAL;
 final class Tests extends Helper
 {
     private string $testResultDir = __DIR__ . '/../../../data/test-runs';
-    private string $testDir = __DIR__ . '/../../../tests';
+    private string $testDir       = __DIR__ . '/../../../tests';
 
     public function getName(): string
     {
@@ -68,7 +69,7 @@ final class Tests extends Helper
 
     public function getTest(InputInterface $input, OutputInterface $output): ?string
     {
-        $rows = [];
+        $rows  = [];
         $names = [];
         $tests = [];
 
@@ -83,6 +84,7 @@ final class Tests extends Helper
 
             if (!file_exists($pathName . '/metadata.json')) {
                 $output->writeln('<error>metadata file for test in ' . $pathName . ' does not exist</error>');
+
                 continue;
             }
 
@@ -103,17 +105,19 @@ final class Tests extends Helper
                     $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Throwable $e) {
                     $output->writeln('<error>An error occured while parsing metadata for test ' . $pathName . '</error>');
+
                     continue;
                 }
             } catch (Throwable $e) {
                 $output->writeln('<error>Could not read metadata file for test in ' . $pathName . '</error>');
+
                 continue;
             }
 
-            $countRows = max(count($metadata['tests']), count($metadata['parsers']));
-            $testNames = array_keys($metadata['tests']);
+            $countRows   = max(count($metadata['tests']), count($metadata['parsers']));
+            $testNames   = array_keys($metadata['tests']);
             $parserNames = array_keys($metadata['parsers']);
-            $valid = true;
+            $valid       = true;
 
             if (0 === $countRows) {
                 $valid = false;
@@ -175,7 +179,7 @@ final class Tests extends Helper
         $table->setRows($rows);
         $table->render();
 
-        $questions = array_keys($names);
+        $questions    = array_keys($names);
         $questionText = 'Select the test run to use';
 
         $question = new ChoiceQuestion(
@@ -190,6 +194,11 @@ final class Tests extends Helper
         return $names[$answer];
     }
 
+    /**
+     * @return mixed[]|Generator
+     *
+     * @throws JsonException
+     */
     public function collectTests(OutputInterface $output, ?string $thisRunDir): iterable
     {
         $expectedDir = null === $thisRunDir ? null : $thisRunDir . '/expected';
@@ -215,18 +224,20 @@ final class Tests extends Helper
             }
 
             $language = $metadata['language'] ?? '';
-            $local = $metadata['local'] ?? false;
-            $api = $metadata['api'] ?? false;
+            $local    = $metadata['local'] ?? false;
+            $api      = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
                     case 'PHP':
-                        $metadata['version'] = $this->getVersionPHP($pathName, $metadata['packageName']);
+                        $metadata['version']      = $this->getVersionPHP($pathName, $metadata['packageName']);
                         $metadata['release-date'] = $this->getUpdateDatePHP($pathName, $metadata['packageName']);
+
                         break;
                     case 'JavaScript':
-                        $metadata['version'] = $this->getVersionJS($pathName, $metadata['packageName']);
+                        $metadata['version']      = $this->getVersionJS($pathName, $metadata['packageName']);
                         $metadata['release-date'] = $this->getUpdateDateJS($pathName, $metadata['packageName']);
+
                         break;
                     default:
                         $output->writeln('<error>could not detect version and release date for testsuite ' . $testDir->getFilename() . '</error>');
@@ -240,18 +251,22 @@ final class Tests extends Helper
                     switch ($testName) {
                         case 'browser-detector':
                             $command = 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php';
+
                             break;
                         case 'crawler-detect':
                             $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
+
                             break;
                         default:
                             $command = 'php ' . $pathName . '/scripts/build.php';
+
                             break;
                     }
 
                     break;
                 case 'JavaScript':
                     $command = 'php ' . $pathName . '/scripts/build.php';
+
                     break;
                 default:
                     continue 2;
@@ -335,7 +350,7 @@ final class Tests extends Helper
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn(array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
+            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
         );
 
         if ([] === $filtered) {
@@ -360,7 +375,7 @@ final class Tests extends Helper
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn(array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
+            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
         );
 
         if ([] === $filtered) {

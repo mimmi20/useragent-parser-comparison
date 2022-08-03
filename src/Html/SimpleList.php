@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
@@ -15,8 +15,12 @@ use function htmlspecialchars;
 
 final class SimpleList extends AbstractHtml
 {
+    /** @var string[][] */
     private array $elements = [];
 
+    /**
+     * @param string[][] $elements
+     */
     public function setElements(array $elements): void
     {
         $this->elements = $elements;

@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -28,7 +28,6 @@ use function shell_exec;
 use function sprintf;
 use function str_pad;
 use function trim;
-use function var_dump;
 
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -50,6 +49,11 @@ final class InitUseragents extends Command
         $this->setName('init-useragents');
     }
 
+    /**
+     * @throws JsonException
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `test-provider`');
@@ -66,11 +70,11 @@ final class InitUseragents extends Command
         $statementSelectProvider->execute();
 
         while ($row = $statementSelectProvider->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            $proName = $row['proName'];
+            $proName    = $row['proName'];
             $proVersion = $row['proVersion'];
-            $proId = $row['proId'];
+            $proId      = $row['proId'];
 
-            $message = sprintf('test suite <fg=yellow>%s</>', $proName);
+            $message       = sprintf('test suite <fg=yellow>%s</>', $proName);
             $messageLength = mb_strlen($message);
 
             $output->write("\r" . $message . ' <info>building test suite</info>');
@@ -101,29 +105,30 @@ final class InitUseragents extends Command
                 $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
             } catch (JsonException $e) {
                 // var_dump($testOutput);
-                var_dump($e->getMessage());
+                //var_dump($e->getMessage());
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! json_decode failed.</error>');
 
                 continue;
             }
 
-            if (null === $tests['tests'] || !is_array($tests['tests']) || [] === $tests['tests']) {
-                var_dump($testOutput);
+            if (!is_array($tests['tests']) || [] === $tests['tests']) {
+                //var_dump($testOutput);
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! No tests were found.</error>');
 
                 continue;
             }
 
             $inserted = 0;
-            $updated = 0;
+            $updated  = 0;
 
             foreach ($tests['tests'] as $singleTestData) {
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if (null === $agent) {
-                    var_dump($singleTestData);
-                    exit;
+                    //var_dump($singleTestData);
+                    //exit;
                     $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $proName . '.</error>');
+
                     continue;
                 }
 

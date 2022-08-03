@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 chdir(dirname(__DIR__));

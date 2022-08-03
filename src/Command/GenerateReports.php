@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
@@ -37,7 +37,7 @@ final class GenerateReports extends Command
 
     public function __construct(PDO $pdo, string $version)
     {
-        $this->pdo = $pdo;
+        $this->pdo     = $pdo;
         $this->version = $version;
 
         parent::__construct();
@@ -84,7 +84,7 @@ final class GenerateReports extends Command
         file_put_contents($basePath . '/index.html', $generate->getHtml($version, $thisRunName));
         $output->writeln("\r" . 'generate general overview page <info>done</info>');
 
-        $baseMessage = 'generate overview page and found pages for';
+        $baseMessage   = 'generate overview page and found pages for';
         $messageLength = 0;
 
         $output->write($baseMessage . ' each provider ...');
@@ -92,7 +92,7 @@ final class GenerateReports extends Command
         $statementSelectProvider->execute();
 
         while ($dbResultProvider = $statementSelectProvider->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-            $message = $baseMessage . sprintf(' provider <fg=yellow>%s</> ', $dbResultProvider['proName']);
+            $message       = $baseMessage . sprintf(' provider <fg=yellow>%s</> ', $dbResultProvider['proName']);
             $messageLength = max($messageLength, mb_strlen($message));
 
             $output->write("\r" . str_pad($message, $messageLength));
@@ -111,7 +111,7 @@ final class GenerateReports extends Command
              * detected - browserNames
              */
             if ($dbResultProvider['proCanDetectClientName']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resClientName` AS `name`,
                 `uaId`,
@@ -140,7 +140,7 @@ final class GenerateReports extends Command
              * detected - renderingEngines
              */
             if ($dbResultProvider['proCanDetectEngineName']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resEngineName` AS `name`,
                 `uaId`,
@@ -169,7 +169,7 @@ final class GenerateReports extends Command
              * detected - OSnames
              */
             if ($dbResultProvider['proCanDetectOsName']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resOsName` AS `name`,
                 `uaId`,
@@ -198,7 +198,7 @@ final class GenerateReports extends Command
              * detected - deviceBrand
              */
             if ($dbResultProvider['proCanDetectDeviceBrand']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resDeviceBrand` AS `name`,
                 `uaId`,
@@ -227,7 +227,7 @@ final class GenerateReports extends Command
              * detected - deviceModel
              */
             if ($dbResultProvider['proCanDetectDeviceName']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resDeviceName` AS `name`,
                 `uaId`,
@@ -256,7 +256,7 @@ final class GenerateReports extends Command
              * detected - deviceTypes
              */
             if ($dbResultProvider['proCanDetectDeviceType']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resDeviceType` AS `name`,
                 `uaId`,
@@ -285,7 +285,7 @@ final class GenerateReports extends Command
              * detected - bots
              */
             if ($dbResultProvider['proCanDetectClientIsBot']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resClientName` AS `name`,
                 `uaId`,
@@ -314,7 +314,7 @@ final class GenerateReports extends Command
              * detected - botTypes
              */
             if ($dbResultProvider['proCanDetectClientType']) {
-                $sql = '
+                $sql       = '
             SELECT
                 `resClientType` AS `name`,
                 `uaId`,
@@ -347,7 +347,7 @@ final class GenerateReports extends Command
             /*
              * no result found
              */
-            $sql = '
+            $sql       = '
         SELECT
             `result`.`resClientName` AS `name`,
             `userAgent`.`uaId`,
@@ -384,7 +384,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectClientName']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
                 `found-results`.`resClientName` AS `name`,
                 `userAgent`.`uaId`,
@@ -439,7 +439,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectEngineName']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
                 `found-results`.`resEngineName` AS `name`,
                 `userAgent`.`uaId`,
@@ -494,7 +494,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectOsName']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
                 `found-results`.`resOsName` AS `name`,
                 `userAgent`.`uaId`,
@@ -549,7 +549,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceBrand']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceBrand` AS `name`,
                 `userAgent`.`uaId`,
@@ -604,7 +604,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceName']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceName` AS `name`,
                 `userAgent`.`uaId`,
@@ -659,7 +659,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceType']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceType` AS `name`,
                 `userAgent`.`uaId`,
@@ -714,7 +714,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectDeviceIsMobile']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
                 `found-results`.`resClientName` AS `name`,
                 `userAgent`.`uaId`,
@@ -760,7 +760,7 @@ final class GenerateReports extends Command
             if ($dbResultProvider['proCanDetectClientIsBot']) {
                 echo '.';
 
-                $sql = '
+                $sql       = '
             SELECT
             	`found-results`.`resClientName` AS `name`,
             	`userAgent`.`uaId`,
@@ -809,7 +809,7 @@ final class GenerateReports extends Command
 
             echo '.';
 
-            $sql = '
+            $sql       = '
         SELECT
             `found-results`.`resClientType` AS `name`,
             `userAgent`.`uaId`,

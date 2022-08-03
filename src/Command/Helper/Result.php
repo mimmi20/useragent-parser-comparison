@@ -6,11 +6,12 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
+declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
+use JsonException;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
@@ -38,15 +39,19 @@ final class Result extends Helper
         return 'result';
     }
 
+    /**
+     * @param mixed[] $singleResult
+     *
+     * @throws JsonException
+     */
     public function storeResult(
-        string  $name,
-        string  $proId,
-        string  $uaId,
-        array   $singleResult,
+        string $name,
+        string $proId,
+        string $uaId,
+        array $singleResult,
         ?string $version = null,
         ?string $resFilename = null
-    ): void
-    {
+    ): void {
         $statementSelectResult = $this->pdo->prepare('SELECT * FROM `result` WHERE `provider_id` = :proId AND `userAgent_id` = :uaId AND `run` = :run');
         $statementInsertResult = $this->pdo->prepare('INSERT INTO `result` (`run`, `provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resResultError`, `resClientName`, `resClientModus`, `resClientVersion`, `resClientManufacturer`, `resClientBits`, `resEngineName`, `resEngineVersion`, `resEngineManufacturer`, `resOsName`, `resOsMarketingName`, `resOsVersion`, `resOsManufacturer`, `resOsBits`, `resDeviceName`, `resDeviceMarketingName`, `resDeviceManufacturer`, `resDeviceBrand`, `resDeviceDualOrientation`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceSimCount`, `resDeviceDisplayWidth`, `resDeviceDisplayHeight`, `resDeviceDisplayIsTouch`, `resDeviceDisplayType`, `resDeviceDisplaySize`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:run, :proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resResultError, :resClientName, :resClientModus, :resClientVersion, :resClientManufacturer, :resClientBits, :resEngineName, :resEngineVersion, :resEngineManufacturer, :resOsName, :resOsMarketingName, :resOsVersion, :resOsManufacturer, :resOsBits, :resDeviceName, :resDeviceMarketingName, :resDeviceManufacturer, :resDeviceBrand, :resDeviceDualOrientation, :resDeviceType, :resDeviceIsMobile, :resDeviceSimCount, :resDeviceDisplayWidth, :resDeviceDisplayHeight, :resDeviceDisplayIsTouch, :resDeviceDisplayType, :resDeviceDisplaySize, :resClientIsBot, :resClientType, :resRawResult)');
         $statementUpdateResult = $this->pdo->prepare('UPDATE `result` SET `resProviderVersion` = :resProviderVersion, `resFilename` = :resFilename, `resParseTime` = :resParseTime, `resInitTime` = :resInitTime, `resMemoryUsed` = :resMemoryUsed, `resLastChangeDate` = :resLastChangeDate, `resResultFound` = :resResultFound, `resResultError` = :resResultError, `resClientName` = :resClientName, `resClientModus` = :resClientModus, `resClientVersion` = :resClientVersion, `resClientManufacturer` = :resClientManufacturer, `resClientBits` = :resClientBits, `resEngineName` = :resEngineName, `resEngineVersion` = :resEngineVersion, `resEngineManufacturer` = :resEngineManufacturer, `resOsName` = :resOsName, `resOsMarketingName` = :resOsMarketingName, `resOsVersion` = :resOsVersion, `resOsManufacturer` = :resOsManufacturer, `resOsBits` = :resOsBits, `resDeviceName` = :resDeviceName, `resDeviceMarketingName` = :resDeviceMarketingName, `resDeviceManufacturer` = :resDeviceManufacturer, `resDeviceBrand` = :resDeviceBrand, `resDeviceDualOrientation` = :resDeviceDualOrientation, `resDeviceType` = :resDeviceType, `resDeviceIsMobile` = :resDeviceIsMobile, `resDeviceSimCount` = :resDeviceSimCount, `resDeviceDisplayWidth` = :resDeviceDisplayWidth, `resDeviceDisplayHeight` = :resDeviceDisplayHeight, `resDeviceDisplayIsTouch` = :resDeviceDisplayIsTouch, `resDeviceDisplayType` = :resDeviceDisplayType, `resDeviceDisplaySize` = :resDeviceDisplaySize, `resClientIsBot` = :resClientIsBot, `resClientType` = :resClientType, `resRawResult` = :resRawResult WHERE `resId` = :resId');
@@ -69,17 +74,17 @@ final class Result extends Helper
         }
 
         $row2['resProviderVersion'] = $singleResult['version'] ?? $version;
-        $row2['resParseTime'] = $singleResult['parse_time'] ?? null;
-        $row2['resInitTime'] = $singleResult['init_time'] ?? null;
-        $row2['resMemoryUsed'] = $singleResult['memory_used'] ?? null;
-        $date = new DateTimeImmutable('now');
-        $row2['resLastChangeDate'] = $date->format('Y-m-d H:i:s');
+        $row2['resParseTime']       = $singleResult['parse_time'] ?? null;
+        $row2['resInitTime']        = $singleResult['init_time'] ?? null;
+        $row2['resMemoryUsed']      = $singleResult['memory_used'] ?? null;
+        $date                       = new DateTimeImmutable('now');
+        $row2['resLastChangeDate']  = $date->format('Y-m-d H:i:s');
 
         /*
          * Hydrate the result
          */
-        $row2['resResultFound'] = (int)isset($singleResult['result']['parsed']);
-        $row2['resResultError'] = (int)isset($singleResult['result']['err']);
+        $row2['resResultFound'] = (int) isset($singleResult['result']['parsed']);
+        $row2['resResultError'] = (int) isset($singleResult['result']['err']);
 
         if ($row2['resResultFound']) {
             $row2 = $this->hydrateResult($row2, $singleResult['result']['parsed']);
@@ -192,6 +197,12 @@ final class Result extends Helper
         }
     }
 
+    /**
+     * @param mixed[]   $row2
+     * @param mixed[][] $result
+     *
+     * @return mixed[]
+     */
     private function hydrateResult(array $row2, array $result): array
     {
         $toHydrate = [
