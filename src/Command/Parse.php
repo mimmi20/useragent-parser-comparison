@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -25,17 +26,17 @@ use Throwable;
 use function array_pop;
 use function assert;
 use function basename;
-use function file_exists;
-use function is_string;
-use function round;
-use function rtrim;
 use function fclose;
+use function file_exists;
 use function file_put_contents;
 use function fopen;
 use function fputcsv;
+use function is_string;
 use function json_encode;
 use function mkdir;
 use function rewind;
+use function round;
+use function rtrim;
 use function stream_get_contents;
 use function time;
 
@@ -143,7 +144,7 @@ final class Parse extends Command
                 }
 
                 if ($normalize) {
-                    $parsed['parsed'] = $normalizeHelper->normalize($parsed['parsed']);
+                    $parsed['parsed'] = $normalizeHelper->normalizeParsed($parsed['parsed']);
                 }
 
                 $rows[] = [
@@ -245,6 +246,8 @@ final class Parse extends Command
     }
 
     /**
+     * @param mixed[][] $input
+     *
      * @throws Exception if cannot open file stream
      */
     private function putcsv(array $input, string $csvFile): string

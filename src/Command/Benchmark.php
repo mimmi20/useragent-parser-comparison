@@ -70,10 +70,10 @@ final class Benchmark extends Command
                 $result = $parser['parse']($file, true);
                 $end    = microtime(true) - $start;
 
-                $initTime += $result['init_time'];
+                $initTime  += $result['init_time'];
                 $parseTime += $result['parse_time'];
                 $totalTime += $end;
-                $memory += $result['memory_used'];
+                $memory    += $result['memory_used'];
 
                 $progress->advance();
             }

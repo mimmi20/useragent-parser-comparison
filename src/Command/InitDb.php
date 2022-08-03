@@ -31,6 +31,9 @@ final class InitDb extends Command
         $this->setName('init-db');
     }
 
+    /**
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $message = 'initialize database';

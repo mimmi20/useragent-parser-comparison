@@ -17,8 +17,12 @@ use function round;
 
 final class OverviewProvider extends AbstractHtml
 {
+    /** @var string[] */
     private array $provider;
 
+    /**
+     * @param string[] $provider
+     */
     public function __construct(PDO $pdo, array $provider, ?string $title = null)
     {
         $this->pdo      = $pdo;
@@ -47,9 +51,11 @@ final class OverviewProvider extends AbstractHtml
             switch ($this->provider['proLanguage']) {
                 case 'PHP':
                     $body .= '<span class="material-icons">php</span>';
+
                     break;
                 case 'JavaScript':
                     $body .= '<span class="material-icons">javascript</span>';
+
                     break;
             }
 
@@ -60,9 +66,11 @@ final class OverviewProvider extends AbstractHtml
                 switch ($this->provider['proLanguage']) {
                     case 'PHP':
                         $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+
                         break;
                     case 'JavaScript':
                         $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
+
                         break;
                     default:
                         $body .= $this->provider['proName'];
@@ -101,6 +109,9 @@ final class OverviewProvider extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
+    /**
+     * @return false|mixed[]
+     */
     private function getResult(): array | false
     {
         $sql = '

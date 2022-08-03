@@ -10,6 +10,8 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
+use JsonException;
+
 use function array_key_exists;
 use function count;
 use function htmlspecialchars;
@@ -23,24 +25,31 @@ use const JSON_THROW_ON_ERROR;
 
 final class UserAgentDetail extends AbstractHtml
 {
+    /** @var string[] */
     private array $userAgent = [];
 
-    /** @var array[] */
+    /** @var mixed[][] */
     private array $results = [];
 
+    /**
+     * @param string[] $userAgent
+     */
     public function setUserAgent(array $userAgent): void
     {
         $this->userAgent = $userAgent;
     }
 
     /**
-     * @param array[] $results
+     * @param mixed[][] $results
      */
     public function setResults(array $results): void
     {
         $this->results = $results;
     }
 
+    /**
+     * @throws JsonException
+     */
     public function getHtml(): string
     {
         $addStr = '';
@@ -160,6 +169,9 @@ $(document).ready(function(){
         return $html;
     }
 
+    /**
+     * @param mixed[] $result
+     */
     private function getRow(array $result): string
     {
         $html = '<tr>';
@@ -172,9 +184,11 @@ $(document).ready(function(){
             switch ($result['proLanguage']) {
                 case 'PHP':
                     $html .= '<span class="material-icons">php</span>';
+
                     break;
                 case 'JavaScript':
                     $html .= '<span class="material-icons">javascript</span>';
+
                     break;
             }
 
@@ -185,9 +199,11 @@ $(document).ready(function(){
                 switch ($result['proLanguage']) {
                     case 'PHP':
                         $html .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
+
                         break;
                     case 'JavaScript':
                         $html .= '<a href="https://www.npmjs.com/package/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
+
                         break;
                     default:
                         $html .= $result['proName'];

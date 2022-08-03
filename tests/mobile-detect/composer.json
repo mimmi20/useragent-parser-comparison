@@ -3,13 +3,14 @@
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0.0",
     "mobiledetect/mobiledetectlib": "^2.8.39",
-    "mimmi20/browscap-helper-source": "^3.0.12"
+    "mimmi20/browscap-helper-source": "^3.0.14"
   },
   "config": {
     "preferred-install": {
       "mobiledetect/mobiledetectlib": "source",
       "*": "dist"
     },
+    "lock": false,
     "sort-packages": true
   },
   "minimum-stability": "stable",

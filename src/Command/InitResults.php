@@ -79,6 +79,7 @@ final class InitResults extends Command
 
             if (!$proId) {
                 $output->writeln(sprintf('<error>no provider found with name %s</error>', $proName));
+
                 continue;
             }
 
@@ -155,6 +156,12 @@ final class InitResults extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * @param mixed[]   $row2
+     * @param mixed[][] $result
+     *
+     * @return mixed[]
+     */
     private function hydrateResult(array $row2, array $result): array
     {
         $toHydrate = [

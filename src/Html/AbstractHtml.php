@@ -14,6 +14,7 @@ use PDO;
 
 use function date;
 use function htmlspecialchars;
+use function mb_substr;
 use function number_format;
 use function round;
 
@@ -61,11 +62,11 @@ abstract class AbstractHtml
                     <circle class="donut-ring"></circle>
                     ';
         if (null !== $resultFound2) {
-            $html .=    '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . ($this->calculatePercent($resultFound2, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . '"></circle>
+            $html .= '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . ' ' . 100 - $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . '"></circle>
                     ';
         }
 
-        $html .=    '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . ($this->calculatePercent($resultFound, $countOfUseragents / 100, 2)) . ' ' . 100 - $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '"></circle>
+        $html .= '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . ' ' . 100 - $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '"></circle>
                     <g class="donut-text">
 
                         <text y="50%" transform="translate(0, 2)">

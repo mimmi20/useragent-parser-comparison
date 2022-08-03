@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files
-  psalm-version="3.4.9@aa0efcf026e353ce2a4b66c4d3d81caebbf0966a"
-  php-version="
+    psalm-version="3.4.9@aa0efcf026e353ce2a4b66c4d3d81caebbf0966a"
+    php-version="
     php:7.2.19;
     apc:5.1.8;
     apcu:5.1.8;
@@ -74,59 +74,59 @@
     zlib:7.2.19
   "
 >
-  <file src="src/Command/Analyze.php">
-    <InvalidArrayOffset occurrences="2">
-      <code>$questions[array_search('Change Test Suite', $questions)]</code>
-      <code>$questions[array_search('Change Test Suite', $questions)]</code>
-    </InvalidArrayOffset>
-    <PossiblyInvalidArrayOffset occurrences="2">
-      <code>$questions[array_search('Change Parser', $questions)]</code>
-      <code>$questions[array_search('Change Property', $questions)]</code>
-    </PossiblyInvalidArrayOffset>
-    <PropertyNotSetInConstructor occurrences="3">
-      <code>$summaryTable</code>
-      <code>$input</code>
-      <code>$output</code>
-    </PropertyNotSetInConstructor>
-    <RedundantCondition occurrences="7">
-      <code>!isset($selectedTest) || $answer === 'Change Test Suite'</code>
-      <code>!isset($selectedParser) || $answer === 'Change Parser'</code>
-      <code>!isset($justAgents) || $answer === 'Show Full Diff'</code>
-      <code>!isset($selectedTest) || $answer === 'Change Test Suite'</code>
-      <code>!isset($section) || $answer === 'Change Section'</code>
-      <code>!isset($property) || $answer === 'Change Section'</code>
-      <code>!isset($justFails) || $answer === 'Show All'</code>
-    </RedundantCondition>
-    <UndefinedVariable occurrences="7">
-      <code>$selectedTest</code>
-      <code>$selectedParser</code>
-      <code>$justAgents</code>
-      <code>$selectedTest</code>
-      <code>$section</code>
-      <code>$property</code>
-      <code>$justFails</code>
-    </UndefinedVariable>
-  </file>
-  <file src="src/Command/Helper/Normalize.php">
-    <PossiblyInvalidArgument occurrences="1">
-      <code>$value</code>
-    </PossiblyInvalidArgument>
-    <PossiblyInvalidArrayOffset occurrences="1">
-      <code>$v[$value]</code>
-    </PossiblyInvalidArrayOffset>
-    <PossiblyInvalidOperand occurrences="2">
-      <code>preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']))</code>
-      <code>preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']))</code>
-    </PossiblyInvalidOperand>
-  </file>
-  <file src="src/Command/Helper/Parsers.php">
-    <ForbiddenCode occurrences="1">
-      <code>shell_exec($parserDir-&gt;getPathname() . '/parse.sh ' . implode(' ', $args))</code>
-    </ForbiddenCode>
-  </file>
-  <file src="src/Command/Test.php">
-    <ForbiddenCode occurrences="1">
-      <code>shell_exec($testData['path'] . '/build.sh')</code>
-    </ForbiddenCode>
-  </file>
+    <file src="src/Command/Analyze.php">
+        <InvalidArrayOffset occurrences="2">
+            <code>$questions[array_search('Change Test Suite', $questions)]</code>
+            <code>$questions[array_search('Change Test Suite', $questions)]</code>
+        </InvalidArrayOffset>
+        <PossiblyInvalidArrayOffset occurrences="2">
+            <code>$questions[array_search('Change Parser', $questions)]</code>
+            <code>$questions[array_search('Change Property', $questions)]</code>
+        </PossiblyInvalidArrayOffset>
+        <PropertyNotSetInConstructor occurrences="3">
+            <code>$summaryTable</code>
+            <code>$input</code>
+            <code>$output</code>
+        </PropertyNotSetInConstructor>
+        <RedundantCondition occurrences="7">
+            <code>!isset($selectedTest) || $answer === 'Change Test Suite'</code>
+            <code>!isset($selectedParser) || $answer === 'Change Parser'</code>
+            <code>!isset($justAgents) || $answer === 'Show Full Diff'</code>
+            <code>!isset($selectedTest) || $answer === 'Change Test Suite'</code>
+            <code>!isset($section) || $answer === 'Change Section'</code>
+            <code>!isset($property) || $answer === 'Change Section'</code>
+            <code>!isset($justFails) || $answer === 'Show All'</code>
+        </RedundantCondition>
+        <UndefinedVariable occurrences="7">
+            <code>$selectedTest</code>
+            <code>$selectedParser</code>
+            <code>$justAgents</code>
+            <code>$selectedTest</code>
+            <code>$section</code>
+            <code>$property</code>
+            <code>$justFails</code>
+        </UndefinedVariable>
+    </file>
+    <file src="src/Command/Helper/Normalize.php">
+        <PossiblyInvalidArgument occurrences="1">
+            <code>$value</code>
+        </PossiblyInvalidArgument>
+        <PossiblyInvalidArrayOffset occurrences="1">
+            <code>$v[$value]</code>
+        </PossiblyInvalidArrayOffset>
+        <PossiblyInvalidOperand occurrences="2">
+            <code>preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']))</code>
+            <code>preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']))</code>
+        </PossiblyInvalidOperand>
+    </file>
+    <file src="src/Command/Helper/Parsers.php">
+        <ForbiddenCode occurrences="1">
+            <code>shell_exec($parserDir-&gt;getPathname() . '/parse.sh ' . implode(' ', $args))</code>
+        </ForbiddenCode>
+    </file>
+    <file src="src/Command/Test.php">
+        <ForbiddenCode occurrences="1">
+            <code>shell_exec($testData['path'] . '/build.sh')</code>
+        </ForbiddenCode>
+    </file>
 </files>

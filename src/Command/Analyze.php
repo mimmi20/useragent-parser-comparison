@@ -22,6 +22,7 @@ use Symfony\Component\Console\Question\Question;
 use Throwable;
 
 use function array_diff_assoc;
+use function array_flip;
 use function array_keys;
 use function array_merge;
 use function array_pop;
@@ -33,14 +34,13 @@ use function assert;
 use function count;
 use function current;
 use function file_exists;
+use function file_get_contents;
 use function is_array;
 use function is_string;
-use function reset;
-use function round;
-use function array_flip;
-use function file_get_contents;
 use function json_decode;
 use function ksort;
+use function reset;
+use function round;
 use function sort;
 use function uasort;
 use function ucfirst;
@@ -51,10 +51,13 @@ final class Analyze extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
 
+    /** @var mixed[] */
     private array $options = [];
 
+    /** @var mixed[] */
     private array $comparison = [];
 
+    /** @var string[] */
     private array $agents = [];
 
     private Table $summaryTable;
@@ -63,6 +66,7 @@ final class Analyze extends Command
 
     private OutputInterface $output;
 
+    /** @var mixed[] */
     private array $failures = [];
 
     protected function configure(): void
@@ -104,7 +108,7 @@ final class Analyze extends Command
             $contents = file_get_contents($this->runDir . '/' . $thisRunName . '/metadata.json');
         } catch (Throwable $e) {
             $output->writeln(
-                '<error>Could not read file (' . $this->runDir . '/' . $thisRunName . '/metadata.json' . ')</error>'
+                '<error>Could not read file (' . $this->runDir . '/' . $thisRunName . '/metadata.json)</error>'
             );
 
             return self::FAILURE;
@@ -146,6 +150,7 @@ final class Analyze extends Command
                     $contents = file_get_contents($expectedFilename);
                 } catch (Throwable $e) {
                     $this->output->writeln('<error>Could not read file (' . $expectedFilename . ')</error>');
+
                     continue;
                 }
 
@@ -154,6 +159,7 @@ final class Analyze extends Command
                     $headerMessage   = '<fg=yellow>Parser comparison for ' . $testName . ' test suite' . (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '') . '</>';
                 } catch (Throwable $e) {
                     $this->output->writeln('<error>An error occured while parsing file (' . $expectedFilename . '), skipping</error>');
+
                     continue;
                 }
             } else {
@@ -164,6 +170,7 @@ final class Analyze extends Command
                     $contents = file_get_contents($fileName);
                 } catch (Throwable $e) {
                     $this->output->writeln('<error>Could not read file (' . $fileName . ')</error>');
+
                     continue;
                 }
 
@@ -172,6 +179,7 @@ final class Analyze extends Command
                     $headerMessage = '<fg=yellow>Parser comparison for ' . $testName . ' file, using ' . array_keys($this->options['parsers'])[0] . ' results as expected</>';
                 } catch (Throwable $e) {
                     $this->output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
+
                     continue;
                 }
 
@@ -325,7 +333,7 @@ final class Analyze extends Command
                         $passFail[$compareKey]['pass'] += $score;
                         $passFail[$compareKey]['fail'] += $possibleScore - $score;
 
-                        $parserScores[$parserName][$testName] += $score;
+                        $parserScores[$parserName][$testName]   += $score;
                         $possibleScores[$parserName][$testName] += $possibleScore;
                     }
 
@@ -384,14 +392,14 @@ final class Analyze extends Command
                     ];
                 }
 
-                $totals[$parserName]['browser']['pass'] += $passFail['browser']['pass'];
-                $totals[$parserName]['browser']['fail'] += $passFail['browser']['fail'];
-                $totals[$parserName]['platform']['pass'] += $passFail['platform']['pass'];
-                $totals[$parserName]['platform']['fail'] += $passFail['platform']['fail'];
-                $totals[$parserName]['device']['pass'] += $passFail['device']['pass'];
-                $totals[$parserName]['device']['fail'] += $passFail['device']['fail'];
-                $totals[$parserName]['time'] += $testResult['parse_time'] + $testResult['init_time'];
-                $totals[$parserName]['score']['earned'] += $parserScores[$parserName][$testName];
+                $totals[$parserName]['browser']['pass']   += $passFail['browser']['pass'];
+                $totals[$parserName]['browser']['fail']   += $passFail['browser']['fail'];
+                $totals[$parserName]['platform']['pass']  += $passFail['platform']['pass'];
+                $totals[$parserName]['platform']['fail']  += $passFail['platform']['fail'];
+                $totals[$parserName]['device']['pass']    += $passFail['device']['pass'];
+                $totals[$parserName]['device']['fail']    += $passFail['device']['fail'];
+                $totals[$parserName]['time']              += $testResult['parse_time'] + $testResult['init_time'];
+                $totals[$parserName]['score']['earned']   += $parserScores[$parserName][$testName];
                 $totals[$parserName]['score']['possible'] += $possibleScores[$parserName][$testName];
             }
 
@@ -853,6 +861,12 @@ final class Analyze extends Command
         $table->render();
     }
 
+    /**
+     * @param mixed[] $expected
+     * @param mixed[] $actual
+     *
+     * @return mixed[]
+     */
     private function makeDiff(array $expected, array $actual): array
     {
         if (empty($expected)) {
@@ -876,6 +890,10 @@ final class Analyze extends Command
         return $result;
     }
 
+    /**
+     * @param mixed[] $expected
+     * @param mixed[] $actual
+     */
     private function calculateScore(array $expected, array $actual, bool $possible = false): int
     {
         $score = 0;
@@ -896,6 +914,9 @@ final class Analyze extends Command
         return $score;
     }
 
+    /**
+     * @param mixed[] $diff
+     */
     private function outputDiff(array $diff): string
     {
         if (empty($diff)) {

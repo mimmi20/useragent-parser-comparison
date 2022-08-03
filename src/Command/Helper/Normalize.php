@@ -31,7 +31,12 @@ final class Normalize extends Helper
         return 'normalize';
     }
 
-    public function normalize(array $parsed): array
+    /**
+     * @param mixed[][] $parsed
+     *
+     * @return mixed[]
+     */
+    public function normalizeParsed(array $parsed): array
     {
         $normalized = [];
         $mappings   = [];
@@ -53,6 +58,7 @@ final class Normalize extends Helper
             foreach ($properties as $key => $value) {
                 if (null === $value) {
                     $normalized[$section][$key] = $value;
+
                     continue;
                 }
 

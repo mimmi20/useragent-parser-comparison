@@ -27,18 +27,18 @@ use function assert;
 use function count;
 use function date;
 use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
 use function implode;
 use function is_array;
 use function is_string;
-use function file_get_contents;
-use function file_put_contents;
 use function json_decode;
 use function json_encode;
 use function ksort;
 use function mkdir;
+use function shell_exec;
 use function sort;
 use function sprintf;
-use function shell_exec;
 use function time;
 use function trim;
 
@@ -49,13 +49,10 @@ use const PHP_EOL;
 
 final class Test extends Command
 {
-    private array $tests = [];
-
+    /** @var mixed[][] */
+    private array $tests     = [];
     private string $testsDir = __DIR__ . '/../../tests';
-
-    private string $runDir = __DIR__ . '/../../data/test-runs';
-
-    private array $results = [];
+    private string $runDir   = __DIR__ . '/../../data/test-runs';
 
     protected function configure(): void
     {
@@ -137,7 +134,6 @@ final class Test extends Command
             $message = sprintf('Generating data for the <fg=yellow>%s</> test suite... ', $testName);
 
             $output->write($message . '<info> building test suite</info>');
-            $this->results[$testName] = [];
 
             $testOutput = trim((string) shell_exec($testData['path'] . '/build.sh'));
 
@@ -155,6 +151,7 @@ final class Test extends Command
 
             if (null === $testOutput['tests']) {
                 $output->writeln("\r" . $message . '<error>There was an error with the output from the ' . $testName . ' test suite, no tests were found.</error>');
+
                 continue;
             }
 
@@ -209,6 +206,7 @@ final class Test extends Command
                     );
                 } catch (Throwable $e) {
                     $output->writeln("\r" . $testMessage . ' <error>encoding the result failed!</error>');
+
                     continue;
                 }
 

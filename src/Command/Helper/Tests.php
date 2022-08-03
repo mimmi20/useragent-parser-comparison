@@ -12,6 +12,7 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use FilesystemIterator;
+use Generator;
 use JsonException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
@@ -83,6 +84,7 @@ final class Tests extends Helper
 
             if (!file_exists($pathName . '/metadata.json')) {
                 $output->writeln('<error>metadata file for test in ' . $pathName . ' does not exist</error>');
+
                 continue;
             }
 
@@ -103,10 +105,12 @@ final class Tests extends Helper
                     $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Throwable $e) {
                     $output->writeln('<error>An error occured while parsing metadata for test ' . $pathName . '</error>');
+
                     continue;
                 }
             } catch (Throwable $e) {
                 $output->writeln('<error>Could not read metadata file for test in ' . $pathName . '</error>');
+
                 continue;
             }
 
@@ -190,6 +194,11 @@ final class Tests extends Helper
         return $names[$answer];
     }
 
+    /**
+     * @return Generator|mixed[]
+     *
+     * @throws JsonException
+     */
     public function collectTests(OutputInterface $output, ?string $thisRunDir): iterable
     {
         $expectedDir = null === $thisRunDir ? null : $thisRunDir . '/expected';
@@ -223,10 +232,12 @@ final class Tests extends Helper
                     case 'PHP':
                         $metadata['version']      = $this->getVersionPHP($pathName, $metadata['packageName']);
                         $metadata['release-date'] = $this->getUpdateDatePHP($pathName, $metadata['packageName']);
+
                         break;
                     case 'JavaScript':
                         $metadata['version']      = $this->getVersionJS($pathName, $metadata['packageName']);
                         $metadata['release-date'] = $this->getUpdateDateJS($pathName, $metadata['packageName']);
+
                         break;
                     default:
                         $output->writeln('<error>could not detect version and release date for testsuite ' . $testDir->getFilename() . '</error>');
@@ -240,18 +251,22 @@ final class Tests extends Helper
                     switch ($testName) {
                         case 'browser-detector':
                             $command = 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php';
+
                             break;
                         case 'crawler-detect':
                             $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
+
                             break;
                         default:
                             $command = 'php ' . $pathName . '/scripts/build.php';
+
                             break;
                     }
 
                     break;
                 case 'JavaScript':
                     $command = 'php ' . $pathName . '/scripts/build.php';
+
                     break;
                 default:
                     continue 2;

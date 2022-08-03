@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
+use JsonException;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
@@ -38,6 +39,11 @@ final class Result extends Helper
         return 'result';
     }
 
+    /**
+     * @param mixed[] $singleResult
+     *
+     * @throws JsonException
+     */
     public function storeResult(
         string $name,
         string $proId,
@@ -191,6 +197,12 @@ final class Result extends Helper
         }
     }
 
+    /**
+     * @param mixed[]   $row2
+     * @param mixed[][] $result
+     *
+     * @return mixed[]
+     */
     private function hydrateResult(array $row2, array $result): array
     {
         $toHydrate = [

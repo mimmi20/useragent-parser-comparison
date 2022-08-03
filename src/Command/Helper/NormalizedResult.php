@@ -28,6 +28,9 @@ final class NormalizedResult extends Helper
         return 'normalized-result';
     }
 
+    /**
+     * @param mixed[] $singleResult
+     */
     public function storeResult(
         string $resId,
         array $singleResult

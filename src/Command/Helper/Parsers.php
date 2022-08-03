@@ -24,12 +24,12 @@ use function assert;
 use function count;
 use function escapeshellarg;
 use function file_exists;
-use function implode;
 use function file_get_contents;
+use function implode;
 use function json_decode;
 use function ksort;
-use function sort;
 use function shell_exec;
+use function sort;
 use function trim;
 
 final class Parsers extends Helper
@@ -41,6 +41,9 @@ final class Parsers extends Helper
         return 'parsers';
     }
 
+    /**
+     * @return mixed[]
+     */
     public function getParsers(InputInterface $input, OutputInterface $output, bool $multiple = true): array
     {
         $rows    = [];

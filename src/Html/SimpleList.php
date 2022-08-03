@@ -15,8 +15,12 @@ use function htmlspecialchars;
 
 final class SimpleList extends AbstractHtml
 {
+    /** @var string[][] */
     private array $elements = [];
 
+    /**
+     * @param string[][] $elements
+     */
     public function setElements(array $elements): void
     {
         $this->elements = $elements;

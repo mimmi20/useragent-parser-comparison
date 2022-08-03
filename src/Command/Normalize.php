@@ -20,10 +20,10 @@ use Throwable;
 
 use function assert;
 use function file_exists;
-use function is_array;
-use function is_string;
 use function file_get_contents;
 use function file_put_contents;
+use function is_array;
+use function is_string;
 use function json_decode;
 use function json_encode;
 use function mkdir;
@@ -37,8 +37,6 @@ use const JSON_UNESCAPED_UNICODE;
 final class Normalize extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
-
-    private array $options = [];
 
     protected function configure(): void
     {
@@ -67,14 +65,14 @@ final class Normalize extends Command
         }
 
         $output->writeln('<comment>Normalizing data from test run: ' . $thisRunName . '</comment>');
-        $this->options = ['tests' => [], 'parsers' => []];
+        $options = ['tests' => [], 'parsers' => []];
 
         if (file_exists($this->runDir . '/' . $thisRunName . '/metadata.json')) {
             try {
                 $contents = file_get_contents($this->runDir . '/' . $thisRunName . '/metadata.json');
 
                 try {
-                    $this->options = json_decode($contents, true);
+                    $options = json_decode($contents, true);
                 } catch (Throwable $e) {
                     $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
                 }
@@ -83,7 +81,7 @@ final class Normalize extends Command
             }
         }
 
-        if (!empty($this->options['tests'])) {
+        if (!empty($options['tests'])) {
             if (!file_exists($this->runDir . '/' . $thisRunName . '/expected/normalized')) {
                 mkdir($this->runDir . '/' . $thisRunName . '/expected/normalized');
             }
@@ -110,6 +108,7 @@ final class Normalize extends Command
                     $data = json_decode($contents, true);
                 } catch (Throwable $e) {
                     $output->writeln("\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>');
+
                     continue;
                 }
 
@@ -117,13 +116,14 @@ final class Normalize extends Command
 
                 if (!is_array($data['tests'])) {
                     $output->writeln("\r" . $message . '<info> done!</info>');
+
                     continue;
                 }
 
                 $output->write("\r" . $message . '<info> normalizing result</info>');
 
                 foreach ($data['tests'] as $ua => $parsed) {
-                    $normalized['tests'][$ua] = $this->normalize($parsed);
+                    $normalized['tests'][$ua] = $this->normalizeResult($parsed);
                 }
 
                 $output->write("\r" . $message . '<info> writing result</info>    ');
@@ -138,7 +138,7 @@ final class Normalize extends Command
             }
         }
 
-        if (!empty($this->options['parsers'])) {
+        if (!empty($options['parsers'])) {
             foreach (new FilesystemIterator($this->runDir . '/' . $thisRunName . '/results') as $resultDir) {
                 assert($resultDir instanceof SplFileInfo);
                 $parserName = $resultDir->getFilename();
@@ -185,7 +185,7 @@ final class Normalize extends Command
                         if (!isset($result['parsed'])) {
                             $output->writeLn('<error>There was no "parsed" property for the ' . $testName . ' test suite </error>');
                         } else {
-                            $result['parsed'] = $this->normalize($result['parsed']);
+                            $result['parsed'] = $this->normalizeResult($result['parsed']);
                             $normalized[]     = $result;
                         }
                     }
@@ -212,11 +212,16 @@ final class Normalize extends Command
         return self::SUCCESS;
     }
 
-    private function normalize(array $parsed): array
+    /**
+     * @param mixed[][] $parsed
+     *
+     * @return mixed[]
+     */
+    private function normalizeResult(array $parsed): array
     {
         $normalizeHelper = $this->getHelper('normalize');
         assert($normalizeHelper instanceof \UserAgentParserComparison\Command\Helper\Normalize);
 
-        return $normalizeHelper->normalize($parsed);
+        return $normalizeHelper->normalizeParsed($parsed);
     }
 }
