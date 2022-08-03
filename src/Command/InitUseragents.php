@@ -105,14 +105,14 @@ final class InitUseragents extends Command
                 $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
             } catch (JsonException $e) {
                 // var_dump($testOutput);
-                //var_dump($e->getMessage());
+                // var_dump($e->getMessage());
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! json_decode failed.</error>');
 
                 continue;
             }
 
             if (!is_array($tests['tests']) || [] === $tests['tests']) {
-                //var_dump($testOutput);
+                // var_dump($testOutput);
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! No tests were found.</error>');
 
                 continue;
@@ -125,8 +125,8 @@ final class InitUseragents extends Command
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if (null === $agent) {
-                    //var_dump($singleTestData);
-                    //exit;
+                    // var_dump($singleTestData);
+                    // exit;
                     $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $proName . '.</error>');
 
                     continue;

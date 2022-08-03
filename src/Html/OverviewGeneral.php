@@ -107,7 +107,7 @@ final class OverviewGeneral extends AbstractHtml
     }
 
     /**
-     * @return mixed[]|Generator
+     * @return Generator|mixed[]
      */
     private function getProviders(?string $run = null): iterable
     {
@@ -172,7 +172,7 @@ final class OverviewGeneral extends AbstractHtml
     }
 
     /**
-     * @return mixed[]|Generator
+     * @return Generator|mixed[]
      */
     private function getUserAgentPerProviderCount(): iterable
     {

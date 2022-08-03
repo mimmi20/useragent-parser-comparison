@@ -195,7 +195,7 @@ final class Tests extends Helper
     }
 
     /**
-     * @return mixed[]|Generator
+     * @return Generator|mixed[]
      *
      * @throws JsonException
      */

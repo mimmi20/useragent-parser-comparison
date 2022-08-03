@@ -110,7 +110,7 @@ final class OverviewProvider extends AbstractHtml
     }
 
     /**
-     * @return mixed[]|false
+     * @return false|mixed[]
      */
     private function getResult(): array | false
     {
