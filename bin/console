@@ -22,6 +22,10 @@ $testsHelper = new \UserAgentParserComparison\Command\Helper\Tests();
 $application->getHelperSet()->set($testsHelper);
 
 $application->add(new \UserAgentParserComparison\Command\Compare());
+$application->add(new \UserAgentParserComparison\Command\Test());
+$application->add(new \UserAgentParserComparison\Command\Parse());
+$application->add(new \UserAgentParserComparison\Command\Normalize());
+$application->add(new \UserAgentParserComparison\Command\Analyze());
 
 if (file_exists('config.php')) {
     include 'config.php';
@@ -35,10 +39,6 @@ if (file_exists('config.php')) {
         $normalizedResultHelper = new \UserAgentParserComparison\Command\Helper\NormalizedResult($pdo);
         $application->getHelperSet()->set($normalizedResultHelper);
 
-        $application->add(new \UserAgentParserComparison\Command\Test($pdo));
-        $application->add(new \UserAgentParserComparison\Command\Parse($pdo));
-        $application->add(new \UserAgentParserComparison\Command\Normalize($pdo));
-        $application->add(new \UserAgentParserComparison\Command\Analyze($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitDb($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitProvider($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitUseragents($pdo));

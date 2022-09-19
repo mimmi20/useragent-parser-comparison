@@ -24,12 +24,8 @@ use function is_array;
 
 final class InitProvider extends Command
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -38,9 +34,7 @@ final class InitProvider extends Command
         $this->setName('init-provider');
     }
 
-    /**
-     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-     */
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `provider` WHERE `proName` = :proName AND `proType` = :proType');
@@ -57,7 +51,7 @@ final class InitProvider extends Command
                 $statementInsertProvider,
                 $statementUpdateProvider,
                 'real',
-                $parserConfig
+                $parserConfig,
             );
         }
 
@@ -71,7 +65,7 @@ final class InitProvider extends Command
                 $statementInsertProvider,
                 $statementUpdateProvider,
                 'testSuite',
-                $testConfig
+                $testConfig,
             );
         }
 
@@ -80,16 +74,14 @@ final class InitProvider extends Command
         return self::SUCCESS;
     }
 
-    /**
-     * @param mixed[][] $providerConfig
-     */
+    /** @param mixed[][] $providerConfig */
     private function insertProvider(
         OutputInterface $output,
         PDOStatement $statementSelectProvider,
         PDOStatement $statementInsertProvider,
         PDOStatement $statementUpdateProvider,
         string $type,
-        array $providerConfig
+        array $providerConfig,
     ): void {
         $proName     = $providerConfig['metadata']['name'];
         $proLanguage = $providerConfig['metadata']['language'];

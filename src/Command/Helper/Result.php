@@ -27,11 +27,8 @@ use const JSON_UNESCAPED_UNICODE;
 
 final class Result extends Helper
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
     }
 
     public function getName(): string
@@ -49,8 +46,8 @@ final class Result extends Helper
         string $proId,
         string $uaId,
         array $singleResult,
-        ?string $version = null,
-        ?string $resFilename = null
+        string | null $version = null,
+        string | null $resFilename = null,
     ): void {
         $statementSelectResult = $this->pdo->prepare('SELECT * FROM `result` WHERE `provider_id` = :proId AND `userAgent_id` = :uaId AND `run` = :run');
         $statementInsertResult = $this->pdo->prepare('INSERT INTO `result` (`run`, `provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resResultError`, `resClientName`, `resClientModus`, `resClientVersion`, `resClientManufacturer`, `resClientBits`, `resEngineName`, `resEngineVersion`, `resEngineManufacturer`, `resOsName`, `resOsMarketingName`, `resOsVersion`, `resOsManufacturer`, `resOsBits`, `resDeviceName`, `resDeviceMarketingName`, `resDeviceManufacturer`, `resDeviceBrand`, `resDeviceDualOrientation`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceSimCount`, `resDeviceDisplayWidth`, `resDeviceDisplayHeight`, `resDeviceDisplayIsTouch`, `resDeviceDisplayType`, `resDeviceDisplaySize`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:run, :proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resResultError, :resClientName, :resClientModus, :resClientVersion, :resClientManufacturer, :resClientBits, :resEngineName, :resEngineVersion, :resEngineManufacturer, :resOsName, :resOsMarketingName, :resOsVersion, :resOsManufacturer, :resOsBits, :resDeviceName, :resDeviceMarketingName, :resDeviceManufacturer, :resDeviceBrand, :resDeviceDualOrientation, :resDeviceType, :resDeviceIsMobile, :resDeviceSimCount, :resDeviceDisplayWidth, :resDeviceDisplayHeight, :resDeviceDisplayIsTouch, :resDeviceDisplayType, :resDeviceDisplaySize, :resClientIsBot, :resClientType, :resRawResult)');

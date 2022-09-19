@@ -16,11 +16,8 @@ use Symfony\Component\Console\Helper\Helper;
 
 final class NormalizedResult extends Helper
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
     }
 
     public function getName(): string
@@ -28,12 +25,10 @@ final class NormalizedResult extends Helper
         return 'normalized-result';
     }
 
-    /**
-     * @param mixed[] $singleResult
-     */
+    /** @param mixed[] $singleResult */
     public function storeResult(
         string $resId,
-        array $singleResult
+        array $singleResult,
     ): void {
         $statementSelectResult = $this->pdo->prepare('SELECT * FROM `result-normalized` WHERE `result_id` = :resId');
         $statementInsertResult = $this->pdo->prepare('INSERT INTO `result-normalized` (`resNormaId`, `result_id`, `resNormaClientName`, `resNormaClientModus`, `resNormaClientVersion`, `resNormaClientManufacturer`, `resNormaClientBits`, `resNormaEngineName`, `resNormaEngineVersion`, `resNormaEngineManufacturer`, `resNormaOsName`, `resNormaOsMarketingName`, `resNormaOsVersion`, `resNormaOsManufacturer`, `resNormaOsBits`, `resNormaDeviceName`, `resNormaDeviceMarketingName`, `resNormaDeviceManufacturer`, `resNormaDeviceBrand`, `resNormaDeviceDualOrientation`, `resNormaDeviceType`, `resNormaDeviceIsMobile`, `resNormaDeviceSimCount`, `resNormaDeviceDisplayWidth`, `resNormaDeviceDisplayHeight`, `resNormaDeviceDisplayIsTouch`, `resNormaDeviceDisplayType`, `resNormaDeviceDisplaySize`, `resNormaClientIsBot`, `resNormaClientType`) VALUES (:resNormaId, :resId, :resNormaClientName, :resNormaClientModus, :resNormaClientVersion, :resNormaClientManufacturer, :resNormaClientBits, :resNormaEngineName, :resNormaEngineVersion, :resNormaEngineManufacturer, :resNormaOsName, :resNormaOsMarketingName, :resNormaOsVersion, :resNormaOsManufacturer, :resNormaOsBits, :resNormaDeviceName, :resNormaDeviceMarketingName, :resNormaDeviceManufacturer, :resNormaDeviceBrand, :resNormaDeviceDualOrientation, :resNormaDeviceType, :resNormaDeviceIsMobile, :resNormaDeviceSimCount, :resNormaDeviceDisplayWidth, :resNormaDeviceDisplayHeight, :resNormaDeviceDisplayIsTouch, :resNormaDeviceDisplayType, :resNormaDeviceDisplaySize, :resNormaClientIsBot, :resNormaClientType)');

@@ -31,25 +31,19 @@ final class UserAgentDetail extends AbstractHtml
     /** @var mixed[][] */
     private array $results = [];
 
-    /**
-     * @param string[] $userAgent
-     */
+    /** @param string[] $userAgent */
     public function setUserAgent(array $userAgent): void
     {
         $this->userAgent = $userAgent;
     }
 
-    /**
-     * @param mixed[][] $results
-     */
+    /** @param mixed[][] $results */
     public function setResults(array $results): void
     {
         $this->results = $results;
     }
 
-    /**
-     * @throws JsonException
-     */
+    /** @throws JsonException */
     public function getHtml(): string
     {
         $addStr = '';
@@ -169,9 +163,7 @@ $(document).ready(function(){
         return $html;
     }
 
-    /**
-     * @param mixed[] $result
-     */
+    /** @param mixed[] $result */
     private function getRow(array $result): string
     {
         $html = '<tr>';

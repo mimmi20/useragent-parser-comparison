@@ -35,12 +35,8 @@ use const JSON_UNESCAPED_UNICODE;
 
 final class InitUseragents extends Command
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -103,7 +99,7 @@ final class InitUseragents extends Command
 
             try {
                 $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException $e) {
+            } catch (JsonException) {
                 // var_dump($testOutput);
                 // var_dump($e->getMessage());
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! json_decode failed.</error>');
