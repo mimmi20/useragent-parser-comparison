@@ -81,7 +81,7 @@ final class Parse extends Command
             $csvFile  = (string) $csvFile;
         } elseif ($csv) {
             $output->writeln(
-                '<error>csvFile parameter is required if csv parameter is specified</error>'
+                '<error>csvFile parameter is required if csv parameter is specified</error>',
             );
 
             return self::FAILURE;
@@ -114,7 +114,7 @@ final class Parse extends Command
 
             if (empty($result)) {
                 $output->writeln(
-                    '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>'
+                    '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>',
                 );
 
                 continue;
@@ -131,7 +131,7 @@ final class Parse extends Command
 
                 file_put_contents(
                     $this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/' . basename($filename) . '.json',
-                    json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                    json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
                 );
             }
 
@@ -201,7 +201,7 @@ final class Parse extends Command
                 ];
 
                 $csvOutput .= $this->putcsv($title, $csvFile) . "\n";
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 $output->writeln('<error> error</error>');
             }
 
@@ -221,7 +221,7 @@ final class Parse extends Command
 
                 try {
                     $csvOutput .= $this->putcsv($out, $csvFile) . "\n";
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln('<error> error</error>');
                 }
             }
@@ -238,7 +238,7 @@ final class Parse extends Command
         if ($thisRunName) {
             file_put_contents(
                 $this->runDir . '/' . $thisRunName . '/metadata.json',
-                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($filename)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($filename)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
             );
         }
 

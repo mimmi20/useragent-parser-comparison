@@ -20,21 +20,15 @@ use function round;
 
 abstract class AbstractHtml
 {
-    protected ?string $title = null;
+    private int | null $userAgentCount = null;
 
-    protected PDO $pdo;
-
-    private ?int $userAgentCount = null;
-
-    public function __construct(PDO $pdo, ?string $title = null)
+    public function __construct(protected PDO $pdo, protected string | null $title = null)
     {
-        $this->pdo   = $pdo;
-        $this->title = $title;
     }
 
     abstract public function getHtml(): string;
 
-    final protected function getUserAgentCount(?string $run = null): int
+    final protected function getUserAgentCount(string | null $run = null): int
     {
         if (null !== $run) {
             $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent` WHERE `uaId` IN (SELECT `result`.`userAgent_id` FROM `result` WHERE `result`.`run` = :run)');
@@ -54,7 +48,7 @@ abstract class AbstractHtml
         return $this->userAgentCount;
     }
 
-    final protected function getPercentCircle(int $countOfUseragents, int $resultFound, ?int $resultFound2 = null): string
+    final protected function getPercentCircle(int $countOfUseragents, int $resultFound, int | null $resultFound2 = null): string
     {
         $html = '
             <div class="svg-item">

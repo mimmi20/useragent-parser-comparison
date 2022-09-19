@@ -17,20 +17,14 @@ use function round;
 
 final class OverviewProvider extends AbstractHtml
 {
-    /** @var string[] */
-    private array $provider;
-
-    /**
-     * @param string[] $provider
-     */
-    public function __construct(PDO $pdo, array $provider, ?string $title = null)
+    /** @param string[] $provider */
+    public function __construct(PDO $pdo, private array $provider, string | null $title = null)
     {
-        $this->pdo      = $pdo;
-        $this->provider = $provider;
-        $this->title    = $title;
+        $this->pdo   = $pdo;
+        $this->title = $title;
     }
 
-    public function getHtml(?string $run = null): string
+    public function getHtml(string | null $run = null): string
     {
         $body = '
 <div class="section">
@@ -109,9 +103,7 @@ final class OverviewProvider extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
-    /**
-     * @return false|mixed[]
-     */
+    /** @return false|mixed[] */
     private function getResult(): array | false
     {
         $sql = '

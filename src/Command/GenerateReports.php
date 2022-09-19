@@ -32,14 +32,8 @@ use function str_pad;
 
 final class GenerateReports extends Command
 {
-    private PDO $pdo;
-    private string $version;
-
-    public function __construct(PDO $pdo, string $version)
+    public function __construct(private PDO $pdo, private string $version)
     {
-        $this->pdo     = $pdo;
-        $this->version = $version;
-
         parent::__construct();
     }
 

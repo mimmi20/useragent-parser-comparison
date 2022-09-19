@@ -30,12 +30,8 @@ use const STR_PAD_LEFT;
 
 final class InitResults extends Command
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 

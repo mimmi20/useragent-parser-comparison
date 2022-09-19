@@ -31,6 +31,7 @@ use function sprintf;
 use function str_replace;
 
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 
@@ -73,10 +74,10 @@ final class Normalize extends Command
 
                 try {
                     $options = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
                 }
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 $output->writeln('<error>Could not read metadata file for run ' . $thisRunName . '</error>');
             }
         }
@@ -100,13 +101,13 @@ final class Normalize extends Command
 
                 try {
                     $contents = file_get_contents($testFile->getPathname());
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     continue;
                 }
 
                 try {
                     $data = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln("\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>');
 
                     continue;
@@ -131,7 +132,7 @@ final class Normalize extends Command
                 // Write normalized to file
                 file_put_contents(
                     $this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testFile->getFilename(),
-                    json_encode($normalized, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                    json_encode($normalized, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
                 );
 
                 $output->writeln("\r" . $message . '<info> done!</info>           ');
@@ -162,13 +163,13 @@ final class Normalize extends Command
 
                     try {
                         $contents = file_get_contents($resultFile->getPathname());
-                    } catch (Throwable $e) {
+                    } catch (Throwable) {
                         continue;
                     }
 
                     try {
                         $data = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                    } catch (Throwable $e) {
+                    } catch (Throwable) {
                         $output->writeln("\r" . $message . '<error>An error occured while parsing results for the ' . $testName . ' test suite</error>');
                         $data['results'] = [];
                     }
@@ -197,7 +198,7 @@ final class Normalize extends Command
                     // Write normalized to file
                     file_put_contents(
                         $this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $resultFile->getFilename(),
-                        json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                        json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE),
                     );
 
                     $output->writeln("\r" . $message . '<info> done!</info>           ');

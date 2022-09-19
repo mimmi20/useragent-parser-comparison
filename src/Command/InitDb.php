@@ -17,12 +17,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class InitDb extends Command
 {
-    private PDO $pdo;
-
-    public function __construct(PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -31,9 +27,7 @@ final class InitDb extends Command
         $this->setName('init-db');
     }
 
-    /**
-     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
-     */
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $message = 'initialize database';

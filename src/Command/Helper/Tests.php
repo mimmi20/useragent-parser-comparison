@@ -67,7 +67,7 @@ final class Tests extends Helper
         return 'tests';
     }
 
-    public function getTest(InputInterface $input, OutputInterface $output): ?string
+    public function getTest(InputInterface $input, OutputInterface $output): string | null
     {
         $rows  = [];
         $names = [];
@@ -103,12 +103,12 @@ final class Tests extends Helper
 
                 try {
                     $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln('<error>An error occured while parsing metadata for test ' . $pathName . '</error>');
 
                     continue;
                 }
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 $output->writeln('<error>Could not read metadata file for test in ' . $pathName . '</error>');
 
                 continue;
@@ -171,7 +171,7 @@ final class Tests extends Helper
             [
                 [new TableCell('Name / Date', ['rowspan' => 2, 'colspan' => 2]), new TableCell('Test Suites', ['colspan' => 2]), new TableCell('Parsers', ['colspan' => 2])],
                 [new TableCell('Name'), new TableCell('Version'), new TableCell('Name'), new TableCell('Version')],
-            ]
+            ],
         );
 
         array_pop($rows);
@@ -184,7 +184,7 @@ final class Tests extends Helper
 
         $question = new ChoiceQuestion(
             $questionText,
-            $questions
+            $questions,
         );
 
         $helper = $this->helperSet->get('question');
@@ -199,7 +199,7 @@ final class Tests extends Helper
      *
      * @throws JsonException
      */
-    public function collectTests(OutputInterface $output, ?string $thisRunDir): iterable
+    public function collectTests(OutputInterface $output, string | null $thisRunDir): iterable
     {
         $expectedDir = null === $thisRunDir ? null : $thisRunDir . '/expected';
 
@@ -217,7 +217,7 @@ final class Tests extends Helper
                 } else {
                     try {
                         $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (JsonException $e) {
+                    } catch (JsonException) {
                         $output->writeln('<error>An error occured while parsing metadata for testsuite ' . $testDir->getFilename() . '</error>');
                     }
                 }
@@ -321,7 +321,7 @@ final class Tests extends Helper
                         if (null !== $expectedDir) {
                             file_put_contents(
                                 $expectedDir . '/' . $testPath . '/' . $singleTestName . '.json',
-                                json_encode(['test' => $singleTestData], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                                json_encode(['test' => $singleTestData], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                             );
                         }
 
@@ -334,7 +334,7 @@ final class Tests extends Helper
 
                     file_put_contents(
                         $expectedDir . '/' . $testPath . '/metadata.json',
-                        json_encode(['version' => $tests['version'] ?? null], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                        json_encode(['version' => $tests['version'] ?? null], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
                     );
                 },
             ];
@@ -344,7 +344,7 @@ final class Tests extends Helper
     /**
      * Return the version of the provider
      */
-    private function getVersionPHP(string $path, string $packageName): ?string
+    private function getVersionPHP(string $path, string $packageName): string | null
     {
         $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
 
@@ -369,7 +369,7 @@ final class Tests extends Helper
     /**
      * Get the last change date of the provider
      */
-    private function getUpdateDatePHP(string $path, string $packageName): ?DateTimeImmutable
+    private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
     {
         $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
 
@@ -394,7 +394,7 @@ final class Tests extends Helper
     /**
      * Return the version of the provider
      */
-    private function getVersionJS(string $path, string $packageName): ?string
+    private function getVersionJS(string $path, string $packageName): string | null
     {
         $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
 
@@ -412,7 +412,7 @@ final class Tests extends Helper
     /**
      * Get the last change date of the provider
      */
-    private function getUpdateDateJS(string $path, string $packageName): ?DateTimeImmutable
+    private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
     {
         $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
 

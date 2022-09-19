@@ -45,6 +45,7 @@ use function sort;
 use function uasort;
 use function ucfirst;
 
+use const JSON_THROW_ON_ERROR;
 use const PHP_ROUND_HALF_DOWN;
 
 final class Analyze extends Command
@@ -106,9 +107,9 @@ final class Analyze extends Command
 
         try {
             $contents = file_get_contents($this->runDir . '/' . $thisRunName . '/metadata.json');
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $output->writeln(
-                '<error>Could not read file (' . $this->runDir . '/' . $thisRunName . '/metadata.json)</error>'
+                '<error>Could not read file (' . $this->runDir . '/' . $thisRunName . '/metadata.json)</error>',
             );
 
             return self::FAILURE;
@@ -116,7 +117,7 @@ final class Analyze extends Command
 
         try {
             $this->options = json_decode($contents, true, JSON_THROW_ON_ERROR);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
         }
 
@@ -148,7 +149,7 @@ final class Analyze extends Command
             if (file_exists($expectedFilename)) {
                 try {
                     $contents = file_get_contents($expectedFilename);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $this->output->writeln('<error>Could not read file (' . $expectedFilename . ')</error>');
 
                     continue;
@@ -157,7 +158,7 @@ final class Analyze extends Command
                 try {
                     $expectedResults = json_decode($contents, true, JSON_THROW_ON_ERROR);
                     $headerMessage   = '<fg=yellow>Parser comparison for ' . $testName . ' test suite' . (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '') . '</>';
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $this->output->writeln('<error>An error occured while parsing file (' . $expectedFilename . '), skipping</error>');
 
                     continue;
@@ -168,7 +169,7 @@ final class Analyze extends Command
                 $fileName        = $this->runDir . '/' . $thisRunName . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testName . '.json';
                 try {
                     $contents = file_get_contents($fileName);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $this->output->writeln('<error>Could not read file (' . $fileName . ')</error>');
 
                     continue;
@@ -177,7 +178,7 @@ final class Analyze extends Command
                 try {
                     $testResult    = json_decode($contents, true, JSON_THROW_ON_ERROR);
                     $headerMessage = '<fg=yellow>Parser comparison for ' . $testName . ' file, using ' . array_keys($this->options['parsers'])[0] . ' results as expected</>';
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $this->output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
 
                     continue;
@@ -249,7 +250,7 @@ final class Analyze extends Command
                 $fileName = $this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $testName . '.json';
                 try {
                     $contents = file_get_contents($fileName);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $this->output->writeln('<error>Could not read file (' . $fileName . '), skipping</error>');
 
                     continue;
@@ -257,7 +258,7 @@ final class Analyze extends Command
 
                 try {
                     $testResult = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $this->output->writeln('<error>An error occured while parsing file (' . $fileName . '), skipping</error>');
 
                     continue;
@@ -475,7 +476,7 @@ final class Analyze extends Command
         if (1 < count($this->options['tests'])) {
             $question = new ChoiceQuestion(
                 'Which Test Suite?',
-                array_keys($this->options['tests'])
+                array_keys($this->options['tests']),
             );
 
             $selectedTest = $questionHelper->ask($this->input, $this->output, $question);
@@ -492,7 +493,7 @@ final class Analyze extends Command
 
         $question = new ChoiceQuestion(
             'Which Section?',
-            ['browser', 'platform', 'device']
+            ['browser', 'platform', 'device'],
         );
 
         return $questionHelper->ask($this->input, $this->output, $question);
@@ -518,7 +519,7 @@ final class Analyze extends Command
         if (1 < count($subs)) {
             $question = new ChoiceQuestion(
                 'Which Property?',
-                $subs
+                $subs,
             );
             $property = $questionHelper->ask($this->input, $this->output, $question);
         } elseif (1 === count($subs)) {
@@ -536,7 +537,7 @@ final class Analyze extends Command
         $question       = new ChoiceQuestion(
             'What would you like to view?',
             ['Show Summary', 'View failure diff', 'View property comparison', 'Exit'],
-            3
+            3,
         );
 
         $answer = $questionHelper->ask($this->input, $this->output, $question);
@@ -554,7 +555,7 @@ final class Analyze extends Command
                         if (1 < count($this->options['tests'])) {
                             $question = new ChoiceQuestion(
                                 'Which test suite?',
-                                array_keys($this->options['tests'])
+                                array_keys($this->options['tests']),
                             );
 
                             $selectedTest = $questionHelper->ask($this->input, $this->output, $question);
@@ -567,7 +568,7 @@ final class Analyze extends Command
                         if (1 < count($this->options['parsers'])) {
                             $question = new ChoiceQuestion(
                                 'Which parser?',
-                                array_keys($this->options['parsers'])
+                                array_keys($this->options['parsers']),
                             );
 
                             $selectedParser = $questionHelper->ask($this->input, $this->output, $question);
@@ -605,7 +606,7 @@ final class Analyze extends Command
                     $question = new ChoiceQuestion(
                         'What would you like to do?',
                         $questions,
-                        count($questions) - 1
+                        count($questions) - 1,
                     );
 
                     $answer = $questionHelper->ask($this->input, $this->output, $question);
@@ -664,7 +665,7 @@ final class Analyze extends Command
                     $question = new ChoiceQuestion(
                         'What would you like to do?',
                         $questions,
-                        count($questions) - 1
+                        count($questions) - 1,
                     );
 
                     $answer = $questionHelper->ask($this->input, $this->output, $question);
@@ -722,7 +723,7 @@ final class Analyze extends Command
     {
         if (empty($this->failures[$test][$parser])) {
             $this->output->writeln(
-                '<error>There were no failures for the ' . $parser . ' parser for the ' . $test . ' test suite</error>'
+                '<error>There were no failures for the ' . $parser . ' parser for the ' . $test . ' test suite</error>',
             );
 
             return;
@@ -914,9 +915,7 @@ final class Analyze extends Command
         return $score;
     }
 
-    /**
-     * @param mixed[] $diff
-     */
+    /** @param mixed[] $diff */
     private function outputDiff(array $diff): string
     {
         if (empty($diff)) {

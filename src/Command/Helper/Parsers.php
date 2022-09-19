@@ -11,6 +11,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command\Helper;
 
 use FilesystemIterator;
+use JsonException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\Table;
@@ -30,7 +31,10 @@ use function json_decode;
 use function ksort;
 use function shell_exec;
 use function sort;
+use function str_replace;
 use function trim;
+
+use const JSON_THROW_ON_ERROR;
 
 final class Parsers extends Helper
 {
@@ -41,9 +45,7 @@ final class Parsers extends Helper
         return 'parsers';
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getParsers(InputInterface $input, OutputInterface $output, bool $multiple = true): array
     {
         $rows    = [];
@@ -63,10 +65,10 @@ final class Parsers extends Helper
 
                     try {
                         $metadata = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                    } catch (Throwable $e) {
+                    } catch (Throwable) {
                         $output->writeln('<error>An error occured while parsing metadata for parser ' . $parserDir->getPathname() . '</error>');
                     }
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln('<error>Could not read metadata file for parser in ' . $parserDir->getPathname() . '</error>');
                 }
             }
@@ -75,6 +77,7 @@ final class Parsers extends Helper
 
             if (!$isActive) {
                 $output->writeln('<error>parser ' . $pathName . ' is not active, skipping</error>');
+
                 continue;
             }
 
@@ -85,7 +88,7 @@ final class Parsers extends Helper
             $parsers[$parserDir->getFilename()] = [
                 'path' => $parserDir->getPathname(),
                 'metadata' => $metadata,
-                'parse' => static function (string $file, bool $benchmark = false) use ($parserDir, $output): ?array {
+                'parse' => static function (string $file, bool $benchmark = false) use ($parserDir, $output): array | null {
                     $args = [
                         escapeshellarg($file),
                     ];
@@ -109,20 +112,24 @@ final class Parsers extends Helper
 
                     return $result;
                 },
-                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir): ?array {
+                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir): array | null {
                     switch ($language) {
                         case 'PHP':
                             switch ($parserDir->getFilename()) {
                                 case 'php-get-browser':
                                     $command = 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
+
                                     break;
                                 default:
                                     $command = 'php ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
+
                                     break;
                             }
+
                             break;
                         case 'JavaScript':
                             $command = 'node ' . $pathName . '/scripts/parse-ua.js --ua ' . escapeshellarg($useragent);
+
                             break;
                         default:
                             return null;
@@ -138,7 +145,7 @@ final class Parsers extends Helper
 
                     try {
                         return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $e) {
+                    } catch (JsonException $e) {
                         $output->writeln('<error>' . $result . '</error>');
                         $output->writeln('<error>' . $result . $e . '</error>');
                     }
@@ -179,7 +186,7 @@ final class Parsers extends Helper
         $question = new ChoiceQuestion(
             $questionText,
             $questions,
-            $default
+            $default,
         );
 
         if (true === $multiple) {

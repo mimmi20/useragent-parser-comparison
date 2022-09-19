@@ -24,7 +24,7 @@ use const PHP_VERSION;
 
 final class OverviewGeneral extends AbstractHtml
 {
-    public function getHtml(string $version = '', ?string $run = null): string
+    public function getHtml(string $version = '', string | null $run = null): string
     {
         $body = '
 <div class="section">
@@ -106,10 +106,8 @@ final class OverviewGeneral extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
-    /**
-     * @return Generator|mixed[]
-     */
-    private function getProviders(?string $run = null): iterable
+    /** @return Generator|mixed[] */
+    private function getProviders(string | null $run = null): iterable
     {
         $sql = 'SELECT
                 `real-provider`.*,
@@ -171,9 +169,7 @@ final class OverviewGeneral extends AbstractHtml
         yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * @return Generator|mixed[]
-     */
+    /** @return Generator|mixed[] */
     private function getUserAgentPerProviderCount(): iterable
     {
         $statement = $this->pdo->prepare('SELECT
@@ -191,7 +187,7 @@ final class OverviewGeneral extends AbstractHtml
         yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function getTableSummary(?string $run = null): string
+    private function getTableSummary(string | null $run = null): string
     {
         $html = '<table class="striped">';
 

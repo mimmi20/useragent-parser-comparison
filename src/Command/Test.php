@@ -43,6 +43,7 @@ use function time;
 use function trim;
 
 use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
@@ -90,7 +91,7 @@ final class Test extends Command
         $question       = new ChoiceQuestion(
             'Choose which test suites to run, separate multiple with commas (press enter to use all)',
             $questions,
-            count($questions) - 1
+            count($questions) - 1,
         );
         $question->setMultiselect(true);
 
@@ -143,7 +144,7 @@ final class Test extends Command
 
             try {
                 $testOutput = json_decode($testOutput, true, JSON_THROW_ON_ERROR);
-            } catch (Throwable $e) {
+            } catch (Throwable) {
                 $output->writeln("\r" . $message . '<error>There was an error with the output from the ' . $testName . ' test suite.</error>');
 
                 continue;
@@ -185,7 +186,7 @@ final class Test extends Command
 
                 if (empty($result)) {
                     $output->writeln(
-                        "\r" . $testMessage . ' <error>The parser did not return any data, there may have been an error</error>'
+                        "\r" . $testMessage . ' <error>The parser did not return any data, there may have been an error</error>',
                     );
 
                     continue;
@@ -202,9 +203,9 @@ final class Test extends Command
                 try {
                     $encoded = json_encode(
                         $result,
-                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
                     );
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln("\r" . $testMessage . ' <error>encoding the result failed!</error>');
 
                     continue;
@@ -212,7 +213,7 @@ final class Test extends Command
 
                 file_put_contents(
                     $resultsDir . '/' . $parserName . '/' . $testName . '.json',
-                    $encoded
+                    $encoded,
                 );
                 $output->writeln("\r" . $testMessage . ' <info> done!</info>                                                                                 ');
 
@@ -223,9 +224,9 @@ final class Test extends Command
         try {
             $encoded = json_encode(
                 ['tests' => $usedTests, 'parsers' => $parsers, 'date' => time()],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE,
             );
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $output->writeln('<error>Encoding result metadata failed for the ' . $thisRunName . ' directory</error>');
 
             return self::FAILURE;
@@ -234,7 +235,7 @@ final class Test extends Command
         // write some test data to file
         file_put_contents(
             $thisRunDir . '/metadata.json',
-            $encoded
+            $encoded,
         );
 
         $output->writeln('<comment>Parsing complete, data stored in ' . $thisRunName . ' directory</comment>');
@@ -251,7 +252,7 @@ final class Test extends Command
             if (file_exists($testDir->getPathname() . '/metadata.json')) {
                 try {
                     $contents = file_get_contents($testDir->getPathname() . '/metadata.json');
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln('<error>An error occured while reading the metadata file</error>');
 
                     continue;
@@ -259,7 +260,7 @@ final class Test extends Command
 
                 try {
                     $metadata = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                } catch (Throwable $e) {
+                } catch (Throwable) {
                     $output->writeln('<error>An error occured while parsing results for the ' . $testDir->getPathname() . ' test suite</error>');
                 }
             }
