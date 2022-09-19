@@ -115,7 +115,7 @@ final class Analyze extends Command
         }
 
         try {
-            $this->options = json_decode($contents, true);
+            $this->options = json_decode($contents, true, JSON_THROW_ON_ERROR);
         } catch (Throwable $e) {
             $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
         }
@@ -155,7 +155,7 @@ final class Analyze extends Command
                 }
 
                 try {
-                    $expectedResults = json_decode($contents, true);
+                    $expectedResults = json_decode($contents, true, JSON_THROW_ON_ERROR);
                     $headerMessage   = '<fg=yellow>Parser comparison for ' . $testName . ' test suite' . (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '') . '</>';
                 } catch (Throwable $e) {
                     $this->output->writeln('<error>An error occured while parsing file (' . $expectedFilename . '), skipping</error>');
@@ -175,7 +175,7 @@ final class Analyze extends Command
                 }
 
                 try {
-                    $testResult    = json_decode($contents, true);
+                    $testResult    = json_decode($contents, true, JSON_THROW_ON_ERROR);
                     $headerMessage = '<fg=yellow>Parser comparison for ' . $testName . ' file, using ' . array_keys($this->options['parsers'])[0] . ' results as expected</>';
                 } catch (Throwable $e) {
                     $this->output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
@@ -256,7 +256,7 @@ final class Analyze extends Command
                 }
 
                 try {
-                    $testResult = json_decode($contents, true);
+                    $testResult = json_decode($contents, true, JSON_THROW_ON_ERROR);
                 } catch (Throwable $e) {
                     $this->output->writeln('<error>An error occured while parsing file (' . $fileName . '), skipping</error>');
 

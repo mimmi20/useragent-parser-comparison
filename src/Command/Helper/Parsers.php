@@ -54,12 +54,15 @@ final class Parsers extends Helper
             assert($parserDir instanceof SplFileInfo);
             $metadata = [];
 
+            $pathName = $parserDir->getPathname();
+            $pathName = str_replace('\\', '/', $pathName);
+
             if (file_exists($parserDir->getPathname() . '/metadata.json')) {
                 try {
                     $contents = file_get_contents($parserDir->getPathname() . '/metadata.json');
 
                     try {
-                        $metadata = json_decode($contents, true);
+                        $metadata = json_decode($contents, true, JSON_THROW_ON_ERROR);
                     } catch (Throwable $e) {
                         $output->writeln('<error>An error occured while parsing metadata for parser ' . $parserDir->getPathname() . '</error>');
                     }
@@ -67,6 +70,17 @@ final class Parsers extends Helper
                     $output->writeln('<error>Could not read metadata file for parser in ' . $parserDir->getPathname() . '</error>');
                 }
             }
+
+            $isActive = $metadata['isActive'] ?? false;
+
+            if (!$isActive) {
+                $output->writeln('<error>parser ' . $pathName . ' is not active, skipping</error>');
+                continue;
+            }
+
+            $language = $metadata['language'] ?? '';
+            $local    = $metadata['local'] ?? false;
+            $api      = $metadata['api'] ?? false;
 
             $parsers[$parserDir->getFilename()] = [
                 'path' => $parserDir->getPathname(),
@@ -79,13 +93,13 @@ final class Parsers extends Helper
                         $args[] = '--benchmark';
                     }
 
-                    $result = shell_exec($parserDir->getPathname() . '/parse.sh ' . implode(' ', $args));
+                    $result = shell_exec('sh ' . $parserDir->getPathname() . '/parse.sh ' . implode(' ', $args));
 
                     if (null !== $result) {
                         $result = trim($result);
 
                         try {
-                            $result = json_decode($result, true);
+                            $result = json_decode($result, true, JSON_THROW_ON_ERROR);
                         } catch (Throwable $e) {
                             $output->writeln('<error>' . $result . $e . '</error>');
 
@@ -94,6 +108,42 @@ final class Parsers extends Helper
                     }
 
                     return $result;
+                },
+                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir): ?array {
+                    switch ($language) {
+                        case 'PHP':
+                            switch ($parserDir->getFilename()) {
+                                case 'php-get-browser':
+                                    $command = 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
+                                    break;
+                                default:
+                                    $command = 'php ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg($useragent);
+                                    break;
+                            }
+                            break;
+                        case 'JavaScript':
+                            $command = 'node ' . $pathName . '/scripts/parse-ua.js --ua ' . escapeshellarg($useragent);
+                            break;
+                        default:
+                            return null;
+                    }
+
+                    $result = shell_exec($command);
+
+                    if (null === $result) {
+                        return null;
+                    }
+
+                    $result = trim($result);
+
+                    try {
+                        return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $e) {
+                        $output->writeln('<error>' . $result . '</error>');
+                        $output->writeln('<error>' . $result . $e . '</error>');
+                    }
+
+                    return null;
                 },
             ];
 

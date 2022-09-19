@@ -72,7 +72,7 @@ final class Normalize extends Command
                 $contents = file_get_contents($this->runDir . '/' . $thisRunName . '/metadata.json');
 
                 try {
-                    $options = json_decode($contents, true);
+                    $options = json_decode($contents, true, JSON_THROW_ON_ERROR);
                 } catch (Throwable $e) {
                     $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
                 }
@@ -105,7 +105,7 @@ final class Normalize extends Command
                 }
 
                 try {
-                    $data = json_decode($contents, true);
+                    $data = json_decode($contents, true, JSON_THROW_ON_ERROR);
                 } catch (Throwable $e) {
                     $output->writeln("\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>');
 
@@ -167,7 +167,7 @@ final class Normalize extends Command
                     }
 
                     try {
-                        $data = json_decode($contents, true);
+                        $data = json_decode($contents, true, JSON_THROW_ON_ERROR);
                     } catch (Throwable $e) {
                         $output->writeln("\r" . $message . '<error>An error occured while parsing results for the ' . $testName . ' test suite</error>');
                         $data['results'] = [];

@@ -142,7 +142,7 @@ final class Test extends Command
             file_put_contents($expectedDir . '/' . $testName . '.json', $testOutput);
 
             try {
-                $testOutput = json_decode($testOutput, true);
+                $testOutput = json_decode($testOutput, true, JSON_THROW_ON_ERROR);
             } catch (Throwable $e) {
                 $output->writeln("\r" . $message . '<error>There was an error with the output from the ' . $testName . ' test suite.</error>');
 
@@ -247,6 +247,7 @@ final class Test extends Command
         foreach (new FilesystemIterator($this->testsDir) as $testDir) {
             assert($testDir instanceof SplFileInfo);
             $metadata = [];
+
             if (file_exists($testDir->getPathname() . '/metadata.json')) {
                 try {
                     $contents = file_get_contents($testDir->getPathname() . '/metadata.json');
@@ -257,7 +258,7 @@ final class Test extends Command
                 }
 
                 try {
-                    $metadata = json_decode($contents, true);
+                    $metadata = json_decode($contents, true, JSON_THROW_ON_ERROR);
                 } catch (Throwable $e) {
                     $output->writeln('<error>An error occured while parsing results for the ' . $testDir->getPathname() . ' test suite</error>');
                 }
