@@ -2,15 +2,16 @@
   "require": {
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0",
-    "mobiledetect/mobiledetectlib": "^2.8.37",
-    "mimmi20/browscap-helper-source": "^3.0.1"
+    "mobiledetect/mobiledetectlib": "^2.8.39",
+    "mimmi20/browscap-helper-source": "^3.0.17"
   },
   "config": {
     "preferred-install": {
       "mobiledetect/mobiledetectlib": "source",
       "*": "dist"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "lock": false
   },
   "minimum-stability": "stable",
   "prefer-stable": true

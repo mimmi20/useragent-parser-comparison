@@ -9,7 +9,8 @@
       "jenssegers/agent": "source",
       "*": "dist"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "lock": false
   },
   "minimum-stability": "stable",
   "prefer-stable": true

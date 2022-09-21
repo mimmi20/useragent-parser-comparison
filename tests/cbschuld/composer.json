@@ -3,14 +3,15 @@
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0",
     "cbschuld/browser.php": "^v1.9.6",
-    "mimmi20/browscap-helper-source": "^3.0.1"
+    "mimmi20/browscap-helper-source": "^3.0.17"
   },
   "config": {
     "preferred-install": {
       "cbschuld/browser.php": "source",
       "*": "dist"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "lock": false
   },
   "minimum-stability": "stable",
   "prefer-stable": true

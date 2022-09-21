@@ -2,14 +2,15 @@
   "require": {
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0",
-    "mimmi20/browser-detector": "^6.0.6 || ^7.0.0",
+    "mimmi20/browser-detector": "^7.0.2",
     "psr/log": "^1.1.4 || ^3.0.0",
-    "monolog/monolog": "^2.3.5",
+    "monolog/monolog": "^2.3.5 || ^3.2.0",
     "matthiasmullie/scrapbook": "^1.4.8"
   },
   "config": {
     "preferred-install": "dist",
-    "sort-packages": true
+    "sort-packages": true,
+    "lock": false
   },
   "minimum-stability": "stable",
   "prefer-stable": true

@@ -210,7 +210,7 @@ class InitDb extends Command
   KEY `resNormaClientName` (`resNormaClientName`),
   KEY `resNormaEngineName` (`resNormaEngineName`),
   KEY `resNormaOsName` (`resNormaOsName`),
-  KEY `resNormaDeviceModel` (`resNormaDeviceModel`),
+  KEY `resNormaDeviceName` (`resNormaDeviceName`),
   KEY `resNormaDeviceBrand` (`resNormaDeviceBrand`),
   KEY `resNormaDeviceType` (`resNormaDeviceType`),
   KEY `resNormaClientIsBot` (`resNormaClientIsBot`),

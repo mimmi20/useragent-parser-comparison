@@ -2,8 +2,8 @@
   "require": {
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0",
-    "mimmi20/browscap-helper-source": "^3.0.1",
-    "whichbrowser/parser": "^v2.1.2",
+    "mimmi20/browscap-helper-source": "^3.0.17",
+    "whichbrowser/parser": "^v2.1.7",
     "symfony/yaml": "^v5.3.11 || ^v6.0.1"
   },
   "config": {
@@ -11,7 +11,8 @@
       "whichbrowser/parser": "source",
       "*": "dist"
     },
-    "sort-packages": true
+    "sort-packages": true,
+    "lock": false
   },
   "minimum-stability": "stable",
   "prefer-stable": true

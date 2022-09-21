@@ -116,7 +116,7 @@ class Compare extends Command
         $command   = $application->find('generate-reports');
         $arguments = [
             'command' => 'generate-reports',
-            'run'     => $name,
+            'run'     => null, //$name,
         ];
 
         $generateInput = new ArrayInput($arguments);
@@ -127,6 +127,8 @@ class Compare extends Command
 
             return $returnCode;
         }
+
+        return self::SUCCESS;
 
         $command   = $application->find('normalize');
         $arguments = [
@@ -142,8 +144,6 @@ class Compare extends Command
 
             return $returnCode;
         }
-
-        return self::SUCCESS;
 
         $command   = $application->find('analyze');
         $arguments = [

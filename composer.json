@@ -11,16 +11,14 @@
         "ext-pdo": "*",
         "ext-simplexml": "*",
         "composer-runtime-api": "^2.0",
-        "ramsey/uuid": "^4.2.3",
-        "symfony/console": "^v6.0.2"
+        "ramsey/uuid": "^4.5.1",
+        "symfony/console": "^v6.1.4"
     },
     "require-dev": {
-        "maglnet/composer-require-checker": "^4.0.0",
-        "mimmi20/coding-standard": "^2.6.1",
+        "mimmi20/coding-standard": "^3.0.10",
         "phpstan/extension-installer": "^1.1.0",
-        "phpstan/phpstan": "^1.4.0",
-        "phpstan/phpstan-deprecation-rules": "^1.0.0",
-        "vimeo/psalm": "^v4.18.1"
+        "phpstan/phpstan": "^1.8.5",
+        "phpstan/phpstan-deprecation-rules": "^1.0.0"
     },
     "minimum-stability": "stable",
     "prefer-stable": true,
@@ -36,7 +34,8 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "phpstan/extension-installer": true,
             "composer/package-versions-deprecated": true
-        }
+        },
+        "lock": false
     },
     "scripts": {
         "php-cs-fixer-check": "php-cs-fixer fix --dry-run -vv",
