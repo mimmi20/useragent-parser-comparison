@@ -1,46 +1,44 @@
 <?php
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
+use PDO;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use UserAgentParserComparison\Html\Index;
 use UserAgentParserComparison\Html\OverviewGeneral;
 use UserAgentParserComparison\Html\OverviewProvider;
 use UserAgentParserComparison\Html\SimpleList;
 use UserAgentParserComparison\Html\UserAgentDetail;
-use function file_get_contents;
+
+use function assert;
+use function count;
+use function file_exists;
 use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
+use function is_string;
+use function max;
+use function mb_strlen;
+use function mb_substr;
 use function mkdir;
-use function sort;
 use function sprintf;
-use SplFileInfo;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
+use function str_pad;
 
-class GenerateReports extends Command
+final class GenerateReports extends Command
 {
-    private \PDO $pdo;
-    private string $version;
-
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo, string $version)
+    public function __construct(private PDO $pdo, private string $version)
     {
-        $this->pdo = $pdo;
-        $this->version = $version;
-
         parent::__construct();
     }
 
@@ -51,15 +49,10 @@ class GenerateReports extends Command
             ->setHelp('');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string|null $thisRunName */
         $thisRunName = $input->getArgument('run');
+        assert(is_string($thisRunName) || null === $thisRunName);
         $basePath = '../gh-pages/';
 
         if (empty($thisRunName)) {
@@ -74,7 +67,7 @@ class GenerateReports extends Command
 
         $basePath .= $version;
 
-        if (! file_exists($basePath)) {
+        if (!file_exists($basePath)) {
             mkdir($basePath, 0777, true);
         }
 
@@ -90,26 +83,34 @@ class GenerateReports extends Command
         file_put_contents($basePath . '/index.html', $generate->getHtml($version, $thisRunName));
         $output->writeln("\r" . 'generate general overview page <info>done</info>');
 
-        $baseMessage = 'generate overview page and found pages for';
-        $messageLength = 0;
+        $baseMessage      = 'generate overview page and found pages for';
+        $messageLength    = 0;
+        $messageLengthMax = 0;
 
         $output->write($baseMessage . ' each provider ...');
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `real-provider`');
         $statementSelectProvider->execute();
 
-        while ($dbResultProvider = $statementSelectProvider->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
-            $message = $baseMessage . sprintf(' provider <fg=yellow>%s</> ', $dbResultProvider['proName']);
+        while ($dbResultProvider = $statementSelectProvider->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $message       = $baseMessage . sprintf(' provider <fg=yellow>%s</> ', $dbResultProvider['proName']);
             $messageLength = max($messageLength, mb_strlen($message));
 
-            $output->write("\r" . str_pad($message, $messageLength));
+            $message = str_pad($message, $messageLength);
+
+            $output->write("\r" . $message);
 
             $generate = new OverviewProvider($this->pdo, $dbResultProvider, 'Overview - ' . $dbResultProvider['proName']);
 
             file_put_contents($basePath . '/' . $dbResultProvider['proName'] . '.html', $generate->getHtml($thisRunName));
-            $output->write('.');
+
+            $message .= '.';
+
+            $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+            $output->write("\r" . str_pad($message, $messageLengthMax));
 
             $folder = $basePath . '/detected/' . $dbResultProvider['proName'];
-            if (! file_exists($folder)) {
+            if (!file_exists($folder)) {
                 mkdir($folder, 0777, true);
             }
 
@@ -117,8 +118,8 @@ class GenerateReports extends Command
              * detected - browserNames
              */
             if ($dbResultProvider['proCanDetectClientName']) {
-                $sql = "
-            SELECT 
+                $sql       = '
+            SELECT
                 `resClientName` AS `name`,
                 `uaId`,
                 `uaString`,
@@ -127,26 +128,33 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resClientName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected browser names - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/client-names.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * detected - renderingEngines
              */
             if ($dbResultProvider['proCanDetectEngineName']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resEngineName` AS `name`,
                 `uaId`,
@@ -156,26 +164,33 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resEngineName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected rendering engines - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/rendering-engines.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * detected - OSnames
              */
             if ($dbResultProvider['proCanDetectOsName']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resOsName` AS `name`,
                 `uaId`,
@@ -185,26 +200,33 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resOsName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected operating systems - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/operating-systems.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * detected - deviceBrand
              */
             if ($dbResultProvider['proCanDetectDeviceBrand']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resDeviceBrand` AS `name`,
                 `uaId`,
@@ -214,26 +236,33 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resDeviceBrand`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected device brands - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-brands.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * detected - deviceModel
              */
             if ($dbResultProvider['proCanDetectDeviceName']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resDeviceName` AS `name`,
                 `uaId`,
@@ -243,26 +272,33 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resDeviceName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected device models - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-models.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * detected - deviceTypes
              */
             if ($dbResultProvider['proCanDetectDeviceType']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resDeviceType` AS `name`,
                 `uaId`,
@@ -272,26 +308,33 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resDeviceType`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected device types - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-types.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * detected - bots
              */
             if ($dbResultProvider['proCanDetectClientIsBot']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resClientName` AS `name`,
                 `uaId`,
@@ -301,26 +344,33 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resClientName`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected as bot - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/bot-is-bot.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * detected - botTypes
              */
             if ($dbResultProvider['proCanDetectClientType']) {
-                $sql = "
+                $sql       = '
             SELECT
                 `resClientType` AS `name`,
                 `uaId`,
@@ -330,30 +380,37 @@ class GenerateReports extends Command
             INNER JOIN `userAgent`
                 ON `uaId` = `userAgent_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY `resClientType`
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Detected client types - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/bot-types.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             $folder = $basePath . '/not-detected/' . $dbResultProvider['proName'];
-            if (! file_exists($folder)) {
+            if (!file_exists($folder)) {
                 mkdir($folder, 0777, true);
             }
 
             /*
              * no result found
              */
-            $sql = "
+            $sql       = '
         SELECT
             `result`.`resClientName` AS `name`,
             `userAgent`.`uaId`,
@@ -371,27 +428,32 @@ class GenerateReports extends Command
             ON `userAgent`.`uaId` = `result`.`userAgent_id`
         WHERE
             `result`.`provider_id` = :proId
+            AND `result`.`run` = :runId
             AND `result`.`resResultFound` = 0
-    ";
+    ';
             $statement = $this->pdo->prepare($sql);
-            $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+            $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+            $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
             $statement->execute();
 
             $generate = new SimpleList($this->pdo, 'Not detected - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-            $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+            $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
             file_put_contents($folder . '/no-result-found.html', $generate->getHtml());
-            $output->write('.');
+
+            $message .= '.';
+
+            $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+            $output->write("\r" . str_pad($message, $messageLengthMax));
 
             /*
              * browserName
              */
             if ($dbResultProvider['proCanDetectClientName']) {
-                echo '.';
-
-                $sql = "
-            SELECT 
+                $sql       = '
+            SELECT
                 `found-results`.`resClientName` AS `name`,
                 `userAgent`.`uaId`,
                 `userAgent`.`uaString`,
@@ -399,7 +461,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-client-names`.`resClientName`)
                     FROM `list-found-general-client-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-client-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -407,7 +469,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-client-names`.`resClientName`)
                     FROM `list-found-general-client-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-client-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -415,7 +477,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-client-names`.`resClientName`)
                     FROM `list-found-general-client-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-client-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -424,28 +486,33 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resClientName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No browser name found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/client-names.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * renderingEngine
              */
             if ($dbResultProvider['proCanDetectEngineName']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resEngineName` AS `name`,
                 `userAgent`.`uaId`,
@@ -454,7 +521,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-engine-names`.`resEngineName`)
                     FROM `list-found-general-engine-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-engine-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-engine-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -462,7 +529,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-engine-names`.`resEngineName`)
                     FROM `list-found-general-engine-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-engine-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-engine-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -470,7 +537,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-engine-names`.`resEngineName`)
                     FROM `list-found-general-engine-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-engine-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-engine-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -479,28 +546,33 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resEngineName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No rendering engine found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/rendering-engines.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * OSname
              */
             if ($dbResultProvider['proCanDetectOsName']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resOsName` AS `name`,
                 `userAgent`.`uaId`,
@@ -509,7 +581,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-os-names`.`resOsName`)
                     FROM `list-found-general-os-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-os-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-os-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -517,7 +589,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-os-names`.`resOsName`)
                     FROM `list-found-general-os-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-os-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-os-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -525,7 +597,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-os-names`.`resOsName`)
                     FROM `list-found-general-os-names`
-                    WHERE 
+                    WHERE
                         `list-found-general-os-names`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-os-names`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -534,28 +606,33 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `resClientIsBot` IS NULL
                 AND `resOsName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No operating system found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/operating-systems.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * deviceBrand
              */
             if ($dbResultProvider['proCanDetectDeviceBrand']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceBrand` AS `name`,
                 `userAgent`.`uaId`,
@@ -564,7 +641,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-device-brands`.`resDeviceBrand`)
                     FROM `list-found-general-device-brands`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-brands`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-brands`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -572,7 +649,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-device-brands`.`resDeviceBrand`)
                     FROM `list-found-general-device-brands`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-brands`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-brands`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -580,7 +657,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-device-brands`.`resDeviceBrand`)
                     FROM `list-found-general-device-brands`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-brands`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-brands`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -589,28 +666,33 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resDeviceBrand` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No device brands found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-brands.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * deviceModel
              */
             if ($dbResultProvider['proCanDetectDeviceName']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceName` AS `name`,
                 `userAgent`.`uaId`,
@@ -619,7 +701,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-models`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -627,7 +709,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-models`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -635,7 +717,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-device-models`.`resDeviceName`)
                     FROM `list-found-general-device-models`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-models`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-models`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -644,28 +726,33 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resDeviceName` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No device model found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-models.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * deviceTypes
              */
             if ($dbResultProvider['proCanDetectDeviceType']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resDeviceType` AS `name`,
                 `userAgent`.`uaId`,
@@ -674,7 +761,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(`list-found-general-device-types`.`resDeviceType`)
                     FROM `list-found-general-device-types`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCount`,
@@ -682,7 +769,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-device-types`.`resDeviceType`)
                     FROM `list-found-general-device-types`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -690,7 +777,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-device-types`.`resDeviceType`)
                     FROM `list-found-general-device-types`
-                    WHERE 
+                    WHERE
                         `list-found-general-device-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-device-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -699,28 +786,33 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resClientIsBot` IS NULL
                 AND `found-results`.`resDeviceType` IS NULL
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No device type found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-types.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * not detected as mobile
              */
             if ($dbResultProvider['proCanDetectDeviceIsMobile']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resClientName` AS `name`,
                 `userAgent`.`uaId`,
@@ -738,6 +830,7 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resDeviceIsMobile` IS NULL
                 AND `userAgent`.`uaId` IN(
                     SELECT
@@ -747,26 +840,30 @@ class GenerateReports extends Command
                         ON `result`.`provider_id` = `test-provider`.`proId`
                         AND `result`.`resDeviceIsMobile` = 1
                 )
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Not detected as mobile - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/device-is-mobile.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * not detected as bot
              */
             if ($dbResultProvider['proCanDetectClientIsBot']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
             	`found-results`.`resClientName` AS `name`,
             	`userAgent`.`uaId`,
@@ -784,6 +881,7 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
             	`found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resClientIsBot` IS NULL
         	    AND `userAgent`.`uaId` IN(
             		SELECT
@@ -793,26 +891,30 @@ class GenerateReports extends Command
                         ON `result`.`provider_id` = `test-provider`.`proId`
             			AND `result`.`resClientIsBot` = 1
                 )
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'Not detected as bot - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/bot-is-bot.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
 
             /*
              * botTypes
              */
             if ($dbResultProvider['proCanDetectClientType']) {
-                echo '.';
-
-                $sql = "
+                $sql       = '
             SELECT
                 `found-results`.`resClientType` AS `name`,
                 `userAgent`.`uaId`,
@@ -829,7 +931,7 @@ class GenerateReports extends Command
                     SELECT
                         COUNT(DISTINCT `list-found-general-client-types`.`resClientType`)
                     FROM `list-found-general-client-types`
-                    WHERE 
+                    WHERE
                         `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionCountUnique`,
@@ -837,7 +939,7 @@ class GenerateReports extends Command
                     SELECT
                         GROUP_CONCAT(DISTINCT `list-found-general-client-types`.`resClientType`)
                     FROM `list-found-general-client-types`
-                    WHERE 
+                    WHERE
                          `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
                         AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
                 ) AS `detectionValuesDistinct`
@@ -846,33 +948,45 @@ class GenerateReports extends Command
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
                 `found-results`.`provider_id` = :proId
+                AND `found-results`.`run` = :runId
                 AND `found-results`.`resClientType` IS NULL
                 AND `userAgent`.`uaId` IN(
                     SELECT
                         `result`.`userAgent_id`
                     FROM `test-provider`
-                    INNER JOIN `result` 
+                    INNER JOIN `result`
                         ON `result`.`provider_id` = `test-provider`.`proId`
                         AND `result`.`resClientType` IS NOT NULL
                 )
-        ";
+        ';
                 $statement = $this->pdo->prepare($sql);
-                $statement->bindValue(':proId', $dbResultProvider['proId'], \PDO::PARAM_STR);
+                $statement->bindValue(':proId', $dbResultProvider['proId'], PDO::PARAM_STR);
+                $statement->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
 
                 $statement->execute();
 
                 $generate = new SimpleList($this->pdo, 'No bot type found - ' . $dbResultProvider['proName'] . ' <small>' . $dbResultProvider['proVersion'] . '</small>');
-                $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+                $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
                 file_put_contents($folder . '/bot-types.html', $generate->getHtml());
-                $output->write('.');
+
+                $message .= '.';
+
+                $messageLengthMax = max($messageLengthMax, mb_strlen($message));
+
+                $output->write("\r" . str_pad($message, $messageLengthMax));
             }
+
+            $message = $baseMessage . sprintf(' provider <fg=yellow>%s</> <info>done</info>', $dbResultProvider['proName']);
+
+            $messageLengthMax2 = max($messageLengthMax + 13, mb_strlen($message));
+            $output->writeln("\r" . str_pad($message, $messageLengthMax2));
         }
 
         $output->writeln("\r" . str_pad($baseMessage . ' each provider <info>done</info>', $messageLength + 30));
 
         $folder = $basePath . '/detected/general';
-        if (! file_exists($folder)) {
+        if (!file_exists($folder)) {
             mkdir($folder, 0777, true);
         }
 
@@ -884,7 +998,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected client names');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/client-names.html', $generate->getHtml());
         $output->write('.');
@@ -896,7 +1010,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected rendering engines');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/rendering-engines.html', $generate->getHtml());
         $output->write('.');
@@ -908,7 +1022,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected operating systems');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/operating-systems.html', $generate->getHtml());
         $output->write('.');
@@ -920,7 +1034,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected device models');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/device-models.html', $generate->getHtml());
         $output->write('.');
@@ -932,7 +1046,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected device brands');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/device-brands.html', $generate->getHtml());
         $output->write('.');
@@ -944,7 +1058,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected device types');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/device-types.html', $generate->getHtml());
         $output->write('.');
@@ -956,7 +1070,7 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected bot names');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/bot-names.html', $generate->getHtml());
         $output->write('.');
@@ -968,51 +1082,52 @@ class GenerateReports extends Command
         $statement->execute();
 
         $generate = new SimpleList($this->pdo, 'Detected bot types');
-        $generate->setElements($statement->fetchAll(\PDO::FETCH_ASSOC));
+        $generate->setElements($statement->fetchAll(PDO::FETCH_ASSOC));
 
         file_put_contents($folder . '/bot-types.html', $generate->getHtml());
 
         $output->writeln("\r" . 'generate overview pages for found elements <info>done</info>  ');
 
-//        $output->write('generate useragent detail pages');
-//
-//        $statementSelectUa = $this->pdo->prepare('SELECT * FROM `useragent`');
-//        $statementSelectUa->execute();
-//
-//        $statementSelectResults = $this->pdo->prepare('SELECT `result`.*, `provider`.* FROM `result` INNER JOIN `provider` ON `result`.`provider_id` = `provider`.`proId` WHERE `result`.`userAgent_id` = :uaId AND `provider`.`proIsActive` = 1 ORDER BY `provider`.`proName`');
-//        $uaCount = 0;
-//
-//        while ($dbResultUa = $statementSelectUa->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
-//            $statementSelectResults->bindValue(':uaId', $dbResultUa['uaId'], \PDO::PARAM_STR);
-//            $statementSelectResults->execute();
-//            $results = $statementSelectResults->fetchAll(\PDO::FETCH_ASSOC);
-//
-//            if (count($results) === 0) {
-//                throw new \Exception('no results found... SELECT `result`.*, `provider`.* FROM `result` INNER JOIN `provider` ON `result`.`provider_id` = `provider`.`proId` WHERE `result`.`userAgent_id` = ' . $dbResultUa['uaId']);
-//            }
-//
-//            $generate = new UserAgentDetail($this->pdo, 'User agent detail - ' . $dbResultUa['uaString']);
-//            $generate->setUserAgent($dbResultUa);
-//            $generate->setResults($results);
-//
-//            /*
-//             * create the folder
-//             */
-//            $folder = $basePath . '/user-agent-detail/' . substr($dbResultUa['uaId'], 0, 2) . '/' . substr($dbResultUa['uaId'], 2, 2);
-//            if (! file_exists($folder)) {
-//                mkdir($folder, 0777, true);
-//            }
-//
-//            /*
-//             * persist!
-//             */
-//            file_put_contents($folder . '/' . $dbResultUa['uaId'] . '.html', $generate->getHtml());
-//            ++$uaCount;
-//
-//            $output->write("\r" . 'generate useragent detail pages ' . $uaCount);
-//        }
-//
-//        $output->writeln("\r" . 'generate useragent detail pages <info>done</info>          ');
+        $output->write('generate useragent detail pages');
+
+        $statementSelectUa = $this->pdo->prepare('SELECT * FROM `useragent`');
+        $statementSelectUa->execute();
+
+        $statementSelectResults = $this->pdo->prepare('SELECT `result`.*, `provider`.* FROM `result` INNER JOIN `provider` ON `result`.`provider_id` = `provider`.`proId` WHERE `result`.`userAgent_id` = :uaId AND `result`.`run` = :runId AND `provider`.`proIsActive` = 1 ORDER BY `provider`.`proName`');
+        $uaCount                = 0;
+
+        while ($dbResultUa = $statementSelectUa->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $statementSelectResults->bindValue(':uaId', $dbResultUa['uaId'], PDO::PARAM_STR);
+            $statementSelectResults->bindValue(':runId', $thisRunName ?? 0, PDO::PARAM_STR);
+            $statementSelectResults->execute();
+            $results = $statementSelectResults->fetchAll(PDO::FETCH_ASSOC);
+
+            if (0 === count($results)) {
+                continue;
+            }
+
+            $generate = new UserAgentDetail($this->pdo, 'User agent detail - ' . $dbResultUa['uaString']);
+            $generate->setUserAgent($dbResultUa);
+            $generate->setResults($results);
+
+            /*
+             * create the folder
+             */
+            $folder = $basePath . '/user-agent-detail/' . mb_substr($dbResultUa['uaId'], 0, 2) . '/' . mb_substr($dbResultUa['uaId'], 2, 2);
+            if (!file_exists($folder)) {
+                mkdir($folder, 0777, true);
+            }
+
+            /*
+             * persist!
+             */
+            file_put_contents($folder . '/' . $dbResultUa['uaId'] . '.html', $generate->getHtml());
+            ++$uaCount;
+
+            $output->write("\r" . 'generate useragent detail pages ' . $uaCount);
+        }
+
+        $output->writeln("\r" . 'generate useragent detail pages <info>done</info>          ');
 
         $output->writeln('<info>done</info>');
 

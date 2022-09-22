@@ -1,39 +1,26 @@
 <?php
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
-use function file_get_contents;
-use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
-use function mkdir;
-use function sort;
-use function sprintf;
-use SplFileInfo;
+use PDO;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class InitDb extends Command
+final class InitDb extends Command
 {
-    private \PDO $pdo;
-
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -42,11 +29,6 @@ class InitDb extends Command
         $this->setName('init-db');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('~~~ initialize database ~~~');
@@ -347,7 +329,7 @@ class InitDb extends Command
         $this->pdo->prepare('CREATE OR REPLACE VIEW `test-provider` AS SELECT * FROM `provider` WHERE `proType` = \'testSuite\' AND `proIsActive` = 1')->execute();
 
         $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT 
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT
         `resClientName` AS `name`,
         `uaId`,
         `uaString`,

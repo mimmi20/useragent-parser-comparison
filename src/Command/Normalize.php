@@ -1,34 +1,31 @@
 <?php
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
-use function file_get_contents;
-use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function mkdir;
-use function sprintf;
-use SplFileInfo;
+use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Normalize extends Command
+use function assert;
+use function is_string;
+use function sprintf;
+
+final class Normalize extends Command
 {
-    private \PDO $pdo;
-
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -42,8 +39,8 @@ class Normalize extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string|null $thisRunName */
         $thisRunName = $input->getArgument('run');
+        assert(is_string($thisRunName) || null === $thisRunName);
 
         if (empty($thisRunName)) {
             // @todo Show user the available runs, perhaps limited to 10 or something, for now, throw an error
@@ -52,30 +49,31 @@ class Normalize extends Command
             return self::FAILURE;
         }
 
-        $statementSelectResultRun  = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run');
-        $statementSelectResultRun->bindValue(':run', $thisRunName, \PDO::PARAM_STR);
+        $statementSelectResultRun = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run');
+        $statementSelectResultRun->bindValue(':run', $thisRunName, PDO::PARAM_STR);
         $statementSelectResultRun->execute();
 
-        $statementSelectResultSource  = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId');
+        $statementSelectResultSource = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId');
 
-        /** @var Helper\Normalize $normalizeHelper */
         $normalizeHelper = $this->getHelper('normalize');
+        assert($normalizeHelper instanceof Helper\Normalize);
 
-        /** @var Helper\NormalizedResult $resultHelper */
         $resultHelper = $this->getHelper('normalized-result');
+        assert($resultHelper instanceof Helper\NormalizedResult);
 
         $output->writeln(sprintf('<comment>Normalizing data from test run: %s</comment>', $thisRunName));
 
-        while ($runRow = $statementSelectResultRun->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
-            $statementSelectResultSource->bindValue(':run', '0', \PDO::PARAM_STR);
-            $statementSelectResultSource->bindValue(':uaId', $runRow['userAgent_id'], \PDO::PARAM_STR);
+        while ($runRow = $statementSelectResultRun->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $statementSelectResultSource->bindValue(':run', '0', PDO::PARAM_STR);
+            $statementSelectResultSource->bindValue(':uaId', $runRow['userAgent_id'], PDO::PARAM_STR);
 
             $statementSelectResultSource->execute();
 
-            $sourceRow = $statementSelectResultSource->fetch(\PDO::FETCH_ASSOC);
+            $sourceRow = $statementSelectResultSource->fetch(PDO::FETCH_ASSOC);
 
             if (false === $sourceRow) {
                 $output->writeln(sprintf('<error>Normalizing data from test run: %s - source for UA "%s" not found</error>', $thisRunName, $runRow['userAgent_id']));
+
                 continue;
             }
 

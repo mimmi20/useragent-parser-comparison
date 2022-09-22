@@ -1,26 +1,44 @@
 <?php
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
-use function preg_replace;
 use Symfony\Component\Console\Helper\Helper;
 
-class Normalize extends Helper
+use function array_key_exists;
+use function array_keys;
+use function array_slice;
+use function explode;
+use function file_exists;
+use function implode;
+use function in_array;
+use function is_array;
+use function mb_strtolower;
+use function preg_replace;
+use function str_replace;
+
+final class Normalize extends Helper
 {
-    /**
-     * @var string
-     */
     private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
     private array $mappings = [];
 
     public function __construct()
     {
-        if (file_exists(self::MAP_FILE)) {
-            $this->mappings = include self::MAP_FILE;
+        if (!file_exists(self::MAP_FILE)) {
+            return;
         }
+
+        $this->mappings = include self::MAP_FILE;
     }
 
     public function getName(): string
@@ -33,9 +51,9 @@ class Normalize extends Helper
         $normalized = [];
 
         foreach (array_keys($parsed) as $key) {
-            $normKey = strtolower(str_replace('res', '', $key));
+            $normKey = mb_strtolower(str_replace('res', '', $key));
 
-            $normalized[$key] = $this->normalizeValue($key, $normKey, $parsed[$key]);
+            $normalized[$key] = $this->normalizeValue($key, $normKey, $parsed[$key], $parsed);
         }
 
         return $normalized;
@@ -50,50 +68,51 @@ class Normalize extends Helper
         return implode('.', $versionParts);
     }
 
-    private function normalizeValue(string $key, string $normKey, mixed $value): array|string|null
+    private function normalizeValue(string | int $key, string $normKey, mixed $value, array $parsed): array | float | string | null
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
-        if ($value === false) {
+        if (false === $value) {
             return 'false';
         }
 
-        if ($value === true) {
+        if (true === $value) {
             return 'true';
         }
 
         if (is_array($value)) {
             $list = [];
             foreach ($value as $key2 => $value2) {
-                $list[$key2] = $this->normalizeValue($key2, $normKey, $value2);
+                $list[$key2] = $this->normalizeValue($key2, $normKey, $value2, $parsed);
             }
 
             return $list;
         }
 
-        if (in_array($normKey, ['clientversion', 'osversion', 'engineversion'])) {
+        if (in_array($normKey, ['clientversion', 'osversion', 'engineversion'], true)) {
             $value = $this->truncateVersion(mb_strtolower((string) $value));
-        } elseif (in_array($normKey, ['devicedisplaysize'])) {
+        } elseif (in_array($normKey, ['devicedisplaysize'], true)) {
             $value = preg_replace('|[^0-9a-z.]|', '', mb_strtolower((string) $value));
-        } else {
+        } elseif (!in_array($normKey, ['parse_time', 'init_time', 'version'], true)) {
             $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
         }
 
         // Special Windows normalization for parsers that don't differntiate the version of windows
         // in the name, but use the version.
-        if ($normKey === 'osname' && !empty($parsed['resOsVersion'])) {
-            if ($value === 'windows') {
+        if ('osname' === $normKey && !empty($parsed['resOsVersion'])) {
+            if ('windows' === $value) {
                 $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['resOsVersion']));
             }
 
-            if ($value === 'windowsphone') {
+            if ('windowsphone' === $value) {
                 $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['resOsVersion']));
             }
         }
 
-        if (isset($this->mappings[$normKey])
+        if (
+            isset($this->mappings[$normKey])
             && is_array($this->mappings[$normKey])
         ) {
             $v = $this->mappings[$normKey];

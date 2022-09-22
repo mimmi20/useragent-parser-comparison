@@ -1,41 +1,48 @@
 <?php
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
+use PDO;
 use Ramsey\Uuid\Uuid;
-use function fclose;
-use function file_put_contents;
-use function fopen;
-use function fputcsv;
-use function json_encode;
-use function mkdir;
-use function rewind;
-use function stream_get_contents;
+use SplFileObject;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableCell;
-use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
+use UserAgentParserComparison\Command\Helper\Parsers;
 
-class Parse extends Command
+use function addcslashes;
+use function assert;
+use function bin2hex;
+use function date;
+use function is_string;
+use function json_encode;
+use function max;
+use function mb_strlen;
+use function mb_substr;
+use function sha1;
+use function sprintf;
+use function str_pad;
+
+use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
+use const PHP_EOL;
+
+final class Parse extends Command
 {
-    private \PDO $pdo;
-
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -50,11 +57,11 @@ class Parse extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string $filename */
-        $filename  = $input->getArgument('file');
+        $filename = $input->getArgument('file');
+        assert(is_string($filename));
 
-        /** @var string|null $thisRunName */
         $thisRunName = $input->getArgument('run');
+        assert(is_string($thisRunName) || null === $thisRunName);
 
         if (empty($thisRunName)) {
             $thisRunName = date('YmdHis');
@@ -66,13 +73,13 @@ class Parse extends Command
         $statementInsertUa       = $this->pdo->prepare('INSERT INTO `useragent` (`uaId`, `uaHash`, `uaString`, `uaAdditionalHeaders`) VALUES (:uaId, :uaHash, :uaString, :uaAdditionalHeaders)');
         $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
 
-        /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
-        $parsers      = $parserHelper->getParsers($input, $output);
-        $actualTest   = 0;
+        assert($parserHelper instanceof Parsers);
+        $parsers    = $parserHelper->getParsers($input, $output);
+        $actualTest = 0;
 
-        $file   = new \SplFileObject($filename);
-        $file->setFlags(\SplFileObject::DROP_NEW_LINE);
+        $file = new SplFileObject($filename);
+        $file->setFlags(SplFileObject::DROP_NEW_LINE);
 
         $providers  = [];
         $nameLength = 0;
@@ -80,13 +87,14 @@ class Parse extends Command
         foreach ($parsers as $parserPath => $parserConfig) {
             $proName = $parserConfig['metadata']['name'] ?? $parserPath;
 
-            $statementSelectProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
+            $statementSelectProvider->bindValue(':proName', $proName, PDO::PARAM_STR);
             $statementSelectProvider->execute();
 
-            $proId = $statementSelectProvider->fetch(\PDO::FETCH_COLUMN);
+            $proId = $statementSelectProvider->fetch(PDO::FETCH_COLUMN);
 
             if (!$proId) {
                 $output->writeln(sprintf('<error>no provider found with name %s</error>', $proName));
+
                 continue;
             }
 
@@ -95,8 +103,8 @@ class Parse extends Command
             $providers[$proName] = [$parserPath, $parserConfig, $proId];
         }
 
-        /** @var Helper\Result $resultHelper */
         $resultHelper = $this->getHelper('result');
+        assert($resultHelper instanceof Helper\Result);
 
         $inserted = 0;
         $updated  = 0;
@@ -109,17 +117,17 @@ class Parse extends Command
                 continue;
             }
 
-            $agent = addcslashes($agentString, PHP_EOL);
+            $agent       = addcslashes($agentString, PHP_EOL);
             $agentToShow = $agent;
 
-            if (mb_strlen($agentToShow) > 100) {
+            if (100 < mb_strlen($agentToShow)) {
                 $agentToShow = mb_substr($agentToShow, 0, 96) . ' ...';
             }
 
             $basicTestMessage = sprintf(
                 '<info>parsing</info> [%s] UA: <fg=yellow>%s</>',
                 $actualTest,
-                $agentToShow
+                $agentToShow,
             );
 
             $output->write("\r" . $basicTestMessage);
@@ -130,11 +138,11 @@ class Parse extends Command
             /*
              * insert UA itself
              */
-            $statementSelectUa->bindValue(':uaHash', $uaHash, \PDO::PARAM_STR);
+            $statementSelectUa->bindValue(':uaHash', $uaHash, PDO::PARAM_STR);
 
             $statementSelectUa->execute();
 
-            $dbResultUa = $statementSelectUa->fetch(\PDO::FETCH_ASSOC);
+            $dbResultUa = $statementSelectUa->fetch(PDO::FETCH_ASSOC);
 
             if (false !== $dbResultUa) {
                 // update!
@@ -146,9 +154,9 @@ class Parse extends Command
 
                 $additionalHeaders = null;
 
-                $statementInsertUa->bindValue(':uaId', $uaId, \PDO::PARAM_STR);
-                $statementInsertUa->bindValue(':uaHash', $uaHash, \PDO::PARAM_STR);
-                $statementInsertUa->bindValue(':uaString', $agent, \PDO::PARAM_STR);
+                $statementInsertUa->bindValue(':uaId', $uaId, PDO::PARAM_STR);
+                $statementInsertUa->bindValue(':uaHash', $uaHash, PDO::PARAM_STR);
+                $statementInsertUa->bindValue(':uaString', $agent, PDO::PARAM_STR);
                 $statementInsertUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
                 $statementInsertUa->execute();
@@ -162,7 +170,6 @@ class Parse extends Command
             $resultHelper->storeResult('0', $proId, $uaId, []);
 
             foreach ($providers as $parserName => $provider) {
-
                 [, $parserConfig, $proId] = $provider;
 
                 $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser...';

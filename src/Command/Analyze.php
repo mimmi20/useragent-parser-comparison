@@ -1,31 +1,64 @@
 <?php
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use Symfony\Component\Console\Helper\TableCellStyle;
-use Symfony\Component\Console\Helper\TableStyle;
-use UserAgentParserComparison\Compare\Comparison;
-use function array_flip;
-use function file_get_contents;
-use function json_decode;
-use function ksort;
-use function sort;
-use function sprintf;
-use function uasort;
+use FilesystemIterator;
+use PDO;
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableCellStyle;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use Throwable;
+use UserAgentParserComparison\Command\Helper\Tests;
+use UserAgentParserComparison\Compare\Comparison;
 
-class Analyze extends Command
+use function array_filter;
+use function array_flip;
+use function array_key_exists;
+use function array_keys;
+use function array_merge;
+use function array_pop;
+use function array_search;
+use function array_shift;
+use function array_splice;
+use function array_values;
+use function assert;
+use function count;
+use function current;
+use function file_exists;
+use function file_get_contents;
+use function file_put_contents;
+use function is_array;
+use function is_string;
+use function json_decode;
+use function ksort;
+use function number_format;
+use function reset;
+use function sort;
+use function sprintf;
+use function uasort;
+use function ucfirst;
+
+use const JSON_THROW_ON_ERROR;
+
+final class Analyze extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
 
@@ -35,23 +68,16 @@ class Analyze extends Command
 
     private array $agents = [];
 
-    private ?Table $summaryTable = null;
+    private Table | null $summaryTable = null;
 
-    private ?InputInterface $input = null;
+    private InputInterface | null $input = null;
 
-    private ?OutputInterface $output = null;
+    private OutputInterface | null $output = null;
 
     private array $failures = [];
 
-    private \PDO $pdo;
-
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -68,15 +94,15 @@ class Analyze extends Command
         $this->input  = $input;
         $this->output = $output;
 
-        /** @var string|null $thisRunName */
         $thisRunName = $input->getArgument('run');
+        assert(is_string($thisRunName) || null === $thisRunName);
 
         if (empty($thisRunName)) {
-            /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
             $testHelper = $this->getHelper('tests');
-            $thisRunName        = $testHelper->getTest($input, $output);
+            assert($testHelper instanceof Tests);
+            $thisRunName = $testHelper->getTest($input, $output);
 
-            if ($thisRunName === null) {
+            if (null === $thisRunName) {
                 $output->writeln('<error>No valid test run found</error>');
 
                 return self::FAILURE;
@@ -99,7 +125,7 @@ class Analyze extends Command
 
         try {
             $contents = file_get_contents($metaDataFile);
-        } catch (Exception $e) {
+        } catch (Throwable) {
             $output->writeln(sprintf('<error>Could not read file (%s)</error>', $metaDataFile));
 
             return self::INVALID;
@@ -107,23 +133,23 @@ class Analyze extends Command
 
         try {
             $this->options = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-        } catch (Exception $e) {
+        } catch (Throwable) {
             $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
 
             return self::INVALID;
         }
 
-        $statementSelectResultRun  = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run');
-        $statementSelectResultRun->bindValue(':run', $thisRunName, \PDO::PARAM_STR);
+        $statementSelectResultRun = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run');
+        $statementSelectResultRun->bindValue(':run', $thisRunName, PDO::PARAM_STR);
         $statementSelectResultRun->execute();
 
-        $statementSelectResultSource  = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId');
+        $statementSelectResultSource = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId');
 
-        /** @var Helper\Normalize $normalizeHelper */
         $normalizeHelper = $this->getHelper('normalize');
+        assert($normalizeHelper instanceof Helper\Normalize);
 
-        /** @var Helper\NormalizedResult $resultHelper */
         $resultHelper = $this->getHelper('normalized-result');
+        assert($resultHelper instanceof Helper\NormalizedResult);
 
         $output->writeln(sprintf('<info>Analyzing data from test run: %s</info>', $thisRunName));
 
@@ -155,56 +181,56 @@ class Analyze extends Command
                 [
                     'rowspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
             new TableCell(
                 'Version',
                 [
                     'rowspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
             new TableCell(
                 'Client Results',
                 [
                     'colspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
             new TableCell(
                 'Engine Results',
                 [
                     'colspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
             new TableCell(
                 'Platform Results',
                 [
                     'colspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
             new TableCell(
                 'Device Results',
                 [
                     'colspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
             new TableCell(
                 'Time',
                 [
                     'colspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
             new TableCell(
                 'Score',
                 [
                     'colspan' => 2,
                     'style' => $headerStyle,
-                ]
+                ],
             ),
         ];
         $rows[] = [
@@ -222,46 +248,47 @@ class Analyze extends Command
             new TableCell('Accuracy', ['style' => $headerStyle]),
         ];
 
-        while ($runRow = $statementSelectResultRun->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
-            $statementSelectResultSource->bindValue(':run', '0', \PDO::PARAM_STR);
-            $statementSelectResultSource->bindValue(':uaId', $runRow['userAgent_id'], \PDO::PARAM_STR);
+        while ($runRow = $statementSelectResultRun->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $statementSelectResultSource->bindValue(':run', '0', PDO::PARAM_STR);
+            $statementSelectResultSource->bindValue(':uaId', $runRow['userAgent_id'], PDO::PARAM_STR);
 
             $statementSelectResultSource->execute();
 
-            $sourceRow = $statementSelectResultSource->fetch(\PDO::FETCH_ASSOC);
+            $sourceRow = $statementSelectResultSource->fetch(PDO::FETCH_ASSOC);
 
             if (false === $sourceRow) {
                 $output->writeln(sprintf('<error>Analyzing data from test run: %s - source for UA "%s" not found</error>', $thisRunName, $runRow['userAgent_id']));
+
                 continue;
             }
 
-            $headerMessage   = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : ''));
+            $headerMessage = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '');
         }
 
         foreach ($this->options['tests'] as $testSuite => $testData) {
             $this->comparison[$testSuite] = [];
 
             $expectedFilename = $this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite;
-            $expectedResults = ['tests' => []];
+            $expectedResults  = ['tests' => []];
 
             if (file_exists($expectedFilename)) {
-                // Process the test files (expected data)
-                /** @var \SplFileInfo $testFile */
-                foreach (new \FilesystemIterator($this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite) as $testFile) {
+                foreach (new FilesystemIterator($this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite) as $testFile) {
+                    assert($testFile instanceof SplFileInfo);
                     if ($testFile->isDir() || 'metadata.json' === $testFile->getFilename()) {
                         continue;
                     }
 
                     try {
                         $contents = file_get_contents($testFile->getPathname());
-                    } catch (Exception $e) {
+                    } catch (Throwable) {
                         continue;
                     }
 
                     try {
                         $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (Exception $e) {
+                    } catch (Throwable) {
                         $output->writeln("\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>');
+
                         continue;
                     }
 
@@ -270,23 +297,25 @@ class Analyze extends Command
                     $expectedResults['tests'][$singleTestName] = $data['test'];
                 }
 
-                $headerMessage   = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : ''));
+                $headerMessage = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '');
             } else {
                 // When we aren't comparing to a test suite, the first parser's results become the expected results
 
-                $fileName        = $this->runDir . '/' . $thisRunName . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testSuite . '.json';
+                $fileName = $this->runDir . '/' . $thisRunName . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testSuite . '.json';
                 try {
                     $contents = file_get_contents($fileName);
-                } catch (Exception $e) {
+                } catch (Throwable) {
                     $this->output->writeln('<error>Could not read file (' . $fileName . ')</error>');
+
                     continue;
                 }
 
                 try {
                     $testResult    = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                     $headerMessage = sprintf('<fg=yellow>Parser comparison for %s file, using %s results as expected</>', $testSuite, array_keys($this->options['parsers'])[0]);
-                } catch (Exception $e) {
+                } catch (Throwable) {
                     $this->output->writeln(sprintf('<error>An error occured while parsing metadata for run %s, skipping</error>', $thisRunName));
+
                     continue;
                 }
 
@@ -305,14 +334,14 @@ class Analyze extends Command
 
             $this->agents = array_flip(array_keys($expectedResults['tests']));
 
-            $scores         = [];
+            $scores = [];
 
             foreach ($this->options['parsers'] as $parserName => $parserData) {
                 $passFail = [
-                    'client'   => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'client' => ['count' => 0, 'pass' => 0, 'fail' => 0],
                     'platform' => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                    'device'   => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                    'engine'   => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'device' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'engine' => ['count' => 0, 'pass' => 0, 'fail' => 0],
                 ];
 
                 $scores[$parserName][$testSuite] = [
@@ -324,10 +353,10 @@ class Analyze extends Command
                 $parseTime = 0.0;
                 $initTime  = 0.0;
 
-                foreach (new \FilesystemIterator($this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $testSuite) as $resultFile) {
+                foreach (new FilesystemIterator($this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $testSuite) as $resultFile) {
                     try {
                         $contents = file_get_contents($resultFile->getPathname());
-                    } catch (Exception $e) {
+                    } catch (Throwable) {
                         $this->output->writeln(sprintf('<error>Could not read file (%s), skipping</error>', $resultFile->getPathname()));
 
                         continue;
@@ -335,7 +364,7 @@ class Analyze extends Command
 
                     try {
                         $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (Exception $e) {
+                    } catch (Throwable) {
                         $this->output->writeln(sprintf('<error>An error occured while parsing file (%s), skipping</error>', $resultFile->getPathname()));
 
                         continue;
@@ -369,9 +398,7 @@ class Analyze extends Command
 
                         $filtered = array_filter(
                             $expected[$compareKey],
-                            function(mixed $value): bool {
-                                return $value !== null;
-                            }
+                            static fn (mixed $value): bool => null !== $value,
                         );
 
                         $scores[$parserName][$testSuite]['count'] += count($filtered);
@@ -380,17 +407,19 @@ class Analyze extends Command
                     }
 
                     $this->comparison[$testSuite] = $comparison->getComparison($parserName, $this->agents[$singleTestName] ?? 0);
-                    $failures = $comparison->getFailures();
+                    $failures                     = $comparison->getFailures();
 
-                    if (!empty($failures)) {
-                        $this->failures[$testSuite][$parserName][$singleTestName] = [
-                            'headers' => $data['headers'],
-                            'fail' => $failures,
-                        ];
+                    if (empty($failures)) {
+                        continue;
                     }
+
+                    $this->failures[$testSuite][$parserName][$singleTestName] = [
+                        'headers' => $data['headers'],
+                        'fail' => $failures,
+                    ];
                 }
 
-                if (($passFail['client']['pass'] + $passFail['client']['fail']) === 0) {
+                if (0 === $passFail['client']['pass'] + $passFail['client']['fail']) {
                     $clientTContent = '<fg=white;bg=blue>-</>';
                     $clientAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -401,7 +430,7 @@ class Analyze extends Command
                     $clientAContent    = $this->colorByPercent($clientAPercentage) . $passFail['client']['pass'] . '/' . ($passFail['client']['pass'] + $passFail['client']['fail']) . ' ' . number_format($clientAPercentage, 2) . '%</>';
                 }
 
-                if (($passFail['engine']['pass'] + $passFail['engine']['fail']) === 0) {
+                if (0 === $passFail['engine']['pass'] + $passFail['engine']['fail']) {
                     $engineTContent = '<fg=white;bg=blue>-</>';
                     $engineAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -412,7 +441,7 @@ class Analyze extends Command
                     $engineAContent    = $this->colorByPercent($engineAPercentage) . $passFail['engine']['pass'] . '/' . ($passFail['engine']['pass'] + $passFail['engine']['fail']) . ' ' . number_format($engineAPercentage, 2) . '%</>';
                 }
 
-                if (($passFail['platform']['pass'] + $passFail['platform']['fail']) === 0) {
+                if (0 === $passFail['platform']['pass'] + $passFail['platform']['fail']) {
                     $platformTContent = '<fg=white;bg=blue>-</>';
                     $platformAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -423,7 +452,7 @@ class Analyze extends Command
                     $platformAContent    = $this->colorByPercent($platformAPercentage) . $passFail['platform']['pass'] . '/' . ($passFail['platform']['pass'] + $passFail['platform']['fail']) . ' ' . number_format($platformAPercentage, 2) . '%</>';
                 }
 
-                if (($passFail['device']['pass'] + $passFail['device']['fail']) === 0) {
+                if (0 === $passFail['device']['pass'] + $passFail['device']['fail']) {
                     $deviceTContent = '<fg=white;bg=blue>-</>';
                     $deviceAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -434,7 +463,7 @@ class Analyze extends Command
                     $deviceAContent    = $this->colorByPercent($deviceAPercentage) . $passFail['device']['pass'] . '/' . ($passFail['device']['pass'] + $passFail['device']['fail']) . ' ' . number_format($deviceAPercentage, 2) . '%</>';
                 }
 
-                if (($scores[$parserName][$testSuite]['pass'] + $scores[$parserName][$testSuite]['fail']) === 0) {
+                if (0 === $scores[$parserName][$testSuite]['pass'] + $scores[$parserName][$testSuite]['fail']) {
                     $summaryTContent = '<fg=white;bg=blue>-</>';
                     $summaryAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -464,13 +493,13 @@ class Analyze extends Command
 
                 if (!isset($totals[$parserName])) {
                     $totals[$parserName] = [
-                        'client'   => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                        'engine'   => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                        'client' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                        'engine' => ['count' => 0, 'pass' => 0, 'fail' => 0],
                         'platform' => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                        'device'   => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                        'time'     => 0,
-                        'init'     => 0,
-                        'score'    => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                        'device' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                        'time' => 0,
+                        'init' => 0,
+                        'score' => ['count' => 0, 'pass' => 0, 'fail' => 0],
                     ];
                 }
 
@@ -496,12 +525,12 @@ class Analyze extends Command
             $rows[] = new TableSeparator();
         }
 
-        if (count($this->options['tests']) > 1) {
+        if (1 < count($this->options['tests'])) {
             $rows[] = [new TableCell('<fg=yellow>Total for all Test suites</>', ['colspan' => 13])];
             $rows[] = new TableSeparator();
 
             foreach ($totals as $parser => $total) {
-                if (($total['client']['pass'] + $total['client']['fail']) === 0) {
+                if (0 === $total['client']['pass'] + $total['client']['fail']) {
                     $clientTContent = '<fg=white;bg=blue>-</>';
                     $clientAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -512,7 +541,7 @@ class Analyze extends Command
                     $clientAContent    = $this->colorByPercent($clientAPercentage) . $total['client']['pass'] . '/' . ($total['client']['pass'] + $total['client']['fail']) . ' ' . number_format($clientAPercentage, 2) . '%</>';
                 }
 
-                if (($total['engine']['pass'] + $total['engine']['fail']) === 0) {
+                if (0 === $total['engine']['pass'] + $total['engine']['fail']) {
                     $engineTContent = '<fg=white;bg=blue>-</>';
                     $engineAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -523,7 +552,7 @@ class Analyze extends Command
                     $engineAContent    = $this->colorByPercent($engineAPercentage) . $total['engine']['pass'] . '/' . ($total['engine']['pass'] + $total['engine']['fail']) . ' ' . number_format($engineAPercentage, 2) . '%</>';
                 }
 
-                if (($total['platform']['pass'] + $total['platform']['fail']) === 0) {
+                if (0 === $total['platform']['pass'] + $total['platform']['fail']) {
                     $platformTContent = '<fg=white;bg=blue>-</>';
                     $platformAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -534,7 +563,7 @@ class Analyze extends Command
                     $platformAContent    = $this->colorByPercent($platformAPercentage) . $total['platform']['pass'] . '/' . ($total['platform']['pass'] + $total['platform']['fail']) . ' ' . number_format($platformAPercentage, 2) . '%</>';
                 }
 
-                if (($total['device']['pass'] + $total['device']['fail']) === 0) {
+                if (0 === $total['device']['pass'] + $total['device']['fail']) {
                     $deviceTContent = '<fg=white;bg=blue>-</>';
                     $deviceAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -545,7 +574,7 @@ class Analyze extends Command
                     $deviceAContent    = $this->colorByPercent($deviceAPercentage) . $total['device']['pass'] . '/' . ($total['device']['pass'] + $total['device']['fail']) . ' ' . number_format($deviceAPercentage, 2) . '%</>';
                 }
 
-                if (($total['score']['pass'] + $total['score']['fail']) === 0) {
+                if (0 === $total['score']['pass'] + $total['score']['fail']) {
                     $summaryTContent = '<fg=white;bg=blue>-</>';
                     $summaryAContent = '<fg=white;bg=blue>-</>';
                 } else {
@@ -558,7 +587,7 @@ class Analyze extends Command
 
                 $rows[] = [
                     $parser,
-                    isset($this->options['parsers'][$parser]['metadata']['version']) ? $this->options['parsers'][$parser]['metadata']['version'] : 'n/a',
+                    $this->options['parsers'][$parser]['metadata']['version'] ?? 'n/a',
                     $clientTContent,
                     $clientAContent,
                     $engineTContent,
@@ -596,10 +625,10 @@ class Analyze extends Command
     {
         $questionHelper = $this->getHelper('question');
 
-        if (count($this->options['tests']) > 1) {
+        if (1 < count($this->options['tests'])) {
             $question = new ChoiceQuestion(
                 'Which Test Suite?',
-                array_keys($this->options['tests'])
+                array_keys($this->options['tests']),
             );
 
             $selectedTest = $questionHelper->ask($this->input, $this->output, $question);
@@ -616,11 +645,10 @@ class Analyze extends Command
 
         $question = new ChoiceQuestion(
             'Which Section?',
-            ['client', 'engine', 'platform', 'device']
+            ['client', 'engine', 'platform', 'device'],
         );
-        $section = $questionHelper->ask($this->input, $this->output, $question);
 
-        return $section;
+        return $questionHelper->ask($this->input, $this->output, $question);
     }
 
     private function changePropertyDiffProperty(string $section): string
@@ -641,13 +669,13 @@ class Analyze extends Command
                 break;
         }
 
-        if (count($subs) > 1) {
+        if (1 < count($subs)) {
             $question = new ChoiceQuestion(
                 'Which Property?',
-                $subs
+                $subs,
             );
             $property = $questionHelper->ask($this->input, $this->output, $question);
-        } elseif (count($subs) === 1) {
+        } elseif (1 === count($subs)) {
             $property = reset($subs);
         } else {
             $property = 'name';
@@ -662,7 +690,7 @@ class Analyze extends Command
         $question       = new ChoiceQuestion(
             'What would you like to view?',
             ['Show Summary', 'View failure diff', 'View property comparison', 'Exit'],
-            3
+            3,
         );
 
         $answer = $questionHelper->ask($this->input, $this->output, $question);
@@ -676,11 +704,11 @@ class Analyze extends Command
             case 'View failure diff':
                 $answer = '';
                 do {
-                    if (!isset($selectedTest) || $answer === 'Change Test Suite') {
-                        if (count($this->options['tests']) > 1) {
+                    if (!isset($selectedTest) || 'Change Test Suite' === $answer) {
+                        if (1 < count($this->options['tests'])) {
                             $question = new ChoiceQuestion(
                                 'Which test suite?',
-                                array_keys($this->options['tests'])
+                                array_keys($this->options['tests']),
                             );
 
                             $selectedTest = $questionHelper->ask($this->input, $this->output, $question);
@@ -689,11 +717,11 @@ class Analyze extends Command
                         }
                     }
 
-                    if (!isset($selectedParser) || $answer === 'Change Parser') {
-                        if (count($this->options['parsers']) > 1) {
+                    if (!isset($selectedParser) || 'Change Parser' === $answer) {
+                        if (1 < count($this->options['parsers'])) {
                             $question = new ChoiceQuestion(
                                 'Which parser?',
-                                array_keys($this->options['parsers'])
+                                array_keys($this->options['parsers']),
                             );
 
                             $selectedParser = $questionHelper->ask($this->input, $this->output, $question);
@@ -702,27 +730,27 @@ class Analyze extends Command
                         }
                     }
 
-                    if (!isset($justAgents) || $answer === 'Show Full Diff') {
+                    if (!isset($justAgents) || 'Show Full Diff' === $answer) {
                         $justAgents = false;
-                    } elseif ($answer === 'Show Just UserAgents') {
+                    } elseif ('Show Just UserAgents' === $answer) {
                         $justAgents = true;
                     }
 
                     $this->analyzeFailures($selectedTest, $selectedParser, $justAgents);
 
                     $justAgentsQuestion = 'Show Just UserAgents';
-                    if ($justAgents === true) {
+                    if (true === $justAgents) {
                         $justAgentsQuestion = 'Show Full Diff';
                     }
 
                     $questions = ['Change Test Suite', 'Change Parser', $justAgentsQuestion, 'Back to Main Menu'];
 
-                    if (count($this->options['tests']) <= 1) {
-                        unset($questions[array_search('Change Test Suite', $questions)]);
+                    if (1 >= count($this->options['tests'])) {
+                        unset($questions[array_search('Change Test Suite', $questions, true)]);
                     }
 
-                    if (count($this->options['parsers']) <= 1) {
-                        unset($questions[array_search('Change Parser', $questions)]);
+                    if (1 >= count($this->options['parsers'])) {
+                        unset($questions[array_search('Change Parser', $questions, true)]);
                     }
 
                     // Re-index
@@ -731,11 +759,11 @@ class Analyze extends Command
                     $question = new ChoiceQuestion(
                         'What would you like to do?',
                         $questions,
-                        count($questions) - 1
+                        count($questions) - 1,
                     );
 
                     $answer = $questionHelper->ask($this->input, $this->output, $question);
-                } while ($answer !== 'Back to Main Menu');
+                } while ('Back to Main Menu' !== $answer);
 
                 $this->showMenu();
 
@@ -743,28 +771,28 @@ class Analyze extends Command
             case 'View property comparison':
                 $answer = '';
                 do {
-                    if (!isset($selectedTest) || $answer === 'Change Test Suite') {
+                    if (!isset($selectedTest) || 'Change Test Suite' === $answer) {
                         $selectedTest = $this->changePropertyDiffTestSuite();
                     }
 
-                    if (!isset($section) || $answer === 'Change Section') {
+                    if (!isset($section) || 'Change Section' === $answer) {
                         $section = $this->changePropertyDiffSection();
                     }
 
-                    if (!isset($property) || $answer === 'Change Section' || $answer === 'Change Property') {
+                    if (!isset($property) || 'Change Section' === $answer || 'Change Property' === $answer) {
                         $property = $this->changePropertyDiffProperty($section);
                     }
 
-                    if (!isset($justFails) || $answer === 'Show All') {
+                    if (!isset($justFails) || 'Show All' === $answer) {
                         $justFails = false;
-                    } elseif ($answer === 'Just Show Failures') {
+                    } elseif ('Just Show Failures' === $answer) {
                         $justFails = true;
                     }
 
                     $this->showComparison($selectedTest, $section, $property, $justFails);
 
                     $justFailureQuestion = 'Just Show Failures';
-                    if ($justFails === true) {
+                    if (true === $justFails) {
                         $justFailureQuestion = 'Show All';
                     }
 
@@ -775,11 +803,11 @@ class Analyze extends Command
                         'Back to Main Menu',
                     ];
 
-                    if (count($this->options['tests']) >= 1) {
+                    if (1 <= count($this->options['tests'])) {
                         array_splice($questions, 1, 0, 'Change Test Suite');
                     }
 
-                    if ($section === 'device') {
+                    if ('device' === $section) {
                         array_splice($questions, 2, 0, 'Change Property');
                     }
 
@@ -789,25 +817,27 @@ class Analyze extends Command
                     $question = new ChoiceQuestion(
                         'What would you like to do?',
                         $questions,
-                        count($questions) - 1
+                        count($questions) - 1,
                     );
 
                     $answer = $questionHelper->ask($this->input, $this->output, $question);
 
-                    if ($answer === 'Export User Agents') {
-                        $question     = new Question('Type the expected value to view the agents parsed:');
-                        $autoComplete = array_merge(['[no value]'], array_keys($this->comparison[$selectedTest][$section][$property]));
-                        sort($autoComplete);
-                        $question->setAutocompleterValues($autoComplete);
-
-                        $value = $questionHelper->ask($this->input, $this->output, $question);
-
-                        $this->showComparisonAgents($selectedTest, $section, $property, $value);
-
-                        $question = new Question('Press enter to continue', 'yes');
-                        $questionHelper->ask($this->input, $this->output, $question);
+                    if ('Export User Agents' !== $answer) {
+                        continue;
                     }
-                } while ($answer !== 'Back to Main Menu');
+
+                    $question     = new Question('Type the expected value to view the agents parsed:');
+                    $autoComplete = array_merge(['[no value]'], array_keys($this->comparison[$selectedTest][$section][$property]));
+                    sort($autoComplete);
+                    $question->setAutocompleterValues($autoComplete);
+
+                    $value = $questionHelper->ask($this->input, $this->output, $question);
+
+                    $this->showComparisonAgents($selectedTest, $section, $property, $value);
+
+                    $question = new Question('Press enter to continue', 'yes');
+                    $questionHelper->ask($this->input, $this->output, $question);
+                } while ('Back to Main Menu' !== $answer);
 
                 $this->showMenu();
 
@@ -821,12 +851,13 @@ class Analyze extends Command
 
     private function showComparisonAgents(string $test, string $section, string $property, string $value): void
     {
-        if ($value === '[no value]') {
+        if ('[no value]' === $value) {
             $value = '';
         }
 
         if (!isset($this->comparison[$test][$section][$property][$value])) {
             $this->output->writeln('<error>There were no agents processed with that property value</error>');
+
             return;
         }
 
@@ -838,6 +869,7 @@ class Analyze extends Command
         foreach ($this->comparison[$test][$section][$property][$value]['expected']['agents'] as $agentId) {
             $this->output->writeln($agents[$agentId]);
         }
+
         $this->output->writeln('');
     }
 
@@ -845,7 +877,7 @@ class Analyze extends Command
     {
         if (empty($this->failures[$test][$parser])) {
             $this->output->writeln(
-                '<error>There were no failures for the ' . $parser . ' parser for the ' . $test . ' test suite</error>'
+                '<error>There were no failures for the ' . $parser . ' parser for the ' . $test . ' test suite</error>',
             );
 
             return;
@@ -879,7 +911,7 @@ class Analyze extends Command
                 continue;
             }
 
-            if ($justAgents === true) {
+            if (true === $justAgents) {
                 foreach ($failData['headers'] as $header => $value) {
                     $this->output->writeln($header . ': ' . $value);
                 }
@@ -888,9 +920,7 @@ class Analyze extends Command
             }
 
             foreach ($failData['headers'] as $header => $value) {
-                $rows[] = [
-                    new TableCell($header . ': ' . $value, ['colspan' => 4])
-                ];
+                $rows[] = [new TableCell($header . ': ' . $value, ['colspan' => 4])];
             }
 
             $rows[] = [
@@ -943,16 +973,18 @@ class Analyze extends Command
                 $htmlD .= '<tr><td>' . $this->outputDiffHtml($failData['fail']['device']) . '</td></tr>';
             }
 
-            if (!empty($failData['fail']['engine'])) {
-                $htmlE .= '<tr><td>';
-
-                foreach ($failData['headers'] as $header => $value) {
-                    $htmlE .= $header . ': ' . $value . '<br/>';
-                }
-
-                $htmlE .= '</td></tr>';
-                $htmlE .= '<tr><td>' . $this->outputDiffHtml($failData['fail']['engine']) . '</td></tr>';
+            if (empty($failData['fail']['engine'])) {
+                continue;
             }
+
+            $htmlE .= '<tr><td>';
+
+            foreach ($failData['headers'] as $header => $value) {
+                $htmlE .= $header . ': ' . $value . '<br/>';
+            }
+
+            $htmlE .= '</td></tr>';
+            $htmlE .= '<tr><td>' . $this->outputDiffHtml($failData['fail']['engine']) . '</td></tr>';
         }
 
         $htmlG .= '</tbody></table></body></html>';
@@ -961,18 +993,20 @@ class Analyze extends Command
         $htmlP .= '</tbody></table></body></html>';
         $htmlD .= '</tbody></table></body></html>';
 
-        if ($justAgents === false) {
-            array_pop($rows);
-
-            $table->setRows($rows);
-
-            $table->render();
-            file_put_contents($this->runDir . '/errors-summary.html', $htmlG);
-            file_put_contents($this->runDir . '/errors-browsers.html', $htmlC);
-            file_put_contents($this->runDir . '/errors-engines.html', $htmlE);
-            file_put_contents($this->runDir . '/errors-platforms.html', $htmlP);
-            file_put_contents($this->runDir . '/errors-devices.html', $htmlD);
+        if (false !== $justAgents) {
+            return;
         }
+
+        array_pop($rows);
+
+        $table->setRows($rows);
+
+        $table->render();
+        file_put_contents($this->runDir . '/errors-summary.html', $htmlG);
+        file_put_contents($this->runDir . '/errors-browsers.html', $htmlC);
+        file_put_contents($this->runDir . '/errors-engines.html', $htmlE);
+        file_put_contents($this->runDir . '/errors-platforms.html', $htmlP);
+        file_put_contents($this->runDir . '/errors-devices.html', $htmlD);
     }
 
     private function showComparison(string $test, string $compareKey, string $compareSubKey, bool $justFails = false): void
@@ -987,7 +1021,7 @@ class Analyze extends Command
                 return 0;
             }
 
-            return ($a['expected']['count'] > $b['expected']['count']) ? -1 : 1;
+            return $a['expected']['count'] > $b['expected']['count'] ? -1 : 1;
         });
 
         $table = new Table($this->output);
@@ -1003,27 +1037,31 @@ class Analyze extends Command
         $rows = [];
 
         foreach ($this->comparison[$test][$compareKey][$compareSubKey] as $expected => $compareRow) {
-            if ($justFails === true && empty($compareRow['expected']['hasFailures'])) {
+            if (true === $justFails && empty($compareRow['expected']['hasFailures'])) {
                 continue;
             }
 
             $max = 0;
             foreach ($compareRow as $child) {
-                if (count($child) > $max) {
-                    $max = count($child);
+                if (count($child) <= $max) {
+                    continue;
                 }
+
+                $max = count($child);
             }
 
             foreach (array_keys($this->options['parsers']) as $parser) {
-                if (isset($compareRow[$parser])) {
-                    uasort($compareRow[$parser], static function (array $a, array $b): int {
-                        if ($a['count'] === $b['count']) {
-                            return 0;
-                        }
-
-                        return ($a['count'] > $b['count']) ? -1 : 1;
-                    });
+                if (!isset($compareRow[$parser])) {
+                    continue;
                 }
+
+                uasort($compareRow[$parser], static function (array $a, array $b): int {
+                    if ($a['count'] === $b['count']) {
+                        return 0;
+                    }
+
+                    return $a['count'] > $b['count'] ? -1 : 1;
+                });
             }
 
             for ($i = 0; $i < $max; ++$i) {
@@ -1031,23 +1069,23 @@ class Analyze extends Command
                 $parsers = array_merge(['expected'], array_keys($this->options['parsers']));
 
                 foreach ($parsers as $parser) {
-                    if ($parser === 'expected') {
-                        if ($i === 0) {
-                            $row[] = ($expected === '' ? '[no value]' : $expected) . ' <comment>(' . $compareRow['expected']['count'] . ')</comment>';
+                    if ('expected' === $parser) {
+                        if (0 === $i) {
+                            $row[] = ('' === $expected ? '[no value]' : $expected) . ' <comment>(' . $compareRow['expected']['count'] . ')</comment>';
                         } else {
                             $row[] = ' ';
                         }
                     } else {
-                        if (isset($compareRow[$parser]) && count($compareRow[$parser]) > 0) {
+                        if (isset($compareRow[$parser]) && 0 < count($compareRow[$parser])) {
                             $key      = current(array_keys($compareRow[$parser]));
                             $quantity = array_shift($compareRow[$parser]);
 
                             if ($key === $expected) {
-                                $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=green>(' . $quantity['count'] . ')</>';
-                            } elseif ($expected === '[n/a]' || $key === '[n/a]') {
-                                $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=blue>(' . $quantity['count'] . ')</>';
+                                $row[] = ('' === $key ? '[no value]' : $key) . ' <fg=green>(' . $quantity['count'] . ')</>';
+                            } elseif ('[n/a]' === $expected || '[n/a]' === $key) {
+                                $row[] = ('' === $key ? '[no value]' : $key) . ' <fg=blue>(' . $quantity['count'] . ')</>';
                             } else {
-                                $row[] = ($key === '' ? '[no value]' : $key) . ' <fg=red>(' . $quantity['count'] . ')</>';
+                                $row[] = ('' === $key ? '[no value]' : $key) . ' <fg=red>(' . $quantity['count'] . ')</>';
                             }
                         } else {
                             $row[] = ' ';
@@ -1072,12 +1110,12 @@ class Analyze extends Command
         $score = 0;
 
         foreach ($expected as $field => $value) {
-            if ($value === null || !array_key_exists($field, $actual)) {
+            if (null === $value || !array_key_exists($field, $actual)) {
                 continue;
             }
 
             // this happens if our possible score calculation is called
-            if ($possible === true && $actual[$field] !== null) {
+            if (true === $possible && null !== $actual[$field]) {
                 ++$score;
             } elseif ($value === $actual[$field]) {
                 ++$score;
@@ -1136,23 +1174,23 @@ class Analyze extends Command
 
     private function colorByPercent(float $percent): string
     {
-        if ($percent >= 100.0) {
+        if (100.0 <= $percent) {
             return '<fg=bright-green;bg=black>';
         }
 
-        if ($percent >= 95.0) {
+        if (95.0 <= $percent) {
             return '<fg=green;bg=black>';
         }
 
-        if ($percent >= 90.0) {
+        if (90.0 <= $percent) {
             return '<fg=bright-yellow;bg=black>';
         }
 
-        if ($percent >= 85.0) {
+        if (85.0 <= $percent) {
             return '<fg=yellow;bg=black>';
         }
 
-        if ($percent < 50.0) {
+        if (50.0 > $percent) {
             return '<fg=red;bg=black>';
         }
 

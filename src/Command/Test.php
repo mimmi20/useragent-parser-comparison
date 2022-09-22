@@ -1,39 +1,45 @@
 <?php
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
-use function file_get_contents;
-use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
-use function mkdir;
-use function sort;
-use function sprintf;
-use SplFileInfo;
+use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class Test extends Command
+use function addcslashes;
+use function array_flip;
+use function assert;
+use function count;
+use function date;
+use function is_string;
+use function max;
+use function mb_strlen;
+use function mb_substr;
+use function sprintf;
+use function str_pad;
+use function strip_tags;
+
+use const PHP_EOL;
+use const STR_PAD_LEFT;
+
+final class Test extends Command
 {
-    private \PDO $pdo;
-
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    public function __construct(private PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
@@ -45,18 +51,12 @@ class Test extends Command
             ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('~~~ Testing all UAs ~~~');
 
-        // Prepare our test directory to store the data from this run
-        /** @var string|null $thisRunName */
         $thisRunName = $input->getArgument('run');
+        assert(is_string($thisRunName) || null === $thisRunName);
 
         if (empty($thisRunName)) {
             $thisRunName = date('YmdHis');
@@ -64,21 +64,21 @@ class Test extends Command
 
         $output->writeln(sprintf('<comment>Testing data for test run: %s</comment>', $thisRunName));
 
-        $statementCreateTempUas  = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT `userAgent`.* FROM `userAgent` INNER JOIN `result` ON `userAgent`.`uaId` = `result`.`userAgent_id` WHERE `result`.`provider_id` = :proId LIMIT :start, :count)');
-        $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
+        $statementCreateTempUas           = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT `userAgent`.* FROM `userAgent` INNER JOIN `result` ON `userAgent`.`uaId` = `result`.`userAgent_id` WHERE `result`.`provider_id` = :proId LIMIT :start, :count)');
+        $statementSelectProvider          = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
         $statementSelectTestCountProvider = $this->pdo->prepare('SELECT `countNumber` FROM `useragents-general-overview` WHERE `proName` = :proName');
 
         $statementSelectTestProvider = $this->pdo->prepare('SELECT * FROM `useragents-general-overview`');
         $statementSelectTestProvider->execute();
 
-        $tests = [];
-        $rows  = [];
+        $tests     = [];
+        $rows      = [];
         $questions = [];
 
-        while ($row = $statementSelectTestProvider->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
+        while ($row = $statementSelectTestProvider->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
             $tests[$row['proId']] = $row['proName'];
-            $questions[] = $row['proName'];
-            $rows[] = [$row['proName'], $row['countNumber']];
+            $questions[]          = $row['proName'];
+            $rows[]               = [$row['proName'], $row['countNumber']];
         }
 
         $output->writeln('These are all available test suites, choose which you would like to run');
@@ -96,7 +96,7 @@ class Test extends Command
         $question       = new ChoiceQuestion(
             'Choose which test suites to run, separate multiple with commas (press enter to use all)',
             $questions,
-            count($questions) - 1
+            count($questions) - 1,
         );
         $question->setMultiselect(true);
 
@@ -104,7 +104,7 @@ class Test extends Command
         $selectedTests = [];
 
         foreach ($answers as $name) {
-            if ($name === 'All Suites') {
+            if ('All Suites' === $name) {
                 $selectedTests = $tests;
 
                 break;
@@ -115,9 +115,9 @@ class Test extends Command
 
         $output->writeln('Choose which parsers you would like to run this test suite against');
 
-        /** @var Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
-        $parsers      = $parserHelper->getParsers($input, $output);
+        assert($parserHelper instanceof Helper\Parsers);
+        $parsers = $parserHelper->getParsers($input, $output);
 
         $providers  = [];
         $nameLength = 0;
@@ -125,13 +125,14 @@ class Test extends Command
         foreach ($parsers as $parserPath => $parserConfig) {
             $proName = $parserConfig['metadata']['name'] ?? $parserPath;
 
-            $statementSelectProvider->bindValue(':proName', $proName, \PDO::PARAM_STR);
+            $statementSelectProvider->bindValue(':proName', $proName, PDO::PARAM_STR);
             $statementSelectProvider->execute();
 
-            $proId = $statementSelectProvider->fetch(\PDO::FETCH_COLUMN);
+            $proId = $statementSelectProvider->fetch(PDO::FETCH_COLUMN);
 
             if (!$proId) {
                 $output->writeln(sprintf('<error>no provider found with name %s</error>', $proName));
+
                 continue;
             }
 
@@ -140,33 +141,36 @@ class Test extends Command
             $providers[$proName] = [$parserPath, $parserConfig, $proId];
         }
 
-        /** @var Helper\Result $resultHelper */
         $resultHelper = $this->getHelper('result');
+        assert($resultHelper instanceof Helper\Result);
+
+        $normalizeHelper = $this->getHelper('normalize');
+        assert($normalizeHelper instanceof Helper\Normalize);
 
         foreach ($selectedTests as $id => $testName) {
-            $actualTest = 0;
+            $actualTest      = 0;
             $currenUserAgent = 1;
             $count           = 100;
             $start           = 0;
 
             $basicMessage = sprintf(
                 'test suite <fg=yellow>%s</>',
-                $testName
+                $testName,
             );
 
             $output->writeln("\r" . $basicMessage);
 
-            $statementSelectTestCountProvider->bindValue(':proName', $testName, \PDO::PARAM_STR);
+            $statementSelectTestCountProvider->bindValue(':proName', $testName, PDO::PARAM_STR);
             $statementSelectTestCountProvider->execute();
 
-            $testCount = $statementSelectTestCountProvider->fetch(\PDO::FETCH_COLUMN);
+            $testCount = $statementSelectTestCountProvider->fetch(PDO::FETCH_COLUMN);
 
             do {
                 $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 
-                $statementCreateTempUas->bindValue(':proId', $id, \PDO::PARAM_STR);
-                $statementCreateTempUas->bindValue(':start', $start, \PDO::PARAM_INT);
-                $statementCreateTempUas->bindValue(':count', $count, \PDO::PARAM_INT);
+                $statementCreateTempUas->bindValue(':proId', $id, PDO::PARAM_STR);
+                $statementCreateTempUas->bindValue(':start', $start, PDO::PARAM_INT);
+                $statementCreateTempUas->bindValue(':count', $count, PDO::PARAM_INT);
 
                 $statementCreateTempUas->execute();
 
@@ -178,23 +182,23 @@ class Test extends Command
 
                 $this->pdo->beginTransaction();
 
-                while ($row = $statementSelectAllUa->fetch(\PDO::FETCH_ASSOC, \PDO::FETCH_ORI_NEXT)) {
-                    $agent = addcslashes($row['uaString'], PHP_EOL);
+                while ($row = $statementSelectAllUa->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+                    $agent       = addcslashes($row['uaString'], PHP_EOL);
                     $agentToShow = $agent;
 
                     ++$actualTest;
 
-                    if (mb_strlen($agentToShow) > (100 - $nameLength)) {
+                    if (mb_strlen($agentToShow) > 100 - $nameLength) {
                         $agentToShow = mb_substr($agentToShow, 0, 96 - $nameLength) . ' ...';
                     }
 
-                    $actualTestToShow = str_pad((string) $actualTest, strlen((string) $testCount), ' ', STR_PAD_LEFT);
+                    $actualTestToShow = str_pad((string) $actualTest, mb_strlen((string) $testCount), ' ', STR_PAD_LEFT);
 
                     $basicTestMessage = sprintf(
                         $basicMessage . ' <info>parsing</info> [%s/%s] UA: <fg=yellow>%s</>',
                         $actualTestToShow,
                         $testCount,
-                        $agentToShow
+                        $agentToShow,
                     );
 
                     $textLength = mb_strlen(strip_tags($basicTestMessage));
@@ -202,7 +206,6 @@ class Test extends Command
                     $output->write("\r" . $basicTestMessage);
 
                     foreach ($providers as $parserName => $provider) {
-
                         [, $parserConfig, $proId] = $provider;
 
                         $testMessage = $basicTestMessage . ' against the <fg=green;options=bold,underscore>' . $parserName . '</> parser ...';
@@ -227,7 +230,9 @@ class Test extends Command
                             continue;
                         }
 
-                        $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $singleResult);
+                        $runNormRow = $normalizeHelper->normalize($singleResult);
+
+                        $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $runNormRow);
                     }
 
                     $testMessage = $basicTestMessage . ' <info>done!</info>';
@@ -238,7 +243,7 @@ class Test extends Command
 
                     $output->writeln("\r" . str_pad($testMessage, $textLength));
 
-                    $currenUserAgent++;
+                    ++$currenUserAgent;
                 }
 
                 $this->pdo->commit();
@@ -246,12 +251,12 @@ class Test extends Command
                 $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `temp_userAgent`');
                 $statementCountAllResults->execute();
 
-                $colCount = $statementCountAllResults->fetch(\PDO::FETCH_COLUMN);
+                $colCount = $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
 
                 $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 
                 $start += $count;
-            } while ($colCount > 0);
+            } while (0 < $colCount);
 
             $output->writeln("\r" . $basicMessage . ' <info>done!</info>');
         }
