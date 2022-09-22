@@ -49,9 +49,7 @@ class InitDb extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $message  = 'initialize database';
-
-        $output->write($message);
+        $output->writeln('~~~ initialize database ~~~');
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `provider`')->execute();
         $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `provider` (
@@ -424,7 +422,7 @@ class InitDb extends Command
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-results` AS SELECT * FROM `result` WHERE `resResultFound` = 1 AND `provider_id` IN (SELECT `proId` FROM `real-provider`)')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `useragents-general-overview` AS SELECT `proId`, `proName`, COUNT(*) AS `countNumber` FROM `test-provider` JOIN `result` ON `provider_id` = `proId` GROUP BY `proId` ORDER BY `proName`')->execute();
 
-        $output->writeln("\r" . $message . ' <info>done</info>');
+        $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
     }

@@ -52,6 +52,8 @@ class Test extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $output->writeln('~~~ Testing all UAs ~~~');
+
         // Prepare our test directory to store the data from this run
         /** @var string|null $thisRunName */
         $thisRunName = $input->getArgument('run');

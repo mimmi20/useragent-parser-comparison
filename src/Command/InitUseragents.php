@@ -119,7 +119,6 @@ class InitUseragents extends Command
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if (null === $agent) {
-                    var_dump($singleTestData);exit;
                     $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $proName . '.</error>');
                     continue;
                 }
@@ -181,6 +180,8 @@ class InitUseragents extends Command
 
             $output->writeln("\r" . $message . str_pad(' <info>importing done</info>', $messageLength));
         }
+
+        $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
     }
