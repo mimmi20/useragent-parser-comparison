@@ -86,7 +86,8 @@ final class InitDb extends Command
   `uaString` LONGTEXT NOT NULL,
   `uaAdditionalHeaders` JSON NULL DEFAULT NULL,
   PRIMARY KEY (`uaId`),
-  UNIQUE KEY `userAgent_hash` (`uaHash`)
+  UNIQUE KEY `userAgent_hash` (`uaHash`),
+  INDEX `uaString` (`uaString`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `result`')->execute();

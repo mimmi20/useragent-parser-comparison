@@ -73,10 +73,22 @@ final class UserAgentDetail extends AbstractHtml
 ';
 
         $script = '
-$(document).ready(function(){
-    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $(\'.modal-trigger\').leanModal();
-});
+(() => {
+    const allModalTriggers = document.querySelectorAll(\'.modal-trigger\');
+    allModalTriggers.forEach(function (modalTrigger) {
+        
+        const dialog = document.getElementById(modalTrigger.data(\'modal\'));
+        const cancelButton = modalTrigger.querySelectorAll(".modal-close")[0];
+        
+        modalTrigger.addEventListener("click", () => {
+            dialog.showModal();
+        });
+        
+        cancelButton.addEventListener("click", () => {
+            dialog.close();
+        });
+    });
+})();
         ';
 
         return parent::getHtmlCombined($body, $script);
@@ -338,10 +350,10 @@ $(document).ready(function(){
         $html .= '<td>
 
 <!-- Modal Trigger -->
-<a class="modal-trigger btn waves-effect waves-light" href="#modal-' . $result['proId'] . '">Detail</a>
+<a class="modal-trigger btn waves-effect waves-light" href="#" data-modal="modal-' . $result['proId'] . '">Detail</a>
 
 <!-- Modal Structure -->
-<div id="modal-' . $result['proId'] . '" class="modal modal-fixed-footer">
+<dialog id="modal-' . $result['proId'] . '">
     <div class="modal-content">
         <h4>' . $result['proName'] . ' result detail</h4>
         <p><pre><code class="php">' . print_r($result['resRawResult'], true) . '</code></pre></p>
@@ -349,7 +361,7 @@ $(document).ready(function(){
     <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">close</a>
     </div>
-</div>
+</dialog>
 
                 </td>';
 

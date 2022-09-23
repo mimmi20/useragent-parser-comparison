@@ -79,7 +79,7 @@ if (hasUa) {
         platform: {
             name: os.family === 'Other' ? null : os.family,
             marketingName: null,
-            version: (os.family === 'Other' || r.os.toVersion() === '0.0.0') ? null : r.os.toVersion(),
+            version: (os.family === 'Other' || os.toVersion() === '0.0.0') ? null : os.toVersion(),
             manufacturer: null,
             bits: null
         },

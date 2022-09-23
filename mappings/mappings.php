@@ -300,6 +300,8 @@ return [
         'nokiaovibrowser'                     => 'nokiaproxybrowser',
         'nokiawebbrowser'                     => 'nokiaossbrowser',
         'nokiaxpress'                         => 'nokiaproxybrowser',
+        'not available'                       => null,
+        'notavailable'                        => null,
         'npbot'                               => 'nameprotect',
         'nsplayer'                            => 'windowsmediaplayer',
         'ntentbrowser'                        => 'ntent',
@@ -548,7 +550,20 @@ return [
         '2013.0'              => '2013',
         ''        => null, // Piwik
     ],
+    'clientmanufacturer' => [
+        'unknown'             => null,
+    ],
+    'enginename' => [
+        'unknown'             => null,
+    ],
+    'engineversion' => [
+        'unknown'             => null,
+    ],
+    'enginemanufacturer' => [
+        'unknown'             => null,
+    ],
     'osname' => [
+        '' => null,
         // device-detector-node-js for the uas
         //   Mozilla/5.0 (X11; Xubuntu 14.04.5 LTS) AppleWebKit/537.36 (KHTML, like Gecko) Xubuntu Chrome/66.0.2623.87 Chrome/66.0.2623.87 Safari/537.36
         //   Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/61.0.3163.100 Chrome/61.0.3163.100 Safari/537.36 PingdomPageSpeed/1.0 (pingbot/2.0; +http://www.pingdom.com/)
@@ -801,6 +816,7 @@ return [
         'nokiaseries30plus'           => 'series30',
         'nokiaseries40'               => 'series40',
         'notavailable'                => null,
+        'not available'               => null,
         'openbsdamd64'                => 'openbsd',
         'openbsdftp'                  => 'openbsd',
         'openbsdi386'                 => 'openbsd',
@@ -1074,6 +1090,7 @@ return [
         'zenwalkgnulinux'             => 'linux',
     ],
     'osversion' => [
+        '' => null,
         '$1.0'        => null,
         '.'           => null,
         '..'          => null,
@@ -1086,6 +1103,8 @@ return [
         'me.0'        => 'me',
         'n905imyu.w'  => null,
         'n\\a'        => null,
+        'notavailable'               => null,
+        'not available'               => null,
         'nt 10.0'     => '10.0',
         'nt 4.0'      => '4.0',
         'nt 5.0'      => '5.0',
@@ -1105,7 +1124,11 @@ return [
         '9'           => '9.0',
         '10'          => '10.0',
     ],
+    'osmarketingname' => [
+        'unknown'             => null,
+    ],
     'devicename' => [
+        '' => null,
         'asusnexus7'                    => 'nexus7',
         'asusz00ad'                     => 'z00ad',
         'blackberryplaybook'            => 'playbook',
@@ -1185,7 +1208,14 @@ return [
         'zuumblaze'                     => 'blaze',
         'zyncz81'                       => 'z81',
     ],
+    'devicemarketingname' => [
+        'unknown'             => null,
+    ],
+    'devicemanufacturer' => [
+        'unknown'             => null,
+    ],
     'devicebrand' => [
+        '' => null,
         'appleinc'        => 'apple',
         'azumimobile'     => 'azumi',
         'blackberry'      => 'rim',
@@ -1224,6 +1254,7 @@ return [
         'xperia'          => 'sony',
     ],
     'devicetype' => [
+        '' => null,
         'crawler'      => null,
         'featurephone' => 'phone',
         'fonepad'      => 'tablet',

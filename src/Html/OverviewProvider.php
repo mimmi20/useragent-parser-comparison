@@ -104,7 +104,7 @@ final class OverviewProvider extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
-    private function getResult(): array | false
+    private function getResult(string | null $run = null): array | false
     {
         $sql = '
             SELECT
@@ -137,13 +137,15 @@ final class OverviewProvider extends AbstractHtml
             FROM `result`
             INNER JOIN `real-provider` ON `proId` = `provider_id`
             WHERE
-                `provider_id` = :proId
+                `provider_id` = :proId AND
+                `run` = :runId
             GROUP BY
                 `proId`
         ';
 
         $statement = $this->pdo->prepare($sql);
         $statement->bindValue(':proId', $this->provider['proId'], PDO::PARAM_STR);
+        $statement->bindValue(':runId', $run ?? 0, PDO::PARAM_STR);
         $statement->execute();
 
         return $statement->fetch();
@@ -174,7 +176,7 @@ final class OverviewProvider extends AbstractHtml
          */
         $countOfUseragents = $this->getUserAgentCount($run);
 
-        $row = $this->getResult();
+        $row = $this->getResult($run);
 
         $html .= '<tbody>';
 

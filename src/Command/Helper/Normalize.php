@@ -111,13 +111,25 @@ final class Normalize extends Helper
             }
         }
 
+        if (!array_key_exists($normKey, $this->mappings)) {
+            var_dump("'$normKey' not found in mapping table");
+        }
+
+        if (!is_array($this->mappings[$normKey])) {
+            var_dump("'$normKey' found in mapping table, but izs not an array");
+        }
+
         if (
-            isset($this->mappings[$normKey])
+            array_key_exists($normKey, $this->mappings)
             && is_array($this->mappings[$normKey])
         ) {
             $v = $this->mappings[$normKey];
         } else {
             $v = [];
+        }
+
+        if (!is_array($v)) {
+            var_dump("'$normKey' found in mapping table, but izs not an array - 2.");
         }
 
         if (is_array($v) && array_key_exists($value, $v)) {
