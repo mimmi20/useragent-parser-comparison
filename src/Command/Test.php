@@ -230,9 +230,40 @@ final class Test extends Command
                             continue;
                         }
 
-                        $runNormRow = $normalizeHelper->normalize($singleResult);
+                        $normalizedDevice = $normalizeHelper->normalize(
+                            [
+                                'devicename' => $singleResult['result']['parsed']['device']['deviceName'] ?? null,
+                                'devicemarketingname' => $singleResult['result']['parsed']['device']['marketingName'] ?? null,
+                                'devicemanufacturer' => $singleResult['result']['parsed']['device']['manufacturer'] ?? null,
+                                'devicebrand' => $singleResult['result']['parsed']['device']['brand'] ?? null,
+                                'devicetype' => $singleResult['result']['parsed']['device']['type'] ?? null,
+                            ]
+                        );
+                        $normalizedClient = $normalizeHelper->normalize(
+                            [
+                                'clientname' => $singleResult['result']['parsed']['client']['name'] ?? null,
+                                'clientversion' => $singleResult['result']['parsed']['client']['version'] ?? null,
+                                'clientmanufacturer' => $singleResult['result']['parsed']['client']['manufacturer'] ?? null,
+                                'clienttype' => $singleResult['result']['parsed']['client']['type'] ?? null,
+                            ]
+                        );
+                        $normalizedPlatform = $normalizeHelper->normalize(
+                            [
+                                'osname' => $singleResult['result']['parsed']['platform']['name'] ?? null,
+                                'osversion' => $singleResult['result']['parsed']['platform']['version'] ?? null,
+                                'osmarketingname' => $singleResult['result']['parsed']['platform']['marketingName'] ?? null,
+                                'osmanufacturer' => $singleResult['result']['parsed']['platform']['manufacturer'] ?? null,
+                            ]
+                        );
+                        $normalizedEngine  = $normalizeHelper->normalize(
+                            [
+                                'enginename' => $singleResult['result']['parsed']['engine']['name'] ?? null,
+                                'engineversion' => $singleResult['result']['parsed']['engine']['version'] ?? null,
+                                'enginemanufacturer' => $singleResult['result']['parsed']['engine']['manufacturer'] ?? null,
+                            ]
+                        );
 
-                        $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $runNormRow);
+                        $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $singleResult);
                     }
 
                     $testMessage = $basicTestMessage . ' <info>done!</info>';

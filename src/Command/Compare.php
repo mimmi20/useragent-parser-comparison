@@ -103,10 +103,6 @@ final class Compare extends Command
                 'run' => $name,
             ];
 
-//            if ($doImport) {
-//                $arguments['--use-db'] = true;
-//            }
-
             $testInput  = new ArrayInput($arguments);
             $returnCode = $command->run($testInput, $output);
 
@@ -115,6 +111,21 @@ final class Compare extends Command
 
                 return $returnCode;
             }
+        }
+
+        $command   = $application->find('normalize');
+        $arguments = [
+            'command' => 'normalize',
+            'run' => $name,
+        ];
+
+        $normalizeInput = new ArrayInput($arguments);
+        $returnCode     = $command->run($normalizeInput, $output);
+
+        if (0 < $returnCode) {
+            $output->writeln('<error>There was an error executing the "normalize" command, cannot continue.</error>');
+
+            return $returnCode;
         }
 
         $command   = $application->find('generate-reports');
@@ -133,21 +144,6 @@ final class Compare extends Command
         }
 
         return self::SUCCESS;
-
-        $command   = $application->find('normalize');
-        $arguments = [
-            'command' => 'normalize',
-            'run' => $name,
-        ];
-
-        $normalizeInput = new ArrayInput($arguments);
-        $returnCode     = $command->run($normalizeInput, $output);
-
-        if (0 < $returnCode) {
-            $output->writeln('<error>There was an error executing the "normalize" command, cannot continue.</error>');
-
-            return $returnCode;
-        }
 
         $command   = $application->find('analyze');
         $arguments = [

@@ -41,7 +41,7 @@ final class OverviewGeneral extends AbstractHtml
 
 <div class="section">
     <h3 class="header center orange-text">
-        Detected by all providers
+        Detection Results
     </h3>
 
     ' . $this->getTableSummary($run) . '
@@ -75,48 +75,51 @@ final class OverviewGeneral extends AbstractHtml
                 SUM(`result`.`resResultFound`) AS `resultFound`,
                 SUM(`result`.`resResultError`) AS `resultError`,
 
-                COUNT(`result`.`resClientName`) AS `clientNameFound`,
-                COUNT(DISTINCT `result`.`resClientName`) AS `clientNameFoundUnique`,
-                COUNT(`result`.`resClientVersion`) AS `clientVersionFound`,
-                COUNT(`result`.`resClientIsBot`) AS `asBotDetected`,
-                COUNT(`result`.`resClientType`) AS `clientTypeFound`,
-                COUNT(DISTINCT `result`.`resClientType`) AS `clientTypeFoundUnique`,
+                COUNT(`result-normalized`.`resNormaClientName`) AS `clientNameFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaClientName`) AS `clientNameFoundUnique`,
+                COUNT(`result-normalized`.`resNormaClientVersion`) AS `clientVersionFound`,
+                COUNT(`result-normalized`.`resNormaClientIsBot`) AS `asBotDetected`,
+                COUNT(`result-normalized`.`resNormaClientType`) AS `clientTypeFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaClientType`) AS `clientTypeFoundUnique`,
 
-                COUNT(`result`.`resEngineName`) AS `engineNameFound`,
-                COUNT(DISTINCT `result`.`resEngineName`) AS `engineNameFoundUnique`,
-                COUNT(`result`.`resEngineVersion`) AS `engineVersionFound`,
+                COUNT(`result-normalized`.`resNormaEngineName`) AS `engineNameFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaEngineName`) AS `engineNameFoundUnique`,
+                COUNT(`result-normalized`.`resNormaEngineVersion`) AS `engineVersionFound`,
 
-                COUNT(`result`.`resOsName`) AS `osNameFound`,
-                COUNT(DISTINCT `result`.`resOsName`) AS `osNameFoundUnique`,
-                COUNT(`result`.`resOsVersion`) AS `osVersionFound`,
+                COUNT(`result-normalized`.`resNormaOsName`) AS `osNameFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaOsName`) AS `osNameFoundUnique`,
+                COUNT(`result-normalized`.`resNormaOsVersion`) AS `osVersionFound`,
 
-                COUNT(`result`.`resDeviceBrand`) AS `deviceBrandFound`,
-                COUNT(DISTINCT `result`.`resDeviceBrand`) AS `deviceBrandFoundUnique`,
+                COUNT(`result-normalized`.`resNormaDeviceBrand`) AS `deviceBrandFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaDeviceBrand`) AS `deviceBrandFoundUnique`,
 
-                COUNT(`result`.`resDeviceName`) AS `deviceModelFound`,
-                COUNT(DISTINCT `result`.`resDeviceName`) AS `deviceModelFoundUnique`,
+                COUNT(`result-normalized`.`resNormaDeviceName`) AS `deviceModelFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaDeviceName`) AS `deviceModelFoundUnique`,
 
-                COUNT(`result`.`resDeviceType`) AS `deviceTypeFound`,
-                COUNT(DISTINCT `result`.`resDeviceType`) AS `deviceTypeFoundUnique`,
+                COUNT(`result-normalized`.`resNormaDeviceType`) AS `deviceTypeFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaDeviceType`) AS `deviceTypeFoundUnique`,
 
-                COUNT(`result`.`resDeviceIsMobile`) AS `asMobileDetected`,
-                COUNT(`result`.`resDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
+                COUNT(`result-normalized`.`resNormaDeviceIsMobile`) AS `asMobileDetected`,
+                COUNT(`result-normalized`.`resNormaDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
 
                 AVG(`result`.`resInitTime`) AS `avgInitTime`,
                 AVG(`result`.`resParseTime`) AS `avgParseTime`,
                 AVG(`result`.`resMemoryUsed`) AS `avgMemoryUsed`
-            FROM `result`
+            FROM `result-normalized`
+            INNER JOIN `result`
+                ON `result`.`resId` = `result-normalized`.`result_id`
             INNER JOIN `real-provider`
                 ON `real-provider`.`proId` = `result`.`provider_id` AND (`real-provider`.`proVersion` = `result`.`resProviderVersion` OR ISNULL(`real-provider`.`proVersion`)) ';
         if (null !== $run) {
-            $sql .= ' WHERE `result`.`run` = :run';
+            $sql .= ' 
+            WHERE `result`.`run` = :run';
         }
 
         $sql .= '
             GROUP BY
-                `real-provider`.`proId`,`real-provider`.`proVersion`,`result`.`run`
+                `real-provider`.`proId`,`real-provider`.`proVersion`
             ORDER BY
-                `real-provider`.`proName`,`result`.`run`';
+                `real-provider`.`proName`';
 
         $statement = $this->pdo->prepare($sql);
 

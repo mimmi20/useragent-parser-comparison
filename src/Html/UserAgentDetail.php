@@ -76,9 +76,8 @@ final class UserAgentDetail extends AbstractHtml
 (() => {
     const allModalTriggers = document.querySelectorAll(\'.modal-trigger\');
     allModalTriggers.forEach(function (modalTrigger) {
-        
-        const dialog = document.getElementById(modalTrigger.data(\'modal\'));
-        const cancelButton = modalTrigger.querySelectorAll(".modal-close")[0];
+        const dialog = document.getElementById(modalTrigger.getAttribute(\'data-modal\'));
+        const cancelButton = dialog.querySelectorAll(".modal-close")[0];
         
         modalTrigger.addEventListener("click", () => {
             dialog.showModal();
@@ -322,7 +321,7 @@ final class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if (array_key_exists('proCanDetectDeviceIsMobile', $result) && null !== $result['proCanDetectDeviceIsMobile']) {
+            if ($result['proCanDetectDeviceIsMobile']) {
                 if ($result['resDeviceIsMobile']) {
                     $html .= '<td>yes</td>';
                 } else {
@@ -332,7 +331,7 @@ final class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if (array_key_exists('proCanDetectDeviceDisplayIsTouch', $result) && null !== $result['proCanDetectDeviceDisplayIsTouch']) {
+            if ($result['proCanDetectDeviceDisplayIsTouch']) {
                 if ($result['resDeviceDisplayIsTouch']) {
                     $html .= '<td>yes</td>';
                 } else {

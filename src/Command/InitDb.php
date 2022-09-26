@@ -331,14 +331,14 @@ final class InitDb extends Command
 
         $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT
-        `resClientName` AS `name`,
-        `uaId`,
-        `uaString`,
-        COUNT(`resClientName`) AS `detectionCount`
+        `list-found-general-client-names`.`resClientName` AS `name`,
+        `userAgent`.`uaId`,
+        `userAgent`.`uaString`,
+        COUNT(`list-found-general-client-names`.`resClientName`) AS `detectionCount`
     FROM `list-found-general-client-names`
     INNER JOIN `userAgent`
-        ON `uaId` = `userAgent_id`
-    GROUP BY `resClientName`')->execute();
+        ON `userAgent`.`uaId` = `list-found-general-client-names`.`userAgent_id`
+    GROUP BY `list-found-general-client-names`.`resClientName`')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-engine-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resEngineName` IS NOT NULL')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-engine-names` AS SELECT
         `resEngineName` AS `name`,

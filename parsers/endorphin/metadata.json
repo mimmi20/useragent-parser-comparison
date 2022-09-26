@@ -14,7 +14,7 @@
       "manufacturer": false,
       "bits": false,
       "isBot": true,
-      "type": true
+      "type": false
     },
     "renderingEngine": {
       "name": false,

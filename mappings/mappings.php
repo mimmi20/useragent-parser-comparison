@@ -553,6 +553,9 @@ return [
     'clientmanufacturer' => [
         'unknown'             => null,
     ],
+    'clienttype' => [
+        'unknown'             => null,
+    ],
     'enginename' => [
         'unknown'             => null,
     ],
@@ -827,6 +830,7 @@ return [
         'osx1012'                     => 'macosx',
         'osx10122'                    => 'macosx',
         'osx1013'                     => 'macosx',
+        'osx10150'                    => 'macosx',
         'osx10411'                    => 'macosx',
         'osx105'                      => 'macosx',
         'osx106'                      => 'macosx',
@@ -1125,6 +1129,9 @@ return [
         '10'          => '10.0',
     ],
     'osmarketingname' => [
+        'unknown'             => null,
+    ],
+    'osmanufacturer' => [
         'unknown'             => null,
     ],
     'devicename' => [

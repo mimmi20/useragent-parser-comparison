@@ -61,19 +61,12 @@ use const JSON_THROW_ON_ERROR;
 final class Analyze extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
-
     private array $options = [];
-
     private array $comparison = [];
-
     private array $agents = [];
-
     private Table | null $summaryTable = null;
-
     private InputInterface | null $input = null;
-
     private OutputInterface | null $output = null;
-
     private array $failures = [];
 
     public function __construct(private PDO $pdo)

@@ -51,9 +51,14 @@ final class Normalize extends Helper
         $normalized = [];
 
         foreach (array_keys($parsed) as $key) {
+            if ('raw' === $key) {
+                $normalized[$key] = $parsed[$key];
+                continue;
+            }
+
             $normKey = mb_strtolower(str_replace('res', '', $key));
 
-            $normalized[$key] = $this->normalizeValue($key, $normKey, $parsed[$key], $parsed);
+            $normalized[$key] = $this->normalizeValue($normKey, $parsed[$key], $parsed);
         }
 
         return $normalized;
@@ -68,7 +73,7 @@ final class Normalize extends Helper
         return implode('.', $versionParts);
     }
 
-    private function normalizeValue(string | int $key, string $normKey, mixed $value, array $parsed): array | float | string | null
+    private function normalizeValue(string $normKey, bool | array | string | int | float | null $value, array $parsed): array | float | string | null
     {
         if (null === $value) {
             return null;
@@ -85,7 +90,7 @@ final class Normalize extends Helper
         if (is_array($value)) {
             $list = [];
             foreach ($value as $key2 => $value2) {
-                $list[$key2] = $this->normalizeValue($key2, $normKey, $value2, $parsed);
+                $list[$key2] = $this->normalizeValue($normKey, $value2, $parsed);
             }
 
             return $list;
@@ -111,12 +116,8 @@ final class Normalize extends Helper
             }
         }
 
-        if (!array_key_exists($normKey, $this->mappings)) {
-            var_dump("'$normKey' not found in mapping table");
-        }
-
-        if (!is_array($this->mappings[$normKey])) {
-            var_dump("'$normKey' found in mapping table, but izs not an array");
+        if (!array_key_exists($normKey, $this->mappings) || !is_array($this->mappings[$normKey])) {
+            return $value;
         }
 
         if (

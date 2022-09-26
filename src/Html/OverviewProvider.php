@@ -108,44 +108,47 @@ final class OverviewProvider extends AbstractHtml
     {
         $sql = '
             SELECT
-                SUM(`resResultFound`) AS `resultFound`,
-                SUM(`resResultError`) AS `resultError`,
+                SUM(`result`.`resResultFound`) AS `resultFound`,
+                SUM(`result`.`resResultError`) AS `resultError`,
 
-                COUNT(`resClientName`) AS `clientNameFound`,
-                COUNT(`resClientVersion`) AS `clientVersionFound`,
-                COUNT(`resClientIsBot`) AS `asBotDetected`,
-                COUNT(`resClientType`) AS `clientTypeFound`,
+                COUNT(`result-normalized`.`resNormaClientName`) AS `clientNameFound`,
+                COUNT(`result-normalized`.`resNormaClientVersion`) AS `clientVersionFound`,
+                COUNT(`result-normalized`.`resNormaClientIsBot`) AS `asBotDetected`,
+                COUNT(`result-normalized`.`resNormaClientType`) AS `clientTypeFound`,
 
-                COUNT(`resEngineName`) AS `engineNameFound`,
-                COUNT(`resEngineVersion`) AS `engineVersionFound`,
+                COUNT(`result-normalized`.`resNormaEngineName`) AS `engineNameFound`,
+                COUNT(`result-normalized`.`resNormaEngineVersion`) AS `engineVersionFound`,
 
-                COUNT(`resOsName`) AS `osNameFound`,
-                COUNT(`resOsVersion`) AS `osVersionFound`,
+                COUNT(`result-normalized`.`resNormaOsName`) AS `osNameFound`,
+                COUNT(`result-normalized`.`resNormaOsVersion`) AS `osVersionFound`,
 
-                COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
+                COUNT(`result-normalized`.`resNormaDeviceBrand`) AS `deviceBrandFound`,
 
-                COUNT(`resDeviceName`) AS `deviceModelFound`,
+                COUNT(`result-normalized`.`resNormaDeviceName`) AS `deviceModelFound`,
 
-                COUNT(`resDeviceType`) AS `deviceTypeFound`,
+                COUNT(`result-normalized`.`resNormaDeviceType`) AS `deviceTypeFound`,
 
-                COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
-                COUNT(`resDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
+                COUNT(`result-normalized`.`resNormaDeviceIsMobile`) AS `asMobileDetected`,
+                COUNT(`result-normalized`.`resNormaDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
 
-                AVG(`resInitTime`) AS `avgInitTime`,
-                AVG(`resParseTime`) AS `avgParseTime`,
-                AVG(`resMemoryUsed`) AS `avgMemoryUsed`
-            FROM `result`
-            INNER JOIN `real-provider` ON `proId` = `provider_id`
+                AVG(`result`.`resInitTime`) AS `avgInitTime`,
+                AVG(`result`.`resParseTime`) AS `avgParseTime`,
+                AVG(`result`.`resMemoryUsed`) AS `avgMemoryUsed`
+            FROM `result-normalized`
+            INNER JOIN `result`
+                ON `result`.`resId` = `result-normalized`.`result_id`
+            INNER JOIN `real-provider` 
+                ON `real-provider`.`proId` = `result`.`provider_id`
             WHERE
-                `provider_id` = :proId AND
-                `run` = :runId
+                `result`.`provider_id` = :proId AND
+                `result`.`run` = :run
             GROUP BY
-                `proId`
+                `real-provider`.`proId`
         ';
 
         $statement = $this->pdo->prepare($sql);
         $statement->bindValue(':proId', $this->provider['proId'], PDO::PARAM_STR);
-        $statement->bindValue(':runId', $run ?? 0, PDO::PARAM_STR);
+        $statement->bindValue(':run', $run ?? 0, PDO::PARAM_STR);
         $statement->execute();
 
         return $statement->fetch();
