@@ -12,7 +12,7 @@
     "ext-simplexml": "*",
     "composer-runtime-api": "^2.0.0",
     "ramsey/uuid": "^4.5.1",
-    "symfony/console": "^v6.1.4"
+    "symfony/console": "^v6.1.5"
   },
   "require-dev": {
     "mimmi20/coding-standard": "^3.0.13",
