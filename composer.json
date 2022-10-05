@@ -16,6 +16,7 @@
   },
   "require-dev": {
     "ext-tokenizer": "*",
+    "ext-xmlwriter": "*",
     "mimmi20/coding-standard": "^3.0.13",
     "phpstan/extension-installer": "^1.1.0",
     "phpstan/phpstan": "^1.8.6",
