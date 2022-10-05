@@ -8,7 +8,7 @@
     "mimmi20/browscap-helper-source": "^3.0.17"
   },
   "config": {
-    "preferred-install":"dist",
+    "preferred-install": "dist",
     "sort-packages": true,
     "lock": false
   },

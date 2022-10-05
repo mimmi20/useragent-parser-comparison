@@ -1,8 +1,6 @@
 <?php
 /**
- * This file is part of the browser-detector-version package.
- *
- * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ * This file is part of the diablomedia/useragent-parser-comparison package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -154,6 +152,12 @@ final class InitResults extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * @param mixed[]   $row2
+     * @param mixed[][] $result
+     *
+     * @return mixed[]
+     */
     private function hydrateResult(array $row2, array $result): array
     {
         $toHydrate = [

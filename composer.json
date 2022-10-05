@@ -1,48 +1,48 @@
 {
-    "name": "diablomedia/useragent-parser-comparison",
-    "description": "project to compare some useragent parsers",
-    "license": "MIT",
-    "type": "library",
-    "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
-    "require": {
-        "php": "^8.1.0",
-        "ext-json": "*",
-        "ext-mbstring": "*",
-        "ext-pdo": "*",
-        "ext-simplexml": "*",
-        "composer-runtime-api": "^2.0",
-        "ramsey/uuid": "^4.5.1",
-        "symfony/console": "^v6.1.4"
-    },
-    "require-dev": {
-        "mimmi20/coding-standard": "^3.0.11",
-        "phpstan/extension-installer": "^1.1.0",
-        "phpstan/phpstan": "^1.8.5",
-        "phpstan/phpstan-deprecation-rules": "^1.0.0"
-    },
-    "minimum-stability": "stable",
-    "prefer-stable": true,
-    "autoload": {
-        "psr-4": {
-            "UserAgentParserComparison\\": "src/"
-        }
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "phpstan/extension-installer": true,
-            "composer/package-versions-deprecated": true
-        },
-        "lock": false
-    },
-    "scripts": {
-        "php-cs-fixer-check": "php-cs-fixer fix --dry-run -vv",
-        "php-cs-fixer-fix": "php-cs-fixer fix -vv",
-        "phpstan": "phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress",
-        "prettier-check": "yarn run prettier -l \"**/*.js\"",
-        "prettier-fix": "yarn run prettier --write \"**/*.js\"",
-        "psalm": "psalm --show-info=false"
+  "name": "diablomedia/useragent-parser-comparison",
+  "description": "project to compare some useragent parsers",
+  "license": "MIT",
+  "type": "library",
+  "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
+  "require": {
+    "php": "^8.1.0",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "ext-pdo": "*",
+    "ext-simplexml": "*",
+    "composer-runtime-api": "^2.0.0",
+    "ramsey/uuid": "^4.5.1",
+    "symfony/console": "^v6.1.5"
+  },
+  "require-dev": {
+    "mimmi20/coding-standard": "^3.0.13",
+    "phpstan/extension-installer": "^1.1.0",
+    "phpstan/phpstan": "^1.8.6",
+    "phpstan/phpstan-deprecation-rules": "^1.0.0"
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "autoload": {
+    "psr-4": {
+      "UserAgentParserComparison\\": "src/"
     }
+  },
+  "config": {
+    "preferred-install": "dist",
+    "sort-packages": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpstan/extension-installer": true,
+      "composer/package-versions-deprecated": true
+    },
+    "lock": false
+  },
+  "scripts": {
+    "php-cs-fixer-check": "php-cs-fixer fix --dry-run -vv",
+    "php-cs-fixer-fix": "php-cs-fixer fix -vv",
+    "phpstan": "phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress",
+    "prettier-check": "yarn run prettier -l \"**/*.js\"",
+    "prettier-fix": "yarn run prettier --write \"**/*.js\"",
+    "psalm": "psalm --show-info=false"
+  }
 }

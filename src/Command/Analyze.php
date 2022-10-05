@@ -1,8 +1,6 @@
 <?php
 /**
- * This file is part of the browser-detector-version package.
- *
- * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ * This file is part of the diablomedia/useragent-parser-comparison package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -61,12 +59,20 @@ use const JSON_THROW_ON_ERROR;
 final class Analyze extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
+
+    /** @var mixed[] */
     private array $options = [];
+
+    /** @var mixed[] */
     private array $comparison = [];
+
+    /** @var string[] */
     private array $agents = [];
     private Table | null $summaryTable = null;
     private InputInterface | null $input = null;
     private OutputInterface | null $output = null;
+
+    /** @var mixed[] */
     private array $failures = [];
 
     public function __construct(private PDO $pdo)
@@ -103,7 +109,7 @@ final class Analyze extends Command
         }
 
         if (!file_exists($this->runDir . '/' . $thisRunName)) {
-            $output->writeln(sprintf('<error>No run directory found with that id (%s)</error>', $thisRunName));
+            $output->writeln('<error>No run directory found with that id (' . $thisRunName . ')</error>');
 
             return self::FAILURE;
         }
@@ -121,7 +127,7 @@ final class Analyze extends Command
         } catch (Throwable) {
             $output->writeln(sprintf('<error>Could not read file (%s)</error>', $metaDataFile));
 
-            return self::INVALID;
+            return self::FAILURE;
         }
 
         try {

@@ -1,8 +1,6 @@
 <?php
 /**
- * This file is part of the browser-detector-version package.
- *
- * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ * This file is part of the diablomedia/useragent-parser-comparison package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -111,7 +109,7 @@ final class OverviewGeneral extends AbstractHtml
             INNER JOIN `real-provider`
                 ON `real-provider`.`proId` = `result`.`provider_id` AND (`real-provider`.`proVersion` = `result`.`resProviderVersion` OR ISNULL(`real-provider`.`proVersion`)) ';
         if (null !== $run) {
-            $sql .= ' 
+            $sql .= '
             WHERE `result`.`run` = :run';
         }
 
@@ -132,6 +130,7 @@ final class OverviewGeneral extends AbstractHtml
         yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** @return Generator|mixed[] */
     private function getUserAgentPerProviderCount(): iterable
     {
         $statement = $this->pdo->prepare('SELECT

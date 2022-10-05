@@ -1,8 +1,6 @@
 <?php
 /**
- * This file is part of the browser-detector-version package.
- *
- * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ * This file is part of the diablomedia/useragent-parser-comparison package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -48,6 +46,11 @@ final class InitUseragents extends Command
         $this->setName('init-useragents');
     }
 
+    /**
+     * @throws JsonException
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `test-provider`');

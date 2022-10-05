@@ -1,8 +1,6 @@
 <?php
 /**
- * This file is part of the browser-detector-version package.
- *
- * Copyright (c) 2016-2022, Thomas Mueller <mimmi20@live.de>
+ * This file is part of the diablomedia/useragent-parser-comparison package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,17 +23,19 @@ use const JSON_THROW_ON_ERROR;
 
 final class UserAgentDetail extends AbstractHtml
 {
+    /** @var string[] */
     private array $userAgent = [];
 
-    /** @var array[] */
+    /** @var mixed[][] */
     private array $results = [];
 
+    /** @param string[] $userAgent */
     public function setUserAgent(array $userAgent): void
     {
         $this->userAgent = $userAgent;
     }
 
-    /** @param array[] $results */
+    /** @param mixed[][] $results */
     public function setResults(array $results): void
     {
         $this->results = $results;
@@ -78,11 +78,11 @@ final class UserAgentDetail extends AbstractHtml
     allModalTriggers.forEach(function (modalTrigger) {
         const dialog = document.getElementById(modalTrigger.getAttribute(\'data-modal\'));
         const cancelButton = dialog.querySelectorAll(".modal-close")[0];
-        
+
         modalTrigger.addEventListener("click", () => {
             dialog.showModal();
         });
-        
+
         cancelButton.addEventListener("click", () => {
             dialog.close();
         });
@@ -171,6 +171,7 @@ final class UserAgentDetail extends AbstractHtml
         return $html;
     }
 
+    /** @param mixed[] $result */
     private function getRow(array $result): string
     {
         $html = '<tr>';
