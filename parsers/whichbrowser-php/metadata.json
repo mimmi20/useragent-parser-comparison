@@ -13,12 +13,12 @@
       "version": true,
       "manufacturer": false,
       "bits": false,
-      "isBot": true,
-      "type": true
+      "isBot": false,
+      "type": false
     },
     "renderingEngine": {
-      "name": true,
-      "version": true,
+      "name": false,
+      "version": false,
       "manufacturer": false
     },
     "operatingSystem": {

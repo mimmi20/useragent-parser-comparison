@@ -15,6 +15,9 @@
     "symfony/console": "^v6.1.5"
   },
   "require-dev": {
+    "ext-dom": "*",
+    "ext-tokenizer": "*",
+    "ext-xmlwriter": "*",
     "mimmi20/coding-standard": "^3.0.13",
     "phpstan/extension-installer": "^1.1.0",
     "phpstan/phpstan": "^1.8.6",
@@ -29,13 +32,13 @@
   },
   "config": {
     "preferred-install": "dist",
-    "lock": false,
     "sort-packages": true,
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
       "phpstan/extension-installer": true,
       "composer/package-versions-deprecated": true
-    }
+    },
+    "lock": false
   },
   "scripts": {
     "php-cs-fixer-check": "php-cs-fixer fix --dry-run -vv",

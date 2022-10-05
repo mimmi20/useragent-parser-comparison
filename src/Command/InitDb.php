@@ -30,9 +30,7 @@ final class InitDb extends Command
     /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $message = 'initialize database';
-
-        $output->write($message);
+        $output->writeln('~~~ initialize database ~~~');
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `provider`')->execute();
         $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `provider` (
@@ -87,7 +85,8 @@ final class InitDb extends Command
   `uaString` LONGTEXT NOT NULL,
   `uaAdditionalHeaders` JSON NULL DEFAULT NULL,
   PRIMARY KEY (`uaId`),
-  UNIQUE KEY `userAgent_hash` (`uaHash`)
+  UNIQUE KEY `userAgent_hash` (`uaHash`),
+  INDEX `uaString` (`uaString`(255))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `result`')->execute();
@@ -191,7 +190,7 @@ final class InitDb extends Command
   KEY `resNormaClientName` (`resNormaClientName`),
   KEY `resNormaEngineName` (`resNormaEngineName`),
   KEY `resNormaOsName` (`resNormaOsName`),
-  KEY `resNormaDeviceModel` (`resNormaDeviceModel`),
+  KEY `resNormaDeviceName` (`resNormaDeviceName`),
   KEY `resNormaDeviceBrand` (`resNormaDeviceBrand`),
   KEY `resNormaDeviceType` (`resNormaDeviceType`),
   KEY `resNormaClientIsBot` (`resNormaClientIsBot`),
@@ -331,14 +330,14 @@ final class InitDb extends Command
 
         $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT
-        `resClientName` AS `name`,
-        `uaId`,
-        `uaString`,
-        COUNT(`resClientName`) AS `detectionCount`
+        `list-found-general-client-names`.`resClientName` AS `name`,
+        `userAgent`.`uaId`,
+        `userAgent`.`uaString`,
+        COUNT(`list-found-general-client-names`.`resClientName`) AS `detectionCount`
     FROM `list-found-general-client-names`
     INNER JOIN `userAgent`
-        ON `uaId` = `userAgent_id`
-    GROUP BY `resClientName`')->execute();
+        ON `userAgent`.`uaId` = `list-found-general-client-names`.`userAgent_id`
+    GROUP BY `list-found-general-client-names`.`resClientName`')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-engine-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resEngineName` IS NOT NULL')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-engine-names` AS SELECT
         `resEngineName` AS `name`,
@@ -405,7 +404,7 @@ final class InitDb extends Command
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-results` AS SELECT * FROM `result` WHERE `resResultFound` = 1 AND `provider_id` IN (SELECT `proId` FROM `real-provider`)')->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `useragents-general-overview` AS SELECT `proId`, `proName`, COUNT(*) AS `countNumber` FROM `test-provider` JOIN `result` ON `provider_id` = `proId` GROUP BY `proId` ORDER BY `proName`')->execute();
 
-        $output->writeln("\r" . $message . ' <info>done</info>');
+        $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
     }

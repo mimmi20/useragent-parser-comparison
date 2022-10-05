@@ -83,10 +83,6 @@ var hackerList = new List(\'simple-list\', options);
                 $html .= ' <small class="detectionCount">' . $element['detectionCount'] . 'x detected</small>';
             }
 
-            if (isset($element['detectionCountUnique'])) {
-                $html .= ' <small class="detectionCountUnique">(' . $element['detectionCountUnique'] . 'x unique)</small>';
-            }
-
             if (isset($element['detectionValuesDistinct'])) {
                 $html .= '<br /><small class="detectionValuesDistinct">' . $element['detectionValuesDistinct'] . '</small>';
             }

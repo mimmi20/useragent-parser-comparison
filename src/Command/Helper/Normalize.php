@@ -13,18 +13,34 @@ namespace UserAgentParserComparison\Command\Helper;
 use Symfony\Component\Console\Helper\Helper;
 
 use function array_key_exists;
+use function array_keys;
 use function array_slice;
 use function explode;
 use function file_exists;
 use function implode;
+use function in_array;
 use function is_array;
 use function mb_strtolower;
 use function preg_replace;
+use function sprintf;
 use function str_replace;
+use function var_dump;
 
 final class Normalize extends Helper
 {
     private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
+
+    /** @var string[][] */
+    private array $mappings = [];
+
+    public function __construct()
+    {
+        if (!file_exists(self::MAP_FILE)) {
+            return;
+        }
+
+        $this->mappings = include self::MAP_FILE;
+    }
 
     public function getName(): string
     {
@@ -32,75 +48,24 @@ final class Normalize extends Helper
     }
 
     /**
-     * @param mixed[][] $parsed
+     * @param mixed[] $parsed
      *
-     * @return mixed[]
+     * @return array<array<float|string|null>|float|string|null>
      */
-    public function normalizeParsed(array $parsed): array
+    public function normalize(array $parsed): array
     {
         $normalized = [];
-        $mappings   = [];
 
-        if (file_exists(self::MAP_FILE)) {
-            $mappings = include self::MAP_FILE;
-        }
+        foreach (array_keys($parsed) as $key) {
+            if ('raw' === $key) {
+                $normalized[$key] = $parsed[$key];
 
-        $sections = ['browser', 'platform', 'device'];
-
-        foreach ($sections as $section) {
-            if (!array_key_exists($section, $parsed)) {
                 continue;
             }
 
-            $normalized[$section] = [];
-            $properties           = $parsed[$section];
+            $normKey = mb_strtolower(str_replace('res', '', $key));
 
-            foreach ($properties as $key => $value) {
-                if (null === $value) {
-                    $normalized[$section][$key] = $value;
-
-                    continue;
-                }
-
-                if ('version' === $key) {
-                    $value = $this->truncateVersion(mb_strtolower((string) $value));
-                } elseif (false === $value) {
-                    $value = 'false';
-                } elseif (true === $value) {
-                    $value = 'true';
-                } else {
-                    $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
-                }
-
-                // Special Windows normalization for parsers that don't differntiate the version of windows
-                // in the name, but use the version.
-                if ('platform' === $section && 'name' === $key && 'windows' === $value) {
-                    if (!empty($parsed['platform']['version'])) {
-                        $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
-                    }
-                }
-
-                if ('platform' === $section && 'name' === $key && 'windowsphone' === $value) {
-                    if (!empty($parsed['platform']['version'])) {
-                        $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
-                    }
-                }
-
-                if (
-                    isset($mappings[$section][$key])
-                    && is_array($mappings[$section][$key])
-                ) {
-                    $v = $mappings[$section][$key];
-                } else {
-                    $v = [];
-                }
-
-                if (is_array($v) && array_key_exists($value, $v)) {
-                    $value = $v[$value];
-                }
-
-                $normalized[$section][$key] = $value;
-            }
+            $normalized[$key] = $this->normalizeValue($normKey, $parsed[$key], $parsed);
         }
 
         return $normalized;
@@ -113,5 +78,78 @@ final class Normalize extends Helper
         $versionParts = array_slice($versionParts, 0, 2);
 
         return implode('.', $versionParts);
+    }
+
+    /**
+     * @param bool|float|int|mixed[]|string|null $value
+     * @param mixed[]                            $parsed
+     *
+     * @return array<float|string|null>|float|string|null
+     */
+    private function normalizeValue(string $normKey, bool | array | string | int | float | null $value, array $parsed): array | float | string | null
+    {
+        if (null === $value) {
+            return null;
+        }
+
+        if (false === $value) {
+            return 'false';
+        }
+
+        if (true === $value) {
+            return 'true';
+        }
+
+        if (is_array($value)) {
+            $list = [];
+            foreach ($value as $key2 => $value2) {
+                $list[$key2] = $this->normalizeValue($normKey, $value2, $parsed);
+            }
+
+            return $list;
+        }
+
+        if (in_array($normKey, ['clientversion', 'osversion', 'engineversion'], true)) {
+            $value = $this->truncateVersion(mb_strtolower((string) $value));
+        } elseif (in_array($normKey, ['devicedisplaysize'], true)) {
+            $value = preg_replace('|[^0-9a-z.]|', '', mb_strtolower((string) $value));
+        } elseif (!in_array($normKey, ['parse_time', 'init_time', 'version'], true)) {
+            $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
+        }
+
+        // Special Windows normalization for parsers that don't differntiate the version of windows
+        // in the name, but use the version.
+        if ('osname' === $normKey && !empty($parsed['resOsVersion'])) {
+            if ('windows' === $value) {
+                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['resOsVersion']));
+            }
+
+            if ('windowsphone' === $value) {
+                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['resOsVersion']));
+            }
+        }
+
+        if (!array_key_exists($normKey, $this->mappings) || !is_array($this->mappings[$normKey])) {
+            return $value;
+        }
+
+        if (
+            array_key_exists($normKey, $this->mappings)
+            && is_array($this->mappings[$normKey])
+        ) {
+            $v = $this->mappings[$normKey];
+        } else {
+            $v = [];
+        }
+
+        if (!is_array($v)) {
+            var_dump(sprintf("'%s' found in mapping table, but izs not an array - 2.", $normKey));
+        }
+
+        if (is_array($v) && array_key_exists($value, $v)) {
+            $value = $v[$value];
+        }
+
+        return $value;
     }
 }

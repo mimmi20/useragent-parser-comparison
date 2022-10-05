@@ -11,7 +11,6 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
-use JsonException;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
@@ -221,7 +220,7 @@ final class Result extends Helper
             'resOsManufacturer' => $result['platform']['manufacturer'] ?? null,
             'resOsBits' => $result['platform']['bits'] ?? null,
 
-            'resDeviceName' => (isset($result['device']['deviceName']) && is_scalar($result['device']['deviceName'])) ?? null,
+            'resDeviceName' => isset($result['device']['deviceName']) && is_scalar($result['device']['deviceName']) ? $result['device']['deviceName'] : null,
             'resDeviceMarketingName' => $result['device']['marketingName'] ?? null,
             'resDeviceManufacturer' => $result['device']['manufacturer'] ?? null,
             'resDeviceBrand' => $result['device']['brand'] ?? null,

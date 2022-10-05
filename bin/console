@@ -10,6 +10,15 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Symfony\Component\Console\Application;
 
+$errorHandler = function (int $code, string $message, string $file = '', int $line = 0, ?array $context = []): bool
+{
+    echo new ErrorException($message, $code, 1, $file, $line);
+
+    return true;
+};
+
+set_error_handler($errorHandler);
+
 $application = new Application();
 
 $parserHelper = new \UserAgentParserComparison\Command\Helper\Parsers();
@@ -43,7 +52,7 @@ if (file_exists('config.php')) {
         $application->add(new \UserAgentParserComparison\Command\InitProvider($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitUseragents($pdo));
         $application->add(new \UserAgentParserComparison\Command\InitResults($pdo));
-        $application->add(new \UserAgentParserComparison\Command\GenerateReports($pdo, $basePath));
+        $application->add(new \UserAgentParserComparison\Command\GenerateReports($pdo, (string) COMPARISON_VERSION));
     }
 }
 

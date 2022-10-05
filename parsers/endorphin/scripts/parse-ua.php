@@ -58,14 +58,14 @@ if ($hasUa) {
             'display' => [
                 'width' => null,
                 'height' => null,
-                'touch' => $r->isTouch,
+                'touch' => $r->isTouch ?? null,
                 'type' => null,
                 'size' => null,
             ],
             'dualOrientation' => null,
             'type'     => $r->device->type ?? null,
             'simCount' => null,
-            'ismobile' => $r->isMobile,
+            'ismobile' => $r->isMobile ?? null,
         ],
         'client' => [
             'name'    => $r->isRobot ? ($r->robot->name ?? null) : ($r->browser->name ?? null),
@@ -74,7 +74,7 @@ if ($hasUa) {
             'manufacturer' => null,
             'bits' => null,
             'type' => null,
-            'isbot'   => $r->isRobot,
+            'isbot'   => $r->isRobot ?? null,
         ],
         'platform' => [
             'name'    => $r->os->name ?? null,

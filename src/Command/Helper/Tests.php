@@ -12,7 +12,6 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use FilesystemIterator;
-use Generator;
 use JsonException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
@@ -350,7 +349,7 @@ final class Tests extends Helper
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
+            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name'],
         );
 
         if ([] === $filtered) {
@@ -375,7 +374,7 @@ final class Tests extends Helper
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name']
+            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name'],
         );
 
         if ([] === $filtered) {

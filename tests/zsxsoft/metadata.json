@@ -17,8 +17,8 @@
       "type": false
     },
     "renderingEngine": {
-      "name": true,
-      "version": true,
+      "name": false,
+      "version": false,
       "manufacturer": false
     },
     "operatingSystem": {
@@ -34,12 +34,12 @@
       "manufacturer": false,
       "brand": true,
       "dual-orientation": false,
-      "type": true,
-      "isMobile": true,
+      "type": false,
+      "isMobile": false,
       "sim-count": false,
       "display-width": false,
       "display-height": false,
-      "isTouch": true,
+      "isTouch": false,
       "display-type": false,
       "display-size": false
     }

@@ -40,50 +40,10 @@ final class OverviewGeneral extends AbstractHtml
 
 <div class="section">
     <h3 class="header center orange-text">
-        Detected by all providers
+        Detection Results
     </h3>
 
     ' . $this->getTableSummary($run) . '
-
-</div>
-
-<div class="section center">
-
-    <h3 class="header center orange-text">
-        Detected by all providers
-    </h3>
-
-    <a href="detected/general/client-names.html" class="btn waves-effect waves-light">
-        Browser names
-    </a><br /><br />
-
-    <a href="detected/general/rendering-engines.html" class="btn waves-effect waves-light">
-        Rendering engines
-    </a><br /><br />
-
-    <a href="detected/general/operating-systems.html" class="btn waves-effect waves-light">
-        Operating systems
-    </a><br /><br />
-
-    <a href="detected/general/device-brands.html" class="btn waves-effect waves-light">
-        Device brands
-    </a><br /><br />
-
-    <a href="detected/general/device-models.html" class="btn waves-effect waves-light">
-        Device models
-    </a><br /><br />
-
-    <a href="detected/general/device-types.html" class="btn waves-effect waves-light">
-        Device types
-    </a><br /><br />
-
-    <a href="detected/general/bot-names.html" class="btn waves-effect waves-light">
-        Bot names
-    </a><br /><br />
-
-    <a href="detected/general/bot-types.html" class="btn waves-effect waves-light">
-        Bot types
-    </a><br /><br />
 
 </div>
 
@@ -115,41 +75,44 @@ final class OverviewGeneral extends AbstractHtml
                 SUM(`result`.`resResultFound`) AS `resultFound`,
                 SUM(`result`.`resResultError`) AS `resultError`,
 
-                COUNT(`result`.`resClientName`) AS `clientNameFound`,
-                COUNT(DISTINCT `result`.`resClientName`) AS `clientNameFoundUnique`,
-                COUNT(`result`.`resClientVersion`) AS `clientVersionFound`,
-                COUNT(`result`.`resClientIsBot`) AS `asBotDetected`,
-                COUNT(`result`.`resClientType`) AS `clientTypeFound`,
-                COUNT(DISTINCT `result`.`resClientType`) AS `clientTypeFoundUnique`,
+                COUNT(`result-normalized`.`resNormaClientName`) AS `clientNameFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaClientName`) AS `clientNameFoundUnique`,
+                COUNT(`result-normalized`.`resNormaClientVersion`) AS `clientVersionFound`,
+                COUNT(`result-normalized`.`resNormaClientIsBot`) AS `asBotDetected`,
+                COUNT(`result-normalized`.`resNormaClientType`) AS `clientTypeFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaClientType`) AS `clientTypeFoundUnique`,
 
-                COUNT(`result`.`resEngineName`) AS `engineNameFound`,
-                COUNT(DISTINCT `result`.`resEngineName`) AS `engineNameFoundUnique`,
-                COUNT(`result`.`resEngineVersion`) AS `engineVersionFound`,
+                COUNT(`result-normalized`.`resNormaEngineName`) AS `engineNameFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaEngineName`) AS `engineNameFoundUnique`,
+                COUNT(`result-normalized`.`resNormaEngineVersion`) AS `engineVersionFound`,
 
-                COUNT(`result`.`resOsName`) AS `osNameFound`,
-                COUNT(DISTINCT `result`.`resOsName`) AS `osNameFoundUnique`,
-                COUNT(`result`.`resOsVersion`) AS `osVersionFound`,
+                COUNT(`result-normalized`.`resNormaOsName`) AS `osNameFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaOsName`) AS `osNameFoundUnique`,
+                COUNT(`result-normalized`.`resNormaOsVersion`) AS `osVersionFound`,
 
-                COUNT(`result`.`resDeviceBrand`) AS `deviceBrandFound`,
-                COUNT(DISTINCT `result`.`resDeviceBrand`) AS `deviceBrandFoundUnique`,
+                COUNT(`result-normalized`.`resNormaDeviceBrand`) AS `deviceBrandFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaDeviceBrand`) AS `deviceBrandFoundUnique`,
 
-                COUNT(`result`.`resDeviceName`) AS `deviceModelFound`,
-                COUNT(DISTINCT `result`.`resDeviceName`) AS `deviceModelFoundUnique`,
+                COUNT(`result-normalized`.`resNormaDeviceName`) AS `deviceModelFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaDeviceName`) AS `deviceModelFoundUnique`,
 
-                COUNT(`result`.`resDeviceType`) AS `deviceTypeFound`,
-                COUNT(DISTINCT `result`.`resDeviceType`) AS `deviceTypeFoundUnique`,
+                COUNT(`result-normalized`.`resNormaDeviceType`) AS `deviceTypeFound`,
+                COUNT(DISTINCT `result-normalized`.`resNormaDeviceType`) AS `deviceTypeFoundUnique`,
 
-                COUNT(`result`.`resDeviceIsMobile`) AS `asMobileDetected`,
-                COUNT(`result`.`resDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
+                COUNT(`result-normalized`.`resNormaDeviceIsMobile`) AS `asMobileDetected`,
+                COUNT(`result-normalized`.`resNormaDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
 
                 AVG(`result`.`resInitTime`) AS `avgInitTime`,
                 AVG(`result`.`resParseTime`) AS `avgParseTime`,
                 AVG(`result`.`resMemoryUsed`) AS `avgMemoryUsed`
-            FROM `result`
+            FROM `result-normalized`
+            INNER JOIN `result`
+                ON `result`.`resId` = `result-normalized`.`result_id`
             INNER JOIN `real-provider`
                 ON `real-provider`.`proId` = `result`.`provider_id` AND (`real-provider`.`proVersion` = `result`.`resProviderVersion` OR ISNULL(`real-provider`.`proVersion`)) ';
         if (null !== $run) {
-            $sql .= ' WHERE `result`.`run` = :run';
+            $sql .= '
+            WHERE `result`.`run` = :run';
         }
 
         $sql .= '
@@ -238,10 +201,7 @@ final class OverviewGeneral extends AbstractHtml
          */
         $html .= '<tbody>';
         foreach ($this->getProviders($run) as $row) {
-            $html .= '<tr>';
-
-            $html .= '<th>';
-
+            $html .= '<tr><th>';
             if ($row['proIsLocal']) {
                 $html .= '<div><span class="material-icons">public_off</span>';
 
@@ -302,50 +262,44 @@ final class OverviewGeneral extends AbstractHtml
             /*
              * Result found?
              */
-            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['resultFound']);
-            $html .= '<br />Tot.' . $row['resultFound'];
-            $html .= '<br />&nbsp;';
+            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['resultFound'], $countOfUseragents);
+            $html .= '<br />' . $row['resultFound'];
             $html .= '</td>';
 
-            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['resultError']);
-            $html .= '<br />Tot.' . $row['resultError'];
-            $html .= '<br />&nbsp;';
+            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['resultError']);
+            $html .= '<br />' . $row['resultError'];
             $html .= '</td>';
 
             /*
              * Client
              */
             if ($row['proCanDetectClientName']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['clientNameFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['clientNameFound'];
-                $html .= '<br />Unq.' . $row['clientNameFoundUnique'];
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['clientNameFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['clientNameFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectClientVersion']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['clientVersionFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['clientVersionFound'];
-                $html .= '<br />&nbsp;';
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['clientVersionFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['clientVersionFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectClientType']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['clientTypeFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['clientTypeFound'];
-                $html .= '<br />&nbsp;';
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['clientTypeFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['clientTypeFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectClientIsBot']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['asBotDetected'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['asBotDetected'];
-                $html .= '<br />&nbsp;';
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['asBotDetected'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['asBotDetected'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
@@ -355,18 +309,16 @@ final class OverviewGeneral extends AbstractHtml
              * Engine
              */
             if ($row['proCanDetectEngineName']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['engineNameFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['engineNameFound'];
-                $html .= '<br />Unq.' . $row['engineNameFoundUnique'];
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['engineNameFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['engineNameFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectEngineVersion']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['engineVersionFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['engineVersionFound'];
-                $html .= '<br />&nbsp;';
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['engineVersionFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['engineVersionFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
@@ -376,18 +328,16 @@ final class OverviewGeneral extends AbstractHtml
              * OS
              */
             if ($row['proCanDetectOsName']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['osNameFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['osNameFound'];
-                $html .= '<br />Unq.' . $row['osNameFoundUnique'];
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['osNameFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['osNameFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectOsVersion']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['osVersionFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['osVersionFound'];
-                $html .= '<br />&nbsp;';
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['osVersionFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['osVersionFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
@@ -397,45 +347,40 @@ final class OverviewGeneral extends AbstractHtml
              * device
              */
             if ($row['proCanDetectDeviceBrand']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['deviceBrandFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['deviceBrandFound'];
-                $html .= '<br />Unq.' . $row['deviceBrandFoundUnique'];
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['deviceBrandFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['deviceBrandFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectDeviceName']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['deviceModelFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['deviceModelFound'];
-                $html .= '<br />Unq.' . $row['deviceModelFoundUnique'];
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['deviceModelFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['deviceModelFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectDeviceType']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['deviceTypeFound'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['deviceTypeFound'];
-                $html .= '<br />Unq.' . $row['deviceTypeFoundUnique'];
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['deviceTypeFound'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['deviceTypeFound'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectDeviceIsMobile']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['asMobileDetected'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['asMobileDetected'];
-                $html .= '<br />&nbsp;';
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['asMobileDetected'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['asMobileDetected'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
             if ($row['proCanDetectDeviceDisplayIsTouch']) {
-                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['asTouchDeviceDetected'], $row['resultFound']);
-                $html .= '<br />Tot.' . $row['asTouchDeviceDetected'];
-                $html .= '<br />&nbsp;';
+                $html .= '<td>' . $this->getPercentCircle($countOfUseragents, (int) $row['asTouchDeviceDetected'], (int) $row['resultFound']);
+                $html .= '<br />' . $row['asTouchDeviceDetected'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
@@ -453,7 +398,7 @@ final class OverviewGeneral extends AbstractHtml
             $html .= '
                 <td>
                     <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="' . htmlspecialchars($info) . '">
-                        ' . number_format(round($row['avgParseTime'] * 1000, 3), 3) . '
+                        ' . number_format(round((float) $row['avgParseTime'] * 1000, 3), 3) . '
                     </a>
                 </td>
             ';
@@ -461,7 +406,7 @@ final class OverviewGeneral extends AbstractHtml
             $html .= '
                 <td>
                     <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="' . htmlspecialchars($info) . '">
-                        ' . number_format(round($row['avgMemoryUsed'], 2), 2) . '
+                        ' . number_format(round((float) $row['avgMemoryUsed'], 2), 2) . '
                     </a>
                 </td>
             ';

@@ -10,9 +10,13 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use FilesystemIterator;
+use PDO;
+use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableCellStyle;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,33 +24,37 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Throwable;
+use UserAgentParserComparison\Command\Helper\Tests;
+use UserAgentParserComparison\Compare\Comparison;
 
-use function array_diff_assoc;
+use function array_filter;
 use function array_flip;
+use function array_key_exists;
 use function array_keys;
 use function array_merge;
 use function array_pop;
 use function array_search;
 use function array_shift;
-use function array_sum;
+use function array_splice;
 use function array_values;
 use function assert;
 use function count;
 use function current;
 use function file_exists;
 use function file_get_contents;
+use function file_put_contents;
 use function is_array;
 use function is_string;
 use function json_decode;
 use function ksort;
+use function number_format;
 use function reset;
-use function round;
 use function sort;
+use function sprintf;
 use function uasort;
 use function ucfirst;
 
 use const JSON_THROW_ON_ERROR;
-use const PHP_ROUND_HALF_DOWN;
 
 final class Analyze extends Command
 {
@@ -59,16 +67,18 @@ final class Analyze extends Command
     private array $comparison = [];
 
     /** @var string[] */
-    private array $agents = [];
-
-    private Table $summaryTable;
-
-    private InputInterface $input;
-
-    private OutputInterface $output;
+    private array $agents                  = [];
+    private Table | null $summaryTable     = null;
+    private InputInterface | null $input   = null;
+    private OutputInterface | null $output = null;
 
     /** @var mixed[] */
     private array $failures = [];
+
+    public function __construct(private PDO $pdo)
+    {
+        parent::__construct();
+    }
 
     protected function configure(): void
     {
@@ -87,10 +97,15 @@ final class Analyze extends Command
         assert(is_string($thisRunName) || null === $thisRunName);
 
         if (empty($thisRunName)) {
-            // @todo Show user the available runs, perhaps limited to 10 or something, for now, throw an error
-            $output->writeln('<error>run argument is required</error>');
+            $testHelper = $this->getHelper('tests');
+            assert($testHelper instanceof Tests);
+            $thisRunName = $testHelper->getTest($input, $output);
 
-            return self::FAILURE;
+            if (null === $thisRunName) {
+                $output->writeln('<error>No valid test run found</error>');
+
+                return self::FAILURE;
+            }
         }
 
         if (!file_exists($this->runDir . '/' . $thisRunName)) {
@@ -99,74 +114,193 @@ final class Analyze extends Command
             return self::FAILURE;
         }
 
-        if (!file_exists($this->runDir . '/' . $thisRunName . '/metadata.json')) {
-            $output->writeln('<error>No options file found for this test run</error>');
+        $metaDataFile = $this->runDir . '/' . $thisRunName . '/metadata.json';
 
-            return self::FAILURE;
+        if (!file_exists($metaDataFile)) {
+            $output->writeln(sprintf('<error>No options file found for run (%s)</error>', $thisRunName));
+
+            return self::INVALID;
         }
 
         try {
-            $contents = file_get_contents($this->runDir . '/' . $thisRunName . '/metadata.json');
+            $contents = file_get_contents($metaDataFile);
         } catch (Throwable) {
-            $output->writeln(
-                '<error>Could not read file (' . $this->runDir . '/' . $thisRunName . '/metadata.json)</error>',
-            );
+            $output->writeln(sprintf('<error>Could not read file (%s)</error>', $metaDataFile));
 
             return self::FAILURE;
         }
 
         try {
-            $this->options = json_decode($contents, true, JSON_THROW_ON_ERROR);
+            $this->options = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
         } catch (Throwable) {
             $output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
+
+            return self::INVALID;
         }
 
-        $output->writeln('<info>Analyzing data from test run: ' . $thisRunName . '</info>');
+        $statementSelectResultRun = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run');
+        $statementSelectResultRun->bindValue(':run', $thisRunName, PDO::PARAM_STR);
+        $statementSelectResultRun->execute();
 
-        if (!empty($this->options['tests'])) {
-            $tests = $this->options['tests'];
-        } elseif (!empty($this->options['file'])) {
-            $tests                  = [
-                $this->options['file'] => [],
-            ];
-            $this->options['tests'] = $tests;
-        } else {
-            $output->writeln('<error>Error in options file for this test run</error>');
+        $statementSelectResultSource = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId');
+
+        $normalizeHelper = $this->getHelper('normalize');
+        assert($normalizeHelper instanceof Helper\Normalize);
+
+        $resultHelper = $this->getHelper('normalized-result');
+        assert($resultHelper instanceof Helper\NormalizedResult);
+
+        $output->writeln(sprintf('<info>Analyzing data from test run: %s</info>', $thisRunName));
+
+        if (empty($this->options['tests']) && empty($this->options['file'])) {
+            $output->writeln(sprintf('<error>Error in options file for run (%s)</error>', $thisRunName));
 
             return self::FAILURE;
+        }
+
+        if (empty($this->options['tests'])) {
+            $this->options['tests'] = [
+                $this->options['file'] => [],
+            ];
         }
 
         $this->summaryTable = new Table($output);
-        $this->summaryTable->setHeaders(['Parser', 'Version', 'Browser Results', 'Platform Results', 'Device Results', 'Time Taken', 'Accuracy Score']);
+
         $rows   = [];
         $totals = [];
 
-        foreach ($tests as $testName => $testData) {
-            $this->comparison[$testName] = [];
+        $headerStyle = new TableCellStyle([
+            'align' => 'center',
+            'fg' => 'green',
+        ]);
 
-            $expectedFilename = $this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testName . '.json';
+        $rows[] = [
+            new TableCell(
+                'Parser',
+                [
+                    'rowspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+            new TableCell(
+                'Version',
+                [
+                    'rowspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+            new TableCell(
+                'Client Results',
+                [
+                    'colspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+            new TableCell(
+                'Engine Results',
+                [
+                    'colspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+            new TableCell(
+                'Platform Results',
+                [
+                    'colspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+            new TableCell(
+                'Device Results',
+                [
+                    'colspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+            new TableCell(
+                'Time',
+                [
+                    'colspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+            new TableCell(
+                'Score',
+                [
+                    'colspan' => 2,
+                    'style' => $headerStyle,
+                ],
+            ),
+        ];
+        $rows[] = [
+            new TableCell('Result', ['style' => $headerStyle]),
+            new TableCell('Correct', ['style' => $headerStyle]),
+            new TableCell('Result', ['style' => $headerStyle]),
+            new TableCell('Correct', ['style' => $headerStyle]),
+            new TableCell('Result', ['style' => $headerStyle]),
+            new TableCell('Correct', ['style' => $headerStyle]),
+            new TableCell('Result', ['style' => $headerStyle]),
+            new TableCell('Correct', ['style' => $headerStyle]),
+            new TableCell('Init', ['style' => $headerStyle]),
+            new TableCell('Parsing', ['style' => $headerStyle]),
+            new TableCell('Test', ['style' => $headerStyle]),
+            new TableCell('Accuracy', ['style' => $headerStyle]),
+        ];
+
+        while ($runRow = $statementSelectResultRun->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
+            $statementSelectResultSource->bindValue(':run', '0', PDO::PARAM_STR);
+            $statementSelectResultSource->bindValue(':uaId', $runRow['userAgent_id'], PDO::PARAM_STR);
+
+            $statementSelectResultSource->execute();
+
+            $sourceRow = $statementSelectResultSource->fetch(PDO::FETCH_ASSOC);
+
+            if (false === $sourceRow) {
+                $output->writeln(sprintf('<error>Analyzing data from test run: %s - source for UA "%s" not found</error>', $thisRunName, $runRow['userAgent_id']));
+
+                continue;
+            }
+
+            $headerMessage = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '');
+        }
+
+        foreach ($this->options['tests'] as $testSuite => $testData) {
+            $this->comparison[$testSuite] = [];
+
+            $expectedFilename = $this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite;
+            $expectedResults  = ['tests' => []];
 
             if (file_exists($expectedFilename)) {
-                try {
-                    $contents = file_get_contents($expectedFilename);
-                } catch (Throwable) {
-                    $this->output->writeln('<error>Could not read file (' . $expectedFilename . ')</error>');
+                foreach (new FilesystemIterator($this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite) as $testFile) {
+                    assert($testFile instanceof SplFileInfo);
+                    if ($testFile->isDir() || 'metadata.json' === $testFile->getFilename()) {
+                        continue;
+                    }
 
-                    continue;
+                    try {
+                        $contents = file_get_contents($testFile->getPathname());
+                    } catch (Throwable) {
+                        continue;
+                    }
+
+                    try {
+                        $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (Throwable) {
+                        $output->writeln("\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>');
+
+                        continue;
+                    }
+
+                    $singleTestName = $testFile->getBasename('.' . $testFile->getExtension());
+
+                    $expectedResults['tests'][$singleTestName] = $data['test'];
                 }
 
-                try {
-                    $expectedResults = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                    $headerMessage   = '<fg=yellow>Parser comparison for ' . $testName . ' test suite' . (isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '') . '</>';
-                } catch (Throwable) {
-                    $this->output->writeln('<error>An error occured while parsing file (' . $expectedFilename . '), skipping</error>');
-
-                    continue;
-                }
+                $headerMessage = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '');
             } else {
                 // When we aren't comparing to a test suite, the first parser's results become the expected results
-                $expectedResults = ['tests' => []];
-                $fileName        = $this->runDir . '/' . $thisRunName . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testName . '.json';
+
+                $fileName = $this->runDir . '/' . $thisRunName . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testSuite . '.json';
                 try {
                     $contents = file_get_contents($fileName);
                 } catch (Throwable) {
@@ -176,10 +310,10 @@ final class Analyze extends Command
                 }
 
                 try {
-                    $testResult    = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                    $headerMessage = '<fg=yellow>Parser comparison for ' . $testName . ' file, using ' . array_keys($this->options['parsers'])[0] . ' results as expected</>';
+                    $testResult    = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    $headerMessage = sprintf('<fg=yellow>Parser comparison for %s file, using %s results as expected</>', $testSuite, array_keys($this->options['parsers'])[0]);
                 } catch (Throwable) {
-                    $this->output->writeln('<error>An error occured while parsing metadata for run ' . $thisRunName . '</error>');
+                    $this->output->writeln(sprintf('<error>An error occured while parsing metadata for run %s, skipping</error>', $thisRunName));
 
                     continue;
                 }
@@ -193,261 +327,278 @@ final class Analyze extends Command
                 continue;
             }
 
-            $rows[] = [new TableCell($headerMessage, ['colspan' => 7])];
+            $rows[] = new TableSeparator();
+            $rows[] = [new TableCell($headerMessage, ['colspan' => 13])];
             $rows[] = new TableSeparator();
 
-            foreach ($expectedResults['tests'] as $agent => $result) {
-                if (!isset($this->agents[$agent])) {
-                    $this->agents[$agent] = count($this->agents);
-                }
+            $this->agents = array_flip(array_keys($expectedResults['tests']));
 
-                foreach (['browser', 'platform', 'device'] as $compareKey) {
-                    $subs = ['name'];
-                    if ('device' === $compareKey) {
-                        $subs = ['name', 'brand', 'type'];
-                    }
-
-                    if (!isset($this->comparison[$testName][$compareKey])) {
-                        $this->comparison[$testName][$compareKey] = [];
-                    }
-
-                    foreach ($subs as $compareSubKey) {
-                        if (!isset($this->comparison[$testName][$compareKey][$compareSubKey])) {
-                            $this->comparison[$testName][$compareKey][$compareSubKey] = [];
-                        }
-
-                        if (isset($result[$compareKey][$compareSubKey]) && null !== $result[$compareKey][$compareSubKey]) {
-                            $expectedValue = $result[$compareKey][$compareSubKey];
-                        } else {
-                            $expectedValue = '[n/a]';
-                        }
-
-                        if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue])) {
-                            $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue] = [
-                                'expected' => [
-                                    'count' => 0,
-                                    'agents' => [],
-                                ],
-                            ];
-                        }
-
-                        ++$this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue]['expected']['count'];
-                        $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue]['expected']['agents'][] = $this->agents[$agent];
-                    }
-                }
-            }
-
-            $parserScores   = [];
-            $possibleScores = [];
+            $scores = [];
 
             foreach ($this->options['parsers'] as $parserName => $parserData) {
-                if (!file_exists($this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $testName . '.json')) {
-                    $this->output->writeln('<error>No output found for the ' . $parserName . ' parser, skipping</error>');
-
-                    continue;
-                }
-
-                $fileName = $this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $testName . '.json';
-                try {
-                    $contents = file_get_contents($fileName);
-                } catch (Throwable) {
-                    $this->output->writeln('<error>Could not read file (' . $fileName . '), skipping</error>');
-
-                    continue;
-                }
-
-                try {
-                    $testResult = json_decode($contents, true, JSON_THROW_ON_ERROR);
-                } catch (Throwable) {
-                    $this->output->writeln('<error>An error occured while parsing file (' . $fileName . '), skipping</error>');
-
-                    continue;
-                }
-
                 $passFail = [
-                    'browser' => ['pass' => 0, 'fail' => 0],
-                    'platform' => ['pass' => 0, 'fail' => 0],
-                    'device' => ['pass' => 0, 'fail' => 0],
+                    'client' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'platform' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'device' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'engine' => ['count' => 0, 'pass' => 0, 'fail' => 0],
                 ];
 
-                $parserScores[$parserName][$testName]   = 0;
-                $possibleScores[$parserName][$testName] = 0;
+                $scores[$parserName][$testSuite] = [
+                    'count' => 0,
+                    'pass' => 0,
+                    'fail' => 0,
+                ];
 
-                foreach ($testResult['results'] as $data) {
-                    $expected = $expectedResults['tests'][$data['useragent']];
-                    $failures = [];
+                $parseTime = 0.0;
+                $initTime  = 0.0;
 
-                    foreach (['browser', 'platform', 'device'] as $compareKey) {
-                        $subs = ['name'];
-                        if ('device' === $compareKey) {
-                            $subs = ['name', 'brand', 'type'];
-                        }
+                foreach (new FilesystemIterator($this->runDir . '/' . $thisRunName . '/results/' . $parserName . '/normalized/' . $testSuite) as $resultFile) {
+                    try {
+                        $contents = file_get_contents($resultFile->getPathname());
+                    } catch (Throwable) {
+                        $this->output->writeln(sprintf('<error>Could not read file (%s), skipping</error>', $resultFile->getPathname()));
 
-                        foreach ($subs as $compareSubKey) {
-                            if (isset($expected[$compareKey][$compareSubKey]) && null !== $expected[$compareKey][$compareSubKey]) {
-                                $expectedValue = $expected[$compareKey][$compareSubKey];
-                            } else {
-                                $expectedValue = '[n/a]';
-                            }
+                        continue;
+                    }
 
-                            if (isset($data['parsed'][$compareKey][$compareSubKey]) && null !== $data['parsed'][$compareKey][$compareSubKey]) {
-                                $actualValue = $data['parsed'][$compareKey][$compareSubKey];
-                            } else {
-                                $actualValue = '[n/a]';
-                            }
+                    try {
+                        $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (Throwable) {
+                        $this->output->writeln(sprintf('<error>An error occured while parsing file (%s), skipping</error>', $resultFile->getPathname()));
 
-                            if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName])) {
-                                $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName] = [];
-                            }
+                        continue;
+                    }
 
-                            if (!isset($this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue])) {
-                                $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue] = [
-                                    'count' => 0,
-                                    'agents' => [],
-                                ];
-                            }
+                    if (!array_key_exists('parsed', $data)) {
+                        continue;
+                    }
 
-                            ++$this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['count'];
-                            $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['agents'][] = $this->agents[$data['useragent']];
+                    $singleTestName = $resultFile->getBasename('.' . $resultFile->getExtension());
 
-                            if ($expectedValue === $actualValue) {
-                                continue;
-                            }
+                    $expected   = $expectedResults['tests'][$singleTestName] ?? [];
+                    $comparison = new Comparison($expected, $data['parsed'] ?? []);
+                    $comparison->setTestname($singleTestName);
+                    $comparison->setTest($data);
 
-                            if ('[n/a]' === $expectedValue || '[n/a]' === $actualValue) {
-                                continue;
-                            }
+                    $parseTime += $data['time'];
+                    $initTime  += $data['init'];
 
-                            $this->comparison[$testName][$compareKey][$compareSubKey][$expectedValue]['expected']['hasFailures'] = true;
-                        }
-
-                        if ($data['parsed'][$compareKey] !== $expected[$compareKey]) {
-                            $diff = $this->makeDiff($expected[$compareKey], $data['parsed'][$compareKey]);
-                            if (!empty($diff)) {
-                                $failures[$compareKey] = $diff;
-                            }
+                    foreach (['client', 'platform', 'device', 'engine'] as $compareKey) {
+                        if (!array_key_exists($compareKey, $expected) || !array_key_exists($compareKey, $data['parsed'])) {
+                            continue;
                         }
 
                         $score         = $this->calculateScore($expected[$compareKey], $data['parsed'][$compareKey]);
                         $possibleScore = $this->calculateScore($expected[$compareKey], $data['parsed'][$compareKey], true);
 
-                        $passFail[$compareKey]['pass'] += $score;
-                        $passFail[$compareKey]['fail'] += $possibleScore - $score;
+                        $passFail[$compareKey]['count'] += count($expected[$compareKey]);
+                        $passFail[$compareKey]['pass']  += $score;
+                        $passFail[$compareKey]['fail']  += $possibleScore - $score;
 
-                        $parserScores[$parserName][$testName]   += $score;
-                        $possibleScores[$parserName][$testName] += $possibleScore;
+                        $filtered = array_filter(
+                            $expected[$compareKey],
+                            static fn (mixed $value): bool => null !== $value,
+                        );
+
+                        $scores[$parserName][$testSuite]['count'] += count($filtered);
+                        $scores[$parserName][$testSuite]['pass']  += $score;
+                        $scores[$parserName][$testSuite]['fail']  += $possibleScore - $score;
                     }
+
+                    $this->comparison[$testSuite] = $comparison->getComparison($parserName, $this->agents[$singleTestName] ?? 0);
+                    $failures                     = $comparison->getFailures();
 
                     if (empty($failures)) {
                         continue;
                     }
 
-                    $this->failures[$testName][$parserName][$data['useragent']] = $failures;
+                    $this->failures[$testSuite][$parserName][$singleTestName] = [
+                        'headers' => $data['headers'],
+                        'fail' => $failures,
+                    ];
                 }
 
-                if (0 === array_sum($passFail['browser'])) {
-                    $browserContent = '<fg=white;bg=blue>-</>';
+                if (0 === $passFail['client']['pass'] + $passFail['client']['fail']) {
+                    $clientTContent = '<fg=white;bg=blue>-</>';
+                    $clientAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $browserPercentage = $passFail['browser']['pass'] / array_sum($passFail['browser']) * 100;
-                    $browserContent    = $this->colorByPercent($browserPercentage) . $passFail['browser']['pass'] . '/' . array_sum($passFail['browser']) . ' ' . round($browserPercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $clientTPercentage = ($passFail['client']['pass'] + $passFail['client']['fail']) / $passFail['client']['count'] * 100;
+                    $clientTContent    = $this->colorByPercent($clientTPercentage) . ($passFail['client']['pass'] + $passFail['client']['fail']) . '/' . $passFail['client']['count'] . ' ' . number_format($clientTPercentage, 2) . '%</>';
+
+                    $clientAPercentage = $passFail['client']['pass'] / ($passFail['client']['pass'] + $passFail['client']['fail']) * 100;
+                    $clientAContent    = $this->colorByPercent($clientAPercentage) . $passFail['client']['pass'] . '/' . ($passFail['client']['pass'] + $passFail['client']['fail']) . ' ' . number_format($clientAPercentage, 2) . '%</>';
                 }
 
-                if (0 === array_sum($passFail['platform'])) {
-                    $platformContent = '<fg=white;bg=blue>-</>';
+                if (0 === $passFail['engine']['pass'] + $passFail['engine']['fail']) {
+                    $engineTContent = '<fg=white;bg=blue>-</>';
+                    $engineAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $platformPercentage = $passFail['platform']['pass'] / array_sum($passFail['platform']) * 100;
-                    $platformContent    = $this->colorByPercent($platformPercentage) . $passFail['platform']['pass'] . '/' . array_sum($passFail['platform']) . ' ' . round($platformPercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $engineTPercentage = ($passFail['engine']['pass'] + $passFail['engine']['fail']) / $passFail['engine']['count'] * 100;
+                    $engineTContent    = $this->colorByPercent($engineTPercentage) . ($passFail['engine']['pass'] + $passFail['engine']['fail']) . '/' . $passFail['engine']['count'] . ' ' . number_format($engineTPercentage, 2) . '%</>';
+
+                    $engineAPercentage = $passFail['engine']['pass'] / ($passFail['engine']['pass'] + $passFail['engine']['fail']) * 100;
+                    $engineAContent    = $this->colorByPercent($engineAPercentage) . $passFail['engine']['pass'] . '/' . ($passFail['engine']['pass'] + $passFail['engine']['fail']) . ' ' . number_format($engineAPercentage, 2) . '%</>';
                 }
 
-                if (0 === array_sum($passFail['device'])) {
-                    $deviceContent = '<fg=white;bg=blue>-</>';
+                if (0 === $passFail['platform']['pass'] + $passFail['platform']['fail']) {
+                    $platformTContent = '<fg=white;bg=blue>-</>';
+                    $platformAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $devicePercentage = $passFail['device']['pass'] / array_sum($passFail['device']) * 100;
-                    $deviceContent    = $this->colorByPercent($devicePercentage) . $passFail['device']['pass'] . '/' . array_sum($passFail['device']) . ' ' . round($devicePercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $platformTPercentage = ($passFail['platform']['pass'] + $passFail['platform']['fail']) / $passFail['platform']['count'] * 100;
+                    $platformTContent    = $this->colorByPercent($platformTPercentage) . ($passFail['platform']['pass'] + $passFail['platform']['fail']) . '/' . $passFail['platform']['count'] . ' ' . number_format($platformTPercentage, 2) . '%</>';
+
+                    $platformAPercentage = $passFail['platform']['pass'] / ($passFail['platform']['pass'] + $passFail['platform']['fail']) * 100;
+                    $platformAContent    = $this->colorByPercent($platformAPercentage) . $passFail['platform']['pass'] . '/' . ($passFail['platform']['pass'] + $passFail['platform']['fail']) . ' ' . number_format($platformAPercentage, 2) . '%</>';
                 }
 
-                if (0 === $possibleScores[$parserName][$testName]) {
-                    $summaryContent = '<fg=white;bg=blue>-</>';
+                if (0 === $passFail['device']['pass'] + $passFail['device']['fail']) {
+                    $deviceTContent = '<fg=white;bg=blue>-</>';
+                    $deviceAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $summaryPercentage = $parserScores[$parserName][$testName] / $possibleScores[$parserName][$testName] * 100;
-                    $summaryContent    = $this->colorByPercent($summaryPercentage) . $parserScores[$parserName][$testName] . '/' . $possibleScores[$parserName][$testName] . ' ' . round($summaryPercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $deviceTPercentage = ($passFail['device']['pass'] + $passFail['device']['fail']) / $passFail['device']['count'] * 100;
+                    $deviceTContent    = $this->colorByPercent($deviceTPercentage) . ($passFail['device']['pass'] + $passFail['device']['fail']) . '/' . $passFail['device']['count'] . ' ' . number_format($deviceTPercentage, 2) . '%</>';
+
+                    $deviceAPercentage = $passFail['device']['pass'] / ($passFail['device']['pass'] + $passFail['device']['fail']) * 100;
+                    $deviceAContent    = $this->colorByPercent($deviceAPercentage) . $passFail['device']['pass'] . '/' . ($passFail['device']['pass'] + $passFail['device']['fail']) . ' ' . number_format($deviceAPercentage, 2) . '%</>';
+                }
+
+                if (0 === $scores[$parserName][$testSuite]['pass'] + $scores[$parserName][$testSuite]['fail']) {
+                    $summaryTContent = '<fg=white;bg=blue>-</>';
+                    $summaryAContent = '<fg=white;bg=blue>-</>';
+                } else {
+                    $summaryTPercentage = ($scores[$parserName][$testSuite]['pass'] + $scores[$parserName][$testSuite]['fail']) / $scores[$parserName][$testSuite]['count'] * 100;
+                    $summaryTContent    = $this->colorByPercent($summaryTPercentage) . ($scores[$parserName][$testSuite]['pass'] + $scores[$parserName][$testSuite]['fail']) . '/' . $scores[$parserName][$testSuite]['count'] . ' ' . number_format($summaryTPercentage, 2) . '%</>';
+
+                    $summaryAPercentage = $scores[$parserName][$testSuite]['pass'] / ($scores[$parserName][$testSuite]['pass'] + $scores[$parserName][$testSuite]['fail']) * 100;
+                    $summaryAContent    = $this->colorByPercent($summaryAPercentage) . $scores[$parserName][$testSuite]['pass'] . '/' . ($scores[$parserName][$testSuite]['pass'] + $scores[$parserName][$testSuite]['fail']) . ' ' . number_format($summaryAPercentage, 2) . '%</>';
                 }
 
                 $rows[] = [
-                    $parserName,
+                    $parserData['metadata']['name'],
                     $parserData['metadata']['version'] ?? 'n/a',
-                    $browserContent,
-                    $platformContent,
-                    $deviceContent,
-                    round($testResult['parse_time'] + $testResult['init_time'], 3) . 's',
-                    $summaryContent,
+                    $clientTContent,
+                    $clientAContent,
+                    $engineTContent,
+                    $engineAContent,
+                    $platformTContent,
+                    $platformAContent,
+                    $deviceTContent,
+                    $deviceAContent,
+                    number_format($initTime, 3) . 's',
+                    number_format($parseTime, 3) . 's',
+                    $summaryTContent,
+                    $summaryAContent,
                 ];
 
                 if (!isset($totals[$parserName])) {
                     $totals[$parserName] = [
-                        'browser' => ['pass' => 0, 'fail' => 0],
-                        'platform' => ['pass' => 0, 'fail' => 0],
-                        'device' => ['pass' => 0, 'fail' => 0],
+                        'client' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                        'engine' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                        'platform' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                        'device' => ['count' => 0, 'pass' => 0, 'fail' => 0],
                         'time' => 0,
-                        'score' => ['earned' => 0, 'possible' => 0],
+                        'init' => 0,
+                        'score' => ['count' => 0, 'pass' => 0, 'fail' => 0],
                     ];
                 }
 
-                $totals[$parserName]['browser']['pass']   += $passFail['browser']['pass'];
-                $totals[$parserName]['browser']['fail']   += $passFail['browser']['fail'];
+                $totals[$parserName]['client']['count']   += $passFail['client']['count'];
+                $totals[$parserName]['client']['pass']    += $passFail['client']['pass'];
+                $totals[$parserName]['client']['fail']    += $passFail['client']['fail'];
+                $totals[$parserName]['engine']['count']   += $passFail['engine']['count'];
+                $totals[$parserName]['engine']['pass']    += $passFail['engine']['pass'];
+                $totals[$parserName]['engine']['fail']    += $passFail['engine']['fail'];
+                $totals[$parserName]['platform']['count'] += $passFail['platform']['count'];
                 $totals[$parserName]['platform']['pass']  += $passFail['platform']['pass'];
                 $totals[$parserName]['platform']['fail']  += $passFail['platform']['fail'];
+                $totals[$parserName]['device']['count']   += $passFail['device']['count'];
                 $totals[$parserName]['device']['pass']    += $passFail['device']['pass'];
                 $totals[$parserName]['device']['fail']    += $passFail['device']['fail'];
-                $totals[$parserName]['time']              += $testResult['parse_time'] + $testResult['init_time'];
-                $totals[$parserName]['score']['earned']   += $parserScores[$parserName][$testName];
-                $totals[$parserName]['score']['possible'] += $possibleScores[$parserName][$testName];
+                $totals[$parserName]['time']              += $parseTime;
+                $totals[$parserName]['init']              += $initTime;
+                $totals[$parserName]['score']['count']    += $scores[$parserName][$testSuite]['count'];
+                $totals[$parserName]['score']['pass']     += $scores[$parserName][$testSuite]['pass'];
+                $totals[$parserName]['score']['fail']     += $scores[$parserName][$testSuite]['fail'];
             }
 
             $rows[] = new TableSeparator();
         }
 
         if (1 < count($this->options['tests'])) {
-            $rows[] = [new TableCell('<fg=yellow>Total for all Test suites</>', ['colspan' => 6])];
+            $rows[] = [new TableCell('<fg=yellow>Total for all Test suites</>', ['colspan' => 13])];
             $rows[] = new TableSeparator();
 
             foreach ($totals as $parser => $total) {
-                if (0 === array_sum($total['browser'])) {
-                    $browserContent = '<fg=white;bg=blue>-</>';
+                if (0 === $total['client']['pass'] + $total['client']['fail']) {
+                    $clientTContent = '<fg=white;bg=blue>-</>';
+                    $clientAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $browserPercentage = $total['browser']['pass'] / array_sum($total['browser']) * 100;
-                    $browserContent    = $this->colorByPercent($browserPercentage) . $total['browser']['pass'] . '/' . array_sum($total['browser']) . ' ' . round($browserPercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $clientTPercentage = ($total['client']['pass'] + $total['client']['fail']) / $total['client']['count'] * 100;
+                    $clientTContent    = $this->colorByPercent($clientTPercentage) . ($total['client']['pass'] + $total['client']['fail']) . '/' . $total['client']['count'] . ' ' . number_format($clientTPercentage, 2) . '%</>';
+
+                    $clientAPercentage = $total['client']['pass'] / ($total['client']['pass'] + $total['client']['fail']) * 100;
+                    $clientAContent    = $this->colorByPercent($clientAPercentage) . $total['client']['pass'] . '/' . ($total['client']['pass'] + $total['client']['fail']) . ' ' . number_format($clientAPercentage, 2) . '%</>';
                 }
 
-                if (0 === array_sum($total['platform'])) {
-                    $platformContent = '<fg=white;bg=blue>-</>';
+                if (0 === $total['engine']['pass'] + $total['engine']['fail']) {
+                    $engineTContent = '<fg=white;bg=blue>-</>';
+                    $engineAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $platformPercentage = $total['platform']['pass'] / array_sum($total['platform']) * 100;
-                    $platformContent    = $this->colorByPercent($platformPercentage) . $total['platform']['pass'] . '/' . array_sum($total['platform']) . ' ' . round($platformPercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $engineTPercentage = ($total['engine']['pass'] + $total['engine']['fail']) / $total['engine']['count'] * 100;
+                    $engineTContent    = $this->colorByPercent($engineTPercentage) . ($total['engine']['pass'] + $total['engine']['fail']) . '/' . $total['engine']['count'] . ' ' . number_format($engineTPercentage, 2) . '%</>';
+
+                    $engineAPercentage = $total['engine']['pass'] / ($total['engine']['pass'] + $total['engine']['fail']) * 100;
+                    $engineAContent    = $this->colorByPercent($engineAPercentage) . $total['engine']['pass'] . '/' . ($total['engine']['pass'] + $total['engine']['fail']) . ' ' . number_format($engineAPercentage, 2) . '%</>';
                 }
 
-                if (0 === array_sum($total['device'])) {
-                    $deviceContent = '<fg=white;bg=blue>-</>';
+                if (0 === $total['platform']['pass'] + $total['platform']['fail']) {
+                    $platformTContent = '<fg=white;bg=blue>-</>';
+                    $platformAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $devicePercentage = $total['device']['pass'] / array_sum($total['device']) * 100;
-                    $deviceContent    = $this->colorByPercent($devicePercentage) . $total['device']['pass'] . '/' . array_sum($total['device']) . ' ' . round($devicePercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $platformTPercentage = ($total['platform']['pass'] + $total['platform']['fail']) / $total['platform']['count'] * 100;
+                    $platformTContent    = $this->colorByPercent($platformTPercentage) . ($total['platform']['pass'] + $total['platform']['fail']) . '/' . $total['platform']['count'] . ' ' . number_format($platformTPercentage, 2) . '%</>';
+
+                    $platformAPercentage = $total['platform']['pass'] / ($total['platform']['pass'] + $total['platform']['fail']) * 100;
+                    $platformAContent    = $this->colorByPercent($platformAPercentage) . $total['platform']['pass'] . '/' . ($total['platform']['pass'] + $total['platform']['fail']) . ' ' . number_format($platformAPercentage, 2) . '%</>';
                 }
 
-                if (0 === $total['score']['possible']) {
-                    $summaryContent = '<fg=white;bg=blue>-</>';
+                if (0 === $total['device']['pass'] + $total['device']['fail']) {
+                    $deviceTContent = '<fg=white;bg=blue>-</>';
+                    $deviceAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $summaryPercentage = $total['score']['earned'] / $total['score']['possible'] * 100;
-                    $summaryContent    = $this->colorByPercent($summaryPercentage) . $total['score']['earned'] . '/' . $total['score']['possible'] . ' ' . round($summaryPercentage, 2, PHP_ROUND_HALF_DOWN) . '%</>';
+                    $deviceTPercentage = ($total['device']['pass'] + $total['device']['fail']) / $total['device']['count'] * 100;
+                    $deviceTContent    = $this->colorByPercent($deviceTPercentage) . ($total['device']['pass'] + $total['device']['fail']) . '/' . $total['device']['count'] . ' ' . number_format($deviceTPercentage, 2) . '%</>';
+
+                    $deviceAPercentage = $total['device']['pass'] / ($total['device']['pass'] + $total['device']['fail']) * 100;
+                    $deviceAContent    = $this->colorByPercent($deviceAPercentage) . $total['device']['pass'] . '/' . ($total['device']['pass'] + $total['device']['fail']) . ' ' . number_format($deviceAPercentage, 2) . '%</>';
+                }
+
+                if (0 === $total['score']['pass'] + $total['score']['fail']) {
+                    $summaryTContent = '<fg=white;bg=blue>-</>';
+                    $summaryAContent = '<fg=white;bg=blue>-</>';
+                } else {
+                    $summaryTPercentage = ($total['score']['pass'] + $total['score']['fail']) / $total['score']['count'] * 100;
+                    $summaryTContent    = $this->colorByPercent($summaryTPercentage) . ($total['score']['pass'] + $total['score']['fail']) . '/' . $total['score']['count'] . ' ' . number_format($summaryTPercentage, 2) . '%</>';
+
+                    $summaryAPercentage = $total['score']['pass'] / ($total['score']['pass'] + $total['score']['fail']) * 100;
+                    $summaryAContent    = $this->colorByPercent($summaryAPercentage) . $total['score']['pass'] . '/' . ($total['score']['pass'] + $total['score']['fail']) . ' ' . number_format($summaryAPercentage, 2) . '%</>';
                 }
 
                 $rows[] = [
                     $parser,
                     $this->options['parsers'][$parser]['metadata']['version'] ?? 'n/a',
-                    $browserContent,
-                    $platformContent,
-                    $deviceContent,
-                    round($total['time'], 3) . 's',
-                    $summaryContent,
+                    $clientTContent,
+                    $clientAContent,
+                    $engineTContent,
+                    $engineAContent,
+                    $platformTContent,
+                    $platformAContent,
+                    $deviceTContent,
+                    $deviceAContent,
+                    number_format($total['init'], 3) . 's',
+                    number_format($total['time'], 3) . 's',
+                    $summaryTContent,
+                    $summaryAContent,
                 ];
             }
 
@@ -493,7 +644,7 @@ final class Analyze extends Command
 
         $question = new ChoiceQuestion(
             'Which Section?',
-            ['browser', 'platform', 'device'],
+            ['client', 'engine', 'platform', 'device'],
         );
 
         return $questionHelper->ask($this->input, $this->output, $question);
@@ -505,7 +656,8 @@ final class Analyze extends Command
         $subs           = [];
 
         switch ($section) {
-            case 'browser':
+            case 'client':
+            case 'engine':
             case 'platform':
                 $subs = ['name'];
 
@@ -646,20 +798,19 @@ final class Analyze extends Command
                     $questions = [
                         'Export User Agents',
                         'Change Section',
-                        'Change Property',
-                        'Change Test Suite',
                         $justFailureQuestion,
                         'Back to Main Menu',
                     ];
 
-                    if (1 >= count($this->options['tests'])) {
-                        unset($questions[array_search('Change Test Suite', $questions, true)]);
+                    if (1 <= count($this->options['tests'])) {
+                        array_splice($questions, 1, 0, 'Change Test Suite');
                     }
 
-                    if ('browser' === $section || 'platform' === $section) {
-                        unset($questions[array_search('Change Property', $questions, true)]);
+                    if ('device' === $section) {
+                        array_splice($questions, 2, 0, 'Change Property');
                     }
 
+                    // Re-index
                     $questions = array_values($questions);
 
                     $question = new ChoiceQuestion(
@@ -703,20 +854,22 @@ final class Analyze extends Command
             $value = '';
         }
 
-        if (isset($this->comparison[$test][$section][$property][$value])) {
-            $agents = array_flip($this->agents);
-
-            $this->output->writeln('<comment>Showing ' . count($this->comparison[$test][$section][$property][$value]['expected']['agents']) . ' user agents</comment>');
-
-            $this->output->writeln('');
-            foreach ($this->comparison[$test][$section][$property][$value]['expected']['agents'] as $agentId) {
-                $this->output->writeln($agents[$agentId]);
-            }
-
-            $this->output->writeln('');
-        } else {
+        if (!isset($this->comparison[$test][$section][$property][$value])) {
             $this->output->writeln('<error>There were no agents processed with that property value</error>');
+
+            return;
         }
+
+        $agents = array_flip($this->agents);
+
+        $this->output->writeln('<comment>Showing ' . count($this->comparison[$test][$section][$property][$value]['expected']['agents']) . ' user agents</comment>');
+
+        $this->output->writeln('');
+        foreach ($this->comparison[$test][$section][$property][$value]['expected']['agents'] as $agentId) {
+            $this->output->writeln($agents[$agentId]);
+        }
+
+        $this->output->writeln('');
     }
 
     private function analyzeFailures(string $test, string $parser, bool $justAgents = false): void
@@ -736,27 +889,108 @@ final class Analyze extends Command
         $table->setColumnMaxWidth(1, 50);
         $table->setColumnWidth(2, 50);
         $table->setColumnMaxWidth(2, 50);
+        $table->setColumnWidth(3, 50);
+        $table->setColumnMaxWidth(3, 50);
         $table->setStyle('box');
 
+        $htmlG = '<html><body><table><colgroup><col span="4" style="width: 25%"></colgroup><thead><tr><th colspan="3">UserAgent</th></tr><tr><th>Client</th><th>Engine</th><th>Platform</th><th>Device</th></tr></thead><tbody>';
+        $htmlC = '<html><body><table><thead><tr><th>UserAgent</th></tr><tr><th>Client</th></tr></thead><tbody>';
+        $htmlE = '<html><body><table><thead><tr><th>UserAgent</th></tr><tr><th>Engine</th></tr></thead><tbody>';
+        $htmlP = '<html><body><table><thead><tr><th>UserAgent</th></tr><tr><th>Platform</th></tr></thead><tbody>';
+        $htmlD = '<html><body><table><thead><tr><th>UserAgent</th></tr><tr><th>Device</th></tr></thead><tbody>';
+
         $table->setHeaders([
-            [new TableCell('UserAgent', ['colspan' => 3])],
-            [new TableCell('Browser'), new TableCell('Platform'), new TableCell('Device')],
+            [new TableCell('UserAgent', ['colspan' => 4])],
+            [new TableCell('Client'), new TableCell('Engine'), new TableCell('Platform'), new TableCell('Device')],
         ]);
 
         $rows = [];
-        foreach ($this->failures[$test][$parser] as $agent => $failData) {
-            if (true === $justAgents) {
-                $this->output->writeln($agent);
-            } else {
-                $rows[] = [new TableCell((string) $agent, ['colspan' => 3])];
-                $rows[] = [
-                    new TableCell(isset($failData['browser']) ? $this->outputDiff($failData['browser']) : ''),
-                    new TableCell(isset($failData['platform']) ? $this->outputDiff($failData['platform']) : ''),
-                    new TableCell(isset($failData['device']) ? $this->outputDiff($failData['device']) : ''),
-                ];
-                $rows[] = new TableSeparator();
+        foreach ($this->failures[$test][$parser] as $singleTestName => $failData) {
+            if (empty($failData['fail']['client']) && empty($failData['fail']['platform']) && empty($failData['fail']['device']) && empty($failData['fail']['engine'])) {
+                continue;
             }
+
+            if (true === $justAgents) {
+                foreach ($failData['headers'] as $header => $value) {
+                    $this->output->writeln($header . ': ' . $value);
+                }
+
+                continue;
+            }
+
+            foreach ($failData['headers'] as $header => $value) {
+                $rows[] = [new TableCell($header . ': ' . $value, ['colspan' => 4])];
+            }
+
+            $rows[] = [
+                new TableCell(isset($failData['fail']['client']) ? $this->outputDiff($failData['fail']['client']) : ''),
+                new TableCell(isset($failData['fail']['engine']) ? $this->outputDiff($failData['fail']['engine']) : ''),
+                new TableCell(isset($failData['fail']['platform']) ? $this->outputDiff($failData['fail']['platform']) : ''),
+                new TableCell(isset($failData['fail']['device']) ? $this->outputDiff($failData['fail']['device']) : ''),
+            ];
+            $rows[] = new TableSeparator();
+
+            $htmlG .= '<tr><td colspan="4">';
+
+            foreach ($failData['headers'] as $header => $value) {
+                $htmlG .= $header . ': ' . $value . '<br/>';
+            }
+
+            $htmlG .= '</td></tr>';
+            $htmlG .= '<tr><td>' . (!empty($failData['fail']['client']) ? $this->outputDiffHtml($failData['fail']['client']) : '') . '</td><td>' . (!empty($failData['fail']['engine']) ? $this->outputDiffHtml($failData['fail']['engine']) : '') . '</td><td>' . (!empty($failData['fail']['platform']) ? $this->outputDiffHtml($failData['fail']['platform']) : '') . '</td><td>' . (!empty($failData['fail']['device']) ? $this->outputDiffHtml($failData['fail']['device']) : '') . '</td></tr>';
+
+            if (!empty($failData['fail']['client'])) {
+                $htmlC .= '<tr><td>';
+
+                foreach ($failData['headers'] as $header => $value) {
+                    $htmlC .= $header . ': ' . $value . '<br/>';
+                }
+
+                $htmlC .= '</td></tr>';
+                $htmlC .= '<tr><td>' . $this->outputDiffHtml($failData['fail']['client']) . '</td></tr>';
+            }
+
+            if (!empty($failData['fail']['platform'])) {
+                $htmlP .= '<tr><td>';
+
+                foreach ($failData['headers'] as $header => $value) {
+                    $htmlP .= $header . ': ' . $value . '<br/>';
+                }
+
+                $htmlP .= '</td></tr>';
+                $htmlP .= '<tr><td>' . $this->outputDiffHtml($failData['fail']['platform']) . '</td></tr>';
+            }
+
+            if (!empty($failData['fail']['device'])) {
+                $htmlD .= '<tr><td>';
+
+                foreach ($failData['headers'] as $header => $value) {
+                    $htmlD .= $header . ': ' . $value . '<br/>';
+                }
+
+                $htmlD .= '</td></tr>';
+                $htmlD .= '<tr><td>' . $this->outputDiffHtml($failData['fail']['device']) . '</td></tr>';
+            }
+
+            if (empty($failData['fail']['engine'])) {
+                continue;
+            }
+
+            $htmlE .= '<tr><td>';
+
+            foreach ($failData['headers'] as $header => $value) {
+                $htmlE .= $header . ': ' . $value . '<br/>';
+            }
+
+            $htmlE .= '</td></tr>';
+            $htmlE .= '<tr><td>' . $this->outputDiffHtml($failData['fail']['engine']) . '</td></tr>';
         }
+
+        $htmlG .= '</tbody></table></body></html>';
+        $htmlC .= '</tbody></table></body></html>';
+        $htmlE .= '</tbody></table></body></html>';
+        $htmlP .= '</tbody></table></body></html>';
+        $htmlD .= '</tbody></table></body></html>';
 
         if (false !== $justAgents) {
             return;
@@ -767,6 +1001,11 @@ final class Analyze extends Command
         $table->setRows($rows);
 
         $table->render();
+        file_put_contents($this->runDir . '/errors-summary.html', $htmlG);
+        file_put_contents($this->runDir . '/errors-browsers.html', $htmlC);
+        file_put_contents($this->runDir . '/errors-engines.html', $htmlE);
+        file_put_contents($this->runDir . '/errors-platforms.html', $htmlP);
+        file_put_contents($this->runDir . '/errors-devices.html', $htmlD);
     }
 
     private function showComparison(string $test, string $compareKey, string $compareSubKey, bool $justFails = false): void
@@ -839,8 +1078,11 @@ final class Analyze extends Command
                         if (isset($compareRow[$parser]) && 0 < count($compareRow[$parser])) {
                             $key      = current(array_keys($compareRow[$parser]));
                             $quantity = array_shift($compareRow[$parser]);
-                            if ('[n/a]' === $expected || $key === $expected || '[n/a]' === $key) {
+
+                            if ($key === $expected) {
                                 $row[] = ('' === $key ? '[no value]' : $key) . ' <fg=green>(' . $quantity['count'] . ')</>';
+                            } elseif ('[n/a]' === $expected || '[n/a]' === $key) {
+                                $row[] = ('' === $key ? '[no value]' : $key) . ' <fg=blue>(' . $quantity['count'] . ')</>';
                             } else {
                                 $row[] = ('' === $key ? '[no value]' : $key) . ' <fg=red>(' . $quantity['count'] . ')</>';
                             }
@@ -863,44 +1105,15 @@ final class Analyze extends Command
     }
 
     /**
-     * @param mixed[] $expected
-     * @param mixed[] $actual
-     *
-     * @return mixed[]
-     */
-    private function makeDiff(array $expected, array $actual): array
-    {
-        if (empty($expected)) {
-            return [];
-        }
-
-        $result = [];
-        $diff   = array_diff_assoc($expected, $actual);
-
-        foreach ($diff as $field => $value) {
-            // We can only compare the fields that aren't null in either expected or actual
-            // to be "fair" to parsers that don't have all of the data (or have too much if the test
-            // suite doesn't contain the properties that a parser may)
-            if (!isset($actual[$field], $expected[$field])) {
-                continue;
-            }
-
-            $result[$field] = ['expected' => $value, 'actual' => $actual[$field]];
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param mixed[] $expected
-     * @param mixed[] $actual
+     * @param array<string, array<bool|string|null>> $expected
+     * @param array<string, array<bool|string|null>> $actual
      */
     private function calculateScore(array $expected, array $actual, bool $possible = false): int
     {
         $score = 0;
 
         foreach ($expected as $field => $value) {
-            if (null === $value) {
+            if (null === $value || !array_key_exists($field, $actual)) {
                 continue;
             }
 
@@ -915,7 +1128,7 @@ final class Analyze extends Command
         return $score;
     }
 
-    /** @param mixed[] $diff */
+    /** @param array<string, array<string|null>> $diff */
     private function outputDiff(array $diff): string
     {
         if (empty($diff)) {
@@ -925,7 +1138,40 @@ final class Analyze extends Command
         $output = '';
 
         foreach ($diff as $field => $data) {
-            $output .= $field . ': <fg=white;bg=green>' . $data['expected'] . '</> <fg=white;bg=red>' . $data['actual'] . '</> ';
+            $output .= $field . ' (expected) : <fg=white;bg=green>' . $data['expected'] . '</> ';
+            $output .= $field . ' (actual)   : <fg=white;bg=red>' . $data['actual'] . '</> ';
+        }
+
+        return $output;
+    }
+
+    /** @param array<string, array<string|null>> $diff */
+    private function outputDiffHtml(array $diff): string
+    {
+        if (empty($diff)) {
+            return '';
+        }
+
+        $output = '';
+
+        foreach ($diff as $field => $data) {
+            $expected = $data['expected'];
+
+            if (null === $expected) {
+                $expected = '(null)';
+            } elseif ('' === $expected) {
+                $expected = '(empty)';
+            }
+
+            $actual = $data['actual'];
+
+            if (null === $actual) {
+                $actual = '(null)';
+            } elseif ('' === $actual) {
+                $actual = '(empty)';
+            }
+
+            $output .= $field . ': "<span style="background-color: green; color: white">' . $expected . '</span>" "<span style="background-color: red; color: white">' . $actual . '</span>" ';
         }
 
         return $output;
@@ -934,7 +1180,7 @@ final class Analyze extends Command
     private function colorByPercent(float $percent): string
     {
         if (100.0 <= $percent) {
-            return '<fg=green;bg=black;options=bold>';
+            return '<fg=bright-green;bg=black>';
         }
 
         if (95.0 <= $percent) {
@@ -942,7 +1188,7 @@ final class Analyze extends Command
         }
 
         if (90.0 <= $percent) {
-            return '<fg=yellow;bg=black;options=bold>';
+            return '<fg=bright-yellow;bg=black>';
         }
 
         if (85.0 <= $percent) {
@@ -953,6 +1199,6 @@ final class Analyze extends Command
             return '<fg=red;bg=black>';
         }
 
-        return '</>';
+        return '<fg=white;bg=black>';
     }
 }

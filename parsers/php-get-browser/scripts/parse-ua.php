@@ -65,7 +65,7 @@ if ($hasUa) {
             'version' => $r->version ?? null,
             'manufacturer' => $r->browser_maker ?? null,
             'bits' => $r->browser_bits ?? null,
-            'isBot'   => $r->crawler ?? null,
+            'isbot'   => $r->crawler ?? null,
             'type'    => $r->browser_type ?? null,
         ],
         'platform' => [

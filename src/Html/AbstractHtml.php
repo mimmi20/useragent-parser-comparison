@@ -56,15 +56,15 @@ abstract class AbstractHtml
                     <circle class="donut-ring"></circle>
                     ';
         if (null !== $resultFound2) {
-            $html .= '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . ' ' . 100 - $this->calculatePercent($resultFound2, $countOfUseragents / 100, 2) . '"></circle>
+            $html .=    '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent((int) $resultFound2, (float) ($countOfUseragents / 100), 2) . ' ' . 100 - $this->calculatePercent($resultFound2, (float) ($countOfUseragents / 100), 2) . '"></circle>
                     ';
         }
 
-        $html .= '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . ' ' . 100 - $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '"></circle>
+        $html .=    '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent((int) $resultFound, (float) ($countOfUseragents / 100), 2) . ' ' . 100 - $this->calculatePercent($resultFound, (float) ($countOfUseragents / 100), 2) . '"></circle>
                     <g class="donut-text">
 
                         <text y="50%" transform="translate(0, 2)">
-                            <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent($resultFound, $countOfUseragents / 100, 2) . '%</tspan>
+                            <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent((int) $resultFound, (float) ($countOfUseragents / 100), 2) . '%</tspan>
                         </text>
                     </g>
                 </svg>
@@ -76,6 +76,10 @@ abstract class AbstractHtml
 
     protected function calculatePercent(int $resultFound, float $onePercent, int $decimals = 4): string
     {
+        if (0.0 === $onePercent) {
+            return number_format(0.0, $decimals);
+        }
+
         return number_format(round($resultFound / $onePercent, 6), $decimals);
     }
 
@@ -101,8 +105,8 @@ abstract class AbstractHtml
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style type="text/css">
         .svg-item {
-            width: 100px;
-            height: 100px;
+            width: 50px;
+            height: 50px;
             font-size: 16px;
             margin: 0 auto;
         }
@@ -141,7 +145,8 @@ abstract class AbstractHtml
 
         .donut-text {
             font-family: Arial, Helvetica, sans-serif;
-            fill: #d9e021;
+            fill: #0a236c;
+            font-size: 18px;
         }
     </style>
 </head>
@@ -178,11 +183,11 @@ abstract class AbstractHtml
 
 </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js" type="text/javascript"></script>
 
-    <script>
+    <script type="text/javascript">
     ' . $script . '
     </script>
 

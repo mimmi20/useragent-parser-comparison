@@ -28,6 +28,7 @@ use function shell_exec;
 use function sprintf;
 use function str_pad;
 use function trim;
+use function var_dump;
 
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -99,16 +100,16 @@ final class InitUseragents extends Command
 
             try {
                 $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException) {
+            } catch (JsonException $e) {
                 // var_dump($testOutput);
-                // var_dump($e->getMessage());
+                var_dump($e->getMessage());
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! json_decode failed.</error>');
 
                 continue;
             }
 
-            if (!is_array($tests['tests']) || [] === $tests['tests']) {
-                // var_dump($testOutput);
+            if (null === $tests['tests'] || !is_array($tests['tests']) || [] === $tests['tests']) {
+                var_dump($testOutput);
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! No tests were found.</error>');
 
                 continue;
@@ -121,8 +122,6 @@ final class InitUseragents extends Command
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if (null === $agent) {
-                    // var_dump($singleTestData);
-                    // exit;
                     $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $proName . '.</error>');
 
                     continue;
@@ -185,6 +184,8 @@ final class InitUseragents extends Command
 
             $output->writeln("\r" . $message . str_pad(' <info>importing done</info>', $messageLength));
         }
+
+        $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
     }

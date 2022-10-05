@@ -39,6 +39,8 @@ if (hasUa) {
     const start = process.hrtime();
     const r = detector.detect(line);
     const bot = detector.parseBot(line);
+    const isNotABot = (Array.isArray(bot) && bot.length === 0) || JSON.stringify(bot) === '{}';
+    const isMobile = DeviceHelper.isMobile(r);
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {
@@ -57,16 +59,16 @@ if (hasUa) {
             dualOrientation: null,
             type: r.device.type ?? null,
             simCount: null,
-            ismobile: DeviceHelper.isMobile(r)
+            ismobile: isMobile
         },
         client: {
-            name: bot === null ? (r.client.name ?? null) : (bot.name ?? null),
+            name: r.client.name ?? null,
             modus: null,
-            version: bot !== null ? (r.client.name ?? null) : null,
+            version: r.client.version ?? null,
             manufacturer: null,
             bits: null,
-            isBot: bot !== null,
-            type: bot === null ? (r.client.type ?? null) : (bot.category ?? null)
+            isbot: null,
+            type: r.client.type ?? null
         },
         platform: {
             name: r.os.name ?? null,
@@ -76,11 +78,11 @@ if (hasUa) {
             bits: null
         },
         engine: {
-            name: null,
-            version: null,
+            name: r.client.engine ?? null,
+            version: r.client.engine_version ?? null,
             manufacturer: null
         },
-        raw: r
+        raw: [r, bot]
     };
     output.parse_time = end;
 }

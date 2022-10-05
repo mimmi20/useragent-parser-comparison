@@ -10,8 +10,8 @@
       "ua-parser/uap-core": "source",
       "*": "dist"
     },
-    "lock": false,
-    "sort-packages": true
+    "sort-packages": true,
+    "lock": false
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
