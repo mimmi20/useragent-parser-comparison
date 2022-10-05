@@ -393,24 +393,6 @@ updates:
     commit-message:
       prefix: "npm/parsers/bowser"
 
-  - package-ecosystem: "npm"
-    directory: "parsers/bowser/"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "03:00"
-      timezone: "UTC"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
-    assignees:
-      - "mimmi20"
-    labels:
-      - "dependencies"
-    versioning-strategy: "increase"
-    commit-message:
-      prefix: "npm/parsers/bowser"
-
   - package-ecosystem: "composer"
     directory: "parsers/browscap-php/"
     schedule:
