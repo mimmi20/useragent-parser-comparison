@@ -15,6 +15,7 @@
     "symfony/console": "^v6.1.5"
   },
   "require-dev": {
+    "ext-dom": "*",
     "ext-tokenizer": "*",
     "ext-xmlwriter": "*",
     "mimmi20/coding-standard": "^3.0.13",
