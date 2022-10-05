@@ -18,17 +18,13 @@ use Symfony\Component\Console\Output\OutputInterface;
 use UserAgentParserComparison\Html\Index;
 use UserAgentParserComparison\Html\OverviewGeneral;
 use UserAgentParserComparison\Html\OverviewProvider;
-use UserAgentParserComparison\Html\SimpleList;
-use UserAgentParserComparison\Html\UserAgentDetail;
 
 use function assert;
-use function count;
 use function file_exists;
 use function file_put_contents;
 use function is_string;
 use function max;
 use function mb_strlen;
-use function mb_substr;
 use function mkdir;
 use function sprintf;
 use function str_pad;
@@ -864,31 +860,31 @@ final class GenerateReports extends Command
 //            if ($dbResultProvider['proCanDetectClientIsBot']) {
 //                $sql       = '
 //            SELECT
-//            	`found-results`.`resClientName` AS `name`,
-//            	`userAgent`.`uaId`,
-//            	`userAgent`.`uaString`,
-//            	(
-//            		SELECT
-//            			COUNT(`list-found-general-client-isbot`.`resClientName`)
-//            		FROM `list-found-general-client-isbot`
+//              `found-results`.`resClientName` AS `name`,
+//              `userAgent`.`uaId`,
+//              `userAgent`.`uaString`,
+//              (
+//                  SELECT
+//                      COUNT(`list-found-general-client-isbot`.`resClientName`)
+//                  FROM `list-found-general-client-isbot`
 //                    WHERE
-//            			`list-found-general-client-isbot`.`userAgent_id` = `userAgent`.`uaId`
-//            			AND `list-found-general-client-isbot`.`provider_id` != `found-results`.`provider_id`
+//                      `list-found-general-client-isbot`.`userAgent_id` = `userAgent`.`uaId`
+//                      AND `list-found-general-client-isbot`.`provider_id` != `found-results`.`provider_id`
 //                ) as `detectionCount`
 //            FROM `found-results`
 //            INNER JOIN `userAgent`
 //                ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
 //            WHERE
-//            	`found-results`.`provider_id` = :proId
+//              `found-results`.`provider_id` = :proId
 //                AND `found-results`.`run` = :runId
 //                AND `found-results`.`resClientIsBot` IS NULL
-//        	    AND `userAgent`.`uaId` IN(
-//            		SELECT
+//              AND `userAgent`.`uaId` IN(
+//                  SELECT
 //                        `result`.`userAgent_id`
 //                    FROM `test-provider`
 //                    INNER JOIN `result`
 //                        ON `result`.`provider_id` = `test-provider`.`proId`
-//            			AND `result`.`resClientIsBot` = 1
+//                      AND `result`.`resClientIsBot` = 1
 //                )
 //        ';
 //                $statement = $this->pdo->prepare($sql);

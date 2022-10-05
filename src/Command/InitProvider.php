@@ -34,6 +34,7 @@ final class InitProvider extends Command
         $this->setName('init-provider');
     }
 
+    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `provider` WHERE `proName` = :proName AND `proType` = :proType');
@@ -75,6 +76,7 @@ final class InitProvider extends Command
         return self::SUCCESS;
     }
 
+    /** @param mixed[][] $providerConfig */
     private function insertProvider(
         OutputInterface $output,
         PDOStatement $statementSelectProvider,

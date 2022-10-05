@@ -143,21 +143,21 @@ final class Compare extends Command
 
         return self::SUCCESS;
 
-        $command   = $application->find('analyze');
-        $arguments = [
-            'command' => 'analyze',
-            'run' => $name,
-        ];
-
-        $analyzeInput = new ArrayInput($arguments);
-        $returnCode   = $command->run($analyzeInput, $output);
-
-        if (0 < $returnCode) {
-            $output->writeln('<error>There was an error executing the "analyze" command, cannot continue.</error>');
-
-            return $returnCode;
-        }
-
-        return self::SUCCESS;
+//        $command   = $application->find('analyze');
+//        $arguments = [
+//            'command' => 'analyze',
+//            'run' => $name,
+//        ];
+//
+//        $analyzeInput = new ArrayInput($arguments);
+//        $returnCode   = $command->run($analyzeInput, $output);
+//
+//        if (0 < $returnCode) {
+//            $output->writeln('<error>There was an error executing the "analyze" command, cannot continue.</error>');
+//
+//            return $returnCode;
+//        }
+//
+//        return self::SUCCESS;
     }
 }

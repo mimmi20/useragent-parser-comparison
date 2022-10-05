@@ -12,6 +12,7 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use FilesystemIterator;
+use Generator;
 use JsonException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
@@ -120,6 +121,7 @@ final class Parsers extends Helper
         return $selectedParsers;
     }
 
+    /** @return Generator|mixed[] */
     public function getAllParsers(OutputInterface $output): iterable
     {
         foreach (new FilesystemIterator($this->parsersDir) as $parserDir) {

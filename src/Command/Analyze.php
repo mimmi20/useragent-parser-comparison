@@ -67,9 +67,9 @@ final class Analyze extends Command
     private array $comparison = [];
 
     /** @var string[] */
-    private array $agents = [];
-    private Table | null $summaryTable = null;
-    private InputInterface | null $input = null;
+    private array $agents                  = [];
+    private Table | null $summaryTable     = null;
+    private InputInterface | null $input   = null;
     private OutputInterface | null $output = null;
 
     /** @var mixed[] */
@@ -1104,6 +1104,10 @@ final class Analyze extends Command
         $table->render();
     }
 
+    /**
+     * @param array<string, array<bool|string|null>> $expected
+     * @param array<string, array<bool|string|null>> $actual
+     */
     private function calculateScore(array $expected, array $actual, bool $possible = false): int
     {
         $score = 0;
@@ -1124,6 +1128,7 @@ final class Analyze extends Command
         return $score;
     }
 
+    /** @param array<string, array<string|null>> $diff */
     private function outputDiff(array $diff): string
     {
         if (empty($diff)) {
@@ -1140,6 +1145,7 @@ final class Analyze extends Command
         return $output;
     }
 
+    /** @param array<string, array<string|null>> $diff */
     private function outputDiffHtml(array $diff): string
     {
         if (empty($diff)) {

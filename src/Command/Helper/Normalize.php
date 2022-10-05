@@ -22,12 +22,15 @@ use function in_array;
 use function is_array;
 use function mb_strtolower;
 use function preg_replace;
+use function sprintf;
 use function str_replace;
+use function var_dump;
 
 final class Normalize extends Helper
 {
     private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
+    /** @var string[][] */
     private array $mappings = [];
 
     public function __construct()
@@ -44,6 +47,11 @@ final class Normalize extends Helper
         return 'normalize';
     }
 
+    /**
+     * @param mixed[] $parsed
+     *
+     * @return array<array<float|string|null>|float|string|null>
+     */
     public function normalize(array $parsed): array
     {
         $normalized = [];
@@ -51,6 +59,7 @@ final class Normalize extends Helper
         foreach (array_keys($parsed) as $key) {
             if ('raw' === $key) {
                 $normalized[$key] = $parsed[$key];
+
                 continue;
             }
 
@@ -71,6 +80,12 @@ final class Normalize extends Helper
         return implode('.', $versionParts);
     }
 
+    /**
+     * @param bool|float|int|mixed[]|string|null $value
+     * @param mixed[]                            $parsed
+     *
+     * @return array<float|string|null>|float|string|null
+     */
     private function normalizeValue(string $normKey, bool | array | string | int | float | null $value, array $parsed): array | float | string | null
     {
         if (null === $value) {
@@ -128,7 +143,7 @@ final class Normalize extends Helper
         }
 
         if (!is_array($v)) {
-            var_dump("'$normKey' found in mapping table, but izs not an array - 2.");
+            var_dump(sprintf("'%s' found in mapping table, but izs not an array - 2.", $normKey));
         }
 
         if (is_array($v) && array_key_exists($value, $v)) {

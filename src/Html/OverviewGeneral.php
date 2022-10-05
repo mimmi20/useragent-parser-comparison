@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
+use Generator;
 use PDO;
 
 use function extension_loaded;
@@ -65,6 +66,7 @@ final class OverviewGeneral extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
+    /** @return Generator|mixed[] */
     private function getProviders(string | null $run = null): iterable
     {
         $sql = 'SELECT
