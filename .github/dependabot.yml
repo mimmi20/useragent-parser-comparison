@@ -22,6 +22,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 #    ignore:
 #      - dependency-name: infection/infection
 #        versions:
@@ -47,6 +48,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   # tests
   - package-ecosystem: "composer"
@@ -66,6 +68,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/browser-detector/"
@@ -84,6 +87,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/cbschuld/"
@@ -102,6 +106,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/crawler-detect/"
@@ -120,6 +125,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/curated/"
@@ -138,6 +144,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/donatj/"
@@ -156,6 +163,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/endorphin/"
@@ -174,6 +182,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/matomo/"
@@ -192,6 +201,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/mobile-detect/"
@@ -210,6 +220,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/sinergi/"
@@ -228,6 +239,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/ua-parser-js/"
@@ -246,6 +258,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/ua-parser-php/"
@@ -264,6 +277,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/whichbrowser-php/"
@@ -282,6 +296,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/woothee-php/"
@@ -300,6 +315,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "tests/zsxsoft/"
@@ -318,6 +334,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "tests/ua-parser-js/"
@@ -336,6 +353,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   # parsers
   - package-ecosystem: "npm"
@@ -355,6 +373,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/amplitude-ua-parser-js/"
@@ -373,6 +392,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/bowser/"
@@ -391,6 +411,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/browscap-php/"
@@ -409,6 +430,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/browser-detect/"
@@ -427,6 +449,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/browser-detector/"
@@ -445,6 +468,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "parsers/cbschuld/"
@@ -463,6 +487,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "parsers/crawler-detect/"
@@ -481,6 +506,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/detect-browser/"
@@ -499,6 +525,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/device-detector/"
@@ -517,6 +544,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/device-detector-node/"
@@ -535,6 +563,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/donatj/"
@@ -553,6 +582,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "parsers/endorphin/"
@@ -571,6 +601,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/express-useragent/"
@@ -589,6 +620,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/fex-uadevice/"
@@ -607,6 +639,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/financial-times-useragent_parser/"
@@ -625,6 +658,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/hotoo-detector/"
@@ -643,6 +677,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/jenssegers-agent/"
@@ -661,6 +696,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/journyio-user-agent-parser/"
@@ -679,6 +715,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/matomo/"
@@ -697,6 +734,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "parsers/mobile-detect/"
@@ -715,6 +753,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/node-device-detector/"
@@ -733,6 +772,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/platformjs/"
@@ -751,6 +791,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/sinergi/"
@@ -769,6 +810,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/ua-parser-js/"
@@ -787,6 +829,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/ua-parser-php/"
@@ -805,6 +848,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/vigour-ua/"
@@ -823,6 +867,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "npm"
     directory: "parsers/whichbrowser-js/"
@@ -841,6 +886,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/whichbrowser-php/"
@@ -859,6 +905,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "parsers/wolfcast/"
@@ -877,6 +924,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "npm"
     directory: "parsers/woothee-js/"
@@ -895,6 +943,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "npm"
 
   - package-ecosystem: "composer"
     directory: "parsers/woothee-php/"
@@ -913,6 +962,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   - package-ecosystem: "composer"
     directory: "parsers/zsxsoft/"
@@ -931,6 +981,7 @@ updates:
     versioning-strategy: "increase"
     commit-message:
       include: "scope"
+      prefix: "composer"
 
   # actions
   - package-ecosystem: "github-actions"
@@ -948,4 +999,4 @@ updates:
     labels:
       - "dependencies"
     commit-message:
-      include: "scope"
+      prefix: "github-actions"
