@@ -15,6 +15,7 @@
     "symfony/console": "^v6.1.5"
   },
   "require-dev": {
+    "ext-tokenizer": "*",
     "mimmi20/coding-standard": "^3.0.13",
     "phpstan/extension-installer": "^1.1.0",
     "phpstan/phpstan": "^1.8.6",
