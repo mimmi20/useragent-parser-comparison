@@ -4,7 +4,7 @@
     "composer-runtime-api": "^2.0.0",
     "browscap/browscap-php": "^7.1.0",
     "psr/log": "^1.1.4 || ^3.0.0",
-    "symfony/console": "^v6.1.4",
+    "symfony/console": "^v6.1.5",
     "symfony/filesystem": "^v6.1.4",
     "matthiasmullie/scrapbook": "^1.4.8",
     "league/flysystem": "^3.5.2"
