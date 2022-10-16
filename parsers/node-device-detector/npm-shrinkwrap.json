@@ -9,7 +9,7 @@
       "version": "1.0.0",
       "license": "ISC",
       "dependencies": {
-        "node-device-detector": "^2.0.7"
+        "node-device-detector": "^2.0.8"
       }
     },
     "node_modules/argparse": {
@@ -29,9 +29,9 @@
       }
     },
     "node_modules/node-device-detector": {
-      "version": "2.0.7",
-      "resolved": "https://registry.npmjs.org/node-device-detector/-/node-device-detector-2.0.7.tgz",
-      "integrity": "sha512-bqnVXXyHjN/k7UNSDTbsffUSTSb8NFfJSJ72gua4gTYYvfNDxUVi9Cv2SmNbKNKJdCPf6NpagpKplh4L06XX7Q==",
+      "version": "2.0.8",
+      "resolved": "https://registry.npmjs.org/node-device-detector/-/node-device-detector-2.0.8.tgz",
+      "integrity": "sha512-cRlBUb+D+i8O+uYFyw8ujE8rYAbeCYUFgUnQzOth0mpcusAfYe6ebHF1idlq6qKht6aRZyhmg/Rf2r/C+LJ97A==",
       "dependencies": {
         "js-yaml": "^4.1.0"
       },
@@ -56,9 +56,9 @@
       }
     },
     "node-device-detector": {
-      "version": "2.0.7",
-      "resolved": "https://registry.npmjs.org/node-device-detector/-/node-device-detector-2.0.7.tgz",
-      "integrity": "sha512-bqnVXXyHjN/k7UNSDTbsffUSTSb8NFfJSJ72gua4gTYYvfNDxUVi9Cv2SmNbKNKJdCPf6NpagpKplh4L06XX7Q==",
+      "version": "2.0.8",
+      "resolved": "https://registry.npmjs.org/node-device-detector/-/node-device-detector-2.0.8.tgz",
+      "integrity": "sha512-cRlBUb+D+i8O+uYFyw8ujE8rYAbeCYUFgUnQzOth0mpcusAfYe6ebHF1idlq6qKht6aRZyhmg/Rf2r/C+LJ97A==",
       "requires": {
         "js-yaml": "^4.1.0"
       }
