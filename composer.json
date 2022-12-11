@@ -12,7 +12,7 @@
     "ext-simplexml": "*",
     "composer-runtime-api": "^2.0.0",
     "ramsey/uuid": "^4.6.0",
-    "symfony/console": "^v6.2.0"
+    "symfony/console": "^v6.2.1"
   },
   "require-dev": {
     "ext-dom": "*",
