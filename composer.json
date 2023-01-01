@@ -11,7 +11,7 @@
     "ext-pdo": "*",
     "ext-simplexml": "*",
     "composer-runtime-api": "^2.0.0",
-    "ramsey/uuid": "^4.7.0",
+    "ramsey/uuid": "^4.7.1",
     "symfony/console": "^v6.2.2"
   },
   "require-dev": {
