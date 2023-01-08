@@ -3,7 +3,7 @@
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0",
     "jaybizzle/crawler-detect": "^v1.2.112",
-    "mimmi20/browscap-helper-source": "^3.0.17"
+    "mimmi20/browscap-helper-source": "^3.0.18"
   },
   "config": {
     "preferred-install": {
