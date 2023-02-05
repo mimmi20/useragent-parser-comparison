@@ -1,3 +1,5 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
 name: "Continuous Integration"
 
 on:
@@ -17,9 +19,10 @@ jobs:
 
     uses: "mimmi20/template/.github/workflows/ci.yml@master"
     with:
-      extensions: ""
+      extensions: "dom, iconv, json, mbstring, pdo, simplexml, tokenizer, xmlwriter"
       ini-values: "opcache.enable=1, opcache.fast_shutdown=0, zend.assertions=1, assert.exception=On, intl.default_locale=de, intl.use_exceptions=1, zend.exception_ignore_args=0"
       composer-options: "--optimize-autoloader --prefer-dist --prefer-stable -v"
       composer-outdated-option: ""
+      skip-phpstan: true
     secrets:
       envPAT: "${{ secrets.GITHUB_TOKEN }}"
