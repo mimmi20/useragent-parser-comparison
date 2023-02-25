@@ -16,16 +16,22 @@ use Symfony\Component\Console\Helper\Helper;
 
 final class NormalizedResult extends Helper
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
     }
 
+    /** @throws void */
     public function getName(): string
     {
         return 'normalized-result';
     }
 
-    /** @param mixed[] $singleResult */
+    /**
+     * @param array<mixed> $singleResult
+     *
+     * @throws void
+     */
     public function storeResult(
         string $resId,
         array $singleResult,

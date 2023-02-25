@@ -30,9 +30,10 @@ final class Normalize extends Helper
 {
     private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
-    /** @var string[][] */
+    /** @var array<array<string>> */
     private array $mappings = [];
 
+    /** @throws void */
     public function __construct()
     {
         if (!file_exists(self::MAP_FILE)) {
@@ -42,15 +43,18 @@ final class Normalize extends Helper
         $this->mappings = include self::MAP_FILE;
     }
 
+    /** @throws void */
     public function getName(): string
     {
         return 'normalize';
     }
 
     /**
-     * @param mixed[] $parsed
+     * @param array<mixed> $parsed
      *
      * @return array<array<float|string|null>|float|string|null>
+     *
+     * @throws void
      */
     public function normalize(array $parsed): array
     {
@@ -71,6 +75,7 @@ final class Normalize extends Helper
         return $normalized;
     }
 
+    /** @throws void */
     private function truncateVersion(string $version): string
     {
         $version      = str_replace('_', '.', $version);
@@ -81,13 +86,18 @@ final class Normalize extends Helper
     }
 
     /**
-     * @param bool|float|int|mixed[]|string|null $value
-     * @param mixed[]                            $parsed
+     * @param array<mixed>|bool|float|int|string|null $value
+     * @param array<mixed>                            $parsed
      *
      * @return array<float|string|null>|float|string|null
+     *
+     * @throws void
      */
-    private function normalizeValue(string $normKey, bool | array | string | int | float | null $value, array $parsed): array | float | string | null
-    {
+    private function normalizeValue(
+        string $normKey,
+        bool | array | string | int | float | null $value,
+        array $parsed,
+    ): array | float | string | null {
         if (null === $value) {
             return null;
         }
@@ -102,6 +112,7 @@ final class Normalize extends Helper
 
         if (is_array($value)) {
             $list = [];
+
             foreach ($value as $key2 => $value2) {
                 $list[$key2] = $this->normalizeValue($normKey, $value2, $parsed);
             }
@@ -143,7 +154,7 @@ final class Normalize extends Helper
         }
 
         if (!is_array($v)) {
-            var_dump(sprintf("'%s' found in mapping table, but izs not an array - 2.", $normKey));
+            var_dump(sprintf('\'%s\' found in mapping table, but izs not an array - 2.', $normKey));
         }
 
         if (is_array($v) && array_key_exists($value, $v)) {

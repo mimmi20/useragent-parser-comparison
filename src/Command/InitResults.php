@@ -30,19 +30,24 @@ use const STR_PAD_LEFT;
 
 final class InitResults extends Command
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('init-results')
             ->addOption('run', 'r', InputOption::VALUE_OPTIONAL, 'The name of the test run, if omitted will be generated from date');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /** @throws void */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $name = $input->getOption('run');
 
         if (empty($name)) {
@@ -153,10 +158,12 @@ final class InitResults extends Command
     }
 
     /**
-     * @param mixed[]   $row2
-     * @param mixed[][] $result
+     * @param array<mixed>        $row2
+     * @param array<array<mixed>> $result
      *
-     * @return mixed[]
+     * @return array<mixed>
+     *
+     * @throws void
      */
     private function hydrateResult(array $row2, array $result): array
     {

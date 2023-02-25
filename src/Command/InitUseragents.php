@@ -36,11 +36,13 @@ use const JSON_UNESCAPED_UNICODE;
 
 final class InitUseragents extends Command
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('init-useragents');
@@ -51,8 +53,10 @@ final class InitUseragents extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `test-provider`');
 
         $statementSelectUa = $this->pdo->prepare('SELECT * FROM `userAgent` WHERE `uaHash` = :uaHash');

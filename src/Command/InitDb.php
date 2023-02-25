@@ -17,19 +17,27 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class InitDb extends Command
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('init-db');
     }
 
-    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /**
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $output->writeln('~~~ initialize database ~~~');
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `provider`')->execute();

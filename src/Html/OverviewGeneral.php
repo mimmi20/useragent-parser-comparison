@@ -24,8 +24,11 @@ use const PHP_VERSION;
 
 final class OverviewGeneral extends AbstractHtml
 {
-    public function getHtml(string $version = '', string | null $run = null): string
-    {
+    /** @throws void */
+    public function getHtml(
+        string $version = '',
+        string | null $run = null,
+    ): string {
         $body = '
 <div class="section">
     <h1 class="header center orange-text">Useragent parser comparison ' . $version . '</h1>
@@ -66,7 +69,11 @@ final class OverviewGeneral extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
-    /** @return Generator|mixed[] */
+    /**
+     * @return array<mixed>|Generator
+     *
+     * @throws void
+     */
     private function getProviders(string | null $run = null): iterable
     {
         $sql = 'SELECT
@@ -110,6 +117,7 @@ final class OverviewGeneral extends AbstractHtml
                 ON `result`.`resId` = `result-normalized`.`result_id`
             INNER JOIN `real-provider`
                 ON `real-provider`.`proId` = `result`.`provider_id` AND (`real-provider`.`proVersion` = `result`.`resProviderVersion` OR ISNULL(`real-provider`.`proVersion`)) ';
+
         if (null !== $run) {
             $sql .= '
             WHERE `result`.`run` = :run';
@@ -132,7 +140,11 @@ final class OverviewGeneral extends AbstractHtml
         yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /** @return Generator|mixed[] */
+    /**
+     * @return array<mixed>|Generator
+     *
+     * @throws void
+     */
     private function getUserAgentPerProviderCount(): iterable
     {
         $statement = $this->pdo->prepare('SELECT
@@ -150,6 +162,7 @@ final class OverviewGeneral extends AbstractHtml
         yield from $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /** @throws void */
     private function getTableSummary(string | null $run = null): string
     {
         $html = '<table class="striped">';
@@ -200,8 +213,10 @@ final class OverviewGeneral extends AbstractHtml
          * body
          */
         $html .= '<tbody>';
+
         foreach ($this->getProviders($run) as $row) {
             $html .= '<tr><th>';
+
             if ($row['proIsLocal']) {
                 $html .= '<div><span class="material-icons">public_off</span>';
 
@@ -219,6 +234,7 @@ final class OverviewGeneral extends AbstractHtml
                 $html .= '</div>';
 
                 $html .= '<div>';
+
                 if ($row['proPackageName']) {
                     switch ($row['proLanguage']) {
                         case 'PHP':
@@ -237,6 +253,7 @@ final class OverviewGeneral extends AbstractHtml
                 }
 
                 $html .= '<br /><small>' . $row['proVersion'] . '</small>';
+
                 if (null !== $row['proLastReleaseDate']) {
                     $html .= '<br /><small>' . $row['proLastReleaseDate'] . '</small>';
                 }
@@ -246,6 +263,7 @@ final class OverviewGeneral extends AbstractHtml
                 $html .= '<div><span class="material-icons">public</span></div>';
 
                 $html .= '<div>';
+
                 if ($row['proHomepage']) {
                     $html .= '<a href="' . $row['proHomepage'] . '">' . $row['proName'] . '</a>';
                 } else {
@@ -387,6 +405,7 @@ final class OverviewGeneral extends AbstractHtml
             }
 
             $info = 'PHP v' . PHP_VERSION . ' | Zend v' . zend_version() . ' | On ' . PHP_OS;
+
             if (extension_loaded('xdebug')) {
                 $info .= ' | with xdebug';
             }
@@ -423,6 +442,7 @@ final class OverviewGeneral extends AbstractHtml
         return $html;
     }
 
+    /** @throws void */
     private function getTableTests(): string
     {
         $html = '<table class="striped">';

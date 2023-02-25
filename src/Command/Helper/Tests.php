@@ -12,6 +12,7 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use FilesystemIterator;
+use Generator;
 use JsonException;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
@@ -61,19 +62,24 @@ final class Tests extends Helper
     private string $testResultDir = __DIR__ . '/../../../data/test-runs';
     private string $testDir       = __DIR__ . '/../../../tests';
 
+    /** @throws void */
     public function getName(): string
     {
         return 'tests';
     }
 
-    public function getTest(InputInterface $input, OutputInterface $output): string | null
-    {
+    /** @throws void */
+    public function getTest(
+        InputInterface $input,
+        OutputInterface $output,
+    ): string | null {
         $rows  = [];
         $names = [];
         $tests = [];
 
         foreach (new FilesystemIterator($this->testResultDir) as $testDir) {
             assert($testDir instanceof SplFileInfo);
+
             if (!is_dir($testDir->getPathname())) {
                 continue;
             }
@@ -194,12 +200,14 @@ final class Tests extends Helper
     }
 
     /**
-     * @return Generator|mixed[]
+     * @return array<mixed>|Generator
      *
      * @throws JsonException
      */
-    public function collectTests(OutputInterface $output, string | null $thisRunDir): iterable
-    {
+    public function collectTests(
+        OutputInterface $output,
+        string | null $thisRunDir,
+    ): iterable {
         $expectedDir = null === $thisRunDir ? null : $thisRunDir . '/expected';
 
         foreach (new FilesystemIterator($this->testDir) as $testDir) {
@@ -223,8 +231,8 @@ final class Tests extends Helper
             }
 
             $language = $metadata['language'] ?? '';
-            $local    = $metadata['local'] ?? false;
-            $api      = $metadata['api'] ?? false;
+//            $local    = $metadata['local'] ?? false;
+//            $api      = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
@@ -342,9 +350,13 @@ final class Tests extends Helper
 
     /**
      * Return the version of the provider
+     *
+     * @throws JsonException
      */
-    private function getVersionPHP(string $path, string $packageName): string | null
-    {
+    private function getVersionPHP(
+        string $path,
+        string $packageName,
+    ): string | null {
         $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
 
         $filtered = array_filter(
@@ -367,9 +379,13 @@ final class Tests extends Helper
 
     /**
      * Get the last change date of the provider
+     *
+     * @throws JsonException
      */
-    private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
-    {
+    private function getUpdateDatePHP(
+        string $path,
+        string $packageName,
+    ): DateTimeImmutable | null {
         $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
 
         $filtered = array_filter(
@@ -392,9 +408,13 @@ final class Tests extends Helper
 
     /**
      * Return the version of the provider
+     *
+     * @throws JsonException
      */
-    private function getVersionJS(string $path, string $packageName): string | null
-    {
+    private function getVersionJS(
+        string $path,
+        string $packageName,
+    ): string | null {
         $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
 
         if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
@@ -410,9 +430,13 @@ final class Tests extends Helper
 
     /**
      * Get the last change date of the provider
+     *
+     * @throws JsonException
      */
-    private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
-    {
+    private function getUpdateDateJS(
+        string $path,
+        string $packageName,
+    ): DateTimeImmutable | null {
         $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
 
         if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {

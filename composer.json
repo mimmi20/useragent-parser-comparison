@@ -18,10 +18,10 @@
     "ext-dom": "*",
     "ext-tokenizer": "*",
     "ext-xmlwriter": "*",
-    "mimmi20/coding-standard": "^3.0.26",
+    "mimmi20/coding-standard": "4.0.0-beta.6",
     "phpstan/extension-installer": "^1.2.0",
-    "phpstan/phpstan": "^1.9.14",
-    "phpstan/phpstan-deprecation-rules": "^1.1.1"
+    "phpstan/phpstan": "^1.10.2",
+    "phpstan/phpstan-deprecation-rules": "^1.1.2"
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
@@ -45,7 +45,6 @@
     "php-cs-fixer-fix": "php-cs-fixer fix -vv",
     "phpstan": "phpstan analyse -c phpstan.neon --memory-limit=768M --no-progress",
     "prettier-check": "yarn run prettier -l \"**/*.js\"",
-    "prettier-fix": "yarn run prettier --write \"**/*.js\"",
-    "psalm": "psalm --show-info=false"
+    "prettier-fix": "yarn run prettier --write \"**/*.js\""
   }
 }

@@ -60,26 +60,28 @@ final class Analyze extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
 
-    /** @var mixed[] */
+    /** @var array<mixed> */
     private array $options = [];
 
-    /** @var mixed[] */
+    /** @var array<mixed> */
     private array $comparison = [];
 
-    /** @var string[] */
+    /** @var array<string> */
     private array $agents                  = [];
     private Table | null $summaryTable     = null;
     private InputInterface | null $input   = null;
     private OutputInterface | null $output = null;
 
-    /** @var mixed[] */
+    /** @var array<mixed> */
     private array $failures = [];
 
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('analyze')
@@ -88,8 +90,11 @@ final class Analyze extends Command
             ->setHelp('');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /** @throws void */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $this->input  = $input;
         $this->output = $output;
 
@@ -273,6 +278,7 @@ final class Analyze extends Command
             if (file_exists($expectedFilename)) {
                 foreach (new FilesystemIterator($this->runDir . '/' . $thisRunName . '/expected/normalized/' . $testSuite) as $testFile) {
                     assert($testFile instanceof SplFileInfo);
+
                     if ($testFile->isDir() || 'metadata.json' === $testFile->getFilename()) {
                         continue;
                     }
@@ -301,6 +307,7 @@ final class Analyze extends Command
                 // When we aren't comparing to a test suite, the first parser's results become the expected results
 
                 $fileName = $this->runDir . '/' . $thisRunName . '/results/' . array_keys($this->options['parsers'])[0] . '/normalized/' . $testSuite . '.json';
+
                 try {
                     $contents = file_get_contents($fileName);
                 } catch (Throwable) {
@@ -615,11 +622,13 @@ final class Analyze extends Command
         return self::SUCCESS;
     }
 
+    /** @throws void */
     private function showSummary(): void
     {
         $this->summaryTable->render();
     }
 
+    /** @throws void */
     private function changePropertyDiffTestSuite(): string
     {
         $questionHelper = $this->getHelper('question');
@@ -638,6 +647,7 @@ final class Analyze extends Command
         return $selectedTest;
     }
 
+    /** @throws void */
     private function changePropertyDiffSection(): string
     {
         $questionHelper = $this->getHelper('question');
@@ -650,6 +660,7 @@ final class Analyze extends Command
         return $questionHelper->ask($this->input, $this->output, $question);
     }
 
+    /** @throws void */
     private function changePropertyDiffProperty(string $section): string
     {
         $questionHelper = $this->getHelper('question');
@@ -683,6 +694,7 @@ final class Analyze extends Command
         return $property;
     }
 
+    /** @throws void */
     private function showMenu(): void
     {
         $questionHelper = $this->getHelper('question');
@@ -702,6 +714,7 @@ final class Analyze extends Command
                 break;
             case 'View failure diff':
                 $answer = '';
+
                 do {
                     if (!isset($selectedTest) || 'Change Test Suite' === $answer) {
                         if (1 < count($this->options['tests'])) {
@@ -738,6 +751,7 @@ final class Analyze extends Command
                     $this->analyzeFailures($selectedTest, $selectedParser, $justAgents);
 
                     $justAgentsQuestion = 'Show Just UserAgents';
+
                     if (true === $justAgents) {
                         $justAgentsQuestion = 'Show Full Diff';
                     }
@@ -769,6 +783,7 @@ final class Analyze extends Command
                 break;
             case 'View property comparison':
                 $answer = '';
+
                 do {
                     if (!isset($selectedTest) || 'Change Test Suite' === $answer) {
                         $selectedTest = $this->changePropertyDiffTestSuite();
@@ -791,6 +806,7 @@ final class Analyze extends Command
                     $this->showComparison($selectedTest, $section, $property, $justFails);
 
                     $justFailureQuestion = 'Just Show Failures';
+
                     if (true === $justFails) {
                         $justFailureQuestion = 'Show All';
                     }
@@ -848,8 +864,13 @@ final class Analyze extends Command
         }
     }
 
-    private function showComparisonAgents(string $test, string $section, string $property, string $value): void
-    {
+    /** @throws void */
+    private function showComparisonAgents(
+        string $test,
+        string $section,
+        string $property,
+        string $value,
+    ): void {
         if ('[no value]' === $value) {
             $value = '';
         }
@@ -865,6 +886,7 @@ final class Analyze extends Command
         $this->output->writeln('<comment>Showing ' . count($this->comparison[$test][$section][$property][$value]['expected']['agents']) . ' user agents</comment>');
 
         $this->output->writeln('');
+
         foreach ($this->comparison[$test][$section][$property][$value]['expected']['agents'] as $agentId) {
             $this->output->writeln($agents[$agentId]);
         }
@@ -872,8 +894,12 @@ final class Analyze extends Command
         $this->output->writeln('');
     }
 
-    private function analyzeFailures(string $test, string $parser, bool $justAgents = false): void
-    {
+    /** @throws void */
+    private function analyzeFailures(
+        string $test,
+        string $parser,
+        bool $justAgents = false,
+    ): void {
         if (empty($this->failures[$test][$parser])) {
             $this->output->writeln(
                 '<error>There were no failures for the ' . $parser . ' parser for the ' . $test . ' test suite</error>',
@@ -905,7 +931,8 @@ final class Analyze extends Command
         ]);
 
         $rows = [];
-        foreach ($this->failures[$test][$parser] as $singleTestName => $failData) {
+
+        foreach ($this->failures[$test][$parser] as /* $singleTestName => */ $failData) {
             if (empty($failData['fail']['client']) && empty($failData['fail']['platform']) && empty($failData['fail']['device']) && empty($failData['fail']['engine'])) {
                 continue;
             }
@@ -1008,8 +1035,13 @@ final class Analyze extends Command
         file_put_contents($this->runDir . '/errors-devices.html', $htmlD);
     }
 
-    private function showComparison(string $test, string $compareKey, string $compareSubKey, bool $justFails = false): void
-    {
+    /** @throws void */
+    private function showComparison(
+        string $test,
+        string $compareKey,
+        string $compareSubKey,
+        bool $justFails = false,
+    ): void {
         if (empty($this->comparison[$test][$compareKey][$compareSubKey])) {
             return;
         }
@@ -1041,6 +1073,7 @@ final class Analyze extends Command
             }
 
             $max = 0;
+
             foreach ($compareRow as $child) {
                 if (count($child) <= $max) {
                     continue;
@@ -1107,9 +1140,14 @@ final class Analyze extends Command
     /**
      * @param array<string, array<bool|string|null>> $expected
      * @param array<string, array<bool|string|null>> $actual
+     *
+     * @throws void
      */
-    private function calculateScore(array $expected, array $actual, bool $possible = false): int
-    {
+    private function calculateScore(
+        array $expected,
+        array $actual,
+        bool $possible = false,
+    ): int {
         $score = 0;
 
         foreach ($expected as $field => $value) {
@@ -1128,7 +1166,11 @@ final class Analyze extends Command
         return $score;
     }
 
-    /** @param array<string, array<string|null>> $diff */
+    /**
+     * @param array<string, array<string|null>> $diff
+     *
+     * @throws void
+     */
     private function outputDiff(array $diff): string
     {
         if (empty($diff)) {
@@ -1145,7 +1187,11 @@ final class Analyze extends Command
         return $output;
     }
 
-    /** @param array<string, array<string|null>> $diff */
+    /**
+     * @param array<string, array<string|null>> $diff
+     *
+     * @throws void
+     */
     private function outputDiffHtml(array $diff): string
     {
         if (empty($diff)) {
@@ -1177,6 +1223,7 @@ final class Analyze extends Command
         return $output;
     }
 
+    /** @throws void */
     private function colorByPercent(float $percent): string
     {
         if (100.0 <= $percent) {

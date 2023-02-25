@@ -22,11 +22,13 @@ use function sprintf;
 
 final class Normalize extends Command
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('normalize')
@@ -35,8 +37,11 @@ final class Normalize extends Command
             ->setHelp('');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /** @throws void */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $thisRunName = $input->getArgument('run');
         assert(is_string($thisRunName) || null === $thisRunName);
 

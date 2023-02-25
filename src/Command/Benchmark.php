@@ -29,6 +29,7 @@ use function round;
 
 final class Benchmark extends Command
 {
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('benchmark')
@@ -38,8 +39,11 @@ final class Benchmark extends Command
             ->setHelp('Runs the selected parsers against a list of useragents (provided in the passed in "file" argument). By default performs just one iteration per parser but this can be configured with the "--iterations" option.  Reports the time taken and memory use of each parser.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /** @throws void */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $file       = $input->getArgument('file');
         $iterations = $input->getOption('iterations');
         assert(is_bool($iterations) || is_string($iterations) || null === $iterations);
@@ -96,6 +100,7 @@ final class Benchmark extends Command
         return 0;
     }
 
+    /** @throws void */
     private function formatBytes(float $bytes, int $precision = 2): string
     {
         $base     = log($bytes, 1024);

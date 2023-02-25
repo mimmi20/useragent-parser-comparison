@@ -1,19 +1,46 @@
 parameters:
   level: 1
+
   parallel:
     maximumNumberOfProcesses: 1
     processTimeout: 200.0
+
   paths:
     - src
     - bin
     - mappings
+
   scanFiles:
     - %currentWorkingDirectory%/vendor/autoload.php
     - %currentWorkingDirectory%/vendor/squizlabs/php_codesniffer/autoload.php
     - %currentWorkingDirectory%/vendor/squizlabs/php_codesniffer/src/Util/Tokens.php
+
+  checkAlwaysTrueCheckTypeFunctionCall: true
+  checkAlwaysTrueInstanceof: true
+  checkAlwaysTrueStrictComparison: true
+  checkBenevolentUnionTypes: true
+  checkDynamicProperties: true
+  checkExplicitMixedMissingReturn: true
+  checkFunctionNameCase: true
   checkGenericClassInNonGenericObjectType: false
-  checkMissingIterableValueType: false
+  checkImplicitMixed: true
+  checkInternalClassCaseSensitivity: true
+  checkMissingCallableSignature: true
+  checkMissingIterableValueType: true
+  checkTooWideReturnTypesInProtectedAndPublicMethods: true
+  checkUninitializedProperties: true
+  inferPrivatePropertyTypeFromConstructor: true
+  polluteScopeWithAlwaysIterableForeach: false
+  polluteScopeWithLoopInitialAssignments: false
+# reportAlwaysTrueInLastCondition: true
+  reportMaybesInMethodSignatures: true
+  reportMaybesInPropertyPhpDocTypes: true
+  reportStaticMethodSignatures: true
+# reportWrongPhpDocTypeInVarTag: true
   treatPhpDocTypesAsCertain: false
+
+  tipsOfTheDay: false
+
   exceptions:
     implicitThrows: false
     checkedExceptionRegexes:
@@ -22,5 +49,6 @@ parameters:
     check:
       missingCheckedExceptionInThrows: true
       tooWideThrowType: true
+
 #  ignoreErrors:
 #    - '~Useless \@throws~'
