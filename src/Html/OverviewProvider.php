@@ -17,13 +17,21 @@ use function round;
 
 final class OverviewProvider extends AbstractHtml
 {
-    /** @param string[] $provider */
-    public function __construct(PDO $pdo, private array $provider, string | null $title = null)
-    {
+    /**
+     * @param array<string> $provider
+     *
+     * @throws void
+     */
+    public function __construct(
+        PDO $pdo,
+        private array $provider,
+        string | null $title = null,
+    ) {
         $this->pdo   = $pdo;
         $this->title = $title;
     }
 
+    /** @throws void */
     public function getHtml(string | null $run = null): string
     {
         $body = '
@@ -39,6 +47,7 @@ final class OverviewProvider extends AbstractHtml
 
 <div class="section">
     ';
+
         if ($this->provider['proIsLocal']) {
             $body .= '<div><span class="material-icons">public_off</span>';
 
@@ -56,6 +65,7 @@ final class OverviewProvider extends AbstractHtml
             $body .= '</div>';
 
             $body .= '<div>';
+
             if ($this->provider['proPackageName']) {
                 switch ($this->provider['proLanguage']) {
                     case 'PHP':
@@ -74,6 +84,7 @@ final class OverviewProvider extends AbstractHtml
             }
 
             $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
+
             if (null !== $this->provider['proLastReleaseDate']) {
                 $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
             }
@@ -83,6 +94,7 @@ final class OverviewProvider extends AbstractHtml
             $body .= '<div><span class="material-icons">public</span></div>';
 
             $body .= '<div>';
+
             if ($this->provider['proHomepage']) {
                 $body .= '<a href="' . $this->provider['proHomepage'] . '">' . $this->provider['proName'] . '</a>';
             } else {
@@ -103,6 +115,7 @@ final class OverviewProvider extends AbstractHtml
         return parent::getHtmlCombined($body);
     }
 
+    /** @throws void */
     private function getResult(string | null $run = null): array | false
     {
         $sql = '
@@ -153,6 +166,7 @@ final class OverviewProvider extends AbstractHtml
         return $statement->fetch();
     }
 
+    /** @throws void */
     private function getTable(string | null $run = null): string
     {
         $provider = $this->provider;
@@ -231,6 +245,7 @@ final class OverviewProvider extends AbstractHtml
                 <th rowspan="4">Client</th>
                 <th>Name</th>
             ';
+
         if ($provider['proCanDetectClientName']) {
             $html .= '
                 <td>' . $row['clientNameFound'] . '</td>
@@ -261,6 +276,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Version</th>
             ';
+
         if ($provider['proCanDetectClientVersion']) {
             $html .= '
                 <td>' . $row['clientVersionFound'] . '</td>
@@ -284,6 +300,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Type</th>
             ';
+
         if ($provider['proCanDetectClientType']) {
             $html .= '
                 <td>' . $row['clientTypeFound'] . '</td>
@@ -307,6 +324,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Is bot</th>
             ';
+
         if ($provider['proCanDetectClientIsBot']) {
             $html .= '
                 <td>' . $row['asBotDetected'] . '</td>
@@ -334,6 +352,7 @@ final class OverviewProvider extends AbstractHtml
                 <th rowspan="2">Rendering Engine</th>
                 <th>Name</th>
             ';
+
         if ($provider['proCanDetectEngineName']) {
             $html .= '
                 <td>' . $row['engineNameFound'] . '</td>
@@ -364,6 +383,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Version</th>
             ';
+
         if ($provider['proCanDetectEngineVersion']) {
             $html .= '
                 <td>' . $row['engineVersionFound'] . '</td>
@@ -391,6 +411,7 @@ final class OverviewProvider extends AbstractHtml
                 <th rowspan="2">Operating System</th>
                 <th>Name</th>
             ';
+
         if ($provider['proCanDetectOsName']) {
             $html .= '
                 <td>' . $row['osNameFound'] . '</td>
@@ -421,6 +442,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Version</th>
             ';
+
         if ($provider['proCanDetectOsVersion']) {
             $html .= '
                 <td>' . $row['osVersionFound'] . '</td>
@@ -448,6 +470,7 @@ final class OverviewProvider extends AbstractHtml
                 <th rowspan="5">Device</th>
                 <th>Brand</th>
             ';
+
         if ($provider['proCanDetectDeviceBrand']) {
             $html .= '
                 <td>' . $row['deviceBrandFound'] . '</td>
@@ -478,6 +501,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Model</th>
             ';
+
         if ($provider['proCanDetectDeviceName']) {
             $html .= '
                 <td>' . $row['deviceModelFound'] . '</td>
@@ -508,6 +532,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Type</th>
             ';
+
         if ($provider['proCanDetectDeviceType']) {
             $html .= '
                 <td>' . $row['deviceTypeFound'] . '</td>
@@ -538,6 +563,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Is mobile</th>
             ';
+
         if ($provider['proCanDetectDeviceIsMobile']) {
             $html .= '
                 <td>' . $row['asMobileDetected'] . '</td>
@@ -565,6 +591,7 @@ final class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Is touch</th>
             ';
+
         if ($provider['proCanDetectDeviceDisplayIsTouch']) {
             $html .= '
                 <td>' . $row['asTouchDeviceDetected'] . '</td>

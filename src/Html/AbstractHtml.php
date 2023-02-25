@@ -22,12 +22,17 @@ abstract class AbstractHtml
 {
     private int | null $userAgentCount = null;
 
-    public function __construct(protected PDO $pdo, protected string | null $title = null)
-    {
+    /** @throws void */
+    public function __construct(
+        protected PDO $pdo,
+        protected string | null $title = null,
+    ) {
     }
 
+    /** @throws void */
     abstract public function getHtml(): string;
 
+    /** @throws void */
     final protected function getUserAgentCount(string | null $run = null): int
     {
         if (null !== $run) {
@@ -48,13 +53,18 @@ abstract class AbstractHtml
         return $this->userAgentCount;
     }
 
-    final protected function getPercentCircle(int $countOfUseragents, int $resultFound, int | null $resultFound2 = null): string
-    {
+    /** @throws void */
+    final protected function getPercentCircle(
+        int $countOfUseragents,
+        int $resultFound,
+        int | null $resultFound2 = null,
+    ): string {
         $html = '
             <div class="svg-item">
                 <svg width="100%" height="100%" viewBox="0 0 40 40" class="donut">
                     <circle class="donut-ring"></circle>
                     ';
+
         if (null !== $resultFound2) {
             $html .=    '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent((int) $resultFound2, (float) ($countOfUseragents / 100), 2) . ' ' . 100 - $this->calculatePercent($resultFound2, (float) ($countOfUseragents / 100), 2) . '"></circle>
                     ';
@@ -74,8 +84,12 @@ abstract class AbstractHtml
         return $html;
     }
 
-    protected function calculatePercent(int $resultFound, float $onePercent, int $decimals = 4): string
-    {
+    /** @throws void */
+    protected function calculatePercent(
+        int $resultFound,
+        float $onePercent,
+        int $decimals = 4,
+    ): string {
         if (0.0 === $onePercent) {
             return number_format(0.0, $decimals);
         }
@@ -83,6 +97,7 @@ abstract class AbstractHtml
         return number_format(round($resultFound / $onePercent, 6), $decimals);
     }
 
+    /** @throws void */
     protected function getUserAgentUrl(string $uaId): string
     {
         $url  = '../../user-agent-detail/' . mb_substr($uaId, 0, 2) . '/' . mb_substr($uaId, 2, 2);
@@ -91,8 +106,11 @@ abstract class AbstractHtml
         return $url;
     }
 
-    protected function getHtmlCombined(string $body, string $script = ''): string
-    {
+    /** @throws void */
+    protected function getHtmlCombined(
+        string $body,
+        string $script = '',
+    ): string {
         return '
 <!DOCTYPE html>
 <html lang="en">

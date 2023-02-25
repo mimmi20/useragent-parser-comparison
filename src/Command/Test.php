@@ -36,11 +36,13 @@ use const STR_PAD_LEFT;
 
 final class Test extends Command
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('test')
@@ -49,8 +51,11 @@ final class Test extends Command
             ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /** @throws void */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $output->writeln('~~~ Testing all UAs ~~~');
 
         $thisRunName = $input->getArgument('run');
@@ -146,10 +151,9 @@ final class Test extends Command
         assert($normalizeHelper instanceof Helper\Normalize);
 
         foreach ($selectedTests as $id => $testName) {
-            $actualTest      = 0;
-            $currenUserAgent = 1;
-            $count           = 100;
-            $start           = 0;
+            $actualTest = 0;
+            $count      = 100;
+            $start      = 0;
 
             $basicMessage = sprintf(
                 'test suite <fg=yellow>%s</>',
@@ -228,38 +232,38 @@ final class Test extends Command
                             continue;
                         }
 
-                        $normalizedDevice   = $normalizeHelper->normalize(
-                            [
-                                'devicename' => $singleResult['result']['parsed']['device']['deviceName'] ?? null,
-                                'devicemarketingname' => $singleResult['result']['parsed']['device']['marketingName'] ?? null,
-                                'devicemanufacturer' => $singleResult['result']['parsed']['device']['manufacturer'] ?? null,
-                                'devicebrand' => $singleResult['result']['parsed']['device']['brand'] ?? null,
-                                'devicetype' => $singleResult['result']['parsed']['device']['type'] ?? null,
-                            ],
-                        );
-                        $normalizedClient   = $normalizeHelper->normalize(
-                            [
-                                'clientname' => $singleResult['result']['parsed']['client']['name'] ?? null,
-                                'clientversion' => $singleResult['result']['parsed']['client']['version'] ?? null,
-                                'clientmanufacturer' => $singleResult['result']['parsed']['client']['manufacturer'] ?? null,
-                                'clienttype' => $singleResult['result']['parsed']['client']['type'] ?? null,
-                            ],
-                        );
-                        $normalizedPlatform = $normalizeHelper->normalize(
-                            [
-                                'osname' => $singleResult['result']['parsed']['platform']['name'] ?? null,
-                                'osversion' => $singleResult['result']['parsed']['platform']['version'] ?? null,
-                                'osmarketingname' => $singleResult['result']['parsed']['platform']['marketingName'] ?? null,
-                                'osmanufacturer' => $singleResult['result']['parsed']['platform']['manufacturer'] ?? null,
-                            ],
-                        );
-                        $normalizedEngine   = $normalizeHelper->normalize(
-                            [
-                                'enginename' => $singleResult['result']['parsed']['engine']['name'] ?? null,
-                                'engineversion' => $singleResult['result']['parsed']['engine']['version'] ?? null,
-                                'enginemanufacturer' => $singleResult['result']['parsed']['engine']['manufacturer'] ?? null,
-                            ],
-                        );
+//                        $normalizedDevice   = $normalizeHelper->normalize(
+//                            [
+//                                'devicename' => $singleResult['result']['parsed']['device']['deviceName'] ?? null,
+//                                'devicemarketingname' => $singleResult['result']['parsed']['device']['marketingName'] ?? null,
+//                                'devicemanufacturer' => $singleResult['result']['parsed']['device']['manufacturer'] ?? null,
+//                                'devicebrand' => $singleResult['result']['parsed']['device']['brand'] ?? null,
+//                                'devicetype' => $singleResult['result']['parsed']['device']['type'] ?? null,
+//                            ],
+//                        );
+//                        $normalizedClient   = $normalizeHelper->normalize(
+//                            [
+//                                'clientname' => $singleResult['result']['parsed']['client']['name'] ?? null,
+//                                'clientversion' => $singleResult['result']['parsed']['client']['version'] ?? null,
+//                                'clientmanufacturer' => $singleResult['result']['parsed']['client']['manufacturer'] ?? null,
+//                                'clienttype' => $singleResult['result']['parsed']['client']['type'] ?? null,
+//                            ],
+//                        );
+//                        $normalizedPlatform = $normalizeHelper->normalize(
+//                            [
+//                                'osname' => $singleResult['result']['parsed']['platform']['name'] ?? null,
+//                                'osversion' => $singleResult['result']['parsed']['platform']['version'] ?? null,
+//                                'osmarketingname' => $singleResult['result']['parsed']['platform']['marketingName'] ?? null,
+//                                'osmanufacturer' => $singleResult['result']['parsed']['platform']['manufacturer'] ?? null,
+//                            ],
+//                        );
+//                        $normalizedEngine   = $normalizeHelper->normalize(
+//                            [
+//                                'enginename' => $singleResult['result']['parsed']['engine']['name'] ?? null,
+//                                'engineversion' => $singleResult['result']['parsed']['engine']['version'] ?? null,
+//                                'enginemanufacturer' => $singleResult['result']['parsed']['engine']['manufacturer'] ?? null,
+//                            ],
+//                        );
 
                         $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $singleResult);
                     }
@@ -271,8 +275,6 @@ final class Test extends Command
                     }
 
                     $output->writeln("\r" . str_pad($testMessage, $textLength));
-
-                    ++$currenUserAgent;
                 }
 
                 $this->pdo->commit();

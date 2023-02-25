@@ -31,11 +31,15 @@ use function str_pad;
 
 final class GenerateReports extends Command
 {
-    public function __construct(private PDO $pdo, private string $version)
-    {
+    /** @throws void */
+    public function __construct(
+        private readonly PDO $pdo,
+        private readonly string $version,
+    ) {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('generate-reports')
@@ -43,8 +47,11 @@ final class GenerateReports extends Command
             ->setHelp('');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /** @throws void */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $thisRunName = $input->getArgument('run');
         assert(is_string($thisRunName) || null === $thisRunName);
         $basePath = '../gh-pages/';

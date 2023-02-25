@@ -10,6 +10,8 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
+use JsonException;
+
 use function array_key_exists;
 use function count;
 use function htmlspecialchars;
@@ -23,27 +25,37 @@ use const JSON_THROW_ON_ERROR;
 
 final class UserAgentDetail extends AbstractHtml
 {
-    /** @var string[] */
+    /** @var array<string> */
     private array $userAgent = [];
 
-    /** @var mixed[][] */
+    /** @var array<array<mixed>> */
     private array $results = [];
 
-    /** @param string[] $userAgent */
+    /**
+     * @param array<string> $userAgent
+     *
+     * @throws void
+     */
     public function setUserAgent(array $userAgent): void
     {
         $this->userAgent = $userAgent;
     }
 
-    /** @param mixed[][] $results */
+    /**
+     * @param array<array<mixed>> $results
+     *
+     * @throws void
+     */
     public function setResults(array $results): void
     {
         $this->results = $results;
     }
 
+    /** @throws JsonException */
     public function getHtml(): string
     {
         $addStr = '';
+
         if (null !== $this->userAgent['uaAdditionalHeaders']) {
             $addHeaders = json_decode($this->userAgent['uaAdditionalHeaders'], true, 512, JSON_THROW_ON_ERROR);
 
@@ -93,6 +105,7 @@ final class UserAgentDetail extends AbstractHtml
         return parent::getHtmlCombined($body, $script);
     }
 
+    /** @throws void */
     private function getProvidersTable(): string
     {
         $html = '<table class="striped">';
@@ -171,7 +184,11 @@ final class UserAgentDetail extends AbstractHtml
         return $html;
     }
 
-    /** @param mixed[] $result */
+    /**
+     * @param array<mixed> $result
+     *
+     * @throws void
+     */
     private function getRow(array $result): string
     {
         $html = '<tr>';
@@ -195,6 +212,7 @@ final class UserAgentDetail extends AbstractHtml
             $html .= '</div>';
 
             $html .= '<div>';
+
             if ($result['proPackageName']) {
                 switch ($result['proLanguage']) {
                     case 'PHP':
@@ -213,6 +231,7 @@ final class UserAgentDetail extends AbstractHtml
             }
 
             $html .= '<br /><small>' . $result['proVersion'] . '</small>';
+
             if (null !== $result['proLastReleaseDate']) {
                 $html .= '<br /><small>' . $result['proLastReleaseDate'] . '</small>';
             }
@@ -222,6 +241,7 @@ final class UserAgentDetail extends AbstractHtml
             $html .= '<div><span class="material-icons">public</span></div>';
 
             $html .= '<div>';
+
             if ($result['proHomepage']) {
                 $html .= '<a href="' . $result['proHomepage'] . '">' . $result['proName'] . '</a>';
             } else {

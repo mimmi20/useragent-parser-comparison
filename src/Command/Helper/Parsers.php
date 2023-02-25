@@ -46,14 +46,22 @@ final class Parsers extends Helper
 {
     private string $parsersDir = __DIR__ . '/../../../parsers';
 
+    /** @throws void */
     public function getName(): string
     {
         return 'parsers';
     }
 
-    /** @return mixed[] */
-    public function getParsers(InputInterface $input, OutputInterface $output, bool $multiple = true): array
-    {
+    /**
+     * @return array<mixed>
+     *
+     * @throws void
+     */
+    public function getParsers(
+        InputInterface $input,
+        OutputInterface $output,
+        bool $multiple = true,
+    ): array {
         $rows    = [];
         $names   = [];
         $parsers = [];
@@ -121,7 +129,11 @@ final class Parsers extends Helper
         return $selectedParsers;
     }
 
-    /** @return Generator|mixed[] */
+    /**
+     * @return array<mixed>|Generator
+     *
+     * @throws JsonException
+     */
     public function getAllParsers(OutputInterface $output): iterable
     {
         foreach (new FilesystemIterator($this->parsersDir) as $parserDir) {
@@ -158,8 +170,8 @@ final class Parsers extends Helper
             }
 
             $language = $metadata['language'] ?? '';
-            $local    = $metadata['local'] ?? false;
-            $api      = $metadata['api'] ?? false;
+//            $local    = $metadata['local'] ?? false;
+//            $api      = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
@@ -229,9 +241,13 @@ final class Parsers extends Helper
 
     /**
      * Return the version of the provider
+     *
+     * @throws JsonException
      */
-    private function getVersionPHP(string $path, string $packageName): string | null
-    {
+    private function getVersionPHP(
+        string $path,
+        string $packageName,
+    ): string | null {
         $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
 
         $filtered = array_filter(
@@ -254,9 +270,13 @@ final class Parsers extends Helper
 
     /**
      * Get the last change date of the provider
+     *
+     * @throws JsonException
      */
-    private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
-    {
+    private function getUpdateDatePHP(
+        string $path,
+        string $packageName,
+    ): DateTimeImmutable | null {
         $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
 
         $filtered = array_filter(
@@ -279,9 +299,13 @@ final class Parsers extends Helper
 
     /**
      * Return the version of the provider
+     *
+     * @throws JsonException
      */
-    private function getVersionJS(string $path, string $packageName): string | null
-    {
+    private function getVersionJS(
+        string $path,
+        string $packageName,
+    ): string | null {
         $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
 
         if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
@@ -297,9 +321,13 @@ final class Parsers extends Helper
 
     /**
      * Get the last change date of the provider
+     *
+     * @throws JsonException
      */
-    private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
-    {
+    private function getUpdateDateJS(
+        string $path,
+        string $packageName,
+    ): DateTimeImmutable | null {
         $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
 
         if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {

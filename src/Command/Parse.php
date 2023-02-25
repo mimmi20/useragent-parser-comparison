@@ -10,6 +10,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use JsonException;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use SplFileObject;
@@ -39,11 +40,13 @@ use const PHP_EOL;
 
 final class Parse extends Command
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('parse')
@@ -53,8 +56,11 @@ final class Parse extends Command
             ->setHelp('Parses the useragent strings (one per line) from the passed in file');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /** @throws JsonException */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $filename = $input->getArgument('file');
         assert(is_string($filename));
 
@@ -104,9 +110,6 @@ final class Parse extends Command
         $resultHelper = $this->getHelper('result');
         assert($resultHelper instanceof Helper\Result);
 
-        $inserted = 0;
-        $updated  = 0;
-
         while (!$file->eof()) {
             $agentString = $file->fgets();
             ++$actualTest;
@@ -145,8 +148,6 @@ final class Parse extends Command
             if (false !== $dbResultUa) {
                 // update!
                 $uaId = $dbResultUa['uaId'];
-
-                ++$updated;
             } else {
                 $uaId = Uuid::uuid4()->toString();
 
@@ -158,8 +159,6 @@ final class Parse extends Command
                 $statementInsertUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
 
                 $statementInsertUa->execute();
-
-                ++$inserted;
             }
 
             /*

@@ -22,6 +22,7 @@ use function date;
 
 final class Compare extends Command
 {
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('compare')
@@ -33,8 +34,10 @@ final class Compare extends Command
     }
 
     /** @throws Exception */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $file = $input->getArgument('file');
 
         // Prepare our test directory to store the data from this run

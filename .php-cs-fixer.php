@@ -38,8 +38,8 @@ return $config
                     'separate' => 'bottom',
                 ],
                 'php_unit_strict' => ['assertions' => ['assertAttributeEquals', 'assertAttributeNotEquals', 'assertNotEquals']],
-            ]
-        )
+            ],
+        ),
     )
     ->setUsingCache(true)
     ->setFinder($finder);

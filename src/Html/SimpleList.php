@@ -15,15 +15,20 @@ use function htmlspecialchars;
 
 final class SimpleList extends AbstractHtml
 {
-    /** @var string[][] */
+    /** @var array<array<string>> */
     private array $elements = [];
 
-    /** @param string[][] $elements */
+    /**
+     * @param array<array<string>> $elements
+     *
+     * @throws void
+     */
     public function setElements(array $elements): void
     {
         $this->elements = $elements;
     }
 
+    /** @throws void */
     public function getHtml(): string
     {
         $body = '
@@ -67,6 +72,7 @@ var hackerList = new List(\'simple-list\', options);
         return parent::getHtmlCombined($body, $script);
     }
 
+    /** @throws void */
     private function getList(): string
     {
         $html = '<ul class="list collection">';

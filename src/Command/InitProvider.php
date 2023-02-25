@@ -24,19 +24,27 @@ use function is_array;
 
 final class InitProvider extends Command
 {
-    public function __construct(private PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('init-provider');
     }
 
-    /** @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter */
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
+    /**
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output,
+    ): int {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `provider` WHERE `proName` = :proName AND `proType` = :proType');
         $statementInsertProvider = $this->pdo->prepare('INSERT INTO `provider` (`proId`, `proType`, `proName`, `proHomepage`, `proVersion`, `proLastReleaseDate`, `proPackageName`, `proLanguage`, `proIsLocal`, `proIsApi`, `proIsActive`, `proCanDetectClientName`, `proCanDetectClientModus`, `proCanDetectClientVersion`, `proCanDetectClientManufacturer`, `proCanDetectClientBits`, `proCanDetectEngineName`, `proCanDetectEngineVersion`, `proCanDetectEngineManufacturer`, `proCanDetectOsName`, `proCanDetectOsMarketingName`, `proCanDetectOsVersion`, `proCanDetectOsManufacturer`, `proCanDetectOsBits`, `proCanDetectDeviceName`, `proCanDetectDeviceMarketingName`, `proCanDetectDeviceManufacturer`, `proCanDetectDeviceBrand`, `proCanDetectDeviceDualOrientation`, `proCanDetectDeviceType`, `proCanDetectDeviceIsMobile`, `proCanDetectDeviceSimCount`, `proCanDetectDeviceDisplayWidth`, `proCanDetectDeviceDisplayHeight`, `proCanDetectDeviceDisplayIsTouch`, `proCanDetectDeviceDisplayType`, `proCanDetectDeviceDisplaySize`, `proCanDetectClientIsBot`, `proCanDetectClientType`, `proCommand`) VALUES (:proId, :proType, :proName, :proHomepage, :proVersion, :proLastReleaseDate, :proPackageName, :proLanguage, :proIsLocal, :proIsApi, :proIsActive, :proCanDetectClientName, :proCanDetectClientModus, :proCanDetectClientVersion, :proCanDetectClientManufacturer, :proCanDetectClientBits, :proCanDetectEngineName, :proCanDetectEngineVersion, :proCanDetectEngineManufacturer, :proCanDetectOsName, :proCanDetectOsMarketingName, :proCanDetectOsVersion, :proCanDetectOsManufacturer, :proCanDetectOsBits, :proCanDetectDeviceName, :proCanDetectDeviceMarketingName, :proCanDetectDeviceManufacturer, :proCanDetectDeviceBrand, :proCanDetectDeviceDualOrientation, :proCanDetectDeviceType, :proCanDetectDeviceIsMobile, :proCanDetectDeviceSimCount, :proCanDetectDeviceDisplayWidth, :proCanDetectDeviceDisplayHeight, :proCanDetectDeviceDisplayIsTouch, :proCanDetectDeviceDisplayType, :proCanDetectDeviceDisplaySize, :proCanDetectClientIsBot, :proCanDetectClientType, :proCommand)');
         $statementUpdateProvider = $this->pdo->prepare('UPDATE `provider` SET `proType` = :proType, `proName` = :proName, `proHomepage` = :proHomepage, `proVersion` = :proVersion, `proLastReleaseDate` = :proLastReleaseDate, `proPackageName` = :proPackageName, `proLanguage` = :proLanguage, `proIsLocal` = :proIsLocal, `proIsApi` = :proIsApi, `proIsActive` = :proIsActive, `proCanDetectClientName` = :proCanDetectClientName, `proCanDetectClientModus` = :proCanDetectClientModus, `proCanDetectClientVersion` = :proCanDetectClientVersion, `proCanDetectClientManufacturer` = :proCanDetectClientManufacturer, `proCanDetectClientBits` = :proCanDetectClientBits, `proCanDetectEngineName` = :proCanDetectEngineName, `proCanDetectEngineVersion` = :proCanDetectEngineVersion, `proCanDetectEngineManufacturer` = :proCanDetectEngineManufacturer, `proCanDetectOsName` = :proCanDetectOsName, `proCanDetectOsMarketingName` = :proCanDetectOsMarketingName, `proCanDetectOsVersion` = :proCanDetectOsVersion, `proCanDetectOsManufacturer` = :proCanDetectOsManufacturer, `proCanDetectOsBits` = :proCanDetectOsBits, `proCanDetectDeviceName` = :proCanDetectDeviceName, `proCanDetectDeviceMarketingName` = :proCanDetectDeviceMarketingName, `proCanDetectDeviceManufacturer` = :proCanDetectDeviceManufacturer, `proCanDetectDeviceBrand` = :proCanDetectDeviceBrand, `proCanDetectDeviceDualOrientation` = :proCanDetectDeviceDualOrientation, `proCanDetectDeviceType` = :proCanDetectDeviceType, `proCanDetectDeviceIsMobile` = :proCanDetectDeviceIsMobile, `proCanDetectDeviceSimCount` = :proCanDetectDeviceSimCount, `proCanDetectDeviceDisplayWidth` = :proCanDetectDeviceDisplayWidth, `proCanDetectDeviceDisplayHeight` = :proCanDetectDeviceDisplayHeight, `proCanDetectDeviceDisplayIsTouch` = :proCanDetectDeviceDisplayIsTouch, `proCanDetectDeviceDisplayType` = :proCanDetectDeviceDisplayType, `proCanDetectDeviceDisplaySize` = :proCanDetectDeviceDisplaySize, `proCanDetectClientIsBot` = :proCanDetectClientIsBot, `proCanDetectClientType` = :proCanDetectClientType, `proCommand` = :proCommand WHERE `proId` = :proId');
@@ -76,7 +84,11 @@ final class InitProvider extends Command
         return self::SUCCESS;
     }
 
-    /** @param mixed[][] $providerConfig */
+    /**
+     * @param array<array<mixed>> $providerConfig
+     *
+     * @throws void
+     */
     private function insertProvider(
         OutputInterface $output,
         PDOStatement $statementSelectProvider,
@@ -141,6 +153,7 @@ final class InitProvider extends Command
             $statementUpdateProvider->bindValue(':proName', $proName, PDO::PARAM_STR);
             $statementUpdateProvider->bindValue(':proHomepage', $proHomepage, PDO::PARAM_STR);
             $statementUpdateProvider->bindValue(':proVersion', $proVersion, PDO::PARAM_STR);
+
             if (null !== $proReleaseDate) {
                 $statementUpdateProvider->bindValue(':proLastReleaseDate', $proReleaseDate->format('Y-m-d H:i:s'), PDO::PARAM_STR);
             } else {
@@ -194,6 +207,7 @@ final class InitProvider extends Command
         $statementInsertProvider->bindValue(':proName', $proName, PDO::PARAM_STR);
         $statementInsertProvider->bindValue(':proHomepage', $proHomepage, PDO::PARAM_STR);
         $statementInsertProvider->bindValue(':proVersion', $proVersion, PDO::PARAM_STR);
+
         if (null !== $proReleaseDate) {
             $statementInsertProvider->bindValue(':proLastReleaseDate', $proReleaseDate->format('Y-m-d H:i:s'), PDO::PARAM_STR);
         } else {
