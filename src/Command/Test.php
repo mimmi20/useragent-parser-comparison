@@ -139,7 +139,7 @@ final class Test extends Command
                 continue;
             }
 
-            $nameLength = max($nameLength, mb_strlen($proName));
+            $nameLength = max($nameLength, mb_strlen((string) $proName));
 
             $providers[$proName] = [$parserPath, $parserConfig, $proId];
         }
@@ -185,8 +185,7 @@ final class Test extends Command
                 $this->pdo->beginTransaction();
 
                 while ($row = $statementSelectAllUa->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
-                    $agent       = addcslashes($row['uaString'], PHP_EOL);
-                    $agentToShow = $agent;
+                    $agentToShow = addcslashes((string) $row['uaString'], PHP_EOL);
 
                     ++$actualTest;
 

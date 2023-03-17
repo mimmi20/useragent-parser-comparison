@@ -17,7 +17,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use UserAgentParserComparison\Command\Helper\Parsers;
 
-use function array_merge;
 use function assert;
 use function count;
 use function date;
@@ -84,7 +83,7 @@ final class InitResults extends Command
                 continue;
             }
 
-            $nameLength = max($nameLength, mb_strlen($proName));
+            $nameLength = max($nameLength, mb_strlen((string) $proName));
 
             $providers[$proName] = [$parserPath, $parserConfig, $proId];
         }
@@ -155,37 +154,5 @@ final class InitResults extends Command
         } while (0 < $colCount);
 
         return self::SUCCESS;
-    }
-
-    /**
-     * @param array<mixed>        $row2
-     * @param array<array<mixed>> $result
-     *
-     * @return array<mixed>
-     *
-     * @throws void
-     */
-    private function hydrateResult(array $row2, array $result): array
-    {
-        $toHydrate = [
-            'resClientName' => $result['client']['name'] ?? null,
-            'resClientVersion' => $result['client']['version'] ?? null,
-            'resClientIsBot' => $result['client']['isBot'] ?? null,
-            'resClientType' => $result['client']['type'] ?? null,
-
-            'resEngineName' => $result['engine']['name'],
-            'resEngineVersion' => $result['engine']['version'],
-
-            'resOsName' => $result['platform']['name'],
-            'resOsVersion' => $result['platform']['version'],
-
-            'resDeviceName' => $result['device']['name'],
-            'resDeviceBrand' => $result['device']['brand'],
-            'resDeviceType' => $result['device']['type'],
-            'resDeviceIsMobile' => $result['device']['ismobile'],
-            'resDeviceDisplayIsTouch' => $result['device']['istouch'],
-        ];
-
-        return array_merge($row2, $toHydrate);
     }
 }

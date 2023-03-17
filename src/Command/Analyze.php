@@ -56,6 +56,7 @@ use function ucfirst;
 
 use const JSON_THROW_ON_ERROR;
 
+/** @SuppressWarnings(PHPMD.ExcessiveClassLength) */
 final class Analyze extends Command
 {
     private string $runDir = __DIR__ . '/../../data/test-runs';
@@ -262,11 +263,7 @@ final class Analyze extends Command
 
             if (false === $sourceRow) {
                 $output->writeln(sprintf('<error>Analyzing data from test run: %s - source for UA "%s" not found</error>', $thisRunName, $runRow['userAgent_id']));
-
-                continue;
             }
-
-            $headerMessage = sprintf('Parser comparison for <fg=yellow>%s%s</>', $testData['metadata']['name'], isset($testData['metadata']['version']) ? ' (' . $testData['metadata']['version'] . ')' : '');
         }
 
         foreach ($this->options['tests'] as $testSuite => $testData) {
@@ -292,7 +289,7 @@ final class Analyze extends Command
                     try {
                         $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                     } catch (Throwable) {
-                        $output->writeln("\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>');
+                        $output->writeln("\r" . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>');
 
                         continue;
                     }

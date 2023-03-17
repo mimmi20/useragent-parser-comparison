@@ -61,6 +61,7 @@ final class Parse extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
+        $proId    = null;
         $filename = $input->getArgument('file');
         assert(is_string($filename));
 
@@ -102,7 +103,7 @@ final class Parse extends Command
                 continue;
             }
 
-            $nameLength = max($nameLength, mb_strlen($proName));
+            $nameLength = max($nameLength, mb_strlen((string) $proName));
 
             $providers[$proName] = [$parserPath, $parserConfig, $proId];
         }

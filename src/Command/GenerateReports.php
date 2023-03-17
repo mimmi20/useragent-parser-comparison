@@ -29,6 +29,7 @@ use function mkdir;
 use function sprintf;
 use function str_pad;
 
+/** @SuppressWarnings(PHPMD.ExcessiveClassLength) */
 final class GenerateReports extends Command
 {
     /** @throws void */

@@ -188,6 +188,8 @@ final class UserAgentDetail extends AbstractHtml
      * @param array<mixed> $result
      *
      * @throws void
+     *
+     * @SuppressWarnings(PHPMD.DevelopmentCodeFragment)
      */
     private function getRow(array $result): string
     {

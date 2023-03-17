@@ -192,16 +192,10 @@ final class Parsers extends Helper
 
             switch ($language) {
                 case 'PHP':
-                    switch ($parserDir->getFilename()) {
-                        case 'php-get-browser':
-                            $command = 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php';
-
-                            break;
-                        default:
-                            $command = 'php ' . $pathName . '/scripts/parse-ua.php';
-
-                            break;
-                    }
+                    $command = match ($parserDir->getFilename()) {
+                        'php-get-browser' => 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php',
+                        default => 'php ' . $pathName . '/scripts/parse-ua.php',
+                    };
 
                     break;
                 case 'JavaScript':
