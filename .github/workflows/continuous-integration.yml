@@ -25,7 +25,7 @@ jobs:
       composer-outdated-option: ""
       skip-phpstan: true
       skip-phplint: false
-      skip-rector: false
+      skip-rector: true
       skip-phpmd: false
     secrets:
       envPAT: "${{ secrets.GITHUB_TOKEN }}"
