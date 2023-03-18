@@ -22,9 +22,7 @@ use function in_array;
 use function is_array;
 use function mb_strtolower;
 use function preg_replace;
-use function sprintf;
 use function str_replace;
-use function var_dump;
 
 final class Normalize extends Helper
 {
@@ -132,11 +130,11 @@ final class Normalize extends Helper
         // in the name, but use the version.
         if ('osname' === $normKey && !empty($parsed['resOsVersion'])) {
             if ('windows' === $value) {
-                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['resOsVersion']));
+                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower((string) $parsed['resOsVersion']));
             }
 
             if ('windowsphone' === $value) {
-                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['resOsVersion']));
+                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower((string) $parsed['resOsVersion']));
             }
         }
 
@@ -151,10 +149,6 @@ final class Normalize extends Helper
             $v = $this->mappings[$normKey];
         } else {
             $v = [];
-        }
-
-        if (!is_array($v)) {
-            var_dump(sprintf('\'%s\' found in mapping table, but izs not an array - 2.', $normKey));
         }
 
         if (is_array($v) && array_key_exists($value, $v)) {

@@ -236,18 +236,11 @@ final class OverviewGeneral extends AbstractHtml
                 $html .= '<div>';
 
                 if ($row['proPackageName']) {
-                    switch ($row['proLanguage']) {
-                        case 'PHP':
-                            $html .= '<a href="https://packagist.org/packages/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>';
-
-                            break;
-                        case 'JavaScript':
-                            $html .= '<a href="https://www.npmjs.com/package/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>';
-
-                            break;
-                        default:
-                            $html .= $row['proName'];
-                    }
+                    match ($row['proLanguage']) {
+                        'PHP' => $html        .= '<a href="https://packagist.org/packages/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>',
+                        'JavaScript' => $html .= '<a href="https://www.npmjs.com/package/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>',
+                        default => $html      .= $row['proName'],
+                    };
                 } else {
                     $html .= $row['proName'];
                 }
@@ -437,9 +430,7 @@ final class OverviewGeneral extends AbstractHtml
 
         $html .= '</tbody>';
 
-        $html .= '</table>';
-
-        return $html;
+        return $html . '</table>';
     }
 
     /** @throws void */
@@ -479,8 +470,6 @@ final class OverviewGeneral extends AbstractHtml
 
         $html .= '</tbody>';
 
-        $html .= '</table>';
-
-        return $html;
+        return $html . '</table>';
     }
 }

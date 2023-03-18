@@ -48,7 +48,6 @@ use function shell_exec;
 use function sprintf;
 use function str_replace;
 use function trim;
-use function var_dump;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
@@ -309,16 +308,13 @@ final class Tests extends Helper
 
                     try {
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (JsonException $e) {
-                        // var_dump($testOutput);
-                        var_dump($e);
+                    } catch (JsonException) {
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
 
                         return null;
                     }
 
                     if (null === $tests['tests'] || !is_array($tests['tests']) || [] === $tests['tests']) {
-                        var_dump($testOutput);
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>');
 
                         return null;

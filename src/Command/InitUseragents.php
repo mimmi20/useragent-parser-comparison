@@ -28,7 +28,6 @@ use function shell_exec;
 use function sprintf;
 use function str_pad;
 use function trim;
-use function var_dump;
 
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -104,16 +103,13 @@ final class InitUseragents extends Command
 
             try {
                 $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
-            } catch (JsonException $e) {
-                // var_dump($testOutput);
-                var_dump($e->getMessage());
+            } catch (JsonException) {
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! json_decode failed.</error>');
 
                 continue;
             }
 
             if (null === $tests['tests'] || !is_array($tests['tests']) || [] === $tests['tests']) {
-                var_dump($testOutput);
                 $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $proName . '! No tests were found.</error>');
 
                 continue;
@@ -131,7 +127,7 @@ final class InitUseragents extends Command
                     continue;
                 }
 
-                $uaHash = bin2hex(sha1($agent, true));
+                $uaHash = bin2hex(sha1((string) $agent, true));
 
                 /*
                  * insert UA itself
@@ -183,6 +179,7 @@ final class InitUseragents extends Command
 
                 $updateMessage = $message . sprintf(' <info>importing</info> [tests inserted: %d, updated: %d]', $inserted, $updated);
                 $messageLength = mb_strlen($updateMessage);
+
                 $output->write("\r" . $updateMessage);
             }
 

@@ -67,27 +67,18 @@ final class OverviewProvider extends AbstractHtml
             $body .= '<div>';
 
             if ($this->provider['proPackageName']) {
-                switch ($this->provider['proLanguage']) {
-                    case 'PHP':
-                        $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
-
-                        break;
-                    case 'JavaScript':
-                        $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
-
-                        break;
-                    default:
-                        $body .= $this->provider['proName'];
-                }
+                match ($this->provider['proLanguage']) {
+                    'PHP' => $body        .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>',
+                    'JavaScript' => $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>',
+                    default => $body      .= $this->provider['proName'],
+                };
             } else {
                 $body .= $this->provider['proName'];
             }
 
             $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
 
-            if (null !== $this->provider['proLastReleaseDate']) {
-                $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
-            }
+            $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
 
             $body .= '</div>';
         } elseif ($this->provider['proIsApi']) {
@@ -207,9 +198,8 @@ final class OverviewProvider extends AbstractHtml
             ';
 
             $html .= '</tbody>';
-            $html .= '</table>';
 
-            return $html;
+            return $html . '</table>';
         }
 
         /*
@@ -636,8 +626,7 @@ final class OverviewProvider extends AbstractHtml
         ';
 
         $html .= '</tbody>';
-        $html .= '</table>';
 
-        return $html;
+        return $html . '</table>';
     }
 }
