@@ -23,10 +23,8 @@ abstract class AbstractHtml
     private int | null $userAgentCount = null;
 
     /** @throws void */
-    public function __construct(
-        protected PDO $pdo,
-        protected string | null $title = null,
-    ) {
+    public function __construct(protected PDO $pdo, protected string | null $title = null)
+    {
     }
 
     /** @throws void */
@@ -35,16 +33,20 @@ abstract class AbstractHtml
     /** @throws void */
     final protected function getUserAgentCount(string | null $run = null): int
     {
-        if (null !== $run) {
-            $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent` WHERE `uaId` IN (SELECT `result`.`userAgent_id` FROM `result` WHERE `result`.`run` = :run)');
+        if ($run !== null) {
+            $statementCountAllResults = $this->pdo->prepare(
+                'SELECT COUNT(*) AS `count` FROM `userAgent` WHERE `uaId` IN (SELECT `result`.`userAgent_id` FROM `result` WHERE `result`.`run` = :run)',
+            );
             $statementCountAllResults->bindValue(':run', $run, PDO::PARAM_STR);
             $statementCountAllResults->execute();
 
             return $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
         }
 
-        if (null === $this->userAgentCount) {
-            $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `userAgent`');
+        if ($this->userAgentCount === null) {
+            $statementCountAllResults = $this->pdo->prepare(
+                'SELECT COUNT(*) AS `count` FROM `userAgent`',
+            );
             $statementCountAllResults->execute();
 
             $this->userAgentCount = $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
@@ -65,16 +67,36 @@ abstract class AbstractHtml
                     <circle class="donut-ring"></circle>
                     ';
 
-        if (null !== $resultFound2) {
-            $html .=    '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent((int) $resultFound2, (float) ($countOfUseragents / 100), 2) . ' ' . 100 - $this->calculatePercent($resultFound2, (float) ($countOfUseragents / 100), 2) . '"></circle>
+        if ($resultFound2 !== null) {
+            $html .= '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent(
+                (int) $resultFound2,
+                (float) ($countOfUseragents / 100),
+                2,
+            ) . ' ' . 100 - $this->calculatePercent(
+                $resultFound2,
+                (float) ($countOfUseragents / 100),
+                2,
+            ) . '"></circle>
                     ';
         }
 
-        $html .=    '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent((int) $resultFound, (float) ($countOfUseragents / 100), 2) . ' ' . 100 - $this->calculatePercent($resultFound, (float) ($countOfUseragents / 100), 2) . '"></circle>
+        $html .= '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent(
+            (int) $resultFound,
+            (float) ($countOfUseragents / 100),
+            2,
+        ) . ' ' . 100 - $this->calculatePercent(
+            $resultFound,
+            (float) ($countOfUseragents / 100),
+            2,
+        ) . '"></circle>
                     <g class="donut-text">
 
                         <text y="50%" transform="translate(0, 2)">
-                            <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent((int) $resultFound, (float) ($countOfUseragents / 100), 2) . '%</tspan>
+                            <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent(
+            (int) $resultFound,
+            (float) ($countOfUseragents / 100),
+            2,
+) . '%</tspan>
                         </text>
                     </g>
                 </svg>
@@ -85,12 +107,9 @@ abstract class AbstractHtml
     }
 
     /** @throws void */
-    protected function calculatePercent(
-        int $resultFound,
-        float $onePercent,
-        int $decimals = 4,
-    ): string {
-        if (0.0 === $onePercent) {
+    protected function calculatePercent(int $resultFound, float $onePercent, int $decimals = 4): string
+    {
+        if ($onePercent === 0.0) {
             return number_format(0.0, $decimals);
         }
 
@@ -107,10 +126,8 @@ abstract class AbstractHtml
     }
 
     /** @throws void */
-    protected function getHtmlCombined(
-        string $body,
-        string $script = '',
-    ): string {
+    protected function getHtmlCombined(string $body, string $script = ''): string
+    {
         return '
 <!DOCTYPE html>
 <html lang="en">

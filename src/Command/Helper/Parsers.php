@@ -57,11 +57,8 @@ final class Parsers extends Helper
      *
      * @throws void
      */
-    public function getParsers(
-        InputInterface $input,
-        OutputInterface $output,
-        bool $multiple = true,
-    ): array {
+    public function getParsers(InputInterface $input, OutputInterface $output, bool $multiple = true): array
+    {
         $rows    = [];
         $names   = [];
         $parsers = [];
@@ -87,11 +84,11 @@ final class Parsers extends Helper
         $questions = array_keys($names);
         sort($questions, SORT_FLAG_CASE | SORT_NATURAL);
 
-        if (true === $multiple) {
+        if ($multiple === true) {
             $questions[] = 'All Parsers';
         }
 
-        if (true === $multiple) {
+        if ($multiple === true) {
             $questionText = 'Choose which parsers to use, separate multiple with commas (press enter to use all)';
             $default      = count($questions) - 1;
         } else {
@@ -99,13 +96,9 @@ final class Parsers extends Helper
             $default      = null;
         }
 
-        $question = new ChoiceQuestion(
-            $questionText,
-            $questions,
-            $default,
-        );
+        $question = new ChoiceQuestion($questionText, $questions, $default);
 
-        if (true === $multiple) {
+        if ($multiple === true) {
             $question->setMultiselect(true);
         }
 
@@ -117,7 +110,7 @@ final class Parsers extends Helper
         $selectedParsers = [];
 
         foreach ($answers as $name) {
-            if ('All Parsers' === $name) {
+            if ($name === 'All Parsers') {
                 $selectedParsers = $parsers;
 
                 break;
@@ -146,8 +139,10 @@ final class Parsers extends Helper
             if (file_exists($pathName . '/metadata.json')) {
                 $contents = @file_get_contents($pathName . '/metadata.json');
 
-                if (false === $contents) {
-                    $output->writeln('<error>Could not read metadata file for parser in ' . $pathName . '</error>');
+                if ($contents === false) {
+                    $output->writeln(
+                        '<error>Could not read metadata file for parser in ' . $pathName . '</error>',
+                    );
 
                     continue;
                 }
@@ -155,7 +150,9 @@ final class Parsers extends Helper
                 try {
                     $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (JsonException) {
-                    $output->writeln('<error>An error occured while parsing metadata for parser ' . $pathName . '</error>');
+                    $output->writeln(
+                        '<error>An error occured while parsing metadata for parser ' . $pathName . '</error>',
+                    );
 
                     continue;
                 }
@@ -170,23 +167,37 @@ final class Parsers extends Helper
             }
 
             $language = $metadata['language'] ?? '';
-//            $local    = $metadata['local'] ?? false;
-//            $api      = $metadata['api'] ?? false;
+            //            $local    = $metadata['local'] ?? false;
+            //            $api      = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
                     case 'PHP':
-                        $metadata['version']      = $this->getVersionPHP($pathName, $metadata['packageName']);
-                        $metadata['release-date'] = $this->getUpdateDatePHP($pathName, $metadata['packageName']);
+                        $metadata['version']      = $this->getVersionPHP(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
+                        $metadata['release-date'] = $this->getUpdateDatePHP(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
 
                         break;
                     case 'JavaScript':
-                        $metadata['version']      = $this->getVersionJS($pathName, $metadata['packageName']);
-                        $metadata['release-date'] = $this->getUpdateDateJS($pathName, $metadata['packageName']);
+                        $metadata['version']      = $this->getVersionJS(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
+                        $metadata['release-date'] = $this->getUpdateDateJS(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
 
                         break;
                     default:
-                        $output->writeln('<error>could not detect version and release date for parser ' . $pathName . '</error>');
+                        $output->writeln(
+                            '<error>could not detect version and release date for parser ' . $pathName . '</error>',
+                        );
                 }
             }
 
@@ -207,14 +218,13 @@ final class Parsers extends Helper
             }
 
             yield $parserDir->getFilename() => [
-                'name' => $pathName,
-                'path' => $parserDir->getFilename(),
-                'metadata' => $metadata,
                 'command' => $command,
+                'metadata' => $metadata,
+                'name' => $pathName,
                 'parse-ua' => static function (string $useragent) use ($output, $command): array | null {
                     $result = shell_exec($command . ' --ua ' . escapeshellarg($useragent));
 
-                    if (null === $result) {
+                    if ($result === null) {
                         return null;
                     }
 
@@ -229,6 +239,7 @@ final class Parsers extends Helper
 
                     return null;
                 },
+                'path' => $parserDir->getFilename(),
             ];
         }
     }
@@ -238,24 +249,30 @@ final class Parsers extends Helper
      *
      * @throws JsonException
      */
-    private function getVersionPHP(
-        string $path,
-        string $packageName,
-    ): string | null {
-        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getVersionPHP(string $path, string $packageName): string | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/vendor/composer/installed.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name'],
+            static fn (array $value): bool => array_key_exists(
+                'name',
+                $value,
+            ) && $packageName === $value['name'],
         );
 
-        if ([] === $filtered) {
+        if ($filtered === []) {
             return null;
         }
 
         $filtered = reset($filtered);
 
-        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+        if ($filtered === [] || !array_key_exists('time', $filtered)) {
             return null;
         }
 
@@ -267,24 +284,30 @@ final class Parsers extends Helper
      *
      * @throws JsonException
      */
-    private function getUpdateDatePHP(
-        string $path,
-        string $packageName,
-    ): DateTimeImmutable | null {
-        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/vendor/composer/installed.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name'],
+            static fn (array $value): bool => array_key_exists(
+                'name',
+                $value,
+            ) && $packageName === $value['name'],
         );
 
-        if ([] === $filtered) {
+        if ($filtered === []) {
             return null;
         }
 
         $filtered = reset($filtered);
 
-        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+        if ($filtered === [] || !array_key_exists('time', $filtered)) {
             return null;
         }
 
@@ -296,11 +319,14 @@ final class Parsers extends Helper
      *
      * @throws JsonException
      */
-    private function getVersionJS(
-        string $path,
-        string $packageName,
-    ): string | null {
-        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getVersionJS(string $path, string $packageName): string | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/npm-shrinkwrap.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
             return $installed['packages']['node_modules/' . $packageName]['version'];
@@ -318,14 +344,19 @@ final class Parsers extends Helper
      *
      * @throws JsonException
      */
-    private function getUpdateDateJS(
-        string $path,
-        string $packageName,
-    ): DateTimeImmutable | null {
-        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/npm-shrinkwrap.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {
-            return new DateTimeImmutable($installed['packages']['node_modules/' . $packageName]['time']);
+            return new DateTimeImmutable(
+                $installed['packages']['node_modules/' . $packageName]['time'],
+            );
         }
 
         if (isset($installed['dependencies'][$packageName]['time'])) {

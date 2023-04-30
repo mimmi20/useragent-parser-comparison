@@ -33,17 +33,19 @@ final class Normalize extends Command
     {
         $this->setName('normalize')
             ->setDescription('Normalizes data from a test run for better analysis')
-            ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run directory that you want to normalize')
+            ->addArgument(
+                'run',
+                InputArgument::OPTIONAL,
+                'The name of the test run directory that you want to normalize',
+            )
             ->setHelp('');
     }
 
     /** @throws void */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $thisRunName = $input->getArgument('run');
-        assert(is_string($thisRunName) || null === $thisRunName);
+        assert(is_string($thisRunName) || $thisRunName === null);
 
         if (empty($thisRunName)) {
             // @todo Show user the available runs, perhaps limited to 10 or something, for now, throw an error
@@ -52,11 +54,15 @@ final class Normalize extends Command
             return self::FAILURE;
         }
 
-        $statementSelectResultRun = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run');
+        $statementSelectResultRun = $this->pdo->prepare(
+            'SELECT `result`.* FROM `result` WHERE `result`.`run` = :run',
+        );
         $statementSelectResultRun->bindValue(':run', $thisRunName, PDO::PARAM_STR);
         $statementSelectResultRun->execute();
 
-        $statementSelectResultSource = $this->pdo->prepare('SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId');
+        $statementSelectResultSource = $this->pdo->prepare(
+            'SELECT `result`.* FROM `result` WHERE `result`.`run` = :run AND `result`.`userAgent_id` = :uaId',
+        );
 
         $normalizeHelper = $this->getHelper('normalize');
         assert($normalizeHelper instanceof Helper\Normalize);
@@ -64,7 +70,9 @@ final class Normalize extends Command
         $resultHelper = $this->getHelper('normalized-result');
         assert($resultHelper instanceof Helper\NormalizedResult);
 
-        $output->writeln(sprintf('<comment>Normalizing data from test run: %s</comment>', $thisRunName));
+        $output->writeln(
+            sprintf('<comment>Normalizing data from test run: %s</comment>', $thisRunName),
+        );
 
         while ($runRow = $statementSelectResultRun->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
             $statementSelectResultSource->bindValue(':run', '0', PDO::PARAM_STR);
@@ -74,8 +82,14 @@ final class Normalize extends Command
 
             $sourceRow = $statementSelectResultSource->fetch(PDO::FETCH_ASSOC);
 
-            if (false === $sourceRow) {
-                $output->writeln(sprintf('<error>Normalizing data from test run: %s - source for UA "%s" not found</error>', $thisRunName, $runRow['userAgent_id']));
+            if ($sourceRow === false) {
+                $output->writeln(
+                    sprintf(
+                        '<error>Normalizing data from test run: %s - source for UA "%s" not found</error>',
+                        $thisRunName,
+                        $runRow['userAgent_id'],
+                    ),
+                );
 
                 continue;
             }

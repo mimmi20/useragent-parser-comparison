@@ -98,7 +98,9 @@ var hackerList = new List(\'simple-list\', options);
             $html .= '<strong>Example user agent</strong><br />';
 
             $html .= '<span>';
-            $html .= '<a href="' . $this->getUserAgentUrl($element['uaId']) . '" class="userAgent">' . htmlspecialchars($element['uaString']) . '</a>';
+            $html .= '<a href="' . $this->getUserAgentUrl(
+                $element['uaId'],
+            ) . '" class="userAgent">' . htmlspecialchars($element['uaString']) . '</a>';
             $html .= '</span>';
 
             $html .= '</li>';

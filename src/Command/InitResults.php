@@ -39,14 +39,17 @@ final class InitResults extends Command
     protected function configure(): void
     {
         $this->setName('init-results')
-            ->addOption('run', 'r', InputOption::VALUE_OPTIONAL, 'The name of the test run, if omitted will be generated from date');
+            ->addOption(
+                'run',
+                'r',
+                InputOption::VALUE_OPTIONAL,
+                'The name of the test run, if omitted will be generated from date',
+            );
     }
 
     /** @throws void */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $name = $input->getOption('run');
 
         if (empty($name)) {
@@ -56,9 +59,13 @@ final class InitResults extends Command
         $resultHelper = $this->getHelper('result');
         assert($resultHelper instanceof Helper\Result);
 
-        $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
+        $statementSelectProvider = $this->pdo->prepare(
+            'SELECT `proId` FROM `real-provider` WHERE `proName` = :proName',
+        );
 
-        $statementCreateTempUas = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT * FROM `userAgent` LIMIT :start, :count)');
+        $statementCreateTempUas = $this->pdo->prepare(
+            'CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT * FROM `userAgent` LIMIT :start, :count)',
+        );
 
         $output->writeln('~~~ Detect all UAs ~~~');
 
@@ -114,16 +121,36 @@ final class InitResults extends Command
                 $message = $baseMessage;
 
                 foreach ($providers as $proName => $provider) {
-                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
+                    $output->write(
+                        str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                            (string) $currenUserAgent,
+                            8,
+                            ' ',
+                            STR_PAD_LEFT,
+                        ) . ' - ' . str_pad(
+                            $proName,
+                            $nameLength,
+                        ),
+                    );
 
                     [, $parserConfig, $proId] = $provider;
 
                     $singleResult = $parserConfig['parse-ua']($row['uaString']);
 
-                    if (null === $singleResult) {
+                    if ($singleResult === null) {
                         $message .= 'E';
 
-                        $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
+                        $output->write(
+                            str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                                (string) $currenUserAgent,
+                                8,
+                                ' ',
+                                STR_PAD_LEFT,
+                            ) . ' - ' . str_pad(
+                                $proName,
+                                $nameLength,
+                            ),
+                        );
 
                         continue;
                     }
@@ -132,18 +159,40 @@ final class InitResults extends Command
 
                     $message .= '.';
 
-                    $output->write(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . ' - ' . str_pad($proName, $nameLength));
+                    $output->write(
+                        str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                            (string) $currenUserAgent,
+                            8,
+                            ' ',
+                            STR_PAD_LEFT,
+                        ) . ' - ' . str_pad(
+                            $proName,
+                            $nameLength,
+                        ),
+                    );
                 }
 
                 // display "progress"
-                $output->writeln(str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad((string) $currenUserAgent, 8, ' ', STR_PAD_LEFT) . '   ' . str_pad(' ', $nameLength));
+                $output->writeln(
+                    str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                        (string) $currenUserAgent,
+                        8,
+                        ' ',
+                        STR_PAD_LEFT,
+                    ) . '   ' . str_pad(
+                        ' ',
+                        $nameLength,
+                    ),
+                );
 
                 ++$currenUserAgent;
             }
 
             $this->pdo->commit();
 
-            $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `temp_userAgent`');
+            $statementCountAllResults = $this->pdo->prepare(
+                'SELECT COUNT(*) AS `count` FROM `temp_userAgent`',
+            );
             $statementCountAllResults->execute();
 
             $colCount = $statementCountAllResults->fetch(PDO::FETCH_COLUMN);

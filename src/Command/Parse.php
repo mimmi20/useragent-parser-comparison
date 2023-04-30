@@ -57,16 +57,14 @@ final class Parse extends Command
     }
 
     /** @throws JsonException */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $proId    = null;
         $filename = $input->getArgument('file');
         assert(is_string($filename));
 
         $thisRunName = $input->getArgument('run');
-        assert(is_string($thisRunName) || null === $thisRunName);
+        assert(is_string($thisRunName) || $thisRunName === null);
 
         if (empty($thisRunName)) {
             $thisRunName = date('YmdHis');
@@ -74,9 +72,15 @@ final class Parse extends Command
 
         $output->writeln(sprintf('<comment>Parsing data for test run: %s</comment>', $thisRunName));
 
-        $statementSelectUa       = $this->pdo->prepare('SELECT * FROM `userAgent` WHERE `uaHash` = :uaHash');
-        $statementInsertUa       = $this->pdo->prepare('INSERT INTO `useragent` (`uaId`, `uaHash`, `uaString`, `uaAdditionalHeaders`) VALUES (:uaId, :uaHash, :uaString, :uaAdditionalHeaders)');
-        $statementSelectProvider = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
+        $statementSelectUa       = $this->pdo->prepare(
+            'SELECT * FROM `userAgent` WHERE `uaHash` = :uaHash',
+        );
+        $statementInsertUa       = $this->pdo->prepare(
+            'INSERT INTO `useragent` (`uaId`, `uaHash`, `uaString`, `uaAdditionalHeaders`) VALUES (:uaId, :uaHash, :uaString, :uaAdditionalHeaders)',
+        );
+        $statementSelectProvider = $this->pdo->prepare(
+            'SELECT `proId` FROM `real-provider` WHERE `proName` = :proName',
+        );
 
         $parserHelper = $this->getHelper('parsers');
         assert($parserHelper instanceof Parsers);
@@ -146,7 +150,7 @@ final class Parse extends Command
 
             $dbResultUa = $statementSelectUa->fetch(PDO::FETCH_ASSOC);
 
-            if (false !== $dbResultUa) {
+            if ($dbResultUa !== false) {
                 // update!
                 $uaId = $dbResultUa['uaId'];
             } else {
@@ -157,7 +161,13 @@ final class Parse extends Command
                 $statementInsertUa->bindValue(':uaId', $uaId, PDO::PARAM_STR);
                 $statementInsertUa->bindValue(':uaHash', $uaHash, PDO::PARAM_STR);
                 $statementInsertUa->bindValue(':uaString', $agent, PDO::PARAM_STR);
-                $statementInsertUa->bindValue(':uaAdditionalHeaders', json_encode($additionalHeaders, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+                $statementInsertUa->bindValue(
+                    ':uaAdditionalHeaders',
+                    json_encode(
+                        $additionalHeaders,
+                        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                    ),
+                );
 
                 $statementInsertUa->execute();
             }

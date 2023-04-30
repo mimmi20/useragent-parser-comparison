@@ -35,18 +35,24 @@ final class Benchmark extends Command
         $this->setName('benchmark')
             ->setDescription('Benchmarks selected parsers against a passed in file')
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the file to parse')
-            ->addOption('iterations', 'i', InputOption::VALUE_REQUIRED, 'Number of parser runs to perform per parser', 1)
-            ->setHelp('Runs the selected parsers against a list of useragents (provided in the passed in "file" argument). By default performs just one iteration per parser but this can be configured with the "--iterations" option.  Reports the time taken and memory use of each parser.');
+            ->addOption(
+                'iterations',
+                'i',
+                InputOption::VALUE_REQUIRED,
+                'Number of parser runs to perform per parser',
+                1,
+            )
+            ->setHelp(
+                'Runs the selected parsers against a list of useragents (provided in the passed in "file" argument). By default performs just one iteration per parser but this can be configured with the "--iterations" option.  Reports the time taken and memory use of each parser.',
+            );
     }
 
     /** @throws void */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $file       = $input->getArgument('file');
         $iterations = $input->getOption('iterations');
-        assert(is_bool($iterations) || is_string($iterations) || null === $iterations);
+        assert(is_bool($iterations) || is_string($iterations) || $iterations === null);
         $iterations = (int) $iterations;
 
         $parserHelper = $this->getHelper('parsers');
@@ -55,7 +61,9 @@ final class Benchmark extends Command
         $parsers = $parserHelper->getParsers($input, $output);
 
         $table = new Table($output);
-        $table->setHeaders(['Parser', 'Average Init Time', 'Average Parse Time', 'Average Extra Time', 'Average Memory Used']);
+        $table->setHeaders(
+            ['Parser', 'Average Init Time', 'Average Parse Time', 'Average Extra Time', 'Average Memory Used'],
+        );
         $rows = [];
 
         foreach ($parsers as $parserName => $parser) {

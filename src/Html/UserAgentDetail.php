@@ -56,14 +56,21 @@ final class UserAgentDetail extends AbstractHtml
     {
         $addStr = '';
 
-        if (null !== $this->userAgent['uaAdditionalHeaders']) {
-            $addHeaders = json_decode($this->userAgent['uaAdditionalHeaders'], true, 512, JSON_THROW_ON_ERROR);
+        if ($this->userAgent['uaAdditionalHeaders'] !== null) {
+            $addHeaders = json_decode(
+                $this->userAgent['uaAdditionalHeaders'],
+                true,
+                512,
+                JSON_THROW_ON_ERROR,
+            );
 
             if (is_array($addHeaders) && 0 < count($addHeaders)) {
                 $addStr = '<br /><strong>Additional headers</strong><br />';
 
                 foreach ($addHeaders as $key => $value) {
-                    $addStr .= '<strong>' . htmlspecialchars($key) . '</strong> ' . htmlspecialchars($value) . '<br />';
+                    $addStr .= '<strong>' . htmlspecialchars($key) . '</strong> ' . htmlspecialchars(
+                        $value,
+                    ) . '<br />';
                 }
             }
         }
@@ -156,7 +163,7 @@ final class UserAgentDetail extends AbstractHtml
         $html .= '</th></tr>';
 
         foreach ($this->results as $result) {
-            if (!array_key_exists('proType', $result) || 'testSuite' !== $result['proType']) {
+            if (!array_key_exists('proType', $result) || $result['proType'] !== 'testSuite') {
                 continue;
             }
 
@@ -171,7 +178,7 @@ final class UserAgentDetail extends AbstractHtml
         $html .= '</th></tr>';
 
         foreach ($this->results as $result) {
-            if (!array_key_exists('proType', $result) || 'real' !== $result['proType']) {
+            if (!array_key_exists('proType', $result) || $result['proType'] !== 'real') {
                 continue;
             }
 
@@ -234,7 +241,7 @@ final class UserAgentDetail extends AbstractHtml
 
             $html .= '<br /><small>' . $result['proVersion'] . '</small>';
 
-            if (null !== $result['proLastReleaseDate']) {
+            if ($result['proLastReleaseDate'] !== null) {
                 $html .= '<br /><small>' . $result['proLastReleaseDate'] . '</small>';
             }
 
@@ -289,7 +296,10 @@ final class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if (array_key_exists('proCanDetectClientIsBot', $result) && null !== $result['proCanDetectClientIsBot']) {
+            if (
+                array_key_exists('proCanDetectClientIsBot', $result)
+                && $result['proCanDetectClientIsBot'] !== null
+            ) {
                 if ($result['resClientIsBot']) {
                     $html .= '<td>yes</td>';
                 } else {

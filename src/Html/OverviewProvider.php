@@ -22,11 +22,8 @@ final class OverviewProvider extends AbstractHtml
      *
      * @throws void
      */
-    public function __construct(
-        PDO $pdo,
-        private array $provider,
-        string | null $title = null,
-    ) {
+    public function __construct(PDO $pdo, private readonly array $provider, string | null $title = null)
+    {
         $this->pdo   = $pdo;
         $this->title = $title;
     }
@@ -40,7 +37,9 @@ final class OverviewProvider extends AbstractHtml
 
     <div class="row center">
         <h5 class="header light">
-            We took <strong>' . $this->getUserAgentCount($run) . '</strong> different user agents and analyzed them with this provider<br />
+            We took <strong>' . $this->getUserAgentCount(
+        $run,
+) . '</strong> different user agents and analyzed them with this provider<br />
         </h5>
     </div>
 </div>
@@ -187,7 +186,7 @@ final class OverviewProvider extends AbstractHtml
 
         $html .= '<tbody>';
 
-        if (false === $row) {
+        if ($row === false) {
             $html .= '
             <tr>
                 <td colspan="5" class="center-align red lighten-1">
@@ -239,7 +238,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectClientName']) {
             $html .= '
                 <td>' . $row['clientNameFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['clientNameFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['clientNameFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
                         Detected
@@ -270,7 +273,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectClientVersion']) {
             $html .= '
                 <td>' . $row['clientVersionFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['clientVersionFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['clientVersionFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -294,7 +301,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectClientType']) {
             $html .= '
                 <td>' . $row['clientTypeFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['clientTypeFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['clientTypeFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -318,7 +329,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectClientIsBot']) {
             $html .= '
                 <td>' . $row['asBotDetected'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['asBotDetected'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['asBotDetected'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -346,7 +361,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectEngineName']) {
             $html .= '
                 <td>' . $row['engineNameFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['engineNameFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['engineNameFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/rendering-engines.html" class="btn waves-effect waves-light">
                         Detected
@@ -377,7 +396,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectEngineVersion']) {
             $html .= '
                 <td>' . $row['engineVersionFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['engineVersionFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['engineVersionFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -405,7 +428,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectOsName']) {
             $html .= '
                 <td>' . $row['osNameFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['osNameFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['osNameFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/operating-systems.html" class="btn waves-effect waves-light">
                         Detected
@@ -436,7 +463,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectOsVersion']) {
             $html .= '
                 <td>' . $row['osVersionFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['osVersionFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['osVersionFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -464,7 +495,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectDeviceBrand']) {
             $html .= '
                 <td>' . $row['deviceBrandFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['deviceBrandFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['deviceBrandFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-brands.html" class="btn waves-effect waves-light">
                         Detected
@@ -495,7 +530,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectDeviceName']) {
             $html .= '
                 <td>' . $row['deviceModelFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['deviceModelFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['deviceModelFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-models.html" class="btn waves-effect waves-light">
                         Detected
@@ -526,7 +565,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectDeviceType']) {
             $html .= '
                 <td>' . $row['deviceTypeFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['deviceTypeFound'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['deviceTypeFound'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-types.html" class="btn waves-effect waves-light">
                         Detected
@@ -557,7 +600,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectDeviceIsMobile']) {
             $html .= '
                 <td>' . $row['asMobileDetected'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['asMobileDetected'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['asMobileDetected'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="not-detected/' . $provider['proName'] . '/device-is-mobile.html" class="btn waves-effect waves-light">
                         Not detected
@@ -585,7 +632,11 @@ final class OverviewProvider extends AbstractHtml
         if ($provider['proCanDetectDeviceDisplayIsTouch']) {
             $html .= '
                 <td>' . $row['asTouchDeviceDetected'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['asTouchDeviceDetected'], (int) $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    (int) $row['asTouchDeviceDetected'],
+                    (int) $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
