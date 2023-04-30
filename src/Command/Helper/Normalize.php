@@ -59,7 +59,7 @@ final class Normalize extends Helper
         $normalized = [];
 
         foreach (array_keys($parsed) as $key) {
-            if ('raw' === $key) {
+            if ($key === 'raw') {
                 $normalized[$key] = $parsed[$key];
 
                 continue;
@@ -96,15 +96,15 @@ final class Normalize extends Helper
         bool | array | string | int | float | null $value,
         array $parsed,
     ): array | float | string | null {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        if (false === $value) {
+        if ($value === false) {
             return 'false';
         }
 
-        if (true === $value) {
+        if ($value === true) {
             return 'true';
         }
 
@@ -128,13 +128,21 @@ final class Normalize extends Helper
 
         // Special Windows normalization for parsers that don't differntiate the version of windows
         // in the name, but use the version.
-        if ('osname' === $normKey && !empty($parsed['resOsVersion'])) {
-            if ('windows' === $value) {
-                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower((string) $parsed['resOsVersion']));
+        if ($normKey === 'osname' && !empty($parsed['resOsVersion'])) {
+            if ($value === 'windows') {
+                $value .= preg_replace(
+                    '|[^0-9a-z.]|',
+                    '',
+                    mb_strtolower((string) $parsed['resOsVersion']),
+                );
             }
 
-            if ('windowsphone' === $value) {
-                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower((string) $parsed['resOsVersion']));
+            if ($value === 'windowsphone') {
+                $value .= preg_replace(
+                    '|[^0-9a-z.]|',
+                    '',
+                    mb_strtolower((string) $parsed['resOsVersion']),
+                );
             }
         }
 
@@ -142,14 +150,9 @@ final class Normalize extends Helper
             return $value;
         }
 
-        if (
-            array_key_exists($normKey, $this->mappings)
-            && is_array($this->mappings[$normKey])
-        ) {
-            $v = $this->mappings[$normKey];
-        } else {
-            $v = [];
-        }
+        $v = array_key_exists($normKey, $this->mappings) && is_array($this->mappings[$normKey])
+            ? $this->mappings[$normKey]
+            : [];
 
         if (is_array($v) && array_key_exists($value, $v)) {
             $value = $v[$value];

@@ -12,9 +12,11 @@
         <exclude name="SlevomatCodingStandard.Classes.ClassLength.ClassTooLong"/>
         <exclude name="SlevomatCodingStandard.Complexity.Cognitive.ComplexityTooHigh"/>
         <exclude name="Generic.Metrics.CyclomaticComplexity"/>
+        <exclude name="SlevomatCodingStandard.Files.FileLength.FileTooLong"/>
     </rule>
 
     <!-- Paths to check -->
     <file>src</file>
     <file>.php-cs-fixer.php</file>
+    <file>rector.php</file>
 </ruleset>

@@ -68,10 +68,8 @@ final class Tests extends Helper
     }
 
     /** @throws void */
-    public function getTest(
-        InputInterface $input,
-        OutputInterface $output,
-    ): string | null {
+    public function getTest(InputInterface $input, OutputInterface $output): string | null
+    {
         $rows  = [];
         $names = [];
         $tests = [];
@@ -87,7 +85,9 @@ final class Tests extends Helper
             $pathName = str_replace('\\', '/', $pathName);
 
             if (!file_exists($pathName . '/metadata.json')) {
-                $output->writeln('<error>metadata file for test in ' . $pathName . ' does not exist</error>');
+                $output->writeln(
+                    '<error>metadata file for test in ' . $pathName . ' does not exist</error>',
+                );
 
                 continue;
             }
@@ -108,12 +108,16 @@ final class Tests extends Helper
                 try {
                     $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                 } catch (Throwable) {
-                    $output->writeln('<error>An error occured while parsing metadata for test ' . $pathName . '</error>');
+                    $output->writeln(
+                        '<error>An error occured while parsing metadata for test ' . $pathName . '</error>',
+                    );
 
                     continue;
                 }
             } catch (Throwable) {
-                $output->writeln('<error>Could not read metadata file for test in ' . $pathName . '</error>');
+                $output->writeln(
+                    '<error>Could not read metadata file for test in ' . $pathName . '</error>',
+                );
 
                 continue;
             }
@@ -123,7 +127,7 @@ final class Tests extends Helper
             $parserNames = array_keys($metadata['parsers']);
             $valid       = true;
 
-            if (0 === $countRows) {
+            if ($countRows === 0) {
                 $valid = false;
             }
 
@@ -138,21 +142,55 @@ final class Tests extends Helper
             $runName = empty($metadata['date']) ? 'n/a' : date('Y-m-d H:i:s', $metadata['date']);
 
             $rows[] = [
-                new TableCell(($valid ? '<fg=green;bg=black>' : '<fg=red;bg=black>') . $testDir->getFilename() . '</>', ['rowspan' => $countRows]),
-                new TableCell(($valid ? '<fg=green;bg=black>' : '<fg=red;bg=black>') . $runName . '</>', ['rowspan' => $countRows]),
-                new TableCell(empty($metadata['tests']) ? '' : $metadata['tests'][$testNames[0]]['metadata']['name']),
-                new TableCell(empty($metadata['tests']) ? '' : ($metadata['tests'][$testNames[0]]['metadata']['version'] ?? 'n/a')),
-                new TableCell(empty($metadata['parsers']) ? '' : $metadata['parsers'][$parserNames[0]]['metadata']['name']),
-                new TableCell(empty($metadata['parsers']) ? '' : ($metadata['parsers'][$parserNames[0]]['metadata']['version'] ?? 'n/a')),
+                new TableCell(
+                    ($valid ? '<fg=green;bg=black>' : '<fg=red;bg=black>') . $testDir->getFilename() . '</>',
+                    ['rowspan' => $countRows],
+                ),
+                new TableCell(
+                    ($valid ? '<fg=green;bg=black>' : '<fg=red;bg=black>') . $runName . '</>',
+                    ['rowspan' => $countRows],
+                ),
+                new TableCell(
+                    empty($metadata['tests']) ? '' : $metadata['tests'][$testNames[0]]['metadata']['name'],
+                ),
+                new TableCell(
+                    empty($metadata['tests']) ? '' : ($metadata['tests'][$testNames[0]]['metadata']['version'] ?? 'n/a'),
+                ),
+                new TableCell(
+                    empty($metadata['parsers']) ? '' : $metadata['parsers'][$parserNames[0]]['metadata']['name'],
+                ),
+                new TableCell(
+                    empty($metadata['parsers']) ? '' : ($metadata['parsers'][$parserNames[0]]['metadata']['version'] ?? 'n/a'),
+                ),
             ];
 
             if (1 < $countRows) {
                 for ($i = 1, $max = $countRows; $i < $max; ++$i) {
                     $rows[] = [
-                        new TableCell(empty($metadata['tests']) || !array_key_exists($i, $testNames) ? '' : $metadata['tests'][$testNames[$i]]['metadata']['name']),
-                        new TableCell(empty($metadata['tests']) || !array_key_exists($i, $testNames) ? '' : ($metadata['tests'][$testNames[$i]]['metadata']['version'] ?? 'n/a')),
-                        new TableCell(empty($metadata['parsers']) || !array_key_exists($i, $parserNames) ? '' : $metadata['parsers'][$parserNames[$i]]['metadata']['name']),
-                        new TableCell(empty($metadata['parsers']) || !array_key_exists($i, $parserNames) ? '' : ($metadata['parsers'][$parserNames[$i]]['metadata']['version'] ?? 'n/a')),
+                        new TableCell(
+                            empty($metadata['tests']) || !array_key_exists(
+                                $i,
+                                $testNames,
+                            ) ? '' : $metadata['tests'][$testNames[$i]]['metadata']['name'],
+                        ),
+                        new TableCell(
+                            empty($metadata['tests']) || !array_key_exists(
+                                $i,
+                                $testNames,
+                            ) ? '' : ($metadata['tests'][$testNames[$i]]['metadata']['version'] ?? 'n/a'),
+                        ),
+                        new TableCell(
+                            empty($metadata['parsers']) || !array_key_exists(
+                                $i,
+                                $parserNames,
+                            ) ? '' : $metadata['parsers'][$parserNames[$i]]['metadata']['name'],
+                        ),
+                        new TableCell(
+                            empty($metadata['parsers']) || !array_key_exists(
+                                $i,
+                                $parserNames,
+                            ) ? '' : ($metadata['parsers'][$parserNames[$i]]['metadata']['version'] ?? 'n/a'),
+                        ),
                     ];
                 }
             }
@@ -173,8 +211,25 @@ final class Tests extends Helper
         $table = new Table($output);
         $table->setHeaders(
             [
-                [new TableCell('Name / Date', ['rowspan' => 2, 'colspan' => 2]), new TableCell('Test Suites', ['colspan' => 2]), new TableCell('Parsers', ['colspan' => 2])],
-                [new TableCell('Name'), new TableCell('Version'), new TableCell('Name'), new TableCell('Version')],
+                [
+                    new TableCell('Name / Date', ['rowspan' => 2, 'colspan' => 2]),
+                    new TableCell(
+                        'Test Suites',
+                        ['colspan' => 2],
+                    ),
+                    new TableCell(
+                        'Parsers',
+                        ['colspan' => 2],
+                    ),
+                ],
+                [
+                    new TableCell('Name'),
+                    new TableCell('Version'),
+                    new TableCell('Name'),
+                    new TableCell(
+                        'Version',
+                    ),
+                ],
             ],
         );
 
@@ -186,10 +241,7 @@ final class Tests extends Helper
         $questions    = array_keys($names);
         $questionText = 'Select the test run to use';
 
-        $question = new ChoiceQuestion(
-            $questionText,
-            $questions,
-        );
+        $question = new ChoiceQuestion($questionText, $questions);
 
         $helper = $this->helperSet->get('question');
         assert($helper instanceof QuestionHelper);
@@ -203,11 +255,9 @@ final class Tests extends Helper
      *
      * @throws JsonException
      */
-    public function collectTests(
-        OutputInterface $output,
-        string | null $thisRunDir,
-    ): iterable {
-        $expectedDir = null === $thisRunDir ? null : $thisRunDir . '/expected';
+    public function collectTests(OutputInterface $output, string | null $thisRunDir): iterable
+    {
+        $expectedDir = $thisRunDir === null ? null : $thisRunDir . '/expected';
 
         foreach (new FilesystemIterator($this->testDir) as $testDir) {
             assert($testDir instanceof SplFileInfo);
@@ -218,35 +268,53 @@ final class Tests extends Helper
             if (file_exists($pathName . '/metadata.json')) {
                 $contents = @file_get_contents($pathName . '/metadata.json');
 
-                if (false === $contents) {
-                    $output->writeln('<error>Could not read metadata file for testsuite in ' . $testDir->getFilename() . '</error>');
+                if ($contents === false) {
+                    $output->writeln(
+                        '<error>Could not read metadata file for testsuite in ' . $testDir->getFilename() . '</error>',
+                    );
                 } else {
                     try {
                         $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
                     } catch (JsonException) {
-                        $output->writeln('<error>An error occured while parsing metadata for testsuite ' . $testDir->getFilename() . '</error>');
+                        $output->writeln(
+                            '<error>An error occured while parsing metadata for testsuite ' . $testDir->getFilename() . '</error>',
+                        );
                     }
                 }
             }
 
             $language = $metadata['language'] ?? '';
-//            $local    = $metadata['local'] ?? false;
-//            $api      = $metadata['api'] ?? false;
+            //            $local    = $metadata['local'] ?? false;
+            //            $api      = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
                     case 'PHP':
-                        $metadata['version']      = $this->getVersionPHP($pathName, $metadata['packageName']);
-                        $metadata['release-date'] = $this->getUpdateDatePHP($pathName, $metadata['packageName']);
+                        $metadata['version']      = $this->getVersionPHP(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
+                        $metadata['release-date'] = $this->getUpdateDatePHP(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
 
                         break;
                     case 'JavaScript':
-                        $metadata['version']      = $this->getVersionJS($pathName, $metadata['packageName']);
-                        $metadata['release-date'] = $this->getUpdateDateJS($pathName, $metadata['packageName']);
+                        $metadata['version']      = $this->getVersionJS(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
+                        $metadata['release-date'] = $this->getUpdateDateJS(
+                            $pathName,
+                            $metadata['packageName'],
+                        );
 
                         break;
                     default:
-                        $output->writeln('<error>could not detect version and release date for testsuite ' . $testDir->getFilename() . '</error>');
+                        $output->writeln(
+                            '<error>could not detect version and release date for testsuite ' . $testDir->getFilename() . '</error>',
+                        );
                 }
             }
 
@@ -281,10 +349,6 @@ final class Tests extends Helper
             $testPath = $testDir->getFilename();
 
             yield $testPath => [
-                'name' => $pathName,
-                'path' => $testPath,
-                'metadata' => $metadata,
-                'command' => $command,
                 'build' => static function () use ($testPath, $output, $expectedDir, $command): iterable {
                     $message = sprintf('test suite <fg=yellow>%s</>', $testPath);
 
@@ -292,15 +356,17 @@ final class Tests extends Helper
 
                     $testOutput = shell_exec($command);
 
-                    if (null === $testOutput || false === $testOutput) {
-                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No content was sent.</error>');
+                    if ($testOutput === null || $testOutput === false) {
+                        $output->writeln(
+                            "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No content was sent.</error>',
+                        );
 
                         return null;
                     }
 
                     $testOutput = trim($testOutput);
 
-                    if (null !== $expectedDir) {
+                    if ($expectedDir !== null) {
                         if (!file_exists($expectedDir . '/' . $testPath)) {
                             mkdir($expectedDir . '/' . $testPath);
                         }
@@ -309,37 +375,55 @@ final class Tests extends Helper
                     try {
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
                     } catch (JsonException) {
-                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
+                        $output->writeln(
+                            "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>',
+                        );
 
                         return null;
                     }
 
-                    if (null === $tests['tests'] || !is_array($tests['tests']) || [] === $tests['tests']) {
-                        $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>');
+                    if (
+                        $tests['tests'] === null
+                        || !is_array($tests['tests'])
+                        || $tests['tests'] === []
+                    ) {
+                        $output->writeln(
+                            "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>',
+                        );
 
                         return null;
                     }
 
                     foreach ($tests['tests'] as $singleTestName => $singleTestData) {
-                        if (null !== $expectedDir) {
+                        if ($expectedDir !== null) {
                             file_put_contents(
                                 $expectedDir . '/' . $testPath . '/' . $singleTestName . '.json',
-                                json_encode(['test' => $singleTestData], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                                json_encode(
+                                    ['test' => $singleTestData],
+                                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                                ),
                             );
                         }
 
                         yield $singleTestName => $singleTestData;
                     }
 
-                    if (null === $expectedDir) {
+                    if ($expectedDir === null) {
                         return;
                     }
 
                     file_put_contents(
                         $expectedDir . '/' . $testPath . '/metadata.json',
-                        json_encode(['version' => $tests['version'] ?? null], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                        json_encode(
+                            ['version' => $tests['version'] ?? null],
+                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                        ),
                     );
                 },
+                'command' => $command,
+                'metadata' => $metadata,
+                'name' => $pathName,
+                'path' => $testPath,
             ];
         }
     }
@@ -349,24 +433,30 @@ final class Tests extends Helper
      *
      * @throws JsonException
      */
-    private function getVersionPHP(
-        string $path,
-        string $packageName,
-    ): string | null {
-        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getVersionPHP(string $path, string $packageName): string | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/vendor/composer/installed.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name'],
+            static fn (array $value): bool => array_key_exists(
+                'name',
+                $value,
+            ) && $packageName === $value['name'],
         );
 
-        if ([] === $filtered) {
+        if ($filtered === []) {
             return null;
         }
 
         $filtered = reset($filtered);
 
-        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+        if ($filtered === [] || !array_key_exists('time', $filtered)) {
             return null;
         }
 
@@ -378,24 +468,30 @@ final class Tests extends Helper
      *
      * @throws JsonException
      */
-    private function getUpdateDatePHP(
-        string $path,
-        string $packageName,
-    ): DateTimeImmutable | null {
-        $installed = json_decode(file_get_contents($path . '/vendor/composer/installed.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/vendor/composer/installed.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         $filtered = array_filter(
             $installed['packages'],
-            static fn (array $value): bool => array_key_exists('name', $value) && $packageName === $value['name'],
+            static fn (array $value): bool => array_key_exists(
+                'name',
+                $value,
+            ) && $packageName === $value['name'],
         );
 
-        if ([] === $filtered) {
+        if ($filtered === []) {
             return null;
         }
 
         $filtered = reset($filtered);
 
-        if ([] === $filtered || !array_key_exists('time', $filtered)) {
+        if ($filtered === [] || !array_key_exists('time', $filtered)) {
             return null;
         }
 
@@ -407,11 +503,14 @@ final class Tests extends Helper
      *
      * @throws JsonException
      */
-    private function getVersionJS(
-        string $path,
-        string $packageName,
-    ): string | null {
-        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getVersionJS(string $path, string $packageName): string | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/npm-shrinkwrap.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
             return $installed['packages']['node_modules/' . $packageName]['version'];
@@ -429,14 +528,19 @@ final class Tests extends Helper
      *
      * @throws JsonException
      */
-    private function getUpdateDateJS(
-        string $path,
-        string $packageName,
-    ): DateTimeImmutable | null {
-        $installed = json_decode(file_get_contents($path . '/npm-shrinkwrap.json'), true, 512, JSON_THROW_ON_ERROR);
+    private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
+    {
+        $installed = json_decode(
+            file_get_contents($path . '/npm-shrinkwrap.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR,
+        );
 
         if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {
-            return new DateTimeImmutable($installed['packages']['node_modules/' . $packageName]['time']);
+            return new DateTimeImmutable(
+                $installed['packages']['node_modules/' . $packageName]['time'],
+            );
         }
 
         if (isset($installed['dependencies'][$packageName]['time'])) {

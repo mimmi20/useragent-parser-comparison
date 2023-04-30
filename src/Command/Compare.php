@@ -27,17 +27,31 @@ final class Compare extends Command
     {
         $this->setName('compare')
             ->setDescription('Runs tests, normalizes the results then analyzes the results')
-            ->addOption('run', 'r', InputOption::VALUE_OPTIONAL, 'The name of the test run, if omitted will be generated from date')
-            ->addOption('import', null, InputOption::VALUE_NONE, 'Whether to import providers and useragents')
-            ->addArgument('file', InputArgument::OPTIONAL, 'Path to a file to use as the source of useragents rather than test suites')
-            ->setHelp('This command is a "meta" command that will execute the Test, Normalize and Analyze commands in order');
+            ->addOption(
+                'run',
+                'r',
+                InputOption::VALUE_OPTIONAL,
+                'The name of the test run, if omitted will be generated from date',
+            )
+            ->addOption(
+                'import',
+                null,
+                InputOption::VALUE_NONE,
+                'Whether to import providers and useragents',
+            )
+            ->addArgument(
+                'file',
+                InputArgument::OPTIONAL,
+                'Path to a file to use as the source of useragents rather than test suites',
+            )
+            ->setHelp(
+                'This command is a "meta" command that will execute the Test, Normalize and Analyze commands in order',
+            );
     }
 
     /** @throws Exception */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $file = $input->getArgument('file');
 
         // Prepare our test directory to store the data from this run
@@ -45,7 +59,7 @@ final class Compare extends Command
 
         $application = $this->getApplication();
 
-        if (null === $application) {
+        if ($application === null) {
             throw new Exception('Could not retrieve Symfony Application, aborting');
         }
 
@@ -63,7 +77,9 @@ final class Compare extends Command
             $returnCode        = $command->run($initProviderInput, $output);
 
             if (0 < $returnCode) {
-                $output->writeln('<error>There was an error executing the "init-provider" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "init-provider" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
@@ -75,7 +91,9 @@ final class Compare extends Command
             $returnCode        = $command->run($initProviderInput, $output);
 
             if (0 < $returnCode) {
-                $output->writeln('<error>There was an error executing the "init-useragents" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "init-useragents" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
@@ -93,7 +111,9 @@ final class Compare extends Command
             $returnCode = $command->run($parseInput, $output);
 
             if (0 < $returnCode) {
-                $output->writeln('<error>There was an error executing the "parse" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "parse" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
@@ -108,7 +128,9 @@ final class Compare extends Command
             $returnCode = $command->run($testInput, $output);
 
             if (0 < $returnCode) {
-                $output->writeln('<error>There was an error executing the "test" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "test" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
@@ -124,7 +146,9 @@ final class Compare extends Command
         $returnCode     = $command->run($normalizeInput, $output);
 
         if (0 < $returnCode) {
-            $output->writeln('<error>There was an error executing the "normalize" command, cannot continue.</error>');
+            $output->writeln(
+                '<error>There was an error executing the "normalize" command, cannot continue.</error>',
+            );
 
             return $returnCode;
         }
@@ -139,28 +163,30 @@ final class Compare extends Command
         $returnCode    = $command->run($generateInput, $output);
 
         if (0 < $returnCode) {
-            $output->writeln('<error>There was an error executing the "generate-reports" command, cannot continue.</error>');
+            $output->writeln(
+                '<error>There was an error executing the "generate-reports" command, cannot continue.</error>',
+            );
 
             return $returnCode;
         }
 
         return self::SUCCESS;
 
-//        $command   = $application->find('analyze');
-//        $arguments = [
-//            'command' => 'analyze',
-//            'run' => $name,
-//        ];
-//
-//        $analyzeInput = new ArrayInput($arguments);
-//        $returnCode   = $command->run($analyzeInput, $output);
-//
-//        if (0 < $returnCode) {
-//            $output->writeln('<error>There was an error executing the "analyze" command, cannot continue.</error>');
-//
-//            return $returnCode;
-//        }
-//
-//        return self::SUCCESS;
+        //        $command   = $application->find('analyze');
+        //        $arguments = [
+        //            'command' => 'analyze',
+        //            'run' => $name,
+        //        ];
+        //
+        //        $analyzeInput = new ArrayInput($arguments);
+        //        $returnCode   = $command->run($analyzeInput, $output);
+        //
+        //        if (0 < $returnCode) {
+        //            $output->writeln('<error>There was an error executing the "analyze" command, cannot continue.</error>');
+        //
+        //            return $returnCode;
+        //        }
+        //
+        //        return self::SUCCESS;
     }
 }

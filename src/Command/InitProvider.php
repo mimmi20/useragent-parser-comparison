@@ -41,13 +41,17 @@ final class InitProvider extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
-        $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `provider` WHERE `proName` = :proName AND `proType` = :proType');
-        $statementInsertProvider = $this->pdo->prepare('INSERT INTO `provider` (`proId`, `proType`, `proName`, `proHomepage`, `proVersion`, `proLastReleaseDate`, `proPackageName`, `proLanguage`, `proIsLocal`, `proIsApi`, `proIsActive`, `proCanDetectClientName`, `proCanDetectClientModus`, `proCanDetectClientVersion`, `proCanDetectClientManufacturer`, `proCanDetectClientBits`, `proCanDetectEngineName`, `proCanDetectEngineVersion`, `proCanDetectEngineManufacturer`, `proCanDetectOsName`, `proCanDetectOsMarketingName`, `proCanDetectOsVersion`, `proCanDetectOsManufacturer`, `proCanDetectOsBits`, `proCanDetectDeviceName`, `proCanDetectDeviceMarketingName`, `proCanDetectDeviceManufacturer`, `proCanDetectDeviceBrand`, `proCanDetectDeviceDualOrientation`, `proCanDetectDeviceType`, `proCanDetectDeviceIsMobile`, `proCanDetectDeviceSimCount`, `proCanDetectDeviceDisplayWidth`, `proCanDetectDeviceDisplayHeight`, `proCanDetectDeviceDisplayIsTouch`, `proCanDetectDeviceDisplayType`, `proCanDetectDeviceDisplaySize`, `proCanDetectClientIsBot`, `proCanDetectClientType`, `proCommand`) VALUES (:proId, :proType, :proName, :proHomepage, :proVersion, :proLastReleaseDate, :proPackageName, :proLanguage, :proIsLocal, :proIsApi, :proIsActive, :proCanDetectClientName, :proCanDetectClientModus, :proCanDetectClientVersion, :proCanDetectClientManufacturer, :proCanDetectClientBits, :proCanDetectEngineName, :proCanDetectEngineVersion, :proCanDetectEngineManufacturer, :proCanDetectOsName, :proCanDetectOsMarketingName, :proCanDetectOsVersion, :proCanDetectOsManufacturer, :proCanDetectOsBits, :proCanDetectDeviceName, :proCanDetectDeviceMarketingName, :proCanDetectDeviceManufacturer, :proCanDetectDeviceBrand, :proCanDetectDeviceDualOrientation, :proCanDetectDeviceType, :proCanDetectDeviceIsMobile, :proCanDetectDeviceSimCount, :proCanDetectDeviceDisplayWidth, :proCanDetectDeviceDisplayHeight, :proCanDetectDeviceDisplayIsTouch, :proCanDetectDeviceDisplayType, :proCanDetectDeviceDisplaySize, :proCanDetectClientIsBot, :proCanDetectClientType, :proCommand)');
-        $statementUpdateProvider = $this->pdo->prepare('UPDATE `provider` SET `proType` = :proType, `proName` = :proName, `proHomepage` = :proHomepage, `proVersion` = :proVersion, `proLastReleaseDate` = :proLastReleaseDate, `proPackageName` = :proPackageName, `proLanguage` = :proLanguage, `proIsLocal` = :proIsLocal, `proIsApi` = :proIsApi, `proIsActive` = :proIsActive, `proCanDetectClientName` = :proCanDetectClientName, `proCanDetectClientModus` = :proCanDetectClientModus, `proCanDetectClientVersion` = :proCanDetectClientVersion, `proCanDetectClientManufacturer` = :proCanDetectClientManufacturer, `proCanDetectClientBits` = :proCanDetectClientBits, `proCanDetectEngineName` = :proCanDetectEngineName, `proCanDetectEngineVersion` = :proCanDetectEngineVersion, `proCanDetectEngineManufacturer` = :proCanDetectEngineManufacturer, `proCanDetectOsName` = :proCanDetectOsName, `proCanDetectOsMarketingName` = :proCanDetectOsMarketingName, `proCanDetectOsVersion` = :proCanDetectOsVersion, `proCanDetectOsManufacturer` = :proCanDetectOsManufacturer, `proCanDetectOsBits` = :proCanDetectOsBits, `proCanDetectDeviceName` = :proCanDetectDeviceName, `proCanDetectDeviceMarketingName` = :proCanDetectDeviceMarketingName, `proCanDetectDeviceManufacturer` = :proCanDetectDeviceManufacturer, `proCanDetectDeviceBrand` = :proCanDetectDeviceBrand, `proCanDetectDeviceDualOrientation` = :proCanDetectDeviceDualOrientation, `proCanDetectDeviceType` = :proCanDetectDeviceType, `proCanDetectDeviceIsMobile` = :proCanDetectDeviceIsMobile, `proCanDetectDeviceSimCount` = :proCanDetectDeviceSimCount, `proCanDetectDeviceDisplayWidth` = :proCanDetectDeviceDisplayWidth, `proCanDetectDeviceDisplayHeight` = :proCanDetectDeviceDisplayHeight, `proCanDetectDeviceDisplayIsTouch` = :proCanDetectDeviceDisplayIsTouch, `proCanDetectDeviceDisplayType` = :proCanDetectDeviceDisplayType, `proCanDetectDeviceDisplaySize` = :proCanDetectDeviceDisplaySize, `proCanDetectClientIsBot` = :proCanDetectClientIsBot, `proCanDetectClientType` = :proCanDetectClientType, `proCommand` = :proCommand WHERE `proId` = :proId');
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $statementSelectProvider = $this->pdo->prepare(
+            'SELECT * FROM `provider` WHERE `proName` = :proName AND `proType` = :proType',
+        );
+        $statementInsertProvider = $this->pdo->prepare(
+            'INSERT INTO `provider` (`proId`, `proType`, `proName`, `proHomepage`, `proVersion`, `proLastReleaseDate`, `proPackageName`, `proLanguage`, `proIsLocal`, `proIsApi`, `proIsActive`, `proCanDetectClientName`, `proCanDetectClientModus`, `proCanDetectClientVersion`, `proCanDetectClientManufacturer`, `proCanDetectClientBits`, `proCanDetectEngineName`, `proCanDetectEngineVersion`, `proCanDetectEngineManufacturer`, `proCanDetectOsName`, `proCanDetectOsMarketingName`, `proCanDetectOsVersion`, `proCanDetectOsManufacturer`, `proCanDetectOsBits`, `proCanDetectDeviceName`, `proCanDetectDeviceMarketingName`, `proCanDetectDeviceManufacturer`, `proCanDetectDeviceBrand`, `proCanDetectDeviceDualOrientation`, `proCanDetectDeviceType`, `proCanDetectDeviceIsMobile`, `proCanDetectDeviceSimCount`, `proCanDetectDeviceDisplayWidth`, `proCanDetectDeviceDisplayHeight`, `proCanDetectDeviceDisplayIsTouch`, `proCanDetectDeviceDisplayType`, `proCanDetectDeviceDisplaySize`, `proCanDetectClientIsBot`, `proCanDetectClientType`, `proCommand`) VALUES (:proId, :proType, :proName, :proHomepage, :proVersion, :proLastReleaseDate, :proPackageName, :proLanguage, :proIsLocal, :proIsApi, :proIsActive, :proCanDetectClientName, :proCanDetectClientModus, :proCanDetectClientVersion, :proCanDetectClientManufacturer, :proCanDetectClientBits, :proCanDetectEngineName, :proCanDetectEngineVersion, :proCanDetectEngineManufacturer, :proCanDetectOsName, :proCanDetectOsMarketingName, :proCanDetectOsVersion, :proCanDetectOsManufacturer, :proCanDetectOsBits, :proCanDetectDeviceName, :proCanDetectDeviceMarketingName, :proCanDetectDeviceManufacturer, :proCanDetectDeviceBrand, :proCanDetectDeviceDualOrientation, :proCanDetectDeviceType, :proCanDetectDeviceIsMobile, :proCanDetectDeviceSimCount, :proCanDetectDeviceDisplayWidth, :proCanDetectDeviceDisplayHeight, :proCanDetectDeviceDisplayIsTouch, :proCanDetectDeviceDisplayType, :proCanDetectDeviceDisplaySize, :proCanDetectClientIsBot, :proCanDetectClientType, :proCommand)',
+        );
+        $statementUpdateProvider = $this->pdo->prepare(
+            'UPDATE `provider` SET `proType` = :proType, `proName` = :proName, `proHomepage` = :proHomepage, `proVersion` = :proVersion, `proLastReleaseDate` = :proLastReleaseDate, `proPackageName` = :proPackageName, `proLanguage` = :proLanguage, `proIsLocal` = :proIsLocal, `proIsApi` = :proIsApi, `proIsActive` = :proIsActive, `proCanDetectClientName` = :proCanDetectClientName, `proCanDetectClientModus` = :proCanDetectClientModus, `proCanDetectClientVersion` = :proCanDetectClientVersion, `proCanDetectClientManufacturer` = :proCanDetectClientManufacturer, `proCanDetectClientBits` = :proCanDetectClientBits, `proCanDetectEngineName` = :proCanDetectEngineName, `proCanDetectEngineVersion` = :proCanDetectEngineVersion, `proCanDetectEngineManufacturer` = :proCanDetectEngineManufacturer, `proCanDetectOsName` = :proCanDetectOsName, `proCanDetectOsMarketingName` = :proCanDetectOsMarketingName, `proCanDetectOsVersion` = :proCanDetectOsVersion, `proCanDetectOsManufacturer` = :proCanDetectOsManufacturer, `proCanDetectOsBits` = :proCanDetectOsBits, `proCanDetectDeviceName` = :proCanDetectDeviceName, `proCanDetectDeviceMarketingName` = :proCanDetectDeviceMarketingName, `proCanDetectDeviceManufacturer` = :proCanDetectDeviceManufacturer, `proCanDetectDeviceBrand` = :proCanDetectDeviceBrand, `proCanDetectDeviceDualOrientation` = :proCanDetectDeviceDualOrientation, `proCanDetectDeviceType` = :proCanDetectDeviceType, `proCanDetectDeviceIsMobile` = :proCanDetectDeviceIsMobile, `proCanDetectDeviceSimCount` = :proCanDetectDeviceSimCount, `proCanDetectDeviceDisplayWidth` = :proCanDetectDeviceDisplayWidth, `proCanDetectDeviceDisplayHeight` = :proCanDetectDeviceDisplayHeight, `proCanDetectDeviceDisplayIsTouch` = :proCanDetectDeviceDisplayIsTouch, `proCanDetectDeviceDisplayType` = :proCanDetectDeviceDisplayType, `proCanDetectDeviceDisplaySize` = :proCanDetectDeviceDisplaySize, `proCanDetectClientIsBot` = :proCanDetectClientIsBot, `proCanDetectClientType` = :proCanDetectClientType, `proCommand` = :proCommand WHERE `proId` = :proId',
+        );
 
         $output->writeln('~~~ Load all Providers ~~~');
 
@@ -100,7 +104,9 @@ final class InitProvider extends Command
         $proName     = $providerConfig['metadata']['name'];
         $proLanguage = $providerConfig['metadata']['language'];
 
-        $output->write('writing data for provider <fg=green;options=bold,underscore>' . $proName . '</> [' . $proLanguage . '/' . $type . '] into DB');
+        $output->write(
+            'writing data for provider <fg=green;options=bold,underscore>' . $proName . '</> [' . $proLanguage . '/' . $type . '] into DB',
+        );
 
         $proHomepage                       = $providerConfig['metadata']['homepage'];
         $proVersion                        = $providerConfig['metadata']['version'] ?? null;
@@ -154,8 +160,12 @@ final class InitProvider extends Command
             $statementUpdateProvider->bindValue(':proHomepage', $proHomepage, PDO::PARAM_STR);
             $statementUpdateProvider->bindValue(':proVersion', $proVersion, PDO::PARAM_STR);
 
-            if (null !== $proReleaseDate) {
-                $statementUpdateProvider->bindValue(':proLastReleaseDate', $proReleaseDate->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+            if ($proReleaseDate !== null) {
+                $statementUpdateProvider->bindValue(
+                    ':proLastReleaseDate',
+                    $proReleaseDate->format('Y-m-d H:i:s'),
+                    PDO::PARAM_STR,
+                );
             } else {
                 $statementUpdateProvider->bindValue(':proLastReleaseDate', null);
             }
@@ -165,34 +175,146 @@ final class InitProvider extends Command
             $statementUpdateProvider->bindValue(':proIsLocal', $proIsLocal, PDO::PARAM_INT);
             $statementUpdateProvider->bindValue(':proIsApi', $proIsApi, PDO::PARAM_INT);
             $statementUpdateProvider->bindValue(':proIsActive', $proIsActive, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectClientName', $proCanDetectClientName, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectClientModus', $proCanDetectClientModus, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectClientVersion', $proCanDetectClientVersion, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectClientManufacturer', $proCanDetectClientManufacturer, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectClientBits', $proCanDetectClientBits, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectClientIsBot', $proCanDetectClientIsBot, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectClientType', $proCanDetectClientType, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectEngineName', $proCanDetectEngineName, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectEngineVersion', $proCanDetectEngineVersion, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectEngineManufacturer', $proCanDetectEngineManufacturer, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectOsName', $proCanDetectOsName, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectOsMarketingName', $proCanDetectOsMarketingName, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectOsVersion', $proCanDetectOsVersion, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectOsManufacturer', $proCanDetectOsManufacturer, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectOsBits', $proCanDetectOsBits, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceName', $proCanDetectDeviceName, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceMarketingName', $proCanDetectDeviceMarketingName, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceManufacturer', $proCanDetectDeviceManufacturer, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceBrand', $proCanDetectDeviceBrand, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceDualOrientation', $proCanDetectDeviceDualOrientation, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceType', $proCanDetectDeviceType, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceIsMobile', $proCanDetectDeviceIsMobile, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceSimCount', $proCanDetectDeviceSimCount, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceDisplayWidth', $proCanDetectDeviceDisplayWidth, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceDisplayHeight', $proCanDetectDeviceDisplayHeight, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceDisplayIsTouch', $proCanDetectDeviceDisplayIsTouch, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceDisplayType', $proCanDetectDeviceDisplayType, PDO::PARAM_INT);
-            $statementUpdateProvider->bindValue(':proCanDetectDeviceDisplaySize', $proCanDetectDeviceDisplaySize, PDO::PARAM_INT);
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectClientName',
+                $proCanDetectClientName,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectClientModus',
+                $proCanDetectClientModus,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectClientVersion',
+                $proCanDetectClientVersion,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectClientManufacturer',
+                $proCanDetectClientManufacturer,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectClientBits',
+                $proCanDetectClientBits,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectClientIsBot',
+                $proCanDetectClientIsBot,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectClientType',
+                $proCanDetectClientType,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectEngineName',
+                $proCanDetectEngineName,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectEngineVersion',
+                $proCanDetectEngineVersion,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectEngineManufacturer',
+                $proCanDetectEngineManufacturer,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectOsName',
+                $proCanDetectOsName,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectOsMarketingName',
+                $proCanDetectOsMarketingName,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectOsVersion',
+                $proCanDetectOsVersion,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectOsManufacturer',
+                $proCanDetectOsManufacturer,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectOsBits',
+                $proCanDetectOsBits,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceName',
+                $proCanDetectDeviceName,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceMarketingName',
+                $proCanDetectDeviceMarketingName,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceManufacturer',
+                $proCanDetectDeviceManufacturer,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceBrand',
+                $proCanDetectDeviceBrand,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceDualOrientation',
+                $proCanDetectDeviceDualOrientation,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceType',
+                $proCanDetectDeviceType,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceIsMobile',
+                $proCanDetectDeviceIsMobile,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceSimCount',
+                $proCanDetectDeviceSimCount,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceDisplayWidth',
+                $proCanDetectDeviceDisplayWidth,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceDisplayHeight',
+                $proCanDetectDeviceDisplayHeight,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceDisplayIsTouch',
+                $proCanDetectDeviceDisplayIsTouch,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceDisplayType',
+                $proCanDetectDeviceDisplayType,
+                PDO::PARAM_INT,
+            );
+            $statementUpdateProvider->bindValue(
+                ':proCanDetectDeviceDisplaySize',
+                $proCanDetectDeviceDisplaySize,
+                PDO::PARAM_INT,
+            );
             $statementUpdateProvider->bindValue(':proCommand', $proCommand);
 
             $statementUpdateProvider->execute();
@@ -208,8 +330,12 @@ final class InitProvider extends Command
         $statementInsertProvider->bindValue(':proHomepage', $proHomepage, PDO::PARAM_STR);
         $statementInsertProvider->bindValue(':proVersion', $proVersion, PDO::PARAM_STR);
 
-        if (null !== $proReleaseDate) {
-            $statementInsertProvider->bindValue(':proLastReleaseDate', $proReleaseDate->format('Y-m-d H:i:s'), PDO::PARAM_STR);
+        if ($proReleaseDate !== null) {
+            $statementInsertProvider->bindValue(
+                ':proLastReleaseDate',
+                $proReleaseDate->format('Y-m-d H:i:s'),
+                PDO::PARAM_STR,
+            );
         } else {
             $statementInsertProvider->bindValue(':proLastReleaseDate', null);
         }
@@ -219,34 +345,138 @@ final class InitProvider extends Command
         $statementInsertProvider->bindValue(':proIsLocal', $proIsLocal, PDO::PARAM_INT);
         $statementInsertProvider->bindValue(':proIsApi', $proIsApi, PDO::PARAM_INT);
         $statementInsertProvider->bindValue(':proIsActive', $proIsActive, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectClientName', $proCanDetectClientName, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectClientModus', $proCanDetectClientModus, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectClientVersion', $proCanDetectClientVersion, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectClientManufacturer', $proCanDetectClientManufacturer, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectClientBits', $proCanDetectClientBits, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectClientIsBot', $proCanDetectClientIsBot, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectClientType', $proCanDetectClientType, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectEngineName', $proCanDetectEngineName, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectEngineVersion', $proCanDetectEngineVersion, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectEngineManufacturer', $proCanDetectEngineManufacturer, PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(
+            ':proCanDetectClientName',
+            $proCanDetectClientName,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectClientModus',
+            $proCanDetectClientModus,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectClientVersion',
+            $proCanDetectClientVersion,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectClientManufacturer',
+            $proCanDetectClientManufacturer,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectClientBits',
+            $proCanDetectClientBits,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectClientIsBot',
+            $proCanDetectClientIsBot,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectClientType',
+            $proCanDetectClientType,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectEngineName',
+            $proCanDetectEngineName,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectEngineVersion',
+            $proCanDetectEngineVersion,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectEngineManufacturer',
+            $proCanDetectEngineManufacturer,
+            PDO::PARAM_INT,
+        );
         $statementInsertProvider->bindValue(':proCanDetectOsName', $proCanDetectOsName, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectOsMarketingName', $proCanDetectOsMarketingName, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectOsVersion', $proCanDetectOsVersion, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectOsManufacturer', $proCanDetectOsManufacturer, PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(
+            ':proCanDetectOsMarketingName',
+            $proCanDetectOsMarketingName,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectOsVersion',
+            $proCanDetectOsVersion,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectOsManufacturer',
+            $proCanDetectOsManufacturer,
+            PDO::PARAM_INT,
+        );
         $statementInsertProvider->bindValue(':proCanDetectOsBits', $proCanDetectOsBits, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceName', $proCanDetectDeviceName, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceMarketingName', $proCanDetectDeviceMarketingName, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceManufacturer', $proCanDetectDeviceManufacturer, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceBrand', $proCanDetectDeviceBrand, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceDualOrientation', $proCanDetectDeviceDualOrientation, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceType', $proCanDetectDeviceType, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceIsMobile', $proCanDetectDeviceIsMobile, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceSimCount', $proCanDetectDeviceSimCount, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceDisplayWidth', $proCanDetectDeviceDisplayWidth, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceDisplayHeight', $proCanDetectDeviceDisplayHeight, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceDisplayIsTouch', $proCanDetectDeviceDisplayIsTouch, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceDisplayType', $proCanDetectDeviceDisplayType, PDO::PARAM_INT);
-        $statementInsertProvider->bindValue(':proCanDetectDeviceDisplaySize', $proCanDetectDeviceDisplaySize, PDO::PARAM_INT);
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceName',
+            $proCanDetectDeviceName,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceMarketingName',
+            $proCanDetectDeviceMarketingName,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceManufacturer',
+            $proCanDetectDeviceManufacturer,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceBrand',
+            $proCanDetectDeviceBrand,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceDualOrientation',
+            $proCanDetectDeviceDualOrientation,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceType',
+            $proCanDetectDeviceType,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceIsMobile',
+            $proCanDetectDeviceIsMobile,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceSimCount',
+            $proCanDetectDeviceSimCount,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceDisplayWidth',
+            $proCanDetectDeviceDisplayWidth,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceDisplayHeight',
+            $proCanDetectDeviceDisplayHeight,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceDisplayIsTouch',
+            $proCanDetectDeviceDisplayIsTouch,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceDisplayType',
+            $proCanDetectDeviceDisplayType,
+            PDO::PARAM_INT,
+        );
+        $statementInsertProvider->bindValue(
+            ':proCanDetectDeviceDisplaySize',
+            $proCanDetectDeviceDisplaySize,
+            PDO::PARAM_INT,
+        );
         $statementInsertProvider->bindValue(':proCommand', $proCommand);
 
         $statementInsertProvider->execute();

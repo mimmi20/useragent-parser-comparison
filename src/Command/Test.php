@@ -47,19 +47,23 @@ final class Test extends Command
     {
         $this->setName('test')
             ->setDescription('Runs test against the parsers')
-            ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run, if omitted will be generated from date')
-            ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
+            ->addArgument(
+                'run',
+                InputArgument::OPTIONAL,
+                'The name of the test run, if omitted will be generated from date',
+            )
+            ->setHelp(
+                'Runs various test suites against the parsers to help determine which is the most "correct".',
+            );
     }
 
     /** @throws void */
-    protected function execute(
-        InputInterface $input,
-        OutputInterface $output,
-    ): int {
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
         $output->writeln('~~~ Testing all UAs ~~~');
 
         $thisRunName = $input->getArgument('run');
-        assert(is_string($thisRunName) || null === $thisRunName);
+        assert(is_string($thisRunName) || $thisRunName === null);
 
         if (empty($thisRunName)) {
             $thisRunName = date('YmdHis');
@@ -67,11 +71,19 @@ final class Test extends Command
 
         $output->writeln(sprintf('<comment>Testing data for test run: %s</comment>', $thisRunName));
 
-        $statementCreateTempUas           = $this->pdo->prepare('CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT `userAgent`.* FROM `userAgent` INNER JOIN `result` ON `userAgent`.`uaId` = `result`.`userAgent_id` WHERE `result`.`provider_id` = :proId LIMIT :start, :count)');
-        $statementSelectProvider          = $this->pdo->prepare('SELECT `proId` FROM `real-provider` WHERE `proName` = :proName');
-        $statementSelectTestCountProvider = $this->pdo->prepare('SELECT `countNumber` FROM `useragents-general-overview` WHERE `proName` = :proName');
+        $statementCreateTempUas           = $this->pdo->prepare(
+            'CREATE TEMPORARY TABLE IF NOT EXISTS `temp_userAgent` AS (SELECT `userAgent`.* FROM `userAgent` INNER JOIN `result` ON `userAgent`.`uaId` = `result`.`userAgent_id` WHERE `result`.`provider_id` = :proId LIMIT :start, :count)',
+        );
+        $statementSelectProvider          = $this->pdo->prepare(
+            'SELECT `proId` FROM `real-provider` WHERE `proName` = :proName',
+        );
+        $statementSelectTestCountProvider = $this->pdo->prepare(
+            'SELECT `countNumber` FROM `useragents-general-overview` WHERE `proName` = :proName',
+        );
 
-        $statementSelectTestProvider = $this->pdo->prepare('SELECT * FROM `useragents-general-overview`');
+        $statementSelectTestProvider = $this->pdo->prepare(
+            'SELECT * FROM `useragents-general-overview`',
+        );
         $statementSelectTestProvider->execute();
 
         $tests     = [];
@@ -107,7 +119,7 @@ final class Test extends Command
         $selectedTests = [];
 
         foreach ($answers as $name) {
-            if ('All Suites' === $name) {
+            if ($name === 'All Suites') {
                 $selectedTests = $tests;
 
                 break;
@@ -155,10 +167,7 @@ final class Test extends Command
             $count      = 100;
             $start      = 0;
 
-            $basicMessage = sprintf(
-                'test suite <fg=yellow>%s</>',
-                $testName,
-            );
+            $basicMessage = sprintf('test suite <fg=yellow>%s</>', $testName);
 
             $output->writeln("\r" . $basicMessage);
 
@@ -193,7 +202,12 @@ final class Test extends Command
                         $agentToShow = mb_substr($agentToShow, 0, 96 - $nameLength) . ' ...';
                     }
 
-                    $actualTestToShow = str_pad((string) $actualTest, mb_strlen((string) $testCount), ' ', STR_PAD_LEFT);
+                    $actualTestToShow = str_pad(
+                        (string) $actualTest,
+                        mb_strlen((string) $testCount),
+                        ' ',
+                        STR_PAD_LEFT,
+                    );
 
                     $basicTestMessage = sprintf(
                         $basicMessage . ' <info>parsing</info> [%s/%s] UA: <fg=yellow>%s</>',
@@ -231,38 +245,38 @@ final class Test extends Command
                             continue;
                         }
 
-//                        $normalizedDevice   = $normalizeHelper->normalize(
-//                            [
-//                                'devicename' => $singleResult['result']['parsed']['device']['deviceName'] ?? null,
-//                                'devicemarketingname' => $singleResult['result']['parsed']['device']['marketingName'] ?? null,
-//                                'devicemanufacturer' => $singleResult['result']['parsed']['device']['manufacturer'] ?? null,
-//                                'devicebrand' => $singleResult['result']['parsed']['device']['brand'] ?? null,
-//                                'devicetype' => $singleResult['result']['parsed']['device']['type'] ?? null,
-//                            ],
-//                        );
-//                        $normalizedClient   = $normalizeHelper->normalize(
-//                            [
-//                                'clientname' => $singleResult['result']['parsed']['client']['name'] ?? null,
-//                                'clientversion' => $singleResult['result']['parsed']['client']['version'] ?? null,
-//                                'clientmanufacturer' => $singleResult['result']['parsed']['client']['manufacturer'] ?? null,
-//                                'clienttype' => $singleResult['result']['parsed']['client']['type'] ?? null,
-//                            ],
-//                        );
-//                        $normalizedPlatform = $normalizeHelper->normalize(
-//                            [
-//                                'osname' => $singleResult['result']['parsed']['platform']['name'] ?? null,
-//                                'osversion' => $singleResult['result']['parsed']['platform']['version'] ?? null,
-//                                'osmarketingname' => $singleResult['result']['parsed']['platform']['marketingName'] ?? null,
-//                                'osmanufacturer' => $singleResult['result']['parsed']['platform']['manufacturer'] ?? null,
-//                            ],
-//                        );
-//                        $normalizedEngine   = $normalizeHelper->normalize(
-//                            [
-//                                'enginename' => $singleResult['result']['parsed']['engine']['name'] ?? null,
-//                                'engineversion' => $singleResult['result']['parsed']['engine']['version'] ?? null,
-//                                'enginemanufacturer' => $singleResult['result']['parsed']['engine']['manufacturer'] ?? null,
-//                            ],
-//                        );
+                        //                        $normalizedDevice   = $normalizeHelper->normalize(
+                        //                            [
+                        //                                'devicename' => $singleResult['result']['parsed']['device']['deviceName'] ?? null,
+                        //                                'devicemarketingname' => $singleResult['result']['parsed']['device']['marketingName'] ?? null,
+                        //                                'devicemanufacturer' => $singleResult['result']['parsed']['device']['manufacturer'] ?? null,
+                        //                                'devicebrand' => $singleResult['result']['parsed']['device']['brand'] ?? null,
+                        //                                'devicetype' => $singleResult['result']['parsed']['device']['type'] ?? null,
+                        //                            ],
+                        //                        );
+                        //                        $normalizedClient   = $normalizeHelper->normalize(
+                        //                            [
+                        //                                'clientname' => $singleResult['result']['parsed']['client']['name'] ?? null,
+                        //                                'clientversion' => $singleResult['result']['parsed']['client']['version'] ?? null,
+                        //                                'clientmanufacturer' => $singleResult['result']['parsed']['client']['manufacturer'] ?? null,
+                        //                                'clienttype' => $singleResult['result']['parsed']['client']['type'] ?? null,
+                        //                            ],
+                        //                        );
+                        //                        $normalizedPlatform = $normalizeHelper->normalize(
+                        //                            [
+                        //                                'osname' => $singleResult['result']['parsed']['platform']['name'] ?? null,
+                        //                                'osversion' => $singleResult['result']['parsed']['platform']['version'] ?? null,
+                        //                                'osmarketingname' => $singleResult['result']['parsed']['platform']['marketingName'] ?? null,
+                        //                                'osmanufacturer' => $singleResult['result']['parsed']['platform']['manufacturer'] ?? null,
+                        //                            ],
+                        //                        );
+                        //                        $normalizedEngine   = $normalizeHelper->normalize(
+                        //                            [
+                        //                                'enginename' => $singleResult['result']['parsed']['engine']['name'] ?? null,
+                        //                                'engineversion' => $singleResult['result']['parsed']['engine']['version'] ?? null,
+                        //                                'enginemanufacturer' => $singleResult['result']['parsed']['engine']['manufacturer'] ?? null,
+                        //                            ],
+                        //                        );
 
                         $resultHelper->storeResult($thisRunName, $proId, $row['uaId'], $singleResult);
                     }
@@ -278,7 +292,9 @@ final class Test extends Command
 
                 $this->pdo->commit();
 
-                $statementCountAllResults = $this->pdo->prepare('SELECT COUNT(*) AS `count` FROM `temp_userAgent`');
+                $statementCountAllResults = $this->pdo->prepare(
+                    'SELECT COUNT(*) AS `count` FROM `temp_userAgent`',
+                );
                 $statementCountAllResults->execute();
 
                 $colCount = $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
