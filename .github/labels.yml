@@ -28,13 +28,13 @@
 # other Labels to all mimmi20 repos
 - color: 0025ff
   name: "dependencies"
-  description: "Pull requests that update.sh a dependency file"
+  description: "Pull requests that update a dependency file"
 - color: f9d0c4
   name: "stale"
   description: "no activity"
 - color: b60205
-  name: "BC Break"
-  description: ""
+  name: "bc break"
+  description: "BC Break"
 - color: f4e99c
   name: "maintenance"
   description: "Maintenance"
@@ -54,7 +54,7 @@
   name: "documentation"
   description: "Improvements or additions to documentation"
 
-# other Labels to mimmi20/browser-detector-version
+# other Labels to mimmi20/useragent-parser-comparison
 #- color: 5319e7
 #  name: "new useragents"
 #  description: ""
