@@ -442,6 +442,49 @@ final class InitDb extends Command
             'CREATE OR REPLACE VIEW `useragents-general-overview` AS SELECT `proId`, `proName`, COUNT(*) AS `countNumber` FROM `test-provider` JOIN `result` ON `provider_id` = `proId` GROUP BY `proId` ORDER BY `proName`',
         )->execute();
 
+        $this->pdo->prepare('DROP TABLE IF EXISTS `useragent-headers`')->execute();
+        $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `useragent-headers` (
+  `uaId` CHAR(36) NOT NULL COMMENT \'(DC2Type:uuid)\',
+  `provider` VARCHAR(255) NOT NULL,
+  `providerVersion` VARCHAR(255) DEFAULT NULL,
+  `date` DATETIME NULL DEFAULT NULL,
+  `headers` JSON NOT NULL,
+  `user-agent` LONGTEXT NULL DEFAULT NULL,
+  `device-stock-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-device-user-agent` LONGTEXT NULL DEFAULT NULL,
+  `x-skyfire-version` LONGTEXT NULL DEFAULT NULL,
+  `x-skyfire-phone` LONGTEXT NULL DEFAULT NULL,
+  `x-bluecoat-via` LONGTEXT NULL DEFAULT NULL,
+  `x-operamini-phone-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-operamini-phone` LONGTEXT NULL DEFAULT NULL,
+  `x-ucbrowser-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-ucbrowser-device-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-ucbrowser-device` LONGTEXT NULL DEFAULT NULL,
+  `x-ucbrowser-phone-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-ucbrowser-phone` LONGTEXT NULL DEFAULT NULL,
+  `x-original-user-agent` LONGTEXT NULL DEFAULT NULL,
+  `x-bolt-phone-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-mobile-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-requested-with` LONGTEXT NULL DEFAULT NULL,
+  `ua-os` LONGTEXT NULL DEFAULT NULL,
+  `baidu-flyflow` LONGTEXT NULL DEFAULT NULL,
+  `x-wap-profile` LONGTEXT NULL DEFAULT NULL,
+  `x-puffin-ua` LONGTEXT NULL DEFAULT NULL,
+  `x-mobile-gateway` LONGTEXT NULL DEFAULT NULL,
+  `x-nb-content` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-arch` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-bitness` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-full-version` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-full-version-list` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-mobile` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-model` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-platform` LONGTEXT NULL DEFAULT NULL,
+  `sec-ch-ua-platform-version` LONGTEXT NULL DEFAULT NULL,
+  PRIMARY KEY (`uaId`),
+  UNIQUE KEY `userAgent_headers` (`headers`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
+
         $output->writeln('<info>done!</info>');
 
         return self::SUCCESS;
