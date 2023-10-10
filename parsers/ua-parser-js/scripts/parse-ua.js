@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 const initStart = process.hrtime();
-const parser = require('ua-parser-js');
+const UAParser = require('ua-parser-js');
+const parser = new UAParser();
 // Trigger a parse to force cache loading
-parser('Test String');
+parser.setUA('Test String');
+parser.getResult();
 const initTime = process.hrtime(initStart)[1] / 1000000000;
 
 const packageInfo = require(require('path').dirname(require.resolve('ua-parser-js')) +
@@ -35,11 +37,13 @@ const output = {
 
 if (hasUa) {
     const start = process.hrtime();
-    const r = parser(line);
+    parser.setUA(line);
+    const r = parser.getResult();
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {
         device: {
+            architecture: null,
             deviceName: r.device.model ? r.device.model : null,
             marketingName: null,
             manufacturer: null,
@@ -57,7 +61,9 @@ if (hasUa) {
             ismobile:
                 r.device.type === 'mobile' ||
                 r.device.type === 'tablet' ||
-                r.device.type === 'wearable'
+                r.device.type === 'wearable',
+            istv: null,
+            bits: null
         },
         client: {
             name: r.browser.name ? r.browser.name : null,

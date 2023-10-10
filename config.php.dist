@@ -20,10 +20,14 @@ if (false) {
         \PDO::ATTR_PERSISTENT => true,
     ];
 
-    $pdo = new \PDO(
-        sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
-        $user,
-        $password,
-        $driverOptions
-    );
+    try {
+        $pdo = new \PDO(
+            sprintf('mysql:dbname=%s;host=%s;port=%s;charset=%s', $dbname, $host, $port, $charset),
+            $user,
+            $password,
+            $driverOptions
+        );
+    } catch (\Throwable) {
+        // do nothing
+    }
 }

@@ -11,6 +11,7 @@
         "ext-pdo": "*",
         "ext-simplexml": "*",
         "composer-runtime-api": "^2.0",
+        "mimmi20/browscap-helper-source": "^3.0.22",
         "ramsey/uuid": "^4.2.3",
         "symfony/console": "^v6.0.2"
     },

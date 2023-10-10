@@ -4,23 +4,32 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
-use function preg_replace;
 use Symfony\Component\Console\Helper\Helper;
+
+use function array_key_exists;
+use function array_slice;
+use function explode;
+use function file_exists;
+use function implode;
+use function is_array;
+use function mb_strtolower;
+use function preg_replace;
+use function sprintf;
+use function str_replace;
 
 class Normalize extends Helper
 {
-    /**
-     * @var string
-     */
     private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
     private array $mappings = [];
 
     public function __construct()
     {
-        if (file_exists(self::MAP_FILE)) {
-            $this->mappings = include self::MAP_FILE;
+        if (!file_exists(self::MAP_FILE)) {
+            return;
         }
+
+        $this->mappings = include self::MAP_FILE;
     }
 
     public function getName(): string
@@ -58,18 +67,15 @@ class Normalize extends Helper
         return implode('.', $versionParts);
     }
 
-    private function normalizeValue(string $section, string $key, mixed $value): array|string|null
+    /**
+     * @return array|string|null
+     *
+     * @throws void
+     */
+    private function normalizeValue(string $section, string $key, mixed $value): array | string | null
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
-        }
-
-        if ($value === false) {
-            return 'false';
-        }
-
-        if ($value === true) {
-            return 'true';
         }
 
         if (is_array($value)) {
@@ -81,36 +87,43 @@ class Normalize extends Helper
             return $list;
         }
 
-        if ($key === 'version') {
+        if (false === $value) {
+            $value = 'false';
+        }
+
+        if (true === $value) {
+            $value = 'true';
+        }
+
+        if ('version' === $key) {
             $value = $this->truncateVersion(mb_strtolower((string) $value));
         } else {
-            $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
+            $value = preg_replace('|[^0-9a-z+]|', '', mb_strtolower((string) $value));
         }
 
-        // Special Windows normalization for parsers that don't differntiate the version of windows
-        // in the name, but use the version.
-        if ($section === 'platform' && $key === 'name' && $value === 'windows') {
-            if (!empty($parsed['platform']['version'])) {
-                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
-            }
+        if (!isset($this->mappings[$section][$key])) {
+            return $value;
         }
 
-        if ($section === 'platform' && $key === 'name' && $value === 'windowsphone') {
-            if (!empty($parsed['platform']['version'])) {
-                $value .= preg_replace('|[^0-9a-z.]|', '', mb_strtolower($parsed['platform']['version']));
-            }
+        $v = $this->mappings[$section][$key];
+
+        if (!is_array($v)) {
+            return $value;
         }
 
-        if (isset($this->mappings[$section][$key])
-            && is_array($this->mappings[$section][$key])
-        ) {
-            $v = $this->mappings[$section][$key];
-        } else {
-            $v = [];
-        }
+        $oldValue = $value;
 
-        if (is_array($v) && array_key_exists($value, $v)) {
+        while (array_key_exists($value, $v)) {
             $value = $v[$value];
+
+            if (null === $value) {
+                break;
+            }
+
+            if ($value === $oldValue) {
+                echo sprintf('normalizing circle detected for value "%s"', $value);
+                exit;
+            }
         }
 
         return $value;

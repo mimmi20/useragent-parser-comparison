@@ -248,15 +248,13 @@ class Tests extends Helper
 
                     try {
                         $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
-                    } catch (\JsonException $e) {
-                        var_dump($testOutput);
+                    } catch (\JsonException) {
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>');
 
                         return null;
                     }
 
                     if ($tests['tests'] === null || !is_array($tests['tests']) || $tests['tests'] === []) {
-                        var_dump($testOutput);
                         $output->writeln("\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>');
 
                         return null;

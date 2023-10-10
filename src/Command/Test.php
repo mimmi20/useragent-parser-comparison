@@ -149,8 +149,8 @@ class Test extends Command
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if (null === $agent) {
-                    var_dump($singleTestData);
-                    $output->writeln("\r" . ' <error>There was no useragent header for the testsuite ' . $singleTestName . '.</error>');
+//                    var_dump($singleTestData);
+//                    $output->writeln("\r" . ' <error>There was no useragent header for the testsuite ' . $singleTestName . '.</error>');
                     continue;
                 }
 

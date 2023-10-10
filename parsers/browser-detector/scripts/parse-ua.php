@@ -27,7 +27,7 @@ $start = microtime(true);
 $logger    = new \Psr\Log\NullLogger();
 $factory   = new \BrowserDetector\DetectorFactory($cache, $logger);
 $detector  = $factory();
-$detector('Test String');
+$detector->getBrowser('Test String');
 $initTime = microtime(true) - $start;
 
 $output = [
@@ -35,61 +35,64 @@ $output = [
     'headers' => [
         'user-agent' => $agentString,
     ],
-    'result'      => [
+    'result' => [
         'parsed' => null,
-        'err'    => null,
+        'err' => null,
     ],
-    'parse_time'  => 0,
-    'init_time'   => $initTime,
+    'parse_time' => 0,
+    'init_time' => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('mimmi20/browser-detector'),
+    'version' => \Composer\InstalledVersions::getPrettyVersion('mimmi20/browser-detector'),
 ];
 
 if ($hasUa) {
     $start = microtime(true);
-    $r     = $detector($agentString);
+    $r     = $detector->getBrowser($agentString);
     $end   = microtime(true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => $r->getDevice()->getDeviceName(),
-            'marketingName' => $r->getDevice()->getMarketingName(),
-            'manufacturer' => $r->getDevice()->getManufacturer()->getName(),
-            'brand'    => $r->getDevice()->getBrand()->getBrandName(),
-            'display' => [
-                'width' => $r->getDevice()->getDisplay()->getWidth(),
-                'height' => $r->getDevice()->getDisplay()->getHeight(),
-                'touch' => $r->getDevice()->getDisplay()->hasTouch(),
-                'type' => null,
-                'size' => $r->getDevice()->getDisplay()->getSize(),
-            ],
-            'dualOrientation' => null,
-            'type'     => $r->getDevice()->getType()->getName(),
-            'simCount' => null,
-            'ismobile' => $r->getDevice()->getType()->isMobile(),
+            //'architecture' => $r['device']['architecture'],
+            //'deviceName' => $r['device']['deviceName'],
+            'marketingName' => $r['device']['marketingName'],
+            'manufacturer' => $r['device']['manufacturer'],
+            'brand' => $r['device']['brand'],
+            //'display' => [
+            //    'width' => $r['device']['display']['width'],
+            //    'height' => $r['device']['display']['height'],
+            //    'touch' => $r['device']['display']['touch'],
+            //    'type' => null,
+            //    'size' => $r['device']['display']['size'],
+            //],
+            //'dualOrientation' => $r['device']['dualOrientation'],
+            'type' => $r['device']['type'],
+            'simCount' => $r['device']['simCount'],
+            'ismobile' => $r['device']['ismobile'],
+            'istv' => $r['device']['istv'],
+            'bits' => $r['device']['bits'],
         ],
         'client' => [
-            'name'    => $r->getBrowser()->getName(),
-            'modus' => $r->getBrowser()->getModus(),
-            'version' => $r->getBrowser()->getVersion()->getVersion(),
-            'manufacturer' => $r->getBrowser()->getManufacturer()->getName(),
-            'bits' => $r->getBrowser()->getBits(),
-            'type'    => $r->getBrowser()->getType()->getType(),
-            'isbot'   => $r->getBrowser()->getType()->isBot(),
+            'name' => $r['client']['name'],
+            //'modus' => $r['client']['modus'],
+            'version' => $r['client']['version'],
+            //'manufacturer' => $r['client']['manufacturer'],
+            //'bits' => $r['client']['bits'] ?? null,
+            'type' => $r['client']['type'],
+            'isbot' => $r['client']['isbot'],
         ],
         'platform' => [
-            'name'    => $r->getOs()->getName(),
-            'marketingName' => $r->getOs()->getMarketingName(),
-            'version' => $r->getOs()->getVersion()->getVersion(),
-            'manufacturer' => $r->getOs()->getManufacturer()->getName(),
-            'bits' => $r->getOs()->getBits(),
+            'name' => $r['os']['name'],
+            'marketingName' => $r['os']['marketingName'],
+            'version' => $r['os']['version'],
+            //'manufacturer' => $r['os']['manufacturer'],
+            //'bits' => $r['os']['bits'],
         ],
         'engine' => [
-            'name'    => $r->getEngine()->getName(),
-            'version' => $r->getEngine()->getVersion()->getVersion(),
-            'manufacturer' => $r->getEngine()->getManufacturer()->getName(),
+            'name' => $r['engine']['name'],
+            'version' => $r['engine']['version'],
+            //'manufacturer' => $r['engine']['manufacturer'],
         ],
-        'raw' => $r->toArray(),
+        'raw' => $r,
     ];
 
     $output['parse_time'] = $end;

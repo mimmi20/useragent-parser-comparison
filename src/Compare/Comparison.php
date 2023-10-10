@@ -44,7 +44,7 @@ class Comparison
                 $expected = $compareValues[$compareSubKey];
                 $actual   = $actualData[$compareKey][$compareSubKey] ?? null;
 
-                if ((!is_string($expected) && !is_int($expected)) || (!is_string($actual) && !is_int($actual))) {
+                if (is_array($expected) || is_array($actual)) {
                     continue;
                 }
 
@@ -147,7 +147,11 @@ class Comparison
                 $expectedValue = $pair->getExpected();
                 $actualValue   = $pair->getActual();
 
-                if (null === $expectedValue || null === $actualValue || $expectedValue === $actualValue) {
+                if ($expectedValue === $actualValue) {
+                    continue;
+                }
+
+                if ($expectedValue === null) {
                     continue;
                 }
 

@@ -103,14 +103,22 @@ class Parse extends Command
                 continue;
             }
 
-            $message = sprintf(
-                '%s[%s] Parsing UA <fg=yellow>%s</> ',
+            $agentString = addcslashes($agentString, PHP_EOL);
+            $agentToShow = $agentString;
+
+            if (mb_strlen($agentToShow) > 100) {
+                $agentToShow = mb_substr($agentToShow, 0, 96) . ' ...';
+            }
+
+            $basicTestMessage = sprintf(
+                '%s[%s] Parsing UA <fg=yellow>%s</>',
                 '  ',
                 (string) $actualTest,
-                $agentString
+                $agentToShow . ' ',
             );
 
-            $output->write($message);
+            $output->write($basicTestMessage);
+            $textLength = mb_strlen($basicTestMessage);
 
             foreach ($parsers as $parserName => $parser) {
                 if (!array_key_exists($parserName, $result)) {
@@ -123,11 +131,19 @@ class Parse extends Command
                     ];
                 }
 
-                $output->write("\r" . str_pad($message . '<info>against the <fg=green;options=bold,underscore>' . $parserName . '</> parser... </info>', 285));
+                $testMessage = $basicTestMessage . ' <info>against the <fg=green;options=bold,underscore>' . $parserName . '</> parser... </info>';
+
+                if (mb_strlen($testMessage) > $textLength) {
+                    $textLength = mb_strlen($testMessage);
+                }
+
+                $output->write("\r" . str_pad($testMessage, $textLength));
                 $singleResult = $parser['parse-ua']($agentString);
 
                 if (empty($singleResult)) {
-                    $output->writeln("\r" . $message . '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>');
+                    $testMessage = $basicTestMessage . ' <error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>';
+
+                    $output->writeln("\r" . $testMessage);
 
                     continue;
                 }
@@ -140,7 +156,10 @@ class Parse extends Command
                     'headers' => $singleResult['headers'],
                     'parsed'  => $singleResult['result']['parsed'],
                     'err'     => $singleResult['result']['err'],
+                    'version' => $singleResult['version'],
+                    'init'    => $singleResult['init_time'],
                     'time'    => $singleResult['parse_time'],
+                    'memory'  => $singleResult['memory_used'],
                 ];
 
                 if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
@@ -157,7 +176,13 @@ class Parse extends Command
                 unset($singleResult);
             }
 
-            $output->writeln("\r" . str_pad($message . '<info>done!</info>', 245));
+            $testMessage = $basicTestMessage . ' <info>done!</info>';
+
+            if (mb_strlen($testMessage) > $textLength) {
+                $textLength = mb_strlen($testMessage);
+            }
+
+            $output->writeln("\r" . str_pad($testMessage, $textLength));
 
             foreach ($parsers as $parserName => $parser) {
                 if ($name) {
@@ -177,8 +202,9 @@ class Parse extends Command
                         $singleResult['parsed'] = $normalizeHelper->normalize($singleResult['parsed']);
                     }
 
+
                     $rows[] = [
-                        new TableCell('<fg=yellow>' . $singleResult['useragent'] . '</>', ['colspan' => '7']),
+                        new TableCell('<fg=yellow>' . (isset($singleResult['useragent']) ? ' ' . rtrim($singleResult['useragent'], '\\') . ' ' : '--') . '</fg>', ['colspan' => '7']),
                         round($singleResult['time'], 5) . 's',
                     ];
                     $rows[] = [
@@ -186,7 +212,7 @@ class Parse extends Command
                         $singleResult['parsed']['client']['version'],
                         $singleResult['parsed']['platform']['name'],
                         $singleResult['parsed']['platform']['version'],
-                        $singleResult['parsed']['device']['name'],
+                        $singleResult['parsed']['device']['name'] ?? null,
                         $singleResult['parsed']['device']['brand'],
                         $singleResult['parsed']['device']['type'],
                         $singleResult['parsed']['device']['ismobile'],

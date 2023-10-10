@@ -34,14 +34,14 @@ $output = [
     'headers' => [
         'user-agent' => $agentString,
     ],
-    'result'      => [
+    'result' => [
         'parsed' => null,
-        'err'    => null,
+        'err' => null,
     ],
-    'parse_time'  => 0,
-    'init_time'   => $initTime,
+    'parse_time' => 0,
+    'init_time' => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('matomo/device-detector'),
+    'version' => \Composer\InstalledVersions::getPrettyVersion('matomo/device-detector'),
 ];
 
 if ($hasUa) {
@@ -63,42 +63,45 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => $model ?? null,
-            'marketingName' => null,
+            //'architecture' => null,
+            //'deviceName' => null,
+            'marketingName' => $model ?? null,
             'manufacturer' => null,
-            'brand'    => $brand ?? null,
-            'display' => [
-                'width' => null,
-                'height' => null,
-                'touch' => null,
-                'type' => null,
-                'size' => null,
-            ],
-            'dualOrientation' => null,
-            'type'     => $device ?? null,
+            'brand' => $brand ?? null,
+            //'display' => [
+            //    'width' => null,
+            //    'height' => null,
+            //    'touch' => null,
+            //    'type' => null,
+            //    'size' => null,
+            //],
+            //'dualOrientation' => null,
+            'type' => $device ?? null,
             'simCount' => null,
             'ismobile' => $isMobile,
+            'istv' => false,
+            'bits' => null,
         ],
         'client' => [
-            'name'    => $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
-            'modus' => null,
+            'name' => $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
+            //'modus' => null,
             'version' => $isBot ? null : ($clientInfo['version'] ?? null),
-            'manufacturer' => null,
-            'bits' => null,
+            //'manufacturer' => null,
+            //'bits' => null,
             'type' => $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
             'isbot' => $isBot,
         ],
         'platform' => [
-            'name'    => $osInfo['name'] ?? null,
-            'marketingName' => null,
+            'name' => $osInfo['name'] ?? null,
+            'marketingName' => $osInfo['name'] ?? null,
             'version' => $osInfo['version'] ?? null,
-            'manufacturer' => null,
-            'bits' => null,
+            //'manufacturer' => null,
+            //'bits' => null,
         ],
         'engine' => [
-            'name'    => $isBot ? null : ($clientInfo['engine'] ?? null),
+            'name' => $isBot ? null : ($clientInfo['engine'] ?? null),
             'version' => $isBot ? null : ($clientInfo['engine_version'] ?? null),
-            'manufacturer' => null,
+            //'manufacturer' => null,
         ],
         'raw' => null,
     ];

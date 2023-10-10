@@ -1,7 +1,7 @@
 {
   "name": "uaparserjs",
   "version": "1.0.0",
-  "lockfileVersion": 2,
+  "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
@@ -13,9 +13,9 @@
       }
     },
     "node_modules/ua-parser-js": {
-      "version": "1.0.2",
-      "resolved": "https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-1.0.2.tgz",
-      "integrity": "sha512-00y/AXhx0/SsnI51fTc0rLRmafiGOM4/O+ny10Ps7f+j/b8p/ZY11ytMgznXkOVo4GQ+KwQG5UQLkLGirsACRg==",
+      "version": "1.0.36",
+      "resolved": "https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-1.0.36.tgz",
+      "integrity": "sha512-znuyCIXzl8ciS3+y3fHJI/2OhQIXbXw9MWC/o3qwyR+RGppjZHrM27CGFSKCJXi2Kctiz537iOu2KnXs1lMQhw==",
       "funding": [
         {
           "type": "opencollective",
@@ -24,18 +24,15 @@
         {
           "type": "paypal",
           "url": "https://paypal.me/faisalman"
+        },
+        {
+          "type": "github",
+          "url": "https://github.com/sponsors/faisalman"
         }
       ],
       "engines": {
         "node": "*"
       }
-    }
-  },
-  "dependencies": {
-    "ua-parser-js": {
-      "version": "1.0.2",
-      "resolved": "https://registry.npmjs.org/ua-parser-js/-/ua-parser-js-1.0.2.tgz",
-      "integrity": "sha512-00y/AXhx0/SsnI51fTc0rLRmafiGOM4/O+ny10Ps7f+j/b8p/ZY11ytMgznXkOVo4GQ+KwQG5UQLkLGirsACRg=="
     }
   }
 }

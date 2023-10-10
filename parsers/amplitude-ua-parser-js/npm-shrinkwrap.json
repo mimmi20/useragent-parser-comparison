@@ -1,7 +1,7 @@
 {
   "name": "amplitude-ua-parser-js-1",
   "version": "1.0.0",
-  "lockfileVersion": 2,
+  "lockfileVersion": 3,
   "requires": true,
   "packages": {
     "": {
@@ -13,9 +13,9 @@
       }
     },
     "node_modules/@amplitude/ua-parser-js": {
-      "version": "0.7.26",
-      "resolved": "https://registry.npmjs.org/@amplitude/ua-parser-js/-/ua-parser-js-0.7.26.tgz",
-      "integrity": "sha512-62/Rid6YQ7F2KT/5vTre41Y26ivrEoFC8lbrsJZqBKaiXMJWG0YpNv9RgxNSaZS2jPLVQgoB/FFeWxihOLfIcg==",
+      "version": "0.7.33",
+      "resolved": "https://registry.npmjs.org/@amplitude/ua-parser-js/-/ua-parser-js-0.7.33.tgz",
+      "integrity": "sha512-wKEtVR4vXuPT9cVEIJkYWnlF++Gx3BdLatPBM+SZ1ztVIvnhdGBZR/mn9x/PzyrMcRlZmyi6L56I2J3doVBnjA==",
       "funding": [
         {
           "type": "opencollective",
@@ -29,13 +29,6 @@
       "engines": {
         "node": "*"
       }
-    }
-  },
-  "dependencies": {
-    "@amplitude/ua-parser-js": {
-      "version": "0.7.26",
-      "resolved": "https://registry.npmjs.org/@amplitude/ua-parser-js/-/ua-parser-js-0.7.26.tgz",
-      "integrity": "sha512-62/Rid6YQ7F2KT/5vTre41Y26ivrEoFC8lbrsJZqBKaiXMJWG0YpNv9RgxNSaZS2jPLVQgoB/FFeWxihOLfIcg=="
     }
   }
 }
