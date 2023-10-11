@@ -134,12 +134,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/browscap/browscap.git",
-                "reference": "dac088ffb7b10d96b2e48854a82c5c8bd88be619"
+                "reference": "2cc3948c7c6753488dd8b9cda46639f052f92870"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/browscap/browscap/zipball/dac088ffb7b10d96b2e48854a82c5c8bd88be619",
-                "reference": "dac088ffb7b10d96b2e48854a82c5c8bd88be619",
+                "url": "https://api.github.com/repos/browscap/browscap/zipball/2cc3948c7c6753488dd8b9cda46639f052f92870",
+                "reference": "2cc3948c7c6753488dd8b9cda46639f052f92870",
                 "shasum": ""
             },
             "require": {
@@ -216,7 +216,7 @@
                 "issues": "https://github.com/browscap/browscap/issues",
                 "source": "https://github.com/browscap/browscap"
             },
-            "time": "2023-10-10T06:07:51+00:00"
+            "time": "2023-10-11T05:11:37+00:00"
         },
         {
             "name": "ergebnis/json",

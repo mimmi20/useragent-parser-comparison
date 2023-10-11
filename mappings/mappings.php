@@ -1500,6 +1500,10 @@ return [
             'x60china' => 'x60',
             'galaxytaba101wifi2019' => 'galaxytaba1012019',
             'galaxya802019' => 'galaxya80',
+            'galaxytaba80lte2019global' => 'galaxytaba80lte2019',
+            'redmi9cnfcglobal' => 'redmi9cnfc',
+            'p50pro4g' => 'p50pro',
+            'nova10se4g' => 'nova10se',
         ],
         'name' => [
             'asusnexus7' => 'nexus7',
