@@ -1504,6 +1504,12 @@ return [
             'redmi9cnfcglobal' => 'redmi9cnfc',
             'p50pro4g' => 'p50pro',
             'nova10se4g' => 'nova10se',
+            'galaxyj7primeemea' => 'galaxyj7prime',
+            'galaxya60china' => 'galaxya60',
+            'galaxytaba80wifi2019global' => 'galaxytaba80wifi2019',
+            '8pro5geurope' => '8pro',
+            'galaxya03s4gusa' => 'galaxya03s',
+            'q7plus' => 'q7+',
         ],
         'name' => [
             'asusnexus7' => 'nexus7',
