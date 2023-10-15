@@ -1249,8 +1249,8 @@ class Analyze extends Command
     }
 
     /**
-     * @param array $expected
-     * @param array $actual
+     * @param array<string, string|null> $expected
+     * @param array<string, string|null> $actual
      *
      * @throws void
      */
@@ -1265,7 +1265,11 @@ class Analyze extends Command
                 continue;
             }
 
-            if (!array_key_exists($field, $actual) || $value !== $actual[$field]) {
+            if (!array_key_exists($field, $actual)) {
+                continue;
+            }
+
+            if ($value !== null && $value !== $actual[$field]) {
                 continue;
             }
 

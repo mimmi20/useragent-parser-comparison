@@ -25,7 +25,8 @@ $cache   = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
 );
 
 $start = microtime(true);
-$dd = new DeviceDetector('Test String');
+$dd = new DeviceDetector();
+$dd->setUserAgent('Test String');
 $dd->parse();
 $initTime = microtime(true) - $start;
 
@@ -45,9 +46,10 @@ $output = [
 ];
 
 if ($hasUa) {
+    $dd->skipBotDetection();
     $dd->setUserAgent($agentString);
 
-    $start = microtime(true);
+    $start1 = microtime(true);
     $dd->parse();
 
     $clientInfo = $dd->getClient();
@@ -56,10 +58,20 @@ if ($hasUa) {
     $brand      = $dd->getBrandName();
     $device     = $dd->getDeviceName();
     $isMobile   = $dd->isMobile();
-    $isBot      = $dd->isBot();
-    $botInfo    = $dd->getBot();
 
-    $end = microtime(true) - $start;
+    $end1 = microtime(true) - $start1;
+
+    $dd->skipBotDetection(false);
+    $dd->setUserAgent($agentString . ' - ');
+
+    $start2 = microtime(true);
+
+    $dd->parse();
+
+    $isBot   = $dd->isBot();
+    $botInfo = $dd->getBot();
+
+    $end2 = microtime(true) - $start2;
 
     $output['result']['parsed'] = [
         'device' => [
@@ -106,7 +118,7 @@ if ($hasUa) {
         'raw' => null,
     ];
 
-    $output['parse_time'] = $end;
+    $output['parse_time'] = $isBot ? $end2 : $end1;
 }
 
 $output['memory_used'] = memory_get_peak_usage();
