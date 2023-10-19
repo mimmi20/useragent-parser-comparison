@@ -197,12 +197,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/browser-detector.git",
-                "reference": "23183e9521efe20a0505f8fe13398ad6cdd3bee3"
+                "reference": "34ab01d5efb5be3741e6726e348407678b60ab2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/browser-detector/zipball/23183e9521efe20a0505f8fe13398ad6cdd3bee3",
-                "reference": "23183e9521efe20a0505f8fe13398ad6cdd3bee3",
+                "url": "https://api.github.com/repos/mimmi20/browser-detector/zipball/34ab01d5efb5be3741e6726e348407678b60ab2e",
+                "reference": "34ab01d5efb5be3741e6726e348407678b60ab2e",
                 "shasum": ""
             },
             "require": {
@@ -273,7 +273,7 @@
                 "issues": "https://github.com/mimmi20/BrowserDetector/issues",
                 "source": "https://github.com/mimmi20/BrowserDetector"
             },
-            "time": "2023-10-15T09:30:55+00:00"
+            "time": "2023-10-18T19:42:36+00:00"
         },
         {
             "name": "mimmi20/browser-detector-version",
