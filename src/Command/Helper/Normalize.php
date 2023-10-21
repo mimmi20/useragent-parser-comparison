@@ -121,8 +121,12 @@ class Normalize extends Helper
             }
 
             if ($value === $oldValue) {
-                echo sprintf('normalizing circle detected for value "%s"', $value);
+                echo sprintf('normalizing circle detected for value "%s"', $oldValue);
                 exit;
+            }
+
+            if (array_key_exists($value, $v)) {
+                echo sprintf('"%s" was normalized to "%s" which will be normalized again. Please update the normalizing array.' . "\n", $oldValue, $value);
             }
         }
 
