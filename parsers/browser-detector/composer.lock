@@ -4,24 +4,24 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8aae558122439696b304a0dbd7827b92",
+    "content-hash": "7270beeca9a51d0427362218219668d4",
     "packages": [
         {
             "name": "laminas/laminas-diactoros",
-            "version": "3.2.0",
+            "version": "3.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-diactoros.git",
-                "reference": "aca73646e658dce3f079f6b8648c651e193e331e"
+                "reference": "4db52734837c60259c9b2d7caf08eef8f7f9b9ac"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-diactoros/zipball/aca73646e658dce3f079f6b8648c651e193e331e",
-                "reference": "aca73646e658dce3f079f6b8648c651e193e331e",
+                "url": "https://api.github.com/repos/laminas/laminas-diactoros/zipball/4db52734837c60259c9b2d7caf08eef8f7f9b9ac",
+                "reference": "4db52734837c60259c9b2d7caf08eef8f7f9b9ac",
                 "shasum": ""
             },
             "require": {
-                "php": "~8.0.0 || ~8.1.0 || ~8.2.0 || ~8.3.0",
+                "php": "~8.1.0 || ~8.2.0 || ~8.3.0",
                 "psr/http-factory": "^1.0.2",
                 "psr/http-message": "^1.1 || ^2.0"
             },
@@ -39,7 +39,7 @@
                 "php-http/psr7-integration-tests": "^1.3",
                 "phpunit/phpunit": "^9.5.28",
                 "psalm/plugin-phpunit": "^0.18.4",
-                "vimeo/psalm": "^5.9"
+                "vimeo/psalm": "^5.15.0"
             },
             "type": "library",
             "extra": {
@@ -89,7 +89,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2023-09-03T13:11:37+00:00"
+            "time": "2023-10-26T11:01:07+00:00"
         },
         {
             "name": "matthiasmullie/scrapbook",
@@ -197,24 +197,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/browser-detector.git",
-                "reference": "92bab5b36a628fd6f9285654b7f3539cb045a402"
+                "reference": "25431398a93438207f6c205b3860acd626bfa595"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/browser-detector/zipball/92bab5b36a628fd6f9285654b7f3539cb045a402",
-                "reference": "92bab5b36a628fd6f9285654b7f3539cb045a402",
+                "url": "https://api.github.com/repos/mimmi20/browser-detector/zipball/25431398a93438207f6c205b3860acd626bfa595",
+                "reference": "25431398a93438207f6c205b3860acd626bfa595",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "laminas/laminas-diactoros": "^3.2.0",
-                "mimmi20/browser-detector-version": "^9.0.2",
-                "mimmi20/ios-build": "^3.0.3",
-                "mimmi20/macos-build": "^3.0.2",
-                "mimmi20/ua-browser-type": "^9.0.2",
-                "mimmi20/ua-device-type": "^9.0.2",
-                "mimmi20/ua-normalizer": "^6.0.3",
+                "laminas/laminas-diactoros": "^3.3.0",
+                "mimmi20/browser-detector-version": "^9.0.3",
+                "mimmi20/ios-build": "^3.0.4",
+                "mimmi20/macos-build": "^3.0.3",
+                "mimmi20/ua-browser-type": "^9.0.3",
+                "mimmi20/ua-device-type": "^9.0.3",
+                "mimmi20/ua-normalizer": "^6.0.4",
                 "php": "^8.1.0",
                 "psr/http-message": "^2.0",
                 "psr/log": "^3.0.0",
@@ -228,16 +228,16 @@
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "infection/infection": "^0.27.3",
+                "infection/infection": "^0.27.8",
                 "mikey179/vfsstream": "^1.6.11",
-                "mimmi20/coding-standard": "^5.1.20",
+                "mimmi20/coding-standard": "^5.1.25",
                 "nikic/php-parser": "^v4.17.1",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.38",
+                "phpstan/phpstan": "^1.10.44",
                 "phpstan/phpstan-deprecation-rules": "^1.1.4",
-                "phpstan/phpstan-phpunit": "^1.3.14",
-                "phpunit/phpunit": "^10.4.1",
-                "rector/rector": "^0.18.5"
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.10"
             },
             "type": "library",
             "autoload": {
@@ -273,20 +273,20 @@
                 "issues": "https://github.com/mimmi20/BrowserDetector/issues",
                 "source": "https://github.com/mimmi20/BrowserDetector"
             },
-            "time": "2023-10-21T22:24:52+00:00"
+            "time": "2023-11-26T20:05:01+00:00"
         },
         {
             "name": "mimmi20/browser-detector-version",
-            "version": "9.0.2",
+            "version": "9.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/browser-detector-version.git",
-                "reference": "f8970c858cd952c72e93cef1777639901a760aa1"
+                "reference": "063fd3897c332f53223e3893c2280d230da321f9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/browser-detector-version/zipball/f8970c858cd952c72e93cef1777639901a760aa1",
-                "reference": "f8970c858cd952c72e93cef1777639901a760aa1",
+                "url": "https://api.github.com/repos/mimmi20/browser-detector-version/zipball/063fd3897c332f53223e3893c2280d230da321f9",
+                "reference": "063fd3897c332f53223e3893c2280d230da321f9",
                 "shasum": ""
             },
             "require": {
@@ -301,15 +301,15 @@
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "infection/infection": "^0.27.2",
-                "mimmi20/coding-standard": "^5.1.17",
+                "infection/infection": "^0.27.6",
+                "mimmi20/coding-standard": "^5.1.22",
                 "nikic/php-parser": "^4.17.1",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.35",
+                "phpstan/phpstan": "^1.10.39",
                 "phpstan/phpstan-deprecation-rules": "^1.1.4",
-                "phpstan/phpstan-phpunit": "^1.3.14",
-                "phpunit/phpunit": "^10.3.5",
-                "rector/rector": "^0.18.3"
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.6"
             },
             "type": "library",
             "autoload": {
@@ -341,20 +341,20 @@
                 "issues": "https://github.com/mimmi20/browser-detector-version/issues",
                 "source": "https://github.com/mimmi20/browser-detector-version"
             },
-            "time": "2023-09-30T21:15:21+00:00"
+            "time": "2023-11-03T16:15:15+00:00"
         },
         {
             "name": "mimmi20/ios-build",
-            "version": "3.0.3",
+            "version": "3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ios-build.git",
-                "reference": "f2ae00d2d01760bb1b46565536782bdf0d4e25cb"
+                "reference": "5e0fa7e273ae7dac439b106f73db8ad76c082b9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ios-build/zipball/f2ae00d2d01760bb1b46565536782bdf0d4e25cb",
-                "reference": "f2ae00d2d01760bb1b46565536782bdf0d4e25cb",
+                "url": "https://api.github.com/repos/mimmi20/ios-build/zipball/5e0fa7e273ae7dac439b106f73db8ad76c082b9b",
+                "reference": "5e0fa7e273ae7dac439b106f73db8ad76c082b9b",
                 "shasum": ""
             },
             "require": {
@@ -367,16 +367,15 @@
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "infection/infection": "^0.27.0",
-                "mimmi20/coding-standard": "^5.1.10",
+                "infection/infection": "^0.27.7",
+                "mimmi20/coding-standard": "^5.1.23",
                 "nikic/php-parser": "^4.17.1",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.29",
+                "phpstan/phpstan": "^1.10.41",
                 "phpstan/phpstan-deprecation-rules": "^1.1.4",
-                "phpstan/phpstan-phpunit": "^1.3.13",
-                "phpunit/phpunit": "^10.3.1",
-                "rector/rector": "^0.17.13",
-                "vimeo/psalm": "^5.14.1"
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.6"
             },
             "type": "library",
             "autoload": {
@@ -405,20 +404,20 @@
                 "issues": "https://github.com/mimmi20/ios-build/issues",
                 "source": "https://github.com/mimmi20/ios-build"
             },
-            "time": "2023-08-15T07:01:12+00:00"
+            "time": "2023-11-07T07:43:03+00:00"
         },
         {
             "name": "mimmi20/macos-build",
-            "version": "3.0.2",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/macos-build.git",
-                "reference": "096a79dfa1e57d2230a880580c8bcecff57d9e60"
+                "reference": "b52421a58fd4746d9486694c7d203fcf5949c1a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/macos-build/zipball/096a79dfa1e57d2230a880580c8bcecff57d9e60",
-                "reference": "096a79dfa1e57d2230a880580c8bcecff57d9e60",
+                "url": "https://api.github.com/repos/mimmi20/macos-build/zipball/b52421a58fd4746d9486694c7d203fcf5949c1a2",
+                "reference": "b52421a58fd4746d9486694c7d203fcf5949c1a2",
                 "shasum": ""
             },
             "require": {
@@ -431,16 +430,15 @@
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "infection/infection": "^0.27.0",
-                "mimmi20/coding-standard": "^5.1.10",
+                "infection/infection": "^0.27.7",
+                "mimmi20/coding-standard": "^5.1.23",
                 "nikic/php-parser": "^4.17.1",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.29",
+                "phpstan/phpstan": "^1.10.41",
                 "phpstan/phpstan-deprecation-rules": "^1.1.4",
-                "phpstan/phpstan-phpunit": "^1.3.13",
-                "phpunit/phpunit": "^10.3.1",
-                "rector/rector": "^0.17.13",
-                "vimeo/psalm": "^5.14.1"
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.6"
             },
             "type": "library",
             "autoload": {
@@ -469,20 +467,20 @@
                 "issues": "https://github.com/mimmi20/macos-build/issues",
                 "source": "https://github.com/mimmi20/macos-build"
             },
-            "time": "2023-08-15T07:00:51+00:00"
+            "time": "2023-11-07T07:45:40+00:00"
         },
         {
             "name": "mimmi20/ua-browser-type",
-            "version": "9.0.2",
+            "version": "9.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-browser-type.git",
-                "reference": "27ef1b3b180ff9600e57951eb9a767cdeb38d8d5"
+                "reference": "0bdf0aff2d64e01ca46f7f0806536a88465ed2dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-browser-type/zipball/27ef1b3b180ff9600e57951eb9a767cdeb38d8d5",
-                "reference": "27ef1b3b180ff9600e57951eb9a767cdeb38d8d5",
+                "url": "https://api.github.com/repos/mimmi20/ua-browser-type/zipball/0bdf0aff2d64e01ca46f7f0806536a88465ed2dd",
+                "reference": "0bdf0aff2d64e01ca46f7f0806536a88465ed2dd",
                 "shasum": ""
             },
             "require": {
@@ -495,16 +493,15 @@
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "infection/infection": "^0.27.0",
-                "mimmi20/coding-standard": "^5.1.13",
+                "infection/infection": "^0.27.7",
+                "mimmi20/coding-standard": "^5.1.23",
                 "nikic/php-parser": "^4.17.1",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.32",
+                "phpstan/phpstan": "^1.10.41",
                 "phpstan/phpstan-deprecation-rules": "^1.1.4",
-                "phpstan/phpstan-phpunit": "^1.3.14",
-                "phpunit/phpunit": "^10.3.2",
-                "rector/rector": "^0.18.1",
-                "vimeo/psalm": "^5.15.0"
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.6"
             },
             "type": "library",
             "autoload": {
@@ -540,20 +537,20 @@
                 "issues": "https://github.com/mimmi20/ua-browser-type/issues",
                 "source": "https://github.com/mimmi20/ua-browser-type"
             },
-            "time": "2023-09-06T15:25:12+00:00"
+            "time": "2023-11-06T06:46:53+00:00"
         },
         {
             "name": "mimmi20/ua-device-type",
-            "version": "9.0.2",
+            "version": "9.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-device-type.git",
-                "reference": "b7cfbc7bf0c49e703abcf5c121e39577f6f5c07e"
+                "reference": "6962c521ce23b5a9934e6dc40aa973061f060999"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-device-type/zipball/b7cfbc7bf0c49e703abcf5c121e39577f6f5c07e",
-                "reference": "b7cfbc7bf0c49e703abcf5c121e39577f6f5c07e",
+                "url": "https://api.github.com/repos/mimmi20/ua-device-type/zipball/6962c521ce23b5a9934e6dc40aa973061f060999",
+                "reference": "6962c521ce23b5a9934e6dc40aa973061f060999",
                 "shasum": ""
             },
             "require": {
@@ -566,16 +563,15 @@
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "infection/infection": "^0.27.0",
-                "mimmi20/coding-standard": "^5.1.13",
+                "infection/infection": "^0.27.7",
+                "mimmi20/coding-standard": "^5.1.23",
                 "nikic/php-parser": "^4.17.1",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.32",
+                "phpstan/phpstan": "^1.10.41",
                 "phpstan/phpstan-deprecation-rules": "^1.1.4",
-                "phpstan/phpstan-phpunit": "^1.3.14",
-                "phpunit/phpunit": "^10.3.2",
-                "rector/rector": "^0.18.1",
-                "vimeo/psalm": "^5.15.0"
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.6"
             },
             "type": "library",
             "autoload": {
@@ -611,20 +607,20 @@
                 "issues": "https://github.com/mimmi20/ua-device-type/issues",
                 "source": "https://github.com/mimmi20/ua-device-type"
             },
-            "time": "2023-09-06T15:24:16+00:00"
+            "time": "2023-11-06T06:42:47+00:00"
         },
         {
             "name": "mimmi20/ua-normalizer",
-            "version": "6.0.3",
+            "version": "6.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mimmi20/ua-normalizer.git",
-                "reference": "37d459c82ab8cd960028f8923926fc65ae5e5f3d"
+                "reference": "b1b767e1e009d0ebc7c5238115c57139348d0a8a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mimmi20/ua-normalizer/zipball/37d459c82ab8cd960028f8923926fc65ae5e5f3d",
-                "reference": "37d459c82ab8cd960028f8923926fc65ae5e5f3d",
+                "url": "https://api.github.com/repos/mimmi20/ua-normalizer/zipball/b1b767e1e009d0ebc7c5238115c57139348d0a8a",
+                "reference": "b1b767e1e009d0ebc7c5238115c57139348d0a8a",
                 "shasum": ""
             },
             "require": {
@@ -638,15 +634,15 @@
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
                 "ext-xmlwriter": "*",
-                "infection/infection": "^0.27.3",
-                "mimmi20/coding-standard": "^5.1.19",
+                "infection/infection": "^0.27.7",
+                "mimmi20/coding-standard": "^5.1.23",
                 "nikic/php-parser": "^4.17.1",
                 "phpstan/extension-installer": "^1.3.1",
-                "phpstan/phpstan": "^1.10.37",
+                "phpstan/phpstan": "^1.10.41",
                 "phpstan/phpstan-deprecation-rules": "^1.1.4",
-                "phpstan/phpstan-phpunit": "^1.3.14",
-                "phpunit/phpunit": "^10.3.5",
-                "rector/rector": "^0.18.4"
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.6"
             },
             "type": "library",
             "autoload": {
@@ -683,46 +679,45 @@
                 "issues": "https://github.com/mimmi20/ua-normalizer/issues",
                 "source": "https://github.com/mimmi20/ua-normalizer"
             },
-            "time": "2023-10-03T14:17:48+00:00"
+            "time": "2023-11-07T07:48:01+00:00"
         },
         {
             "name": "monolog/monolog",
-            "version": "2.9.1",
+            "version": "3.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "f259e2b15fb95494c83f52d3caad003bbf5ffaa1"
+                "reference": "c915e2634718dbc8a4a15c61b0e62e7a44e14448"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/f259e2b15fb95494c83f52d3caad003bbf5ffaa1",
-                "reference": "f259e2b15fb95494c83f52d3caad003bbf5ffaa1",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c915e2634718dbc8a4a15c61b0e62e7a44e14448",
+                "reference": "c915e2634718dbc8a4a15c61b0e62e7a44e14448",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.2",
-                "psr/log": "^1.0.1 || ^2.0 || ^3.0"
+                "php": ">=8.1",
+                "psr/log": "^2.0 || ^3.0"
             },
             "provide": {
-                "psr/log-implementation": "1.0.0 || 2.0.0 || 3.0.0"
+                "psr/log-implementation": "3.0.0"
             },
             "require-dev": {
-                "aws/aws-sdk-php": "^2.4.9 || ^3.0",
+                "aws/aws-sdk-php": "^3.0",
                 "doctrine/couchdb": "~1.0@dev",
                 "elasticsearch/elasticsearch": "^7 || ^8",
                 "ext-json": "*",
-                "graylog2/gelf-php": "^1.4.2 || ^2@dev",
-                "guzzlehttp/guzzle": "^7.4",
+                "graylog2/gelf-php": "^1.4.2 || ^2.0",
+                "guzzlehttp/guzzle": "^7.4.5",
                 "guzzlehttp/psr7": "^2.2",
                 "mongodb/mongodb": "^1.8",
                 "php-amqplib/php-amqplib": "~2.4 || ^3",
-                "phpspec/prophecy": "^1.15",
-                "phpstan/phpstan": "^0.12.91",
-                "phpunit/phpunit": "^8.5.14",
-                "predis/predis": "^1.1 || ^2.0",
-                "rollbar/rollbar": "^1.3 || ^2 || ^3",
+                "phpstan/phpstan": "^1.9",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-strict-rules": "^1.4",
+                "phpunit/phpunit": "^10.1",
+                "predis/predis": "^1.1 || ^2",
                 "ruflin/elastica": "^7",
-                "swiftmailer/swiftmailer": "^5.3|^6.0",
                 "symfony/mailer": "^5.4 || ^6",
                 "symfony/mime": "^5.4 || ^6"
             },
@@ -745,7 +740,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-main": "2.x-dev"
+                    "dev-main": "3.x-dev"
                 }
             },
             "autoload": {
@@ -773,7 +768,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-                "source": "https://github.com/Seldaek/monolog/tree/2.9.1"
+                "source": "https://github.com/Seldaek/monolog/tree/3.5.0"
             },
             "funding": [
                 {
@@ -785,7 +780,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-06T13:44:46+00:00"
+            "time": "2023-10-27T15:32:31+00:00"
         },
         {
             "name": "psr/cache",

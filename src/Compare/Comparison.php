@@ -146,16 +146,19 @@ class Comparison
                 /** @var \UserAgentParserComparison\Compare\ValuePairs $pair */
                 $expectedValue = $pair->getExpected();
                 $actualValue   = $pair->getActual();
+                $diff          = true;
+                $unset         = false;
 
                 if ($expectedValue === $actualValue) {
-                    continue;
+                    $diff = false;
                 }
 
                 if ($expectedValue === null) {
-                    continue;
+                    $diff  = false;
+                    $unset = true;
                 }
 
-                $failures[$compareKey][$compareSubKey] = ['expected' => $expectedValue, 'actual' => $actualValue];
+                $failures[$compareKey][$compareSubKey] = ['expected' => $expectedValue, 'actual' => $actualValue, 'diff' => $diff, 'unset' => $unset];
             }
         }
 

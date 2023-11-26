@@ -374,6 +374,31 @@ class Analyze extends Command
                             continue;
                         }
 
+                        $failuresWithDiff = array_filter(
+                            $failures,
+                            function(array $var): bool {
+                                $diff = false;
+
+                                foreach ($var as $value) {
+                                    if ($diff) {
+                                        return true;
+                                    }
+
+                                    if (!array_key_exists('diff', $value)) {
+                                        return true;
+                                    }
+
+                                    $diff = $value['diff'];
+                                }
+
+                                return $diff;
+                            },
+                        );
+
+                        if (empty($failuresWithDiff)) {
+                            continue;
+                        }
+
                         $this->failures[$testSuite][$parserName][$singleTestName] = [
                             'headers' => $data['headers'],
                             'fail' => $failures,
@@ -438,6 +463,31 @@ class Analyze extends Command
                         $failures                     = $comparison->getFailures();
 
                         if (empty($failures)) {
+                            continue;
+                        }
+
+                        $failuresWithDiff = array_filter(
+                            $failures,
+                            function(array $var): bool {
+                                $diff = false;
+
+                                foreach ($var as $value) {
+                                    if ($diff) {
+                                        return true;
+                                    }
+
+                                    if (!array_key_exists('diff', $value)) {
+                                        return true;
+                                    }
+
+                                    $diff = $value['diff'];
+                                }
+
+                                return $diff;
+                            },
+                        );
+
+                        if (empty($failuresWithDiff)) {
                             continue;
                         }
 
@@ -566,12 +616,8 @@ class Analyze extends Command
                 }
 
                 if (0 === $total['score']['pass'] + $total['score']['fail']) {
-                    $summaryTContent = '<fg=white;bg=blue>-</>';
                     $summaryAContent = '<fg=white;bg=blue>-</>';
                 } else {
-                    $summaryTPercentage = ($total['score']['pass'] + $total['score']['fail']) / $total['score']['count'] * 100;
-                    $summaryTContent    = $this->colorByPercent($summaryTPercentage) . ($total['score']['pass'] + $total['score']['fail']) . '/' . $total['score']['count'] . ' ' . number_format($summaryTPercentage, 2) . '%</>';
-
                     $summaryAPercentage = $total['score']['pass'] / ($total['score']['pass'] + $total['score']['fail']) * 100;
                     $summaryAContent    = $this->colorByPercent($summaryAPercentage) . $total['score']['pass'] . '/' . ($total['score']['pass'] + $total['score']['fail']) . ' ' . number_format($summaryAPercentage, 2) . '%</>';
                 }
@@ -873,28 +919,28 @@ class Analyze extends Command
         $table = new Table($this->output);
         $table->setColumnWidth(0, 16);
         $table->setColumnMaxWidth(0, 16);
-        $table->setColumnWidth(1, 18);
-        $table->setColumnMaxWidth(1, 18);
-        $table->setColumnWidth(2, 18);
-        $table->setColumnMaxWidth(2, 18);
+        $table->setColumnWidth(1, 19);
+        $table->setColumnMaxWidth(1, 19);
+        $table->setColumnWidth(2, 19);
+        $table->setColumnMaxWidth(2, 19);
         $table->setColumnWidth(3, 16);
         $table->setColumnMaxWidth(3, 16);
-        $table->setColumnWidth(4, 18);
-        $table->setColumnMaxWidth(4, 18);
-        $table->setColumnWidth(5, 18);
-        $table->setColumnMaxWidth(5, 18);
+        $table->setColumnWidth(4, 19);
+        $table->setColumnMaxWidth(4, 19);
+        $table->setColumnWidth(5, 19);
+        $table->setColumnMaxWidth(5, 19);
         $table->setColumnWidth(6, 16);
         $table->setColumnMaxWidth(6, 16);
-        $table->setColumnWidth(7, 18);
-        $table->setColumnMaxWidth(7, 18);
-        $table->setColumnWidth(8, 18);
-        $table->setColumnMaxWidth(8, 18);
+        $table->setColumnWidth(7, 19);
+        $table->setColumnMaxWidth(7, 19);
+        $table->setColumnWidth(8, 19);
+        $table->setColumnMaxWidth(8, 19);
         $table->setColumnWidth(9, 16);
         $table->setColumnMaxWidth(9, 16);
-        $table->setColumnWidth(10, 21);
-        $table->setColumnMaxWidth(10, 21);
-        $table->setColumnWidth(11, 21);
-        $table->setColumnMaxWidth(11, 21);
+        $table->setColumnWidth(10, 22);
+        $table->setColumnMaxWidth(10, 22);
+        $table->setColumnWidth(11, 22);
+        $table->setColumnMaxWidth(11, 22);
         $table->setStyle('box');
 
         $htmlG = '<html><body><table style="border-collapse: collapse; border: 1px solid black;"><thead><tr><th colspan="12">UserAgent</th></tr><tr><th colspan="3">Client</th><th colspan="3">Engine</th><th colspan="3">Platform</th><th colspan="3">Device</th></tr></thead><tbody>';
@@ -929,8 +975,8 @@ class Analyze extends Command
 
             foreach ($failData['headers'] as $header => $value) {
                 $rows[] = [
-                    new TableCell($header),
-                    new TableCell($value, ['colspan' => 11]),
+                    new TableCell(sprintf('<fg=blue;bg=white>%s</> ', $header)),
+                    new TableCell(sprintf('<fg=blue;bg=white>%s</> ', $value), ['colspan' => 11]),
                 ];
 
                 $htmlG .= '<tr><td>' . $header . '</td><td colspan="11">' . $value . '</td></tr>';
@@ -953,6 +999,8 @@ class Analyze extends Command
 
                 $htmlD .= '<tr><td>' . $header . '</td><td colspan="2">' . $value . '</td></tr>';
             }
+
+            $rows[] = new TableSeparator();
 
             $countDiffRows = 0;
 
@@ -986,10 +1034,15 @@ class Analyze extends Command
                     $field = $clientDiffs[$diffRow];
                     $data  = $failData['fail']['client'][$field];
 
+                    $expectedBgColor = 'green';
+                    $actualBgColor   = 'red';
+
                     $expected = $data['expected'] ?? null;
 
                     if (null === $expected) {
-                        $expected = '(null)';
+                        $expected        = '(null)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
                         $expected = '(empty)';
                     }
@@ -1003,13 +1056,21 @@ class Analyze extends Command
                     }
 
                     $columns[] = new TableCell($field);
-                    $columns[] = new TableCell('<fg=white;bg=green>' . $expected . '</> ');
-                    $columns[] = new TableCell('<fg=white;bg=red>' . $actual . '</> ');
+
+                    if ($actual === $expected) {
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
+                    }
+
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $expectedBgColor, $expected));
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual));
 
                     $htmlC .= '<tr>' . $this->outputDiffHtml2($field, $data) . '</tr>';
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
-                    $columns[] = new TableCell('', ['colspan' => 3]);
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
 
                     $htmlG .= '<td colspan="3"></td>';
                 }
@@ -1018,10 +1079,15 @@ class Analyze extends Command
                     $field = $engineDiffs[$diffRow];
                     $data  = $failData['fail']['engine'][$field];
 
+                    $expectedBgColor = 'green';
+                    $actualBgColor   = 'red';
+
                     $expected = $data['expected'] ?? null;
 
                     if (null === $expected) {
-                        $expected = '(null)';
+                        $expected        = '(null)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
                         $expected = '(empty)';
                     }
@@ -1035,13 +1101,21 @@ class Analyze extends Command
                     }
 
                     $columns[] = new TableCell($field);
-                    $columns[] = new TableCell('<fg=white;bg=green>' . $expected . '</> ');
-                    $columns[] = new TableCell('<fg=white;bg=red>' . $actual . '</> ');
+
+                    if ($actual === $expected) {
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
+                    }
+
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $expectedBgColor, $expected));
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual));
 
                     $htmlE .= '<tr>' . $this->outputDiffHtml2($field, $data) . '</tr>';
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
-                    $columns[] = new TableCell('', ['colspan' => 3]);
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
 
                     $htmlG .= '<td colspan="3"></td>';
                 }
@@ -1050,10 +1124,15 @@ class Analyze extends Command
                     $field = $platformDiffs[$diffRow];
                     $data  = $failData['fail']['platform'][$field];
 
+                    $expectedBgColor = 'green';
+                    $actualBgColor   = 'red';
+
                     $expected = $data['expected'] ?? null;
 
                     if (null === $expected) {
-                        $expected = '(null)';
+                        $expected        = '(null)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
                         $expected = '(empty)';
                     }
@@ -1067,13 +1146,21 @@ class Analyze extends Command
                     }
 
                     $columns[] = new TableCell($field);
-                    $columns[] = new TableCell('<fg=white;bg=green>' . $expected . '</> ');
-                    $columns[] = new TableCell('<fg=white;bg=red>' . $actual . '</> ');
+
+                    if ($actual === $expected) {
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
+                    }
+
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $expectedBgColor, $expected));
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual));
 
                     $htmlP .= '<tr>' . $this->outputDiffHtml2($field, $data) . '</tr>';
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
-                    $columns[] = new TableCell('', ['colspan' => 3]);
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
 
                     $htmlG .= '<td colspan="3"></td>';
                 }
@@ -1082,10 +1169,15 @@ class Analyze extends Command
                     $field = $deviceDiffs[$diffRow];
                     $data  = $failData['fail']['device'][$field];
 
+                    $expectedBgColor = 'green';
+                    $actualBgColor   = 'red';
+
                     $expected = $data['expected'] ?? null;
 
                     if (null === $expected) {
-                        $expected = '(null)';
+                        $expected        = '(null)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
                         $expected = '(empty)';
                     }
@@ -1099,13 +1191,21 @@ class Analyze extends Command
                     }
 
                     $columns[] = new TableCell($field);
-                    $columns[] = new TableCell('<fg=white;bg=green>' . $expected . '</> ');
-                    $columns[] = new TableCell('<fg=white;bg=red>' . $actual . '</> ');
+
+                    if ($actual === $expected) {
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
+                    }
+
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $expectedBgColor, $expected));
+                    $columns[] = new TableCell(sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual));
 
                     $htmlD .= '<tr>' . $this->outputDiffHtml2($field, $data) . '</tr>';
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
-                    $columns[] = new TableCell('', ['colspan' => 3]);
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
+                    $columns[] = new TableCell('');
 
                     $htmlG .= '<td colspan="3"></td>';
                 }
