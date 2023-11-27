@@ -26,7 +26,7 @@ $cache   = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
         new \League\Flysystem\Filesystem($browscapAdapter)
     )
 );
-$logger    = new \Psr\Log\NullLogger('null');
+$logger    = new \Psr\Log\NullLogger();
 $bc        = new \BrowscapPHP\Browscap($cache, $logger);
 $start = microtime(true);
 $bc->getBrowser('Test String');
@@ -74,7 +74,7 @@ if ($hasUa) {
         ],
         'client' => [
             'name'    => $r->browser,
-            'version' => $r->version,
+            'version' => (new \BrowserDetector\Version\VersionBuilder($logger))->set($r->version ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => $r->browser_maker,
             'type'    => $r->browser_type ?? null,
             'isbot'   => property_exists($r, 'crawler') ? $r->crawler : null,
@@ -82,12 +82,12 @@ if ($hasUa) {
         'platform' => [
             'name'    => $r->platform,
             'marketingName' => null,
-            'version' => $r->platform_version,
+            'version' => (new \BrowserDetector\Version\VersionBuilder($logger))->set($r->platform_version ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => $r->platform_maker,
         ],
         'engine' => [
             'name'    => $r->renderingengine_name,
-            'version' => $r->renderingengine_version,
+            'version' => (new \BrowserDetector\Version\VersionBuilder($logger))->set($r->renderingengine_version ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => $r->renderingengine_maker,
         ],
         'raw' => $r,

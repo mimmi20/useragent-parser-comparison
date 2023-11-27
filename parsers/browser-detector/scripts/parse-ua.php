@@ -70,7 +70,7 @@ if ($hasUa) {
         ],
         'client' => [
             'name' => $r['client']['name'],
-            'version' => $r['client']['version'],
+            'version' => (new \BrowserDetector\Version\VersionBuilder($logger))->set($r['client']['version'] ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => $r['client']['manufacturer'],
             'type' => $r['client']['type'],
             'isbot' => $r['client']['isbot'],
@@ -78,12 +78,12 @@ if ($hasUa) {
         'platform' => [
             'name' => $r['os']['name'],
             'marketingName' => $r['os']['marketingName'],
-            'version' => $r['os']['version'],
+            'version' => (new \BrowserDetector\Version\VersionBuilder($logger))->set($r['os']['version'] ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => $r['os']['manufacturer'],
         ],
         'engine' => [
             'name' => $r['engine']['name'],
-            'version' => $r['engine']['version'],
+            'version' => (new \BrowserDetector\Version\VersionBuilder($logger))->set($r['engine']['version'] ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => $r['engine']['manufacturer'],
         ],
         'raw' => $r,

@@ -18,17 +18,18 @@ $result    = null;
 $parseTime = 0;
 
 require_once __DIR__ . '/../vendor/autoload.php';
-use DeviceDetector\DeviceDetector;
 
 $cache   = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
     new \MatthiasMullie\Scrapbook\Adapters\MemoryStore()
 );
 
 $start = microtime(true);
-$dd = new DeviceDetector();
+$dd = new \DeviceDetector\DeviceDetector();
 $dd->setUserAgent('Test String');
 $dd->parse();
 $initTime = microtime(true) - $start;
+
+$logger = new \Psr\Log\NullLogger();
 
 $output = [
     'hasUa' => $hasUa,
@@ -93,7 +94,7 @@ if ($hasUa) {
         ],
         'client' => [
             'name' => $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
-            'version' => $isBot ? null : ($clientInfo['version'] ?? null),
+            'version' => $isBot ? null : (new \BrowserDetector\Version\VersionBuilder($logger))->set($clientInfo['version'] ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => null,
             'type' => $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
             'isbot' => $isBot,
@@ -101,12 +102,12 @@ if ($hasUa) {
         'platform' => [
             'name' => $osInfo['name'] ?? null,
             'marketingName' => $osInfo['name'] ?? null,
-            'version' => $osInfo['version'] ?? null,
+            'version' => (new \BrowserDetector\Version\VersionBuilder($logger))->set($osInfo['version'] ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => null,
         ],
         'engine' => [
             'name' => $isBot ? null : ($clientInfo['engine'] ?? null),
-            'version' => $isBot ? null : ($clientInfo['engine_version'] ?? null),
+            'version' => $isBot ? null : (new \BrowserDetector\Version\VersionBuilder($logger))->set($clientInfo['engine_version'] ?? '')->getVersion(\BrowserDetector\Version\VersionInterface::IGNORE_MICRO),
             'manufacturer' => null,
         ],
         'raw' => null,

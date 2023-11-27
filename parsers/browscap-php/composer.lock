@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7c5cd419d61ddd6847f5c893d4c8244",
+    "content-hash": "66fa8ff4694d1350daa1a7f6c31b5da8",
     "packages": [
         {
             "name": "browscap/browscap-php",
@@ -717,6 +717,74 @@
                 }
             ],
             "time": "2023-01-26T11:04:25+00:00"
+        },
+        {
+            "name": "mimmi20/browser-detector-version",
+            "version": "9.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mimmi20/browser-detector-version.git",
+                "reference": "063fd3897c332f53223e3893c2280d230da321f9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mimmi20/browser-detector-version/zipball/063fd3897c332f53223e3893c2280d230da321f9",
+                "reference": "063fd3897c332f53223e3893c2280d230da321f9",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "php": "^8.1.0",
+                "psr/log": "^3.0.0"
+            },
+            "require-dev": {
+                "ext-ctype": "*",
+                "ext-dom": "*",
+                "ext-simplexml": "*",
+                "ext-tokenizer": "*",
+                "ext-xml": "*",
+                "ext-xmlwriter": "*",
+                "infection/infection": "^0.27.6",
+                "mimmi20/coding-standard": "^5.1.22",
+                "nikic/php-parser": "^4.17.1",
+                "phpstan/extension-installer": "^1.3.1",
+                "phpstan/phpstan": "^1.10.39",
+                "phpstan/phpstan-deprecation-rules": "^1.1.4",
+                "phpstan/phpstan-phpunit": "^1.3.15",
+                "phpunit/phpunit": "^10.4.2",
+                "rector/rector": "^0.18.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BrowserDetector\\Version\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Thomas Müller",
+                    "homepage": "https://github.com/mimmi20",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/mimmi20/browser-detector-version/graphs/contributors"
+                }
+            ],
+            "description": "Version Class for the Browser Detector",
+            "homepage": "https://github.com/mimmi20/browser-detector-version",
+            "keywords": [
+                "version"
+            ],
+            "support": {
+                "issues": "https://github.com/mimmi20/browser-detector-version/issues",
+                "source": "https://github.com/mimmi20/browser-detector-version"
+            },
+            "time": "2023-11-03T16:15:15+00:00"
         },
         {
             "name": "monolog/monolog",

@@ -1044,7 +1044,9 @@ class Analyze extends Command
                         $expectedBgColor = 'black';
                         $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
-                        $expected = '(empty)';
+                        $expected        = '(empty)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     }
 
                     $actual = $data['actual'] ?? null;
@@ -1089,7 +1091,9 @@ class Analyze extends Command
                         $expectedBgColor = 'black';
                         $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
-                        $expected = '(empty)';
+                        $expected        = '(empty)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     }
 
                     $actual = $data['actual'] ?? null;
@@ -1134,7 +1138,9 @@ class Analyze extends Command
                         $expectedBgColor = 'black';
                         $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
-                        $expected = '(empty)';
+                        $expected        = '(empty)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     }
 
                     $actual = $data['actual'] ?? null;
@@ -1179,7 +1185,9 @@ class Analyze extends Command
                         $expectedBgColor = 'black';
                         $actualBgColor   = 'black';
                     } elseif ('' === $expected) {
-                        $expected = '(empty)';
+                        $expected        = '(empty)';
+                        $expectedBgColor = 'black';
+                        $actualBgColor   = 'black';
                     }
 
                     $actual = $data['actual'] ?? null;
@@ -1399,9 +1407,11 @@ class Analyze extends Command
         if (null === $expected) {
             $expected      = '(null)';
             $colorExpected = 'gray';
+            $colorActual   = 'gray';
         } elseif ('' === $expected) {
             $expected      = '(empty)';
             $colorExpected = 'gray';
+            $colorActual   = 'gray';
         }
 
         $actual = $data['actual'];
