@@ -383,9 +383,9 @@ final class Tests extends Helper
                         || !is_array($tests['tests'])
                         || $tests['tests'] === []
                     ) {
-                        $output->writeln(
-                            "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>',
-                        );
+//                        $output->writeln(
+//                            "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>',
+//                        );
 
                         return null;
                     }
