@@ -438,7 +438,8 @@ final class Analyze extends Command
 
                     $singleTestName = $resultFile->getBasename('.' . $resultFile->getExtension());
 
-                    $expected   = $expectedResults['tests'][$singleTestName] ?? [];
+                    $expected = $expectedResults['tests'][$singleTestName] ?? [];
+
                     $comparison = new Comparison($expected, $data['parsed'] ?? []);
                     $comparison->setTestname($singleTestName);
                     $comparison->setTest($data);

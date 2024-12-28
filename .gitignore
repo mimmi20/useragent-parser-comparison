@@ -7,7 +7,7 @@ vendor/
 /data/test-runs/*
 !/data/test-runs/.gitkeep
 .php_cs.cache
-/node_modules
+node_modules/
 config.php
 .php-cs-fixer.cache
 .phplint-cache
@@ -17,3 +17,8 @@ rewrite*.php
 .reports/
 .phpcs.cache
 data/*.txt
+npm-shrinkwrap.json
+/parsers/browscap-php/data
+parsers/php-get-browser/data/browscap.ini
+parsers/php-get-browser/data/version.txt
+parsers/ua-parser-php/version.txt

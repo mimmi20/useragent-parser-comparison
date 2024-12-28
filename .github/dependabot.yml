@@ -212,24 +212,6 @@ updates:
       prefix: "composer"
 
   - package-ecosystem: "composer"
-    directory: "tests/sinergi/"
-    schedule:
-      interval: "daily"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
-    assignees:
-      - "mimmi20"
-    labels:
-      - "dependencies"
-    versioning-strategy: "increase"
-    commit-message:
-      include: "scope"
-      prefix: "composer"
-
-  - package-ecosystem: "composer"
     directory: "tests/ua-parser-js/"
     schedule:
       interval: "daily"
@@ -285,24 +267,6 @@ updates:
 
   - package-ecosystem: "composer"
     directory: "tests/woothee-php/"
-    schedule:
-      interval: "daily"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
-    assignees:
-      - "mimmi20"
-    labels:
-      - "dependencies"
-    versioning-strategy: "increase"
-    commit-message:
-      include: "scope"
-      prefix: "composer"
-
-  - package-ecosystem: "composer"
-    directory: "tests/zsxsoft/"
     schedule:
       interval: "daily"
       time: "04:00"
@@ -752,24 +716,6 @@ updates:
       include: "scope"
       prefix: "npm"
 
-  - package-ecosystem: "composer"
-    directory: "parsers/sinergi/"
-    schedule:
-      interval: "daily"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
-    assignees:
-      - "mimmi20"
-    labels:
-      - "dependencies"
-    versioning-strategy: "increase"
-    commit-message:
-      include: "scope"
-      prefix: "composer"
-
   - package-ecosystem: "npm"
     directory: "parsers/ua-parser-js/"
     schedule:
@@ -914,24 +860,6 @@ updates:
       include: "scope"
       prefix: "composer"
 
-  - package-ecosystem: "composer"
-    directory: "parsers/zsxsoft/"
-    schedule:
-      interval: "daily"
-      time: "04:00"
-      timezone: "Europe/Berlin"
-    open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
-    assignees:
-      - "mimmi20"
-    labels:
-      - "dependencies"
-    versioning-strategy: "increase"
-    commit-message:
-      include: "scope"
-      prefix: "composer"
-
   # actions
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -948,3 +876,5 @@ updates:
       - "dependencies"
     commit-message:
       prefix: "github-actions"
+    ignore:
+      - dependency-name: "mimmi20/ci"
