@@ -2,7 +2,7 @@
   "require": {
     "php": "^8.1.0",
     "composer-runtime-api": "^2.0",
-    "matomo/device-detector": "^6.0.6",
+    "matomo/device-detector": "^6.4.2",
     "mustangostang/spyc": "^0.6.3",
     "mimmi20/browscap-helper-source": "^3.0.18"
   },
