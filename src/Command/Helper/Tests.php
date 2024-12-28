@@ -508,11 +508,7 @@ final class Tests extends Helper
             JSON_THROW_ON_ERROR,
         );
 
-        if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
-            return $installed['packages']['node_modules/' . $packageName]['version'];
-        }
-
-        return $installed['dependencies'][$packageName]['version'] ?? null;
+        return $installed['packages']['node_modules/' . $packageName]['version'] ?? $installed['dependencies'][$packageName]['version'] ?? null;
     }
 
     /**
