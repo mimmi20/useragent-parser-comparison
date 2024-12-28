@@ -100,39 +100,6 @@ The parsers can be any useragent parser from any language (web API based parsers
 }
 ```
 
-Currently this is the list of parsers included:
-
-### Javascript
-
-* 3rd-Eden Useragent 2.x (https://github.com/3rd-Eden/useragent)
-* Browscap JS 1.x (https://github.com/mimmi20/browscap-js/tree/v1)
-* Browscap JS 2.x (https://github.com/mimmi20/browscap-js)
-* Device Detector for Nodejs 0.x (https://github.com/MiGatoSeneca/device-detector-node)
-* UAParser.js (https://github.com/faisalman/ua-parser-js)
-* WhichBrowser JS 0.x (https://github.com/WhichBrowser/Parser-JavaScript)
-* Woothee JS 1.x (https://github.com/woothee/woothee-js)
-
-### PHP
-
-* Browscap PHP 2.x (https://github.com/browscap/browscap-php/tree/2.x)
-* Browscap PHP 3.x (Full, Standard and Lite) (https://github.com/browscap/browscap-php/tree/3.1.0)
-* Browscap PHP 4.x (Full) (https://github.com/browscap/browscap-php)
-* Crossjoin Browscap 1.x (https://github.com/crossjoin/Browscap/tree/1.x)
-* Crossjoin Browscap 2.x (https://github.com/crossjoin/Browscap/tree/2.x)
-* Crossjoin Browscap 3.x (PHP7 only) (https://github.com/crossjoin/Browscap/tree/3.x)
-* BrowserDetector 5.x (https://github.com/mimmi20/BrowserDetector)
-* Donatj UserAgent Parser 0.x (https://github.com/donatj/PhpUserAgent)
-* Endorphin Browser Detector 3.x (https://github.com/endorphin-studio/browser-detector)
-* Jenssegers Agent 2.x (https://github.com/jenssegers/agent)
-* PHP's Native `get_browser` (https://secure.php.net/get_browser) - It is **strongly** recommended that this parser isn't used for large useragent lists unless you're on PHP **7.0.15/7.1.1 or later**. It is **much** too slow otherwise.
-* Piwik Device Detector 3.x (https://github.com/piwik/device-detector)
-* Sinergi Browser Detector 6.x (https://github.com/sinergi/php-browser-detector)
-* UA Parser PHP 3.x (https://github.com/ua-parser/uap-php)
-* WhichBrowser 2.x (https://github.com/WhichBrowser/Parser)
-* Wolfcast BrowserDetection 2.x (https://github.com/Wolfcast/BrowserDetection)
-* Woothee PHP 1.x (https://github.com/woothee/woothee-php)
-* ZSXSoft PHP-UserAgent 1.x (https://github.com/zsxsoft/php-useragent)
-
 ## The Test Suites
 
 Like the parsers, there is no language requirement for a test suite to be included here.  The only requirement is that an executable script named `build` can be called and returns JSON in the following format:
@@ -159,16 +126,3 @@ Like the parsers, there is no language requirement for a test suite to be includ
 ```
 
 Due to the nature of this format, it is a requirement that any given unique useragent has only one set of parsed fields. If a test suite contains different sets of values for a single useragent (across different files, or because other headers are expected to be present), then these either need to be excluded or merged together.
-
-These are the test suites that are currently included:
-
-* Browscap (https://github.com/browscap/browscap)
-* Donatj (https://github.com/donatj/PhpUserAgent)
-* Endorphin (https://github.com/endorphin-studio/browser-detector)
-* Piwik Device Detector (https://github.com/piwik/device-detector)
-* Sinergi (https://github.com/sinergi/php-browser-detector)
-* UA Parser (https://github.com/ua-parser/uap-core)
-* UAParser.js (https://github.com/faisalman/ua-parser-js)
-* WhichBrowser (https://github.com/WhichBrowser/Parser)
-* Woothee (https://github.com/woothee/woothee)
-* ZSXSoft (https://github.com/zsxsoft/php-useragent)
