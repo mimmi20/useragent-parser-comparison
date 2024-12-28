@@ -36,6 +36,7 @@ final class Result extends Helper
     }
 
     /** @throws void */
+    #[\Override]
     public function getName(): string
     {
         return 'result';

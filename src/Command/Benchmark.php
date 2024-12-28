@@ -33,6 +33,7 @@ use function round;
 final class Benchmark extends Command
 {
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('benchmark')
@@ -51,6 +52,7 @@ final class Benchmark extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file       = $input->getArgument('file');

@@ -28,6 +28,7 @@ use const PHP_VERSION;
 final class OverviewGeneral extends AbstractHtml
 {
     /** @throws void */
+    #[\Override]
     public function getHtml(string $version = '', string | null $run = null): string
     {
         $body = '

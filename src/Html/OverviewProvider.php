@@ -32,6 +32,7 @@ final class OverviewProvider extends AbstractHtml
     }
 
     /** @throws void */
+    #[\Override]
     public function getHtml(string | null $run = null): string
     {
         $body = '

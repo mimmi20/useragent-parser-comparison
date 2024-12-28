@@ -32,6 +32,7 @@ final class SimpleList extends AbstractHtml
     }
 
     /** @throws void */
+    #[\Override]
     public function getHtml(): string
     {
         $body = '
@@ -109,8 +110,6 @@ var hackerList = new List(\'simple-list\', options);
             $html .= '</li>';
         }
 
-        $html .= '</ul>';
-
-        return $html;
+        return $html . '</ul>';
     }
 }

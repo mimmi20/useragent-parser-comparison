@@ -16,6 +16,7 @@ namespace UserAgentParserComparison\Html;
 final class Index extends AbstractHtml
 {
     /** @throws void */
+    #[\Override]
     public function getHtml(): string
     {
         $body = '

@@ -50,6 +50,7 @@ final class Parsers extends Helper
     private string $parsersDir = __DIR__ . '/../../../parsers';
 
     /** @throws void */
+    #[\Override]
     public function getName(): string
     {
         return 'parsers';
@@ -335,11 +336,7 @@ final class Parsers extends Helper
             return $installed['packages']['node_modules/' . $packageName]['version'];
         }
 
-        if (isset($installed['dependencies'][$packageName]['version'])) {
-            return $installed['dependencies'][$packageName]['version'];
-        }
-
-        return null;
+        return $installed['dependencies'][$packageName]['version'] ?? null;
     }
 
     /**

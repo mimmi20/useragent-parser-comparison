@@ -29,7 +29,7 @@ use function str_replace;
 
 final class Normalize extends Helper
 {
-    private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
+    private const string MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
     /** @var array<array<string>> */
     private array $mappings = [];
@@ -45,6 +45,7 @@ final class Normalize extends Helper
     }
 
     /** @throws void */
+    #[\Override]
     public function getName(): string
     {
         return 'normalize';

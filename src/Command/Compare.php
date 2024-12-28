@@ -26,6 +26,7 @@ use function date;
 final class Compare extends Command
 {
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('compare')
@@ -53,6 +54,7 @@ final class Compare extends Command
     }
 
     /** @throws Exception */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file = $input->getArgument('file');

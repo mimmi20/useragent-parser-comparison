@@ -25,6 +25,7 @@ final class NormalizedResult extends Helper
     }
 
     /** @throws void */
+    #[\Override]
     public function getName(): string
     {
         return 'normalized-result';

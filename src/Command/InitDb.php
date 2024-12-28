@@ -27,6 +27,7 @@ final class InitDb extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('init-db');
@@ -37,6 +38,7 @@ final class InitDb extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('~~~ initialize database ~~~');

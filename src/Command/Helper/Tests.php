@@ -65,6 +65,7 @@ final class Tests extends Helper
     private string $testDir       = __DIR__ . '/../../../tests';
 
     /** @throws void */
+    #[\Override]
     public function getName(): string
     {
         return 'tests';
@@ -325,20 +326,11 @@ final class Tests extends Helper
 
             switch ($language) {
                 case 'PHP':
-                    switch ($testName) {
-                        case 'browser-detector':
-                            $command = 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php';
-
-                            break;
-                        case 'crawler-detect':
-                            $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
-
-                            break;
-                        default:
-                            $command = 'php ' . $pathName . '/scripts/build.php';
-
-                            break;
-                    }
+                    $command = match ($testName) {
+                        'browser-detector' => 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php',
+                        'crawler-detect' => 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php',
+                        default => 'php ' . $pathName . '/scripts/build.php',
+                    };
 
                     break;
                 case 'JavaScript':
@@ -519,11 +511,7 @@ final class Tests extends Helper
             return $installed['packages']['node_modules/' . $packageName]['version'];
         }
 
-        if (isset($installed['dependencies'][$packageName]['version'])) {
-            return $installed['dependencies'][$packageName]['version'];
-        }
-
-        return null;
+        return $installed['dependencies'][$packageName]['version'] ?? null;
     }
 
     /**
