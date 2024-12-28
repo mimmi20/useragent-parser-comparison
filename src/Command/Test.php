@@ -1,6 +1,8 @@
 <?php
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -25,10 +27,10 @@ use function count;
 use function date;
 use function is_string;
 use function max;
+use function mb_str_pad;
 use function mb_strlen;
 use function mb_substr;
 use function sprintf;
-use function str_pad;
 use function strip_tags;
 
 use const PHP_EOL;
@@ -202,7 +204,7 @@ final class Test extends Command
                         $agentToShow = mb_substr($agentToShow, 0, 96 - $nameLength) . ' ...';
                     }
 
-                    $actualTestToShow = str_pad(
+                    $actualTestToShow = mb_str_pad(
                         (string) $actualTest,
                         mb_strlen((string) $testCount),
                         ' ',
@@ -229,7 +231,7 @@ final class Test extends Command
                             $textLength = mb_strlen($testMessage);
                         }
 
-                        $output->write("\r" . str_pad($testMessage, $textLength));
+                        $output->write("\r" . mb_str_pad($testMessage, $textLength));
 
                         $singleResult = $parserConfig['parse-ua']($row['uaString']);
 
@@ -240,7 +242,7 @@ final class Test extends Command
                                 $textLength = mb_strlen($testMessage);
                             }
 
-                            $output->writeln("\r" . str_pad($testMessage, $textLength));
+                            $output->writeln("\r" . mb_str_pad($testMessage, $textLength));
 
                             continue;
                         }
@@ -287,7 +289,7 @@ final class Test extends Command
                         $textLength = mb_strlen($testMessage);
                     }
 
-                    $output->writeln("\r" . str_pad($testMessage, $textLength));
+                    $output->writeln("\r" . mb_str_pad($testMessage, $textLength));
                 }
 
                 $this->pdo->commit();

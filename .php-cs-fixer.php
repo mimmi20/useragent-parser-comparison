@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This file is part of the ua-normalizer package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
  *
  * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
@@ -14,7 +13,7 @@ declare(strict_types = 1);
 $year = date('Y');
 
 $header = <<<EOF
-    This file is part of the ua-normalizer package.
+    This file is part of the mimmi20/useragent-parser-comparison package.
 
     Copyright (c) 2015-{$year}, Thomas Mueller <mimmi20@live.de>
 
@@ -26,7 +25,6 @@ $finder = PhpCsFixer\Finder::create()
     ->files()
     ->name('*.php')
     ->in(__DIR__ . '/src')
-    ->in(__DIR__ . '/tests')
     ->append([__DIR__ . '/rector.php'])
     ->append([__DIR__ . '/composer-dependency-analyser.php'])
     ->append([__FILE__]);

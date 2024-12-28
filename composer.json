@@ -1,5 +1,5 @@
 {
-  "name": "diablomedia/useragent-parser-comparison",
+  "name": "mimmi20/useragent-parser-comparison",
   "description": "project to compare some useragent parsers",
   "license": "MIT",
   "type": "library",

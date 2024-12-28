@@ -1,6 +1,8 @@
 <?php
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -27,11 +29,11 @@ use function date;
 use function is_string;
 use function json_encode;
 use function max;
+use function mb_str_pad;
 use function mb_strlen;
 use function mb_substr;
 use function sha1;
 use function sprintf;
-use function str_pad;
 
 use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
@@ -186,7 +188,7 @@ final class Parse extends Command
                     $messageLength = mb_strlen($testMessage);
                 }
 
-                $output->write("\r" . str_pad($testMessage, $messageLength));
+                $output->write("\r" . mb_str_pad($testMessage, $messageLength));
 
                 $singleResult = $parserConfig['parse-ua']($agentString);
 
@@ -197,7 +199,7 @@ final class Parse extends Command
                         $messageLength = mb_strlen($testMessage);
                     }
 
-                    $output->writeln("\r" . str_pad($testMessage, $messageLength));
+                    $output->writeln("\r" . mb_str_pad($testMessage, $messageLength));
 
                     continue;
                 }
@@ -211,7 +213,7 @@ final class Parse extends Command
                 $messageLength = mb_strlen($testMessage);
             }
 
-            $output->writeln("\r" . str_pad($testMessage, $messageLength));
+            $output->writeln("\r" . mb_str_pad($testMessage, $messageLength));
         }
 
         $output->writeln('<info>done!</info>');

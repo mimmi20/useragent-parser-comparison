@@ -1,7 +1,6 @@
 <?php
-
 /**
- * This file is part of the ua-normalizer package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
  *
  * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
