@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use JsonException;
+use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Command\Command;
@@ -22,11 +26,11 @@ use function bin2hex;
 use function is_array;
 use function json_decode;
 use function json_encode;
+use function mb_str_pad;
 use function mb_strlen;
 use function sha1;
 use function shell_exec;
 use function sprintf;
-use function str_pad;
 use function trim;
 
 use const JSON_THROW_ON_ERROR;
@@ -42,6 +46,7 @@ final class InitUseragents extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('init-useragents');
@@ -52,6 +57,7 @@ final class InitUseragents extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `test-provider`');
@@ -213,7 +219,9 @@ final class InitUseragents extends Command
                 $output->write("\r" . $updateMessage);
             }
 
-            $output->writeln("\r" . $message . str_pad(' <info>importing done</info>', $messageLength));
+            $output->writeln(
+                "\r" . $message . mb_str_pad(' <info>importing done</info>', $messageLength),
+            );
         }
 
         $output->writeln('<info>done!</info>');

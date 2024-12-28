@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -69,7 +72,7 @@ abstract class AbstractHtml
 
         if ($resultFound2 !== null) {
             $html .= '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent(
-                (int) $resultFound2,
+                $resultFound2,
                 (float) ($countOfUseragents / 100),
                 2,
             ) . ' ' . 100 - $this->calculatePercent(
@@ -80,8 +83,8 @@ abstract class AbstractHtml
                     ';
         }
 
-        $html .= '<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent(
-            (int) $resultFound,
+        return $html . ('<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent(
+            $resultFound,
             (float) ($countOfUseragents / 100),
             2,
         ) . ' ' . 100 - $this->calculatePercent(
@@ -93,7 +96,7 @@ abstract class AbstractHtml
 
                         <text y="50%" transform="translate(0, 2)">
                             <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent(
-            (int) $resultFound,
+            $resultFound,
             (float) ($countOfUseragents / 100),
             2,
 ) . '%</tspan>
@@ -101,9 +104,7 @@ abstract class AbstractHtml
                     </g>
                 </svg>
             </div>
-        ';
-
-        return $html;
+        ');
     }
 
     /** @throws void */
@@ -119,10 +120,9 @@ abstract class AbstractHtml
     /** @throws void */
     protected function getUserAgentUrl(string $uaId): string
     {
-        $url  = '../../user-agent-detail/' . mb_substr($uaId, 0, 2) . '/' . mb_substr($uaId, 2, 2);
-        $url .= '/' . $uaId . '.html';
+        $url = '../../user-agent-detail/' . mb_substr($uaId, 0, 2) . '/' . mb_substr($uaId, 2, 2);
 
-        return $url;
+        return $url . ('/' . $uaId . '.html');
     }
 
     /** @throws void */

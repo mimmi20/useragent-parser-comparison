@@ -11,9 +11,9 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Symfony\Component\Console\Application;
 
 $errorHandler = function (int $code, string $message, string $file = '', int $line = 0, ?array $context = []): bool {
-  echo new ErrorException($message, $code, 1, $file, $line);
+    echo new ErrorException($message, $code, 1, $file, $line);
 
-  return true;
+    return true;
 };
 
 set_error_handler($errorHandler);
@@ -32,28 +32,28 @@ $application->getHelperSet()->set($testsHelper);
 $application->add(new \UserAgentParserComparison\Command\Compare());
 
 if (file_exists('config.php')) {
-  include 'config.php';
+    include 'config.php';
 
-  $basePath = '../gh-pages/v' . COMPARISON_VERSION;
+    $basePath = '../gh-pages/v' . COMPARISON_VERSION;
 
-  if (isset($pdo) && $pdo instanceof \PDO) {
-    $application->add(new \UserAgentParserComparison\Command\Test($pdo));
-    $application->add(new \UserAgentParserComparison\Command\Parse($pdo));
-    $application->add(new \UserAgentParserComparison\Command\Normalize($pdo));
-    $application->add(new \UserAgentParserComparison\Command\Analyze($pdo));
+    if (isset($pdo) && $pdo instanceof \PDO) {
+        $application->add(new \UserAgentParserComparison\Command\Test($pdo));
+        $application->add(new \UserAgentParserComparison\Command\Parse($pdo));
+        $application->add(new \UserAgentParserComparison\Command\Normalize($pdo));
+        $application->add(new \UserAgentParserComparison\Command\Analyze($pdo));
 
-    $resultHelper = new \UserAgentParserComparison\Command\Helper\Result($pdo);
-    $application->getHelperSet()->set($resultHelper);
+        $resultHelper = new \UserAgentParserComparison\Command\Helper\Result($pdo);
+        $application->getHelperSet()->set($resultHelper);
 
-    $normalizedResultHelper = new \UserAgentParserComparison\Command\Helper\NormalizedResult($pdo);
-    $application->getHelperSet()->set($normalizedResultHelper);
+        $normalizedResultHelper = new \UserAgentParserComparison\Command\Helper\NormalizedResult($pdo);
+        $application->getHelperSet()->set($normalizedResultHelper);
 
-    $application->add(new \UserAgentParserComparison\Command\InitDb($pdo));
-    $application->add(new \UserAgentParserComparison\Command\InitProvider($pdo));
-    $application->add(new \UserAgentParserComparison\Command\InitUseragents($pdo));
-    $application->add(new \UserAgentParserComparison\Command\InitResults($pdo));
-    $application->add(new \UserAgentParserComparison\Command\GenerateReports($pdo, (string)COMPARISON_VERSION));
-  }
+        $application->add(new \UserAgentParserComparison\Command\InitDb($pdo));
+        $application->add(new \UserAgentParserComparison\Command\InitProvider($pdo));
+        $application->add(new \UserAgentParserComparison\Command\InitUseragents($pdo));
+        $application->add(new \UserAgentParserComparison\Command\InitResults($pdo));
+        $application->add(new \UserAgentParserComparison\Command\GenerateReports($pdo, (string)COMPARISON_VERSION));
+    }
 }
 
 $application->run();

@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
+use Override;
 use Symfony\Component\Console\Helper\Helper;
 
 use function array_key_exists;
@@ -26,7 +30,7 @@ use function str_replace;
 
 final class Normalize extends Helper
 {
-    private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
+    private const string MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
     /** @var array<array<string>> */
     private array $mappings = [];
@@ -42,6 +46,7 @@ final class Normalize extends Helper
     }
 
     /** @throws void */
+    #[Override]
     public function getName(): string
     {
         return 'normalize';

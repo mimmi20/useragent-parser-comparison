@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -14,6 +17,7 @@ use DateTimeImmutable;
 use FilesystemIterator;
 use Generator;
 use JsonException;
+use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -62,6 +66,7 @@ final class Tests extends Helper
     private string $testDir       = __DIR__ . '/../../../tests';
 
     /** @throws void */
+    #[Override]
     public function getName(): string
     {
         return 'tests';
@@ -322,20 +327,11 @@ final class Tests extends Helper
 
             switch ($language) {
                 case 'PHP':
-                    switch ($testName) {
-                        case 'browser-detector':
-                            $command = 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php';
-
-                            break;
-                        case 'crawler-detect':
-                            $command = 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php';
-
-                            break;
-                        default:
-                            $command = 'php ' . $pathName . '/scripts/build.php';
-
-                            break;
-                    }
+                    $command = match ($testName) {
+                        'browser-detector' => 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php',
+                        'crawler-detect' => 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php',
+                        default => 'php ' . $pathName . '/scripts/build.php',
+                    };
 
                     break;
                 case 'JavaScript':
@@ -512,15 +508,7 @@ final class Tests extends Helper
             JSON_THROW_ON_ERROR,
         );
 
-        if (isset($installed['packages']['node_modules/' . $packageName]['version'])) {
-            return $installed['packages']['node_modules/' . $packageName]['version'];
-        }
-
-        if (isset($installed['dependencies'][$packageName]['version'])) {
-            return $installed['dependencies'][$packageName]['version'];
-        }
-
-        return null;
+        return $installed['packages']['node_modules/' . $packageName]['version'] ?? $installed['dependencies'][$packageName]['version'] ?? null;
     }
 
     /**

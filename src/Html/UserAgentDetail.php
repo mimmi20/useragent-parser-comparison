@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Html;
 
 use JsonException;
+use Override;
 
 use function array_key_exists;
 use function count;
@@ -52,6 +56,7 @@ final class UserAgentDetail extends AbstractHtml
     }
 
     /** @throws JsonException */
+    #[Override]
     public function getHtml(): string
     {
         $addStr = '';
@@ -186,9 +191,8 @@ final class UserAgentDetail extends AbstractHtml
         }
 
         $html .= '</tbody>';
-        $html .= '</table>';
 
-        return $html;
+        return $html . '</table>';
     }
 
     /**
@@ -223,18 +227,11 @@ final class UserAgentDetail extends AbstractHtml
             $html .= '<div>';
 
             if ($result['proPackageName']) {
-                switch ($result['proLanguage']) {
-                    case 'PHP':
-                        $html .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
-
-                        break;
-                    case 'JavaScript':
-                        $html .= '<a href="https://www.npmjs.com/package/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
-
-                        break;
-                    default:
-                        $html .= $result['proName'];
-                }
+                match ($result['proLanguage']) {
+                    'PHP' => $html        .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>',
+                    'JavaScript' => $html .= '<a href="https://www.npmjs.com/package/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>',
+                    default => $html      .= $result['proName'],
+                };
             } else {
                 $html .= $result['proName'];
             }
@@ -397,8 +394,6 @@ final class UserAgentDetail extends AbstractHtml
 
                 </td>';
 
-        $html .= '</tr>';
-
-        return $html;
+        return $html . '</tr>';
     }
 }

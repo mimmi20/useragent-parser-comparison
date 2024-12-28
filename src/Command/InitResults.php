@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,9 +25,9 @@ use function assert;
 use function count;
 use function date;
 use function max;
+use function mb_str_pad;
 use function mb_strlen;
 use function sprintf;
-use function str_pad;
 
 use const STR_PAD_LEFT;
 
@@ -36,6 +40,7 @@ final class InitResults extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('init-results')
@@ -48,6 +53,7 @@ final class InitResults extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getOption('run');
@@ -122,12 +128,12 @@ final class InitResults extends Command
 
                 foreach ($providers as $proName => $provider) {
                     $output->write(
-                        str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                        mb_str_pad($message, $providerCount + 3) . ' - Count: ' . mb_str_pad(
                             (string) $currenUserAgent,
                             8,
                             ' ',
                             STR_PAD_LEFT,
-                        ) . ' - ' . str_pad(
+                        ) . ' - ' . mb_str_pad(
                             $proName,
                             $nameLength,
                         ),
@@ -141,12 +147,12 @@ final class InitResults extends Command
                         $message .= 'E';
 
                         $output->write(
-                            str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                            mb_str_pad($message, $providerCount + 3) . ' - Count: ' . mb_str_pad(
                                 (string) $currenUserAgent,
                                 8,
                                 ' ',
                                 STR_PAD_LEFT,
-                            ) . ' - ' . str_pad(
+                            ) . ' - ' . mb_str_pad(
                                 $proName,
                                 $nameLength,
                             ),
@@ -160,12 +166,12 @@ final class InitResults extends Command
                     $message .= '.';
 
                     $output->write(
-                        str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                        mb_str_pad($message, $providerCount + 3) . ' - Count: ' . mb_str_pad(
                             (string) $currenUserAgent,
                             8,
                             ' ',
                             STR_PAD_LEFT,
-                        ) . ' - ' . str_pad(
+                        ) . ' - ' . mb_str_pad(
                             $proName,
                             $nameLength,
                         ),
@@ -174,12 +180,12 @@ final class InitResults extends Command
 
                 // display "progress"
                 $output->writeln(
-                    str_pad($message, $providerCount + 3) . ' - Count: ' . str_pad(
+                    mb_str_pad($message, $providerCount + 3) . ' - Count: ' . mb_str_pad(
                         (string) $currenUserAgent,
                         8,
                         ' ',
                         STR_PAD_LEFT,
-                    ) . '   ' . str_pad(
+                    ) . '   ' . mb_str_pad(
                         ' ',
                         $nameLength,
                     ),

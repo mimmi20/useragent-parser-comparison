@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,10 +28,10 @@ use function file_exists;
 use function file_put_contents;
 use function is_string;
 use function max;
+use function mb_str_pad;
 use function mb_strlen;
 use function mkdir;
 use function sprintf;
-use function str_pad;
 
 /** @SuppressWarnings(PHPMD.ExcessiveClassLength) */
 final class GenerateReports extends Command
@@ -39,6 +43,7 @@ final class GenerateReports extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('generate-reports')
@@ -51,6 +56,7 @@ final class GenerateReports extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $thisRunName = $input->getArgument('run');
@@ -109,7 +115,7 @@ final class GenerateReports extends Command
             );
             $messageLength = max($messageLength, mb_strlen($message));
 
-            $message = str_pad($message, $messageLength);
+            $message = mb_str_pad($message, $messageLength);
 
             $output->write("\r" . $message);
 
@@ -128,7 +134,7 @@ final class GenerateReports extends Command
 
             $messageLengthMax = max($messageLengthMax, mb_strlen($message));
 
-            $output->write("\r" . str_pad($message, $messageLengthMax));
+            $output->write("\r" . mb_str_pad($message, $messageLengthMax));
 
             //            $folder = $basePath . '/detected/' . $dbResultProvider['proName'];
             //            if (!file_exists($folder)) {
@@ -1004,11 +1010,11 @@ final class GenerateReports extends Command
             );
 
             $messageLengthMax2 = max($messageLengthMax + 13, mb_strlen($message));
-            $output->writeln("\r" . str_pad($message, $messageLengthMax2));
+            $output->writeln("\r" . mb_str_pad($message, $messageLengthMax2));
         }
 
         $output->writeln(
-            "\r" . str_pad($baseMessage . ' each provider <info>done</info>', $messageLength + 30),
+            "\r" . mb_str_pad($baseMessage . ' each provider <info>done</info>', $messageLength + 30),
         );
 
         //        $folder = $basePath . '/detected/general';

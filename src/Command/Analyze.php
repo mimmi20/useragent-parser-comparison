@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use FilesystemIterator;
+use Override;
 use PDO;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
@@ -83,6 +87,7 @@ final class Analyze extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('analyze')
@@ -96,6 +101,7 @@ final class Analyze extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input  = $input;
@@ -438,7 +444,8 @@ final class Analyze extends Command
 
                     $singleTestName = $resultFile->getBasename('.' . $resultFile->getExtension());
 
-                    $expected   = $expectedResults['tests'][$singleTestName] ?? [];
+                    $expected = $expectedResults['tests'][$singleTestName] ?? [];
+
                     $comparison = new Comparison($expected, $data['parsed'] ?? []);
                     $comparison->setTestname($singleTestName);
                     $comparison->setTest($data);
@@ -1271,13 +1278,7 @@ final class Analyze extends Command
         ksort($this->comparison[$test][$compareKey][$compareSubKey]);
         uasort(
             $this->comparison[$test][$compareKey][$compareSubKey],
-            static function (array $a, array $b): int {
-                if ($a['expected']['count'] === $b['expected']['count']) {
-                    return 0;
-                }
-
-                return $a['expected']['count'] > $b['expected']['count'] ? -1 : 1;
-            },
+            static fn (array $a, array $b): int => $b['expected']['count'] <=> $a['expected']['count'],
         );
 
         $table = new Table($this->output);
@@ -1312,13 +1313,10 @@ final class Analyze extends Command
                     continue;
                 }
 
-                uasort($compareRow[$parser], static function (array $a, array $b): int {
-                    if ($a['count'] === $b['count']) {
-                        return 0;
-                    }
-
-                    return $a['count'] > $b['count'] ? -1 : 1;
-                });
+                uasort(
+                    $compareRow[$parser],
+                    static fn (array $a, array $b): int => $b['count'] <=> $a['count'],
+                );
             }
 
             for ($i = 0; $i < $max; ++$i) {

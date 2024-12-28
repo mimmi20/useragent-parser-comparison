@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
@@ -30,6 +34,7 @@ use function round;
 final class Benchmark extends Command
 {
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('benchmark')
@@ -48,6 +53,7 @@ final class Benchmark extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file       = $input->getArgument('file');

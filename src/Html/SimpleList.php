@@ -1,6 +1,9 @@
 <?php
+
 /**
- * This file is part of the diablomedia/useragent-parser-comparison package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -9,6 +12,8 @@
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
+
+use Override;
 
 use function count;
 use function htmlspecialchars;
@@ -29,6 +34,7 @@ final class SimpleList extends AbstractHtml
     }
 
     /** @throws void */
+    #[Override]
     public function getHtml(): string
     {
         $body = '
@@ -43,8 +49,8 @@ final class SimpleList extends AbstractHtml
 <div class="section" id="simple-list">
     <form>
         <div class="input-field">
-          <input class="search" type="search" placeholder="Search for a user agent">
-          <i class="material-icons">close</i>
+            <input class="search" type="search" placeholder="Search for a user agent">
+            <i class="material-icons">close</i>
         </div>
 
         <a class="sort btn" data-sort="name">Sort by name</a>
@@ -106,8 +112,6 @@ var hackerList = new List(\'simple-list\', options);
             $html .= '</li>';
         }
 
-        $html .= '</ul>';
-
-        return $html;
+        return $html . '</ul>';
     }
 }
