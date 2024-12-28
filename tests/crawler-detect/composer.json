@@ -2,8 +2,8 @@
   "require": {
     "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
     "composer-runtime-api": "^2.0",
-    "jaybizzle/crawler-detect": "^v1.2.112",
-    "mimmi20/browscap-helper-source": "^3.0.18"
+    "jaybizzle/crawler-detect": "^v1.3.0",
+    "mimmi20/browscap-helper-source": "^5.0.3"
   },
   "config": {
     "preferred-install": {
