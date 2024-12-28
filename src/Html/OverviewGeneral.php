@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Html;
 
 use Generator;
+use Override;
 use PDO;
 
 use function extension_loaded;
@@ -28,7 +29,7 @@ use const PHP_VERSION;
 final class OverviewGeneral extends AbstractHtml
 {
     /** @throws void */
-    #[\Override]
+    #[Override]
     public function getHtml(string $version = '', string | null $run = null): string
     {
         $body = '

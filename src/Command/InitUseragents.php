@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use JsonException;
+use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Command\Command;
@@ -45,7 +46,7 @@ final class InitUseragents extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->setName('init-useragents');
@@ -56,7 +57,7 @@ final class InitUseragents extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `test-provider`');

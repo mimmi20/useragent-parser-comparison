@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
@@ -33,7 +34,7 @@ use function round;
 final class Benchmark extends Command
 {
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->setName('benchmark')
@@ -52,7 +53,7 @@ final class Benchmark extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file       = $input->getArgument('file');

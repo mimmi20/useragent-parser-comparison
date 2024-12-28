@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use JsonException;
+use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use SplFileObject;
@@ -50,7 +51,7 @@ final class Parse extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->setName('parse')
@@ -61,7 +62,7 @@ final class Parse extends Command
     }
 
     /** @throws JsonException */
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $proId    = null;

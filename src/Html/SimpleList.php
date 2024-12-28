@@ -13,6 +13,8 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
+use Override;
+
 use function count;
 use function htmlspecialchars;
 
@@ -32,7 +34,7 @@ final class SimpleList extends AbstractHtml
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     public function getHtml(): string
     {
         $body = '

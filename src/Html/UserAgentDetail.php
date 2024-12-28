@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Html;
 
 use JsonException;
+use Override;
 
 use function array_key_exists;
 use function count;
@@ -55,7 +56,7 @@ final class UserAgentDetail extends AbstractHtml
     }
 
     /** @throws JsonException */
-    #[\Override]
+    #[Override]
     public function getHtml(): string
     {
         $addStr = '';
@@ -227,9 +228,9 @@ final class UserAgentDetail extends AbstractHtml
 
             if ($result['proPackageName']) {
                 match ($result['proLanguage']) {
-                    'PHP' => $html .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>',
+                    'PHP' => $html        .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>',
                     'JavaScript' => $html .= '<a href="https://www.npmjs.com/package/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>',
-                    default => $html .= $result['proName'],
+                    default => $html      .= $result['proName'],
                 };
             } else {
                 $html .= $result['proName'];

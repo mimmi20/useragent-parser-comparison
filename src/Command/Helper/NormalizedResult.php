@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
+use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
@@ -25,7 +26,7 @@ final class NormalizedResult extends Helper
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     public function getName(): string
     {
         return 'normalized-result';

@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use Exception;
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -26,7 +27,7 @@ use function date;
 final class Compare extends Command
 {
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->setName('compare')
@@ -54,7 +55,7 @@ final class Compare extends Command
     }
 
     /** @throws Exception */
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file = $input->getArgument('file');

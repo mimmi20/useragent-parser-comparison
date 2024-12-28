@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -42,7 +43,7 @@ final class GenerateReports extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->setName('generate-reports')
@@ -55,7 +56,7 @@ final class GenerateReports extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $thisRunName = $input->getArgument('run');

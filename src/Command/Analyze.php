@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use FilesystemIterator;
+use Override;
 use PDO;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
@@ -86,7 +87,7 @@ final class Analyze extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->setName('analyze')
@@ -100,7 +101,7 @@ final class Analyze extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input  = $input;
@@ -1277,7 +1278,7 @@ final class Analyze extends Command
         ksort($this->comparison[$test][$compareKey][$compareSubKey]);
         uasort(
             $this->comparison[$test][$compareKey][$compareSubKey],
-            static fn(array $a, array $b): int => $b['expected']['count'] <=> $a['expected']['count'],
+            static fn (array $a, array $b): int => $b['expected']['count'] <=> $a['expected']['count'],
         );
 
         $table = new Table($this->output);
@@ -1312,7 +1313,10 @@ final class Analyze extends Command
                     continue;
                 }
 
-                uasort($compareRow[$parser], static fn(array $a, array $b): int => $b['count'] <=> $a['count']);
+                uasort(
+                    $compareRow[$parser],
+                    static fn (array $a, array $b): int => $b['count'] <=> $a['count'],
+                );
             }
 
             for ($i = 0; $i < $max; ++$i) {

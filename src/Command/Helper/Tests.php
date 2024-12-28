@@ -17,6 +17,7 @@ use DateTimeImmutable;
 use FilesystemIterator;
 use Generator;
 use JsonException;
+use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -65,7 +66,7 @@ final class Tests extends Helper
     private string $testDir       = __DIR__ . '/../../../tests';
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     public function getName(): string
     {
         return 'tests';

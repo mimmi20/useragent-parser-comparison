@@ -15,6 +15,7 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use JsonException;
+use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
@@ -36,7 +37,7 @@ final class Result extends Helper
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     public function getName(): string
     {
         return 'result';

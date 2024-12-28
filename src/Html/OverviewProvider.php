@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Html;
 
+use Override;
 use PDO;
 
 use function number_format;
@@ -32,7 +33,7 @@ final class OverviewProvider extends AbstractHtml
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     public function getHtml(string | null $run = null): string
     {
         $body = '

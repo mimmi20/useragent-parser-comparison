@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
+use Override;
 use Symfony\Component\Console\Helper\Helper;
 
 use function array_key_exists;
@@ -45,7 +46,7 @@ final class Normalize extends Helper
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     public function getName(): string
     {
         return 'normalize';

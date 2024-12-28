@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use PDO;
 use PDOStatement;
 use Ramsey\Uuid\Uuid;
@@ -34,7 +35,7 @@ final class InitProvider extends Command
     }
 
     /** @throws void */
-    #[\Override]
+    #[Override]
     protected function configure(): void
     {
         $this->setName('init-provider');
@@ -45,7 +46,7 @@ final class InitProvider extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    #[\Override]
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare(
