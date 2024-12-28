@@ -1,45 +1,146 @@
 <?php
+
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
 
-class OverviewProvider extends AbstractHtml
+use Override;
+use PDO;
+
+use function number_format;
+use function round;
+
+final class OverviewProvider extends AbstractHtml
 {
-
-    private array $provider;
-
-    public function __construct(\PDO $pdo, array $provider, ?string $title = null)
+    /**
+     * @param array<string, mixed> $provider
+     *
+     * @throws void
+     */
+    public function __construct(PDO $pdo, private array $provider, string | null $title = null)
     {
-        $this->pdo = $pdo;
-        $this->provider = $provider;
-        $this->title = $title;
+        parent::__construct($pdo, $title);
     }
 
+    /** @throws void */
+    #[Override]
+    public function getHtml(): string
+    {
+        $body = '
+<div class="section">
+    <h1 class="header center orange-text">' . $this->provider['proName'] . ' overview</h1>
+
+    <div class="row center">
+        <h5 class="header light">
+            We took <strong>' . $this->getUserAgentCount() . '</strong> different user agents and analyzed them with this provider<br />
+        </h5>
+    </div>
+</div>
+
+<div class="section">
+    ';
+
+        if ($this->provider['proLocal']) {
+            $body .= '<div><span class="material-icons">public_off</span>';
+
+            switch ($this->provider['proLanguage']) {
+                case 'PHP':
+                    $body .= '<span class="material-icons">php</span>';
+
+                    break;
+                case 'JavaScript':
+                    $body .= '<span class="material-icons">javascript</span>';
+
+                    break;
+            }
+
+            $body .= '</div>';
+
+            $body .= '<div>';
+
+            if ($this->provider['proPackageName']) {
+                match ($this->provider['proLanguage']) {
+                    'PHP' => $body        .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>',
+                    'JavaScript' => $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>',
+                    default => $body      .= $this->provider['proName'],
+                };
+            } else {
+                $body .= $this->provider['proName'];
+            }
+
+            $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
+
+            if ($this->provider['proLastReleaseDate'] !== null) {
+                $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
+            }
+
+            $body .= '</div>';
+        } elseif ($this->provider['proApi']) {
+            $body .= '<div><span class="material-icons">public</span></div>';
+
+            $body .= '<div>';
+
+            if ($this->provider['proHomepage']) {
+                $body .= '<a href="' . $this->provider['proHomepage'] . '">' . $this->provider['proName'] . '</a>';
+            } else {
+                $body .= $this->provider['proName'];
+            }
+
+            $body .= '</div>';
+        }
+
+        $body .= '
+</div>
+
+<div class="section">
+    ' . $this->getTable() . '
+</div>
+';
+
+        return parent::getHtmlCombined($body);
+    }
+
+    /**
+     * @return array<string, mixed>
+     *
+     * @throws void
+     */
     private function getResult(): array
     {
-        $sql = "
+        $sql = '
             SELECT
                 SUM(`resResultFound`) AS `resultFound`,
                 SUM(`resResultError`) AS `resultError`,
-            
+
                 COUNT(`resClientName`) AS `clientNameFound`,
                 COUNT(`resClientVersion`) AS `clientVersionFound`,
                 COUNT(`resClientIsBot`) AS `asBotDetected`,
                 COUNT(`resClientType`) AS `clientTypeFound`,
-            
+
                 COUNT(`resEngineName`) AS `engineNameFound`,
                 COUNT(`resEngineVersion`) AS `engineVersionFound`,
-            
+
                 COUNT(`resOsName`) AS `osNameFound`,
                 COUNT(`resOsVersion`) AS `osVersionFound`,
-            
+
                 COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
-            
+
                 COUNT(`resDeviceModel`) AS `deviceModelFound`,
-            
+
                 COUNT(`resDeviceType`) AS `deviceTypeFound`,
-            
+
                 COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
                 COUNT(`resDeviceIsTouch`) AS `asTouchDeviceDetected`,
-            
+
                 AVG(`resInitTime`) AS `avgInitTime`,
                 AVG(`resParseTime`) AS `avgParseTime`,
                 AVG(`resMemoryUsed`) AS `avgMemoryUsed`
@@ -49,23 +150,24 @@ class OverviewProvider extends AbstractHtml
                 `provider_id` = :proId
             GROUP BY
                 `proId`
-        ";
+        ';
 
         $statement = $this->pdo->prepare($sql);
 
-        $statement->bindValue(':proId', $this->provider['proId'], \PDO::PARAM_STR);
+        $statement->bindValue(':proId', $this->provider['proId'], PDO::PARAM_STR);
 
         $statement->execute();
-        
+
         return $statement->fetch();
     }
 
+    /** @throws void */
     private function getTable(): string
     {
         $provider = $this->provider;
-        
+
         $html = '<table class="striped">';
-        
+
         /*
          * Header
          */
@@ -79,16 +181,16 @@ class OverviewProvider extends AbstractHtml
                 </tr>
             </thead>
         ';
-        
+
         /*
          * body
          */
         $countOfUseragents = $this->getUserAgentCount();
-        
+
         $row = $this->getResult();
-        
+
         $html .= '<tbody>';
-        
+
         /*
          * Results found
          */
@@ -113,7 +215,7 @@ class OverviewProvider extends AbstractHtml
             <td></td>
             </tr>
         ';
-        
+
         /*
          * Client
          */
@@ -122,10 +224,15 @@ class OverviewProvider extends AbstractHtml
                 <th rowspan="4">Client</th>
                 <th>Name</th>
             ';
+
         if ($provider['proCanDetectClientName']) {
             $html .= '
                 <td>' . $row['clientNameFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['clientNameFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['clientNameFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
                         Detected
@@ -143,6 +250,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -151,10 +259,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Version</th>
             ';
+
         if ($provider['proCanDetectClientVersion']) {
             $html .= '
                 <td>' . $row['clientVersionFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['clientVersionFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['clientVersionFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -165,6 +278,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -173,10 +287,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Type</th>
             ';
+
         if ($provider['proCanDetectClientType']) {
             $html .= '
                 <td>' . $row['clientTypeFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['clientTypeFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['clientTypeFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -187,6 +306,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -195,10 +315,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Is bot</th>
             ';
+
         if ($provider['proCanDetectClientIsBot']) {
             $html .= '
                 <td>' . $row['asBotDetected'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['asBotDetected'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['asBotDetected'],
+                    $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -209,10 +334,11 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
-        
+
         /*
          * engine
          */
@@ -221,10 +347,15 @@ class OverviewProvider extends AbstractHtml
                 <th rowspan="2">Rendering Engine</th>
                 <th>Name</th>
             ';
+
         if ($provider['proCanDetectEngineName']) {
             $html .= '
                 <td>' . $row['engineNameFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['engineNameFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['engineNameFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/rendering-engines.html" class="btn waves-effect waves-light">
                         Detected
@@ -242,6 +373,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -250,10 +382,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Version</th>
             ';
+
         if ($provider['proCanDetectEngineVersion']) {
             $html .= '
                 <td>' . $row['engineVersionFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['engineVersionFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['engineVersionFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -264,10 +401,11 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
-        
+
         /*
          * os
          */
@@ -276,10 +414,15 @@ class OverviewProvider extends AbstractHtml
                 <th rowspan="2">Operating System</th>
                 <th>Name</th>
             ';
+
         if ($provider['proCanDetectOsName']) {
             $html .= '
                 <td>' . $row['osNameFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['osNameFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['osNameFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/operating-systems.html" class="btn waves-effect waves-light">
                         Detected
@@ -297,6 +440,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -305,10 +449,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Version</th>
             ';
+
         if ($provider['proCanDetectOsVersion']) {
             $html .= '
                 <td>' . $row['osVersionFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['osVersionFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['osVersionFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -319,10 +468,11 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
-        
+
         /*
          * device
          */
@@ -331,10 +481,15 @@ class OverviewProvider extends AbstractHtml
                 <th rowspan="5">Device</th>
                 <th>Brand</th>
             ';
+
         if ($provider['proCanDetectDeviceBrand']) {
             $html .= '
                 <td>' . $row['deviceBrandFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['deviceBrandFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['deviceBrandFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-brands.html" class="btn waves-effect waves-light">
                         Detected
@@ -352,6 +507,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -360,10 +516,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Model</th>
             ';
+
         if ($provider['proCanDetectDeviceModel']) {
             $html .= '
                 <td>' . $row['deviceModelFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['deviceModelFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['deviceModelFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-models.html" class="btn waves-effect waves-light">
                         Detected
@@ -381,6 +542,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -389,10 +551,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Type</th>
             ';
+
         if ($provider['proCanDetectDeviceType']) {
             $html .= '
                 <td>' . $row['deviceTypeFound'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['deviceTypeFound'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['deviceTypeFound'],
+                    $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-types.html" class="btn waves-effect waves-light">
                         Detected
@@ -410,6 +577,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -418,10 +586,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Is mobile</th>
             ';
+
         if ($provider['proCanDetectDeviceIsMobile']) {
             $html .= '
                 <td>' . $row['asMobileDetected'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['asMobileDetected'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['asMobileDetected'],
+                    $row['resultFound'],
+) . '</td>
                 <td>
                     <a href="not-detected/' . $provider['proName'] . '/device-is-mobile.html" class="btn waves-effect waves-light">
                         Not detected
@@ -436,6 +609,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -444,10 +618,15 @@ class OverviewProvider extends AbstractHtml
                 <tr>
                 <th>Is touch</th>
             ';
+
         if ($provider['proCanDetectDeviceIsTouch']) {
             $html .= '
                 <td>' . $row['asTouchDeviceDetected'] . '</td>
-                <td>' . $this->getPercentCircle($countOfUseragents, $row['asTouchDeviceDetected'], $row['resultFound']) . '</td>
+                <td>' . $this->getPercentCircle(
+                    $countOfUseragents,
+                    $row['asTouchDeviceDetected'],
+                    $row['resultFound'],
+) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -458,6 +637,7 @@ class OverviewProvider extends AbstractHtml
                 </td>
             ';
         }
+
         $html .= '
                 </tr>
             ';
@@ -485,83 +665,9 @@ class OverviewProvider extends AbstractHtml
             <td></td>
             </tr>
         ';
-        
+
         $html .= '</tbody>';
-        
-        $html .= '</table>';
-        
-        return $html;
-    }
 
-    public function getHtml(): string
-    {
-        $body = '
-<div class="section">
-    <h1 class="header center orange-text">' . $this->provider['proName'] . ' overview</h1>
-
-    <div class="row center">
-        <h5 class="header light">
-            We took <strong>' . $this->getUserAgentCount() . '</strong> different user agents and analyzed them with this provider<br />
-        </h5>
-    </div>
-</div>
-
-<div class="section">
-    ';
-        if ($this->provider['proLocal']) {
-            $body .= '<div><span class="material-icons">public_off</span>';
-
-            switch ($this->provider['proLanguage']) {
-                case 'PHP':
-                    $body .= '<span class="material-icons">php</span>';
-                    break;
-                case 'JavaScript':
-                    $body .= '<span class="material-icons">javascript</span>';
-                    break;
-            }
-
-            $body .= '</div>';
-
-            $body .= '<div>';
-            if ($this->provider['proPackageName']) {
-                switch ($this->provider['proLanguage']) {
-                    case 'PHP':
-                        $body .= '<a href="https://packagist.org/packages/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
-                        break;
-                    case 'JavaScript':
-                        $body .= '<a href="https://www.npmjs.com/package/' . $this->provider['proPackageName'] . '">' . $this->provider['proName'] . '</a>';
-                        break;
-                    default:
-                        $body .= $this->provider['proName'];
-                }
-            } else {
-                $body .= $this->provider['proName'];
-            }
-
-            $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
-            if (null !== $this->provider['proLastReleaseDate']) {
-                $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
-            }
-            $body .= '</div>';
-        } elseif ($this->provider['proApi']) {
-            $body .= '<div><span class="material-icons">public</span></div>';
-
-            $body .= '<div>';
-            if ($this->provider['proHomepage']) {
-                $body .= '<a href="' . $this->provider['proHomepage'] . '">' . $this->provider['proName'] . '</a>';
-            } else {
-                $body .= $this->provider['proName'];
-            }
-            $body .= '</div>';
-        }
-        $body .= '
-</div>
-
-<div class="section">
-    ' . $this->getTable() . '
-</div>
-';
-        
-        return parent::getHtmlCombined($body);
+        return $html . '</table>';
     }
 }

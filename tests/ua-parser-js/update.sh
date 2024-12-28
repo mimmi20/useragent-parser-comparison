@@ -3,7 +3,7 @@
 parent_path=$( cd "$(dirname "${BASH_SOURCE}")" ; pwd -P )
 cd "$parent_path"
 
-npm update
+npm update --no-audit --no-fund
 npm shrinkwrap
 
 composer_command="composer"

@@ -1,68 +1,54 @@
 <?php
 
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Compare;
 
-use Exception;
-use function array_flip;
-use function file_get_contents;
-use function json_decode;
-use function ksort;
-use function sort;
-use function uasort;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableCell;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
-
-class ValuePairs
+final class ValuePairs
 {
-    private $expected;
-    private $actual;
+    private string | null $expected = null;
+    private string | null $actual   = null;
 
-    /**
-     * @param mixed $expected
-     */
-    public function setExpected($expected) : void
+    /** @throws void */
+    public function setExpected(string | null $expected): void
     {
         $this->expected = $expected;
     }
 
-    /**
-     * @param mixed $actual
-     */
-    public function setActual($actual) : void
+    /** @throws void */
+    public function setActual(string | null $actual): void
     {
         $this->actual = $actual;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getExpected()
+    /** @throws void */
+    public function getExpected(): string | null
     {
         return $this->expected;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getActual()
+    /** @throws void */
+    public function getActual(): string | null
     {
         return $this->actual;
     }
 
+    /** @throws void */
     public function hasValues(): bool
     {
-        return null !== $this->expected && null !== $this->actual;
+        return $this->expected !== null && $this->actual !== null;
     }
 
+    /** @throws void */
     public function hasDiff(): bool
     {
         return $this->expected !== $this->actual;

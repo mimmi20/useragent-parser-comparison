@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
@@ -12,21 +21,38 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class Compare extends Command
+use function date;
+
+final class Compare extends Command
 {
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('compare')
             ->setDescription('Runs tests, normalizes the results then analyzes the results')
-            ->addOption('run', 'r', InputOption::VALUE_OPTIONAL, 'The name of the test run, if omitted will be generated from date')
-            ->addOption('import', null, InputOption::VALUE_NONE, 'Whether to import providers and useragents')
-            ->addArgument('file', InputArgument::OPTIONAL, 'Path to a file to use as the source of useragents rather than test suites')
-            ->setHelp('This command is a "meta" command that will execute the Test, Normalize and Analyze commands in order');
+            ->addOption(
+                'run',
+                'r',
+                InputOption::VALUE_OPTIONAL,
+                'The name of the test run, if omitted will be generated from date',
+            )
+            ->addOption(
+                'import',
+                null,
+                InputOption::VALUE_NONE,
+                'Whether to import providers and useragents',
+            )
+            ->addArgument(
+                'file',
+                InputArgument::OPTIONAL,
+                'Path to a file to use as the source of useragents rather than test suites',
+            )
+            ->setHelp(
+                'This command is a "meta" command that will execute the Test, Normalize and Analyze commands in order',
+            );
     }
 
-    /**
-     * @throws Exception
-     */
+    /** @throws Exception */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $file = $input->getArgument('file');
@@ -48,29 +74,29 @@ class Compare extends Command
 
         if ($doImport && !$file) {
             $command   = $application->find('init-provider');
-            $arguments = [
-                'command'     => 'init-provider',
-            ];
+            $arguments = ['command' => 'init-provider'];
 
             $initProviderInput = new ArrayInput($arguments);
-            $returnCode = $command->run($initProviderInput, $output);
+            $returnCode        = $command->run($initProviderInput, $output);
 
             if ($returnCode > 0) {
-                $output->writeln('<error>There was an error executing the "init-provider" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "init-provider" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
 
-            $command = $application->find('init-useragents');
-            $arguments = [
-                'command' => 'init-useragents',
-            ];
+            $command   = $application->find('init-useragents');
+            $arguments = ['command' => 'init-useragents'];
 
             $initProviderInput = new ArrayInput($arguments);
-            $returnCode = $command->run($initProviderInput, $output);
+            $returnCode        = $command->run($initProviderInput, $output);
 
             if ($returnCode > 0) {
-                $output->writeln('<error>There was an error executing the "init-useragents" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "init-useragents" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
@@ -79,9 +105,9 @@ class Compare extends Command
         if ($file) {
             $command   = $application->find('parse');
             $arguments = [
-                'command'     => 'parse',
-                'file'        => $file,
-                'run'         => $name,
+                'command' => 'parse',
+                'file' => $file,
+                'run' => $name,
                 '--no-output' => true,
             ];
 
@@ -89,7 +115,9 @@ class Compare extends Command
             $returnCode = $command->run($parseInput, $output);
 
             if ($returnCode > 0) {
-                $output->writeln('<error>There was an error executing the "parse" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "parse" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
@@ -97,7 +125,7 @@ class Compare extends Command
             $command   = $application->find('test');
             $arguments = [
                 'command' => 'test',
-                'run'     => $name,
+                'run' => $name,
             ];
 
             if ($doImport) {
@@ -108,7 +136,9 @@ class Compare extends Command
             $returnCode = $command->run($testInput, $output);
 
             if ($returnCode > 0) {
-                $output->writeln('<error>There was an error executing the "test" command, cannot continue.</error>');
+                $output->writeln(
+                    '<error>There was an error executing the "test" command, cannot continue.</error>',
+                );
 
                 return $returnCode;
             }
@@ -117,14 +147,16 @@ class Compare extends Command
         $command   = $application->find('normalize');
         $arguments = [
             'command' => 'normalize',
-            'run'     => $name,
+            'run' => $name,
         ];
 
         $normalizeInput = new ArrayInput($arguments);
         $returnCode     = $command->run($normalizeInput, $output);
 
         if ($returnCode > 0) {
-            $output->writeln('<error>There was an error executing the "normalize" command, cannot continue.</error>');
+            $output->writeln(
+                '<error>There was an error executing the "normalize" command, cannot continue.</error>',
+            );
 
             return $returnCode;
         }
@@ -132,14 +164,16 @@ class Compare extends Command
         $command   = $application->find('analyze');
         $arguments = [
             'command' => 'analyze',
-            'run'     => $name,
+            'run' => $name,
         ];
 
         $analyzeInput = new ArrayInput($arguments);
         $returnCode   = $command->run($analyzeInput, $output);
 
         if ($returnCode > 0) {
-            $output->writeln('<error>There was an error executing the "analyze" command, cannot continue.</error>');
+            $output->writeln(
+                '<error>There was an error executing the "analyze" command, cannot continue.</error>',
+            );
 
             return $returnCode;
         }

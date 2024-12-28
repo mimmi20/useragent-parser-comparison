@@ -1,20 +1,19 @@
 <?php
 
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
-use function file_get_contents;
-use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
-use function mkdir;
-use function sort;
-use function sprintf;
-use SplFileInfo;
+use JsonException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,48 +21,63 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Throwable;
+use UserAgentParserComparison\Command\Helper\Parsers;
+use UserAgentParserComparison\Command\Helper\Tests;
 
-class Test extends Command
+use function addcslashes;
+use function array_key_exists;
+use function array_keys;
+use function assert;
+use function count;
+use function date;
+use function file_exists;
+use function file_put_contents;
+use function is_string;
+use function json_encode;
+use function mb_str_pad;
+use function mb_strlen;
+use function mb_substr;
+use function mkdir;
+use function sort;
+use function sprintf;
+use function time;
+
+use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
+use const PHP_EOL;
+use const SORT_FLAG_CASE;
+use const SORT_NATURAL;
+
+final class Test extends Command
 {
-    /**
-     * @var array
-     */
-    private $tests = [];
+    /** @var array<mixed> */
+    private array $tests   = [];
+    private string $runDir = __DIR__ . '/../../data/test-runs';
 
-    /**
-     * @var string
-     */
-    private $testsDir = __DIR__ . '/../../tests';
-
-    /**
-     * @var string
-     */
-    private $runDir = __DIR__ . '/../../data/test-runs';
-
-    /**
-     * @var array
-     */
-    private $results = [];
-
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('test')
             ->setDescription('Runs test against the parsers')
             ->addOption('use-db', null, InputOption::VALUE_NONE, 'Whether to use a database')
-            ->addArgument('run', InputArgument::OPTIONAL, 'The name of the test run, if omitted will be generated from date')
-            ->setHelp('Runs various test suites against the parsers to help determine which is the most "correct".');
+            ->addArgument(
+                'run',
+                InputArgument::OPTIONAL,
+                'The name of the test run, if omitted will be generated from date',
+            )
+            ->setHelp(
+                'Runs various test suites against the parsers to help determine which is the most "correct".',
+            );
     }
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     */
+    /** @throws JsonException */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        // Prepare our test directory to store the data from this run
-        /** @var string|null $thisRunDirName */
         $thisRunDirName = $input->getArgument('run');
+        assert(is_string($thisRunDirName) || $thisRunDirName === null);
 
         if (empty($thisRunDirName)) {
             $thisRunDirName = date('YmdHis');
@@ -74,8 +88,8 @@ class Test extends Command
         if ($useDb) {
             $thisRunDir = null;
         } else {
-            $thisRunDir = $this->runDir . '/' . $thisRunDirName;
-            $resultsDir = $thisRunDir . '/results';
+            $thisRunDir  = $this->runDir . '/' . $thisRunDirName;
+            $resultsDir  = $thisRunDir . '/results';
             $expectedDir = $thisRunDir . '/expected';
 
             mkdir($thisRunDir);
@@ -83,8 +97,8 @@ class Test extends Command
             mkdir($expectedDir);
         }
 
-        /** @var \UserAgentParserComparison\Command\Helper\Tests $testHelper */
         $testHelper = $this->getHelper('tests');
+        assert($testHelper instanceof Tests);
 
         foreach ($testHelper->collectTests($output, $thisRunDir) as $testPath => $testConfig) {
             $this->tests[$testPath] = $testConfig;
@@ -97,10 +111,8 @@ class Test extends Command
         $questions = array_keys($this->tests);
         sort($questions, SORT_FLAG_CASE | SORT_NATURAL);
 
-        $i = 1;
         foreach ($questions as $name) {
             $rows[] = [$name];
-            ++$i;
         }
 
         $table = new Table($output);
@@ -114,7 +126,7 @@ class Test extends Command
         $question       = new ChoiceQuestion(
             'Choose which test suites to run, separate multiple with commas (press enter to use all)',
             $questions,
-            count($questions) - 1
+            count($questions) - 1,
         );
         $question->setMultiselect(true);
 
@@ -133,11 +145,12 @@ class Test extends Command
 
         $output->writeln('Choose which parsers you would like to run this test suite against');
 
-        /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
-        $parsers      = $parserHelper->getParsers($input, $output);
+        assert($parserHelper instanceof Parsers);
+        $parsers = $parserHelper->getParsers($input, $output);
 
-        $usedTests = [];
+        $usedTests  = [];
+        $textLength = 0;
 
         foreach ($selectedTests as $testName => $testConfig) {
             $result     = [];
@@ -148,13 +161,13 @@ class Test extends Command
 
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
-                if (null === $agent) {
+                if ($agent === null) {
 //                    var_dump($singleTestData);
 //                    $output->writeln("\r" . ' <error>There was no useragent header for the testsuite ' . $singleTestName . '.</error>');
                     continue;
                 }
 
-                $agent = addcslashes($agent, PHP_EOL);
+                $agent       = addcslashes($agent, PHP_EOL);
                 $agentToShow = $agent;
 
                 if (mb_strlen($agentToShow) > 100) {
@@ -165,19 +178,22 @@ class Test extends Command
                     'test suite <fg=yellow>%s</> <info>parsing</info> [%s] UA: <fg=yellow>%s</>',
                     $testName,
                     $actualTest,
-                    $agentToShow
+                    $agentToShow,
                 );
 
                 $output->write("\r" . $basicTestMessage);
-                $textLength = mb_strlen($basicTestMessage);
+
+                if (mb_strlen($basicTestMessage) > $textLength) {
+                    $textLength = mb_strlen($basicTestMessage);
+                }
 
                 foreach ($parsers as $parserName => $parser) {
                     if (!array_key_exists($parserName, $result)) {
                         $result[$parserName] = [
-                            'parse_time'  => 0,
-                            'init_time'   => 0,
+                            'parse_time' => 0,
+                            'init_time' => 0,
                             'memory_used' => 0,
-                            'version'     => null,
+                            'version' => null,
                         ];
                     }
 
@@ -187,7 +203,7 @@ class Test extends Command
                         $textLength = mb_strlen($testMessage);
                     }
 
-                    $output->write("\r" . str_pad($testMessage, $textLength));
+                    $output->write("\r" . mb_str_pad($testMessage, $textLength));
 
                     $singleResult = $parser['parse-ua']($agent);
 
@@ -198,7 +214,7 @@ class Test extends Command
                             $textLength = mb_strlen($testMessage);
                         }
 
-                        $output->writeln("\r" . str_pad($testMessage, $textLength));
+                        $output->writeln("\r" . mb_str_pad($testMessage, $textLength));
 
                         continue;
                     }
@@ -220,15 +236,15 @@ class Test extends Command
                         json_encode(
                             [
                                 'headers' => $singleResult['headers'],
-                                'parsed'  => $singleResult['result']['parsed'],
-                                'err'     => $singleResult['result']['err'],
+                                'parsed' => $singleResult['result']['parsed'],
+                                'err' => $singleResult['result']['err'],
                                 'version' => $singleResult['version'],
-                                'init'    => $singleResult['init_time'],
-                                'time'    => $singleResult['parse_time'],
-                                'memory'  => $singleResult['memory_used'],
+                                'init' => $singleResult['init_time'],
+                                'time' => $singleResult['parse_time'],
+                                'memory' => $singleResult['memory_used'],
                             ],
-                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
-                        )
+                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                        ),
                     );
 
                     if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
@@ -240,7 +256,7 @@ class Test extends Command
                     }
 
                     $result[$parserName]['parse_time'] += $singleResult['parse_time'];
-                    $result[$parserName]['version'] = $singleResult['version'];
+                    $result[$parserName]['version']     = $singleResult['version'];
                 }
 
                 $testMessage = $basicTestMessage . ' <info>done!</info>';
@@ -249,7 +265,7 @@ class Test extends Command
                     $textLength = mb_strlen($testMessage);
                 }
 
-                $output->write("\r" . str_pad($testMessage, $textLength));
+                $output->write("\r" . mb_str_pad($testMessage, $textLength));
             }
 
             $output->writeln('');
@@ -257,7 +273,7 @@ class Test extends Command
             foreach (array_keys($parsers) as $parserName) {
                 if (!array_key_exists($parserName, $result)) {
                     $output->writeln(
-                        '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>'
+                        '<error>The <fg=red;options=bold,underscore>' . $parserName . '</> parser did not return any data, there may have been an error</error>',
                     );
 
                     continue;
@@ -269,7 +285,10 @@ class Test extends Command
 
                 file_put_contents(
                     $resultsDir . '/' . $parserName . '/' . $testName . '/metadata.json',
-                    json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                    json_encode(
+                        $result[$parserName],
+                        JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                    ),
                 );
 
                 $usedTests[$testName] = $testConfig;
@@ -279,21 +298,22 @@ class Test extends Command
         try {
             $encoded = json_encode(
                 ['tests' => $usedTests, 'parsers' => $parsers, 'date' => time()],
-                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
             );
-        } catch (Exception $e) {
-            $output->writeln('<error>Encoding result metadata failed for the ' . $thisRunDirName . ' directory</error>');
+        } catch (Throwable) {
+            $output->writeln(
+                '<error>Encoding result metadata failed for the ' . $thisRunDirName . ' directory</error>',
+            );
 
             return self::FAILURE;
         }
 
         // write some test data to file
-        file_put_contents(
-            $thisRunDir . '/metadata.json',
-            $encoded
-        );
+        file_put_contents($thisRunDir . '/metadata.json', $encoded);
 
-        $output->writeln('<comment>Parsing complete, data stored in ' . $thisRunDirName . ' directory</comment>');
+        $output->writeln(
+            '<comment>Parsing complete, data stored in ' . $thisRunDirName . ' directory</comment>',
+        );
 
         return self::SUCCESS;
     }

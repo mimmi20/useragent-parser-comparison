@@ -1,10 +1,10 @@
 {
   "require": {
-    "php": "^8.1.0",
+    "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
     "composer-runtime-api": "^2.0",
-    "mimmi20/browscap-helper-source": "^3.0.22",
-    "whichbrowser/parser": "^v2.1.2",
-    "symfony/yaml": "^v5.3.11 || ^v6.0.1"
+    "mimmi20/browscap-helper-source": "^4.0.5",
+    "whichbrowser/parser": "^v2.1.8",
+    "symfony/yaml": "^v5.4.44 || ^v6.4.12 || ^v7.1.5"
   },
   "config": {
     "preferred-install": {

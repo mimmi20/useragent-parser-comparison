@@ -1,14 +1,14 @@
 {
   "require": {
-    "php": "^8.1.0",
+    "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
     "composer-runtime-api": "^2.0.0",
-    "browscap/browscap-php": "7.3.x-dev",
-    "mimmi20/browser-detector-version": "^9.0.3",
-    "psr/log": "^3.0.0",
-    "symfony/console": "^v5.4.0 || ^6.0.1",
-    "symfony/filesystem": "^v5.4.0 || ^6.0.0",
-    "matthiasmullie/scrapbook": "^1.4.8",
-    "league/flysystem": "^3.21.0"
+    "browscap/browscap-php": "7.5.x-dev",
+    "mimmi20/browser-detector-version": "^9.0.7",
+    "psr/log": "^3.0.2",
+    "symfony/console": "^v5.4.44 || ^v6.4.12 || ^v7.1.5",
+    "symfony/filesystem": "^v5.4.44 || ^v6.4.12 || ^v7.1.5",
+    "matthiasmullie/scrapbook": "^1.5.3",
+    "league/flysystem": "^3.29.0"
   },
   "config": {
     "preferred-install": "dist",

@@ -1,55 +1,45 @@
 <?php
 
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Exception;
-use FilesystemIterator;
-use function file_get_contents;
-use function file_put_contents;
-use function json_decode;
-use function json_encode;
-use function ksort;
-use function mkdir;
-use function sort;
-use function sprintf;
-use SplFileInfo;
+use PDO;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class InitDb extends Command
+final class InitDb extends Command
 {
-    private \PDO $pdo;
-
-    /**
-     * @param \PDO $pdo
-     */
-    public function __construct(\PDO $pdo)
+    /** @throws void */
+    public function __construct(private readonly PDO $pdo)
     {
-        $this->pdo = $pdo;
-
         parent::__construct();
     }
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('init-db');
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $message  = 'initialize database';
+        $message = 'initialize database';
 
         $output->write($message);
 
@@ -329,11 +319,17 @@ class InitDb extends Command
   CONSTRAINT `FK_D98F3DB4E127EC2A` FOREIGN KEY (`userAgent_id`) REFERENCES `useragent` (`uaId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `real-provider` AS SELECT * FROM `provider` WHERE `proType` = \'real\' AND `proIsActive` = 1')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `test-provider` AS SELECT * FROM `provider` WHERE `proType` = \'testSuite\' AND `proIsActive` = 1')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `real-provider` AS SELECT * FROM `provider` WHERE `proType` = \'real\' AND `proIsActive` = 1',
+        )->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `test-provider` AS SELECT * FROM `provider` WHERE `proType` = \'testSuite\' AND `proIsActive` = 1',
+        )->execute();
 
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT 
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL',
+        )->execute();
+        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT
         `resClientName` AS `name`,
         `uaId`,
         `uaString`,
@@ -342,7 +338,9 @@ class InitDb extends Command
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resClientName`')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-engine-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resEngineName` IS NOT NULL')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-engine-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resEngineName` IS NOT NULL',
+        )->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-engine-names` AS SELECT
         `resEngineName` AS `name`,
         `uaId`,
@@ -352,7 +350,9 @@ class InitDb extends Command
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resEngineName`')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-os-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resOsName` IS NOT NULL')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-os-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resOsName` IS NOT NULL',
+        )->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-os-names` AS SELECT
         `resOsName` AS `name`,
         `uaId`,
@@ -362,7 +362,9 @@ class InitDb extends Command
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resOsName`')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-device-models` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceName` IS NOT NULL')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-device-models` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceName` IS NOT NULL',
+        )->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-device-models` AS SELECT
         `resDeviceName` AS `name`,
         `uaId`,
@@ -372,7 +374,9 @@ class InitDb extends Command
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resDeviceName`')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-device-brands` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceBrand` IS NOT NULL')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-device-brands` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceBrand` IS NOT NULL',
+        )->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-device-brands` AS SELECT
         `resDeviceBrand` AS `name`,
         `uaId`,
@@ -382,7 +386,9 @@ class InitDb extends Command
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resDeviceBrand`')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-device-types` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceType` IS NOT NULL')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-device-types` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceType` IS NOT NULL',
+        )->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-device-types` AS SELECT
         `resDeviceType` AS `name`,
         `uaId`,
@@ -392,9 +398,15 @@ class InitDb extends Command
     INNER JOIN `userAgent`
         ON `uaId` = `userAgent_id`
     GROUP BY `resDeviceType`')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-device-ismobile` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceIsMobile` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-isbot` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientIsBot` IS NOT NULL')->execute();
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `list-found-general-client-types` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientType` IS NOT NULL')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-device-ismobile` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resDeviceIsMobile` IS NOT NULL',
+        )->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-client-isbot` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientIsBot` IS NOT NULL',
+        )->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `list-found-general-client-types` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientType` IS NOT NULL',
+        )->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-types` AS SELECT
         `resClientType` AS `name`,
         `uaId`,
@@ -405,7 +417,9 @@ class InitDb extends Command
         ON `uaId` = `userAgent_id`
     GROUP BY `resClientType`')->execute();
 
-        $this->pdo->prepare('CREATE OR REPLACE VIEW `found-results` AS SELECT * FROM `result` WHERE `resResultFound` = 1 AND `provider_id` IN (SELECT `proId` FROM `real-provider`)')->execute();
+        $this->pdo->prepare(
+            'CREATE OR REPLACE VIEW `found-results` AS SELECT * FROM `result` WHERE `resResultFound` = 1 AND `provider_id` IN (SELECT `proId` FROM `real-provider`)',
+        )->execute();
 
         $output->writeln("\r" . $message . ' <info>done</info>');
 

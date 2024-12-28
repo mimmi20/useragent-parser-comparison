@@ -1,18 +1,21 @@
 <?php
 
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
 use Exception;
-use function fclose;
-use function file_put_contents;
-use function fopen;
-use function fputcsv;
-use function json_encode;
-use function mkdir;
-use function rewind;
-use function stream_get_contents;
+use JsonException;
+use SplFileObject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -23,14 +26,42 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
+use UserAgentParserComparison\Command\Helper\Parsers;
 
-class Parse extends Command
+use function addcslashes;
+use function array_key_exists;
+use function array_pop;
+use function assert;
+use function basename;
+use function fclose;
+use function file_exists;
+use function file_put_contents;
+use function fopen;
+use function fputcsv;
+use function is_string;
+use function json_encode;
+use function mb_str_pad;
+use function mb_strlen;
+use function mb_substr;
+use function mkdir;
+use function rewind;
+use function round;
+use function rtrim;
+use function sprintf;
+use function stream_get_contents;
+use function time;
+
+use const JSON_PRETTY_PRINT;
+use const JSON_THROW_ON_ERROR;
+use const JSON_UNESCAPED_SLASHES;
+use const JSON_UNESCAPED_UNICODE;
+use const PHP_EOL;
+
+final class Parse extends Command
 {
-    /**
-     * @var string
-     */
-    private $runDir = __DIR__ . '/../../data/test-runs';
+    private string $runDir = __DIR__ . '/../../data/test-runs';
 
+    /** @throws void */
     protected function configure(): void
     {
         $this->setName('parse')
@@ -39,40 +70,52 @@ class Parse extends Command
             ->addArgument('run', InputArgument::OPTIONAL, 'Name of the run, for storing results')
             ->addOption('normalize', null, InputOption::VALUE_NONE, 'Whether to normalize the output')
             ->addOption('csv', null, InputOption::VALUE_NONE, 'Outputs CSV without showing CLI table')
-            ->addOption('no-output', null, InputOption::VALUE_NONE, 'Disables output after parsing, useful when chaining commands')
-            ->addOption('csv-file', null, InputOption::VALUE_OPTIONAL, 'File name to output CSV data to, implies the options "csv" and "no-output"')
-            ->setHelp('Parses the useragent strings (one per line) from the passed in file and outputs the parsed properties.');
+            ->addOption(
+                'no-output',
+                null,
+                InputOption::VALUE_NONE,
+                'Disables output after parsing, useful when chaining commands',
+            )
+            ->addOption(
+                'csv-file',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'File name to output CSV data to, implies the options "csv" and "no-output"',
+            )
+            ->setHelp(
+                'Parses the useragent strings (one per line) from the passed in file and outputs the parsed properties.',
+            );
     }
 
+    /** @throws JsonException */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /** @var string $filename */
-        $filename  = $input->getArgument('file');
+        $filename = $input->getArgument('file');
+        assert(is_string($filename));
         $normalize = $input->getOption('normalize');
         $csv       = $input->getOption('csv');
 
-        /** @var string|null $name */
-        $name     = $input->getArgument('run');
+        $name = $input->getArgument('run');
+        assert(is_string($name) || $name === null);
         $noOutput = $input->getOption('no-output');
 
-        /** @var string|null $csvFile */
         $csvFile = $input->getOption('csv-file');
+        assert(is_string($csvFile) || $csvFile === null);
 
         if ($csvFile) {
             $noOutput = true;
             $csv      = true;
-            $csvFile  = (string) $csvFile;
         } elseif ($csv) {
             $output->writeln(
-                '<error>csvFile parameter is required if csv parameter is specified</error>'
+                '<error>csvFile parameter is required if csv parameter is specified</error>',
             );
 
             return self::FAILURE;
         }
 
-        /** @var Helper\Normalize $normalizeHelper */
         $normalizeHelper = $this->getHelper('normalize');
-        $questionHelper  = $this->getHelper('question');
+        assert($normalizeHelper instanceof Helper\Normalize);
+        $questionHelper = $this->getHelper('question');
 
         $table = new Table($output);
         $table->setHeaders([
@@ -85,15 +128,14 @@ class Parse extends Command
             mkdir($this->runDir . '/' . $name . '/results');
         }
 
-
-        /** @var \UserAgentParserComparison\Command\Helper\Parsers $parserHelper */
         $parserHelper = $this->getHelper('parsers');
-        $parsers      = $parserHelper->getParsers($input, $output);
-        $actualTest   = 0;
+        assert($parserHelper instanceof Parsers);
+        $parsers    = $parserHelper->getParsers($input, $output);
+        $actualTest = 0;
 
         $result = [];
-        $file   = new \SplFileObject($filename);
-        $file->setFlags(\SplFileObject::DROP_NEW_LINE);
+        $file   = new SplFileObject($filename);
+        $file->setFlags(SplFileObject::DROP_NEW_LINE);
 
         while (!$file->eof()) {
             $agentString = $file->fgets();
@@ -123,11 +165,11 @@ class Parse extends Command
             foreach ($parsers as $parserName => $parser) {
                 if (!array_key_exists($parserName, $result)) {
                     $result[$parserName] = [
-                        'results'     => [],
-                        'parse_time'  => 0,
-                        'init_time'   => 0,
+                        'results' => [],
+                        'parse_time' => 0,
+                        'init_time' => 0,
                         'memory_used' => 0,
-                        'version'     => null,
+                        'version' => null,
                     ];
                 }
 
@@ -137,7 +179,7 @@ class Parse extends Command
                     $textLength = mb_strlen($testMessage);
                 }
 
-                $output->write("\r" . str_pad($testMessage, $textLength));
+                $output->write("\r" . mb_str_pad($testMessage, $textLength));
                 $singleResult = $parser['parse-ua']($agentString);
 
                 if (empty($singleResult)) {
@@ -154,12 +196,12 @@ class Parse extends Command
 
                 $result[$parserName]['results'][] = [
                     'headers' => $singleResult['headers'],
-                    'parsed'  => $singleResult['result']['parsed'],
-                    'err'     => $singleResult['result']['err'],
+                    'parsed' => $singleResult['result']['parsed'],
+                    'err' => $singleResult['result']['err'],
                     'version' => $singleResult['version'],
-                    'init'    => $singleResult['init_time'],
-                    'time'    => $singleResult['parse_time'],
-                    'memory'  => $singleResult['memory_used'],
+                    'init' => $singleResult['init_time'],
+                    'time' => $singleResult['parse_time'],
+                    'memory' => $singleResult['memory_used'],
                 ];
 
                 if ($singleResult['init_time'] > $result[$parserName]['init_time']) {
@@ -171,7 +213,7 @@ class Parse extends Command
                 }
 
                 $result[$parserName]['parse_time'] += $singleResult['parse_time'];
-                $result[$parserName]['version'] = $singleResult['version'];
+                $result[$parserName]['version']     = $singleResult['version'];
 
                 unset($singleResult);
             }
@@ -182,7 +224,7 @@ class Parse extends Command
                 $textLength = mb_strlen($testMessage);
             }
 
-            $output->writeln("\r" . str_pad($testMessage, $textLength));
+            $output->writeln("\r" . mb_str_pad($testMessage, $textLength));
 
             foreach ($parsers as $parserName => $parser) {
                 if ($name) {
@@ -191,20 +233,31 @@ class Parse extends Command
                     }
 
                     file_put_contents(
-                        $this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename($filename) . '.json',
-                        json_encode($result[$parserName], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                        $this->runDir . '/' . $name . '/results/' . $parserName . '/' . basename(
+                            $filename,
+                        ) . '.json',
+                        json_encode(
+                            $result[$parserName],
+                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                        ),
                     );
                 }
 
                 $rows = [];
+
                 foreach ($result[$parserName]['results'] as $singleResult) {
                     if ($normalize) {
                         $singleResult['parsed'] = $normalizeHelper->normalize($singleResult['parsed']);
                     }
 
-
                     $rows[] = [
-                        new TableCell('<fg=yellow>' . (isset($singleResult['useragent']) ? ' ' . rtrim($singleResult['useragent'], '\\') . ' ' : '--') . '</fg>', ['colspan' => '7']),
+                        new TableCell(
+                            '<fg=yellow>' . (isset($singleResult['useragent']) ? ' ' . rtrim(
+                                $singleResult['useragent'],
+                                '\\',
+                            ) . ' ' : '--') . '</fg>',
+                            ['colspan' => '7'],
+                        ),
                         round($singleResult['time'], 5) . 's',
                     ];
                     $rows[] = [
@@ -229,54 +282,60 @@ class Parse extends Command
                 if (!$csv && !$noOutput) {
                     $table->render();
 
-                    $question = new ChoiceQuestion('What would you like to do?', ['Dump as CSV', 'Continue'], 1);
+                    $question = new ChoiceQuestion(
+                        'What would you like to do?',
+                        ['Dump as CSV', 'Continue'],
+                        1,
+                    );
 
                     $answer = $questionHelper->ask($input, $output, $question);
                 }
 
-                if ($csv || $answer === 'Dump as CSV') {
-                    $csvOutput = $this->putcsv(
-                        [
-                            'useragent',
-                            'browser_name',
-                            'browser_version',
-                            'platform_name',
-                            'platform_version',
-                            'device_name',
-                            'device_brand',
-                            'device_type',
-                            'ismobile',
-                            'time',
-                        ],
-                        $csvFile
-                    );
+                if (!$csv && $answer !== 'Dump as CSV') {
+                    continue;
+                }
 
-                    $csvOutput .= "\n";
+                $csvOutput = $this->putcsv(
+                    [
+                        'useragent',
+                        'browser_name',
+                        'browser_version',
+                        'platform_name',
+                        'platform_version',
+                        'device_name',
+                        'device_brand',
+                        'device_type',
+                        'ismobile',
+                        'time',
+                    ],
+                    $csvFile,
+                );
 
-                    foreach ($result[$parserName]['results'] as $singleResult) {
-                        $out = [
-                            $singleResult['useragent'],
-                            $singleResult['parsed']['client']['name'],
-                            $singleResult['parsed']['client']['version'],
-                            $singleResult['parsed']['platform']['name'],
-                            $singleResult['parsed']['platform']['version'],
-                            $singleResult['parsed']['device']['name'],
-                            $singleResult['parsed']['device']['brand'],
-                            $singleResult['parsed']['device']['type'],
-                            $singleResult['parsed']['device']['ismobile'],
-                            $singleResult['time'],
-                        ];
+                $csvOutput .= "\n";
 
-                        $csvOutput .= $this->putcsv($out, $csvFile) . "\n";
-                    }
+                foreach ($result[$parserName]['results'] as $singleResult) {
+                    $out = [
+                        $singleResult['useragent'],
+                        $singleResult['parsed']['client']['name'],
+                        $singleResult['parsed']['client']['version'],
+                        $singleResult['parsed']['platform']['name'],
+                        $singleResult['parsed']['platform']['version'],
+                        $singleResult['parsed']['device']['name'],
+                        $singleResult['parsed']['device']['brand'],
+                        $singleResult['parsed']['device']['type'],
+                        $singleResult['parsed']['device']['ismobile'],
+                        $singleResult['time'],
+                    ];
 
-                    if ($csvFile) {
-                        $output->writeln('Wrote CSV data to ' . $csvFile);
-                    } else {
-                        $output->writeln($csvOutput);
-                        $question = new Question('Press enter to continue', 'yes');
-                        $questionHelper->ask($input, $output, $question);
-                    }
+                    $csvOutput .= $this->putcsv($out, $csvFile) . "\n";
+                }
+
+                if ($csvFile) {
+                    $output->writeln('Wrote CSV data to ' . $csvFile);
+                } else {
+                    $output->writeln($csvOutput);
+                    $question = new Question('Press enter to continue', 'yes');
+                    $questionHelper->ask($input, $output, $question);
                 }
             }
         }
@@ -284,7 +343,10 @@ class Parse extends Command
         if ($name) {
             file_put_contents(
                 $this->runDir . '/' . $name . '/metadata.json',
-                json_encode(['parsers' => $parsers, 'date' => time(), 'file' => basename($filename)], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
+                json_encode(
+                    ['parsers' => $parsers, 'date' => time(), 'file' => basename($filename)],
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                ),
             );
         }
 
@@ -294,18 +356,16 @@ class Parse extends Command
     }
 
     /**
-     * @throws \Exception if cannot open file stream
+     * @param array<int|string, string> $input
+     *
+     * @throws Exception if cannot open file stream
      */
     private function putcsv(array $input, string $csvFile): string
     {
         $delimiter = ',';
         $enclosure = '"';
 
-        if ($csvFile) {
-            $fp = fopen($csvFile, 'a+');
-        } else {
-            $fp = fopen('php://temp', 'r+');
-        }
+        $fp = $csvFile ? fopen($csvFile, 'a+') : fopen('php://temp', 'r+');
 
         fputcsv($fp, $input, $delimiter, $enclosure);
         rewind($fp);

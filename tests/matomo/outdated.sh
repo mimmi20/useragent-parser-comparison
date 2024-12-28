@@ -11,3 +11,4 @@ command -v "$composer_command" >/dev/null 2>&1 || {
 
 $composer_command update --prefer-lowest --prefer-source
 $composer_command outdated --direct
+$composer_command audit

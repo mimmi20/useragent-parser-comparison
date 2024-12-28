@@ -2,10 +2,17 @@
 
 const initStart = process.hrtime();
 const DeviceDetector = require('node-device-detector');
+const ClientHints = require('node-device-detector/client-hints');
 const DeviceHelper = require('node-device-detector/helper');
-const detector = new DeviceDetector();
+const detector = new DeviceDetector({
+    clientIndexes: true,
+    deviceIndexes: true,
+    deviceAliasCode: false,
+});
+const clientHint = new ClientHints();
 // Trigger a parse to force cache loading
 detector.detect('Test String');
+detector.parseBot('Test String')
 const initTime = process.hrtime(initStart)[1] / 1000000000;
 
 const packageInfo = require(require('path').dirname(require.resolve('node-device-detector')) +
@@ -37,8 +44,9 @@ const output = {
 
 if (hasUa) {
     const start = process.hrtime();
-    const r = detector.detect(line);
-    const bot = detector.parseBot(line);
+    const hints = clientHint.parse({'user-agent': line});
+    const r = detector.detect(line, hints);
+    const bot = detector.parseBot(line, hints);
     const end = process.hrtime(start)[1] / 1000000000;
 
     output.result.parsed = {

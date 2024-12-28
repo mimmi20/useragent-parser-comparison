@@ -1,34 +1,112 @@
 <?php
+
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+declare(strict_types = 1);
+
 namespace UserAgentParserComparison\Html;
 
-use UserAgentParserComparison\Entity\UserAgentEvaluation;
-use UserAgentParserComparison\Entity\Result;
-use UserAgentParserComparison\Entity\UserAgent;
+use JsonException;
+use Override;
 
-class UserAgentDetail extends AbstractHtml
+use function array_key_exists;
+use function count;
+use function htmlspecialchars;
+use function is_array;
+use function json_decode;
+use function number_format;
+use function print_r;
+use function round;
+
+use const JSON_THROW_ON_ERROR;
+
+final class UserAgentDetail extends AbstractHtml
 {
-
+    /** @var array<int, string> */
     private array $userAgent = [];
 
-    /**
-     * @var array[]
-     */
+    /** @var array<array<mixed>> */
     private array $results = [];
 
-    public function setUserAgent(array $userAgent)
+    /**
+     * @param array<string> $userAgent
+     *
+     * @throws void
+     */
+    public function setUserAgent(array $userAgent): void
     {
         $this->userAgent = $userAgent;
     }
 
     /**
+     * @param array<array<mixed>> $results
      *
-     * @param array[] $results
+     * @throws void
      */
-    public function setResults(array $results)
+    public function setResults(array $results): void
     {
         $this->results = $results;
     }
 
+    /** @throws JsonException */
+    #[Override]
+    public function getHtml(): string
+    {
+        $addStr = '';
+
+        if ($this->userAgent['uaAdditionalHeaders'] !== null) {
+            $addHeaders = json_decode(
+                $this->userAgent['uaAdditionalHeaders'],
+                true,
+                512,
+                JSON_THROW_ON_ERROR,
+            );
+
+            if (is_array($addHeaders) && count($addHeaders) > 0) {
+                $addStr = '<br /><strong>Additional headers</strong><br />';
+
+                foreach ($addHeaders as $key => $value) {
+                    $addStr .= '<strong>' . htmlspecialchars($key) . '</strong> ' . htmlspecialchars(
+                        $value,
+                    ) . '<br />';
+                }
+            }
+        }
+
+        $body = '
+<div class="section">
+    <h1 class="header center orange-text">User agent detail</h1>
+    <div class="row center">
+        <h5 class="header light">
+            ' . htmlspecialchars($this->userAgent['uaString']) . '
+            ' . $addStr . '
+        </h5>
+    </div>
+</div>
+
+<div class="section">
+    ' . $this->getProvidersTable() . '
+</div>
+';
+
+        $script = '
+$(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $(\'.modal-trigger\').leanModal();
+});
+        ';
+
+        return parent::getHtmlCombined($body, $script);
+    }
+
+    /** @throws void */
     private function getProvidersTable(): string
     {
         $html = '<table class="striped">';
@@ -69,7 +147,7 @@ class UserAgentDetail extends AbstractHtml
 
         $html .= '</tr>';
         $html .= '</thead>';
-        
+
         /*
          * Test suite
          */
@@ -77,31 +155,36 @@ class UserAgentDetail extends AbstractHtml
         $html .= '<tr><th colspan="17" class="green lighten-3">';
         $html .= 'Test suite';
         $html .= '</th></tr>';
-        
+
         foreach ($this->results as $result) {
             if (array_key_exists('proType', $result) && $result['proType'] === 'testSuite') {
                 $html .= $this->getRow($result);
             }
         }
-        
+
         /*
          * Providers
          */
         $html .= '<tr><th colspan="17" class="green lighten-3">';
         $html .= 'Providers';
         $html .= '</th></tr>';
-        
+
         foreach ($this->results as $result) {
             if (array_key_exists('proType', $result) && $result['proType'] === 'real') {
                 $html .= $this->getRow($result);
             }
         }
+
         $html .= '</tbody>';
-        $html .= '</table>';
-        
-        return $html;
+
+        return $html . '</table>';
     }
 
+    /**
+     * @param array<mixed> $result
+     *
+     * @throws void
+     */
     private function getRow(array $result): string
     {
         $html = '<tr>';
@@ -114,44 +197,46 @@ class UserAgentDetail extends AbstractHtml
             switch ($result['proLanguage']) {
                 case 'PHP':
                     $html .= '<span class="material-icons">php</span>';
+
                     break;
                 case 'JavaScript':
                     $html .= '<span class="material-icons">javascript</span>';
+
                     break;
             }
 
             $html .= '</div>';
 
             $html .= '<div>';
+
             if ($result['proPackageName']) {
-                switch ($result['proLanguage']) {
-                    case 'PHP':
-                        $html .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
-                        break;
-                    case 'JavaScript':
-                        $html .= '<a href="https://www.npmjs.com/package/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>';
-                        break;
-                    default:
-                        $html .= $result['proName'];
-                }
+                match ($result['proLanguage']) {
+                    'PHP' => $html        .= '<a href="https://packagist.org/packages/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>',
+                    'JavaScript' => $html .= '<a href="https://www.npmjs.com/package/' . $result['proPackageName'] . '">' . $result['proName'] . '</a>',
+                    default => $html      .= $result['proName'],
+                };
             } else {
                 $html .= $result['proName'];
             }
 
             $html .= '<br /><small>' . $result['proVersion'] . '</small>';
-            if (null !== $result['proLastReleaseDate']) {
+
+            if ($result['proLastReleaseDate'] !== null) {
                 $html .= '<br /><small>' . $result['proLastReleaseDate'] . '</small>';
             }
+
             $html .= '</div>';
         } elseif ($result['proApi']) {
             $html .= '<div><span class="material-icons">public</span></div>';
 
             $html .= '<div>';
+
             if ($result['proHomepage']) {
                 $html .= '<a href="' . $result['proHomepage'] . '">' . $result['proName'] . '</a>';
             } else {
                 $html .= $result['proName'];
             }
+
             $html .= '</div>';
         }
 
@@ -191,7 +276,10 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if (array_key_exists('proCanDetectClientIsBot', $result) && null !== $result['proCanDetectClientIsBot']) {
+            if (
+                array_key_exists('proCanDetectClientIsBot', $result)
+                && $result['proCanDetectClientIsBot'] !== null
+            ) {
                 if ($result['resClientIsBot']) {
                     $html .= '<td>yes</td>';
                 } else {
@@ -246,7 +334,10 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if (array_key_exists('proCanDetectDeviceIsMobile', $result) && null !== $result['proCanDetectDeviceIsMobile']) {
+            if (
+                array_key_exists('proCanDetectDeviceIsMobile', $result)
+                && $result['proCanDetectDeviceIsMobile'] !== null
+            ) {
                 if ($result['resDeviceIsMobile']) {
                     $html .= '<td>yes</td>';
                 } else {
@@ -256,7 +347,10 @@ class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if (array_key_exists('proCanDetectDeviceIsTouch', $result) && null !== $result['proCanDetectDeviceIsTouch']) {
+            if (
+                array_key_exists('proCanDetectDeviceIsTouch', $result)
+                && $result['proCanDetectDeviceIsTouch'] !== null
+            ) {
                 if ($result['resDeviceIsTouch']) {
                     $html .= '<td>yes</td>';
                 } else {
@@ -270,12 +364,12 @@ class UserAgentDetail extends AbstractHtml
         $html .= '<td>' . number_format(round($result['resParseTime'] * 1000, 3), 3) . '</td>';
 
         $html .= '<td>' . number_format(round($result['resMemoryUsed'], 2), 2) . '</td>';
-        
+
         $html .= '<td>
-        
+
 <!-- Modal Trigger -->
 <a class="modal-trigger btn waves-effect waves-light" href="#modal-' . $result['proId'] . '">Detail</a>
-        
+
 <!-- Modal Structure -->
 <div id="modal-' . $result['proId'] . '" class="modal modal-fixed-footer">
     <div class="modal-content">
@@ -286,52 +380,9 @@ class UserAgentDetail extends AbstractHtml
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">close</a>
     </div>
 </div>
-        
+
                 </td>';
-        
-        $html .= '</tr>';
-        
-        return $html;
-    }
 
-    public function getHtml(): string
-    {
-        $addStr = '';
-        if ($this->userAgent['uaAdditionalHeaders'] !== null) {
-            $addHeaders = json_decode($this->userAgent['uaAdditionalHeaders'], true, 512, JSON_THROW_ON_ERROR);
-
-            if (is_array($addHeaders) && count($addHeaders) > 0) {
-                $addStr = '<br /><strong>Additional headers</strong><br />';
-
-                foreach ($addHeaders as $key => $value) {
-                    $addStr .= '<strong>' . htmlspecialchars($key) . '</strong> ' . htmlspecialchars($value) . '<br />';
-                }
-            }
-        }
-        
-        $body = '
-<div class="section">
-    <h1 class="header center orange-text">User agent detail</h1>
-    <div class="row center">
-        <h5 class="header light">
-            ' . htmlspecialchars($this->userAgent['uaString']) . '
-            ' . $addStr . '
-        </h5>
-    </div>
-</div>   
-
-<div class="section">
-    ' . $this->getProvidersTable() . '
-</div>
-';
-        
-        $script = '
-$(document).ready(function(){
-    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $(\'.modal-trigger\').leanModal();
-});
-        ';
-        
-        return parent::getHtmlCombined($body, $script);
+        return $html . '</tr>';
     }
 }

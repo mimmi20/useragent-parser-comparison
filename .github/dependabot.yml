@@ -6,9 +6,8 @@ updates:
   - package-ecosystem: "composer"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -17,7 +16,7 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       include: "scope"
       prefix: "composer"
@@ -28,13 +27,13 @@ updates:
 #      - dependency-name: phpunit/phpunit
 #        versions:
 #          - ">= 0"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/browscap/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -43,16 +42,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/browscap"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/browser-detector/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -61,16 +60,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/browser-detector"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/curated/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -79,16 +78,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/curated"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/donatj/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -97,16 +96,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/donatj"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/endorphin/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -115,16 +114,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/endorphin"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/matomo/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -133,16 +132,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/matomo"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/sinergi/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -151,16 +150,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/sinergi"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/ua-parser/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -169,16 +168,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/ua-parser"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/ua-parser-js/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -187,16 +186,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/ua-parser-js"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/whichbrowser/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -205,16 +204,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/whichbrowser"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/woothee/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -223,16 +222,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/woothee"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "composer"
     directory: "tests/zsxsoft/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -241,16 +240,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "composer/tests/zsxsoft"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -259,16 +258,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "npm"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "npm"
     directory: "tests/ua-parser/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -277,16 +276,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "npm/tests/ua-parser"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "npm"
     directory: "tests/ua-parser-js/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -295,16 +294,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "npm/tests/ua-parser-js"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "npm"
     directory: "parsers/3rd-eden-useragent-js-2/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -313,16 +312,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "npm/parsers/3rd-eden-useragent-js-2"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "npm"
     directory: "parsers/bowser-js-2/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -331,16 +330,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "npm/parsers/bowser-js-2"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "npm"
     directory: "parsers/browser-detect-js-0/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -349,16 +348,16 @@ updates:
       - "mimmi20"
     labels:
       - "dependencies"
-    versioning-strategy: increase
+    versioning-strategy: "increase"
     commit-message:
       prefix: "npm/parsers/browser-detect-js-0"
+    rebase-strategy: "auto"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "05:30"
+      interval: "daily"
+      time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
     reviewers:
@@ -369,3 +368,6 @@ updates:
       - "dependencies"
     commit-message:
       prefix: "github-actions"
+    ignore:
+      - dependency-name: "mimmi20/ci"
+    rebase-strategy: "auto"

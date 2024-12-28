@@ -1,39 +1,35 @@
 <?php
 
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Compare;
 
-use Exception;
-use function array_flip;
-use function file_get_contents;
-use function json_decode;
-use function ksort;
-use function sort;
-use function uasort;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableCell;
-use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
+use function array_keys;
+use function is_array;
 
-class Comparison
+final class Comparison
 {
-    private array $data = [];
+    /** @var array<int|string, array<int|string, ValuePairs>> */
+    private array $data             = [];
+    private string | null $testname = null;
 
-    private ?string $testname = null;
-
+    /** @var array<mixed> */
     private array $test = [];
 
     /**
-     * Comparison constructor.
+     * @param array<int|string, array<int|string, array<mixed>>> $expectedData
+     * @param array<int|string, array<int|string, array<mixed>>> $actualData
      *
-     * @param array $expectedData
-     * @param array $actualData
+     * @throws void
      */
     public function __construct(array $expectedData, array $actualData)
     {
@@ -57,24 +53,22 @@ class Comparison
         }
     }
 
-    /**
-     * @return string|null
-     */
-    public function getTestname(): ?string
+    /** @throws void */
+    public function getTestname(): string | null
     {
         return $this->testname;
     }
 
-    /**
-     * @param string|null $testname
-     */
-    public function setTestname(?string $testname): void
+    /** @throws void */
+    public function setTestname(string | null $testname): void
     {
         $this->testname = $testname;
     }
 
     /**
-     * @return array
+     * @return array<mixed>
+     *
+     * @throws void
      */
     public function getTest(): array
     {
@@ -82,13 +76,20 @@ class Comparison
     }
 
     /**
-     * @param array $test
+     * @param array<mixed> $test
+     *
+     * @throws void
      */
     public function setTest(array $test): void
     {
         $this->test = $test;
     }
 
+    /**
+     * @return array<mixed>
+     *
+     * @throws void
+     */
     public function getComparison(string $parserName, int $countUseragent): array
     {
         $comparison = [];
@@ -97,14 +98,14 @@ class Comparison
             $comparison[$compareKey] = [];
 
             foreach ($compareValues as $compareSubKey => $pair) {
-                /** @var \UserAgentParserComparison\Compare\ValuePairs $pair */
+                /** @var ValuePairs $pair */
                 $expectedValue = $pair->getExpected() ?? '[n/a]';
                 $actualValue   = $pair->getActual() ?? '[n/a]';
 
                 if (!isset($comparison[$compareKey][$compareSubKey][$expectedValue])) {
                     $comparison[$compareKey][$compareSubKey][$expectedValue] = [
-                        'expected'  => [
-                            'count'  => 0,
+                        'expected' => [
+                            'count' => 0,
                             'agents' => [],
                         ],
                         $parserName => [],
@@ -116,7 +117,7 @@ class Comparison
 
                 if (!isset($comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue])) {
                     $comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue] = [
-                        'count'  => 0,
+                        'count' => 0,
                         'agents' => [],
                     ];
                 }
@@ -124,10 +125,12 @@ class Comparison
                 ++$comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['count'];
                 $comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['agents'][] = $countUseragent;
 
-                if ($expectedValue !== $actualValue) {
-                    if ($expectedValue !== '[n/a]' && $actualValue !== '[n/a]') {
-                        $comparison[$compareKey][$compareSubKey][$expectedValue]['expected']['hasFailures'] = true;
-                    }
+                if ($expectedValue === $actualValue) {
+                    continue;
+                }
+
+                if ($expectedValue !== '[n/a]' && $actualValue !== '[n/a]') {
+                    $comparison[$compareKey][$compareSubKey][$expectedValue]['expected']['hasFailures'] = true;
                 }
             }
         }
@@ -135,6 +138,11 @@ class Comparison
         return $comparison;
     }
 
+    /**
+     * @return array<int|string, array<int|string, array{expected: mixed, actual: mixed, diff: bool, unset: bool}>>
+     *
+     * @throws void
+     */
     public function getFailures(): array
     {
         $failures = [];
@@ -143,7 +151,7 @@ class Comparison
             $failures[$compareKey] = [];
 
             foreach ($compareValues as $compareSubKey => $pair) {
-                /** @var \UserAgentParserComparison\Compare\ValuePairs $pair */
+                /** @var ValuePairs $pair */
                 $expectedValue = $pair->getExpected();
                 $actualValue   = $pair->getActual();
                 $diff          = true;

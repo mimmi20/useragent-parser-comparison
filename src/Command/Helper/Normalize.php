@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of the browser-detector-version package.
+ *
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
@@ -17,12 +26,14 @@ use function preg_replace;
 use function sprintf;
 use function str_replace;
 
-class Normalize extends Helper
+final class Normalize extends Helper
 {
-    private const MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
+    private const string MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
+    /** @var array<string, array<string, array<string, string|null>>> */
     private array $mappings = [];
 
+    /** @throws void */
     public function __construct()
     {
         if (!file_exists(self::MAP_FILE)) {
@@ -32,11 +43,19 @@ class Normalize extends Helper
         $this->mappings = include self::MAP_FILE;
     }
 
+    /** @throws void */
     public function getName(): string
     {
         return 'normalize';
     }
 
+    /**
+     * @param array<string, mixed> $parsed
+     *
+     * @return array<string, mixed>
+     *
+     * @throws void
+     */
     public function normalize(array $parsed): array
     {
         $normalized = [];
@@ -58,6 +77,7 @@ class Normalize extends Helper
         return $normalized;
     }
 
+    /** @throws void */
     private function truncateVersion(string $version): string
     {
         $version      = str_replace('_', '.', $version);
@@ -68,18 +88,19 @@ class Normalize extends Helper
     }
 
     /**
-     * @return array|string|null
+     * @return array<mixed>|string|null
      *
      * @throws void
      */
     private function normalizeValue(string $section, string $key, mixed $value): array | string | null
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
         if (is_array($value)) {
             $list = [];
+
             foreach ($value as $key2 => $value2) {
                 $list[$key2] = $this->normalizeValue($section, $key2, $value2);
             }
@@ -87,19 +108,21 @@ class Normalize extends Helper
             return $list;
         }
 
-        if (false === $value) {
+        if ($value === false) {
             $value = 'false';
         }
 
-        if (true === $value) {
+        if ($value === true) {
             $value = 'true';
         }
 
-        if ('version' === $key) {
-            $value = $this->truncateVersion(mb_strtolower((string) $value));
-        } else {
-            $value = preg_replace('|[^0-9a-z+]|', '', mb_strtolower((string) $value));
-        }
+        $value = $key === 'version'
+            ? $this->truncateVersion(mb_strtolower((string) $value))
+            : preg_replace(
+                '|[^0-9a-z+]|',
+                '',
+                mb_strtolower((string) $value),
+            );
 
         if (!isset($this->mappings[$section][$key])) {
             return $value;
@@ -116,17 +139,22 @@ class Normalize extends Helper
         while (array_key_exists($value, $v)) {
             $value = $v[$value];
 
-            if (null === $value) {
+            if ($value === null) {
                 break;
             }
 
             if ($value === $oldValue) {
                 echo sprintf('normalizing circle detected for value "%s"', $oldValue);
+
                 exit;
             }
 
             if (array_key_exists($value, $v)) {
-                echo sprintf('"%s" was normalized to "%s" which will be normalized again. Please update the normalizing array.' . "\n", $oldValue, $value);
+                echo sprintf(
+                    '"%s" was normalized to "%s" which will be normalized again. Please update the normalizing array.' . "\n",
+                    $oldValue,
+                    $value,
+                );
             }
         }
 
