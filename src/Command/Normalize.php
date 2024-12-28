@@ -32,6 +32,7 @@ final class Normalize extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('normalize')
@@ -45,6 +46,7 @@ final class Normalize extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $thisRunName = $input->getArgument('run');

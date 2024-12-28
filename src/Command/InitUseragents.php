@@ -45,6 +45,7 @@ final class InitUseragents extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('init-useragents');
@@ -55,6 +56,7 @@ final class InitUseragents extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare('SELECT * FROM `test-provider`');

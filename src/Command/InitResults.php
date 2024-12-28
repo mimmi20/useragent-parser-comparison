@@ -39,6 +39,7 @@ final class InitResults extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('init-results')
@@ -51,6 +52,7 @@ final class InitResults extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getOption('run');

@@ -50,6 +50,7 @@ final class Parse extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('parse')
@@ -60,6 +61,7 @@ final class Parse extends Command
     }
 
     /** @throws JsonException */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $proId    = null;

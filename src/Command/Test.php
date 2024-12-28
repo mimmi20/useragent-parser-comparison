@@ -46,6 +46,7 @@ final class Test extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function configure(): void
     {
         $this->setName('test')
@@ -61,6 +62,7 @@ final class Test extends Command
     }
 
     /** @throws void */
+    #[\Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln('~~~ Testing all UAs ~~~');
