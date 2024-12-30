@@ -2,7 +2,7 @@
   "require": {
     "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
     "mustangostang/spyc": "^0.6.3",
-    "mimmi20/browscap-helper-source": "^3.0.18",
+    "mimmi20/browscap-helper-source": "^5.0.3",
     "ua-parser/uap-core": "dev-master"
   },
   "config": {
