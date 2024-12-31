@@ -2,7 +2,7 @@
   "require": {
     "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
     "composer-runtime-api": "^2.0",
-    "browscap/browscap": "6.1.7",
+    "browscap/browscap": "6.1.7 || 6028",
     "mimmi20/browscap-helper-source": "^5.0.3"
   },
   "config": {
