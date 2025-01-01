@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of the browser-detector-version package.
+ * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -32,6 +32,7 @@ use function count;
 use function escapeshellarg;
 use function file_exists;
 use function file_get_contents;
+use function is_array;
 use function is_string;
 use function json_decode;
 use function reset;
@@ -264,12 +265,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode(
-            $content,
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;
@@ -309,12 +305,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode(
-            $content,
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;
@@ -354,12 +345,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode(
-            $content,
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;
@@ -385,12 +371,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode(
-            $content,
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;
