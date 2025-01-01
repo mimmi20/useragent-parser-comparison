@@ -824,15 +824,15 @@ final class GenerateIndexPage extends Command
             INNER JOIN `userAgent`
                 ON `userAgent`.`uaId` = `found-results`.`userAgent_id`
             WHERE
-            	`found-results`.`provider_id` = :proId
+                `found-results`.`provider_id` = :proId
                 AND `found-results`.`resClientIsBot` IS NULL
-        	    AND `userAgent`.`uaId` IN(
-            		SELECT
+                AND `userAgent`.`uaId` IN(
+                    SELECT
                         `result`.`userAgent_id`
                     FROM `test-provider`
                     INNER JOIN `result`
                         ON `result`.`provider_id` = `test-provider`.`proId`
-            			AND `result`.`resClientIsBot` = 1
+                        AND `result`.`resClientIsBot` = 1
                 )
         ';
                 $statement = $this->pdo->prepare($sql);
