@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -34,18 +34,8 @@ abstract class AbstractHtml
     abstract public function getHtml(): string;
 
     /** @throws void */
-    final protected function getUserAgentCount(string | null $run = null): int
+    final protected function getUserAgentCount(): int
     {
-        if ($run !== null) {
-            $statementCountAllResults = $this->pdo->prepare(
-                'SELECT COUNT(*) AS `count` FROM `userAgent` WHERE `uaId` IN (SELECT `result`.`userAgent_id` FROM `result` WHERE `result`.`run` = :run)',
-            );
-            $statementCountAllResults->bindValue(':run', $run, PDO::PARAM_STR);
-            $statementCountAllResults->execute();
-
-            return $statementCountAllResults->fetch(PDO::FETCH_COLUMN);
-        }
-
         if ($this->userAgentCount === null) {
             $statementCountAllResults = $this->pdo->prepare(
                 'SELECT COUNT(*) AS `count` FROM `userAgent`',
@@ -73,11 +63,11 @@ abstract class AbstractHtml
         if ($resultFound2 !== null) {
             $html .= '<circle class="donut-segment donut-segment-3" stroke-dasharray="' . $this->calculatePercent(
                 $resultFound2,
-                (float) ($countOfUseragents / 100),
+                $countOfUseragents / 100,
                 2,
             ) . ' ' . 100 - $this->calculatePercent(
                 $resultFound2,
-                (float) ($countOfUseragents / 100),
+                $countOfUseragents / 100,
                 2,
             ) . '"></circle>
                     ';
@@ -85,11 +75,11 @@ abstract class AbstractHtml
 
         return $html . ('<circle class="donut-segment donut-segment-2" stroke-dasharray="' . $this->calculatePercent(
             $resultFound,
-            (float) ($countOfUseragents / 100),
+            $countOfUseragents / 100,
             2,
         ) . ' ' . 100 - $this->calculatePercent(
             $resultFound,
-            (float) ($countOfUseragents / 100),
+            $countOfUseragents / 100,
             2,
         ) . '"></circle>
                     <g class="donut-text">
@@ -97,7 +87,7 @@ abstract class AbstractHtml
                         <text y="50%" transform="translate(0, 2)">
                             <tspan x="50%" text-anchor="middle" class="donut-percent">' . $this->calculatePercent(
             $resultFound,
-            (float) ($countOfUseragents / 100),
+            $countOfUseragents / 100,
             2,
 ) . '%</tspan>
                         </text>
@@ -110,10 +100,6 @@ abstract class AbstractHtml
     /** @throws void */
     protected function calculatePercent(int $resultFound, float $onePercent, int $decimals = 4): string
     {
-        if ($onePercent === 0.0) {
-            return number_format(0.0, $decimals);
-        }
-
         return number_format(round($resultFound / $onePercent, 6), $decimals);
     }
 
@@ -140,8 +126,8 @@ abstract class AbstractHtml
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style type="text/css">
         .svg-item {
-            width: 50px;
-            height: 50px;
+            width: 100px;
+            height: 100px;
             font-size: 16px;
             margin: 0 auto;
         }
@@ -180,8 +166,7 @@ abstract class AbstractHtml
 
         .donut-text {
             font-family: Arial, Helvetica, sans-serif;
-            fill: #0a236c;
-            font-size: 18px;
+            fill: #d9e021;
         }
     </style>
 </head>
@@ -218,11 +203,11 @@ abstract class AbstractHtml
 
 </div>
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
 
-    <script type="text/javascript">
+    <script>
     ' . $script . '
     </script>
 

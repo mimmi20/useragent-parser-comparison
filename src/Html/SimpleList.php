@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,11 +20,11 @@ use function htmlspecialchars;
 
 final class SimpleList extends AbstractHtml
 {
-    /** @var array<array<string>> */
+    /** @var array<string, mixed> */
     private array $elements = [];
 
     /**
-     * @param array<array<string>> $elements
+     * @param array<string, mixed> $elements
      *
      * @throws void
      */
@@ -93,6 +93,10 @@ var hackerList = new List(\'simple-list\', options);
              */
             if (isset($element['detectionCount'])) {
                 $html .= ' <small class="detectionCount">' . $element['detectionCount'] . 'x detected</small>';
+            }
+
+            if (isset($element['detectionCountUnique'])) {
+                $html .= ' <small class="detectionCountUnique">(' . $element['detectionCountUnique'] . 'x unique)</small>';
             }
 
             if (isset($element['detectionValuesDistinct'])) {

@@ -22,3 +22,4 @@ parsers/browscap-php/data/
 parsers/php-get-browser/data/browscap.ini
 parsers/php-get-browser/data/version.txt
 parsers/ua-parser-php/version.txt
+package-lock.json

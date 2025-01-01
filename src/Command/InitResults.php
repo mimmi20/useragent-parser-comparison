@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Override;
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,7 +39,6 @@ final class InitResults extends Command
     }
 
     /** @throws void */
-    #[Override]
     protected function configure(): void
     {
         $this->setName('init-results')
@@ -53,7 +51,6 @@ final class InitResults extends Command
     }
 
     /** @throws void */
-    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getOption('run');
@@ -96,7 +93,7 @@ final class InitResults extends Command
                 continue;
             }
 
-            $nameLength = max($nameLength, mb_strlen((string) $proName));
+            $nameLength = max($nameLength, mb_strlen($proName));
 
             $providers[$proName] = [$parserPath, $parserConfig, $proId];
         }
@@ -206,7 +203,7 @@ final class InitResults extends Command
             $this->pdo->prepare('DROP TEMPORARY TABLE IF EXISTS `temp_userAgent`')->execute();
 
             $start += $count;
-        } while (0 < $colCount);
+        } while ($colCount > 0);
 
         return self::SUCCESS;
     }

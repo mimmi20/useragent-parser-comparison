@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -30,8 +30,6 @@ $config
     ->ignoreErrorsOnPath(__DIR__ . '/vendor', [ErrorType::UNKNOWN_FUNCTION])
     ->ignoreErrorsOnPath(__DIR__ . '/vendor', [ErrorType::UNKNOWN_CLASS])
     ->ignoreErrorsOnPath(__DIR__ . '/vendor', [ErrorType::DEV_DEPENDENCY_IN_PROD])
-    // @todo: rework
-    ->ignoreErrorsOnPath(__DIR__ . '/src', [ErrorType::UNKNOWN_CLASS])
 
     // do not complain about some modules
     ->ignoreErrorsOnPackage('mimmi20/coding-standard', [ErrorType::UNUSED_DEPENDENCY])

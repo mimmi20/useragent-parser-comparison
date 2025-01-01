@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,9 +15,7 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use FilesystemIterator;
-use Generator;
 use JsonException;
-use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -34,6 +32,7 @@ use function count;
 use function escapeshellarg;
 use function file_exists;
 use function file_get_contents;
+use function is_array;
 use function is_string;
 use function json_decode;
 use function reset;
@@ -51,14 +50,13 @@ final class Parsers extends Helper
     private string $parsersDir = __DIR__ . '/../../../parsers';
 
     /** @throws void */
-    #[Override]
     public function getName(): string
     {
         return 'parsers';
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string, array{name: string, path: string, metadata: array<string, mixed>, parse-ua: Closure}>
      *
      * @throws void
      */
@@ -128,9 +126,9 @@ final class Parsers extends Helper
     }
 
     /**
-     * @return array<mixed>|Generator
+     * @return iterable<string, array{name: string, path: string, metadata: array<string, mixed>, parse-ua: Closure}>
      *
-     * @throws JsonException
+     * @throws void
      */
     public function getAllParsers(OutputInterface $output): iterable
     {
@@ -172,8 +170,8 @@ final class Parsers extends Helper
             }
 
             $language = $metadata['language'] ?? '';
-            //            $local    = $metadata['local'] ?? false;
-            //            $api      = $metadata['api'] ?? false;
+//            $local    = $metadata['local'] ?? false;
+//            $api      = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
@@ -206,28 +204,34 @@ final class Parsers extends Helper
                 }
             }
 
-            switch ($language) {
-                case 'PHP':
-                    $command = match ($parserDir->getFilename()) {
-                        'php-get-browser' => 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php',
-                        default => 'php ' . $pathName . '/scripts/parse-ua.php',
-                    };
-
-                    break;
-                case 'JavaScript':
-                    $command = 'node ' . $pathName . '/scripts/parse-ua.js';
-
-                    break;
-                default:
-                    continue 2;
-            }
-
             yield $parserDir->getFilename() => [
-                'command' => $command,
-                'metadata' => $metadata,
                 'name' => $pathName,
-                'parse-ua' => static function (string $useragent) use ($output, $command): array | null {
-                    $result = shell_exec($command . ' --ua ' . escapeshellarg($useragent));
+                'path' => $parserDir->getFilename(),
+                'metadata' => $metadata,
+                'parse-ua' => static function (string $useragent) use ($pathName, $output, $language, $parserDir): array | null {
+                    switch ($language) {
+                        case 'PHP':
+                            $command = match ($parserDir->getFilename()) {
+                                'php-get-browser' => 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg(
+                                    $useragent,
+                                ),
+                                default => 'php ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg(
+                                    $useragent,
+                                ),
+                            };
+
+                            break;
+                        case 'JavaScript':
+                            $command = 'node ' . $pathName . '/scripts/parse-ua.js --ua ' . escapeshellarg(
+                                $useragent,
+                            );
+
+                            break;
+                        default:
+                            return null;
+                    }
+
+                    $result = shell_exec($command);
 
                     if ($result === null) {
                         return null;
@@ -239,12 +243,11 @@ final class Parsers extends Helper
                         return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
                     } catch (JsonException $e) {
                         $output->writeln('<error>' . $result . '</error>');
-                        $output->writeln('<error>' . $e . '</error>');
+                        $output->writeln('<error>' . $result . $e . '</error>');
                     }
 
                     return null;
                 },
-                'path' => $parserDir->getFilename(),
             ];
         }
     }
@@ -252,16 +255,21 @@ final class Parsers extends Helper
     /**
      * Return the version of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getVersionPHP(string $path, string $packageName): string | null
     {
-        $installed = json_decode(
-            file_get_contents($path . '/vendor/composer/installed.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $content = @file_get_contents($path . '/vendor/composer/installed.json');
+
+        if ($content === false) {
+            return null;
+        }
+
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($installed)) {
+            return null;
+        }
 
         $filtered = array_filter(
             $installed['packages'],
@@ -287,16 +295,21 @@ final class Parsers extends Helper
     /**
      * Get the last change date of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
     {
-        $installed = json_decode(
-            file_get_contents($path . '/vendor/composer/installed.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $content = @file_get_contents($path . '/vendor/composer/installed.json');
+
+        if ($content === false) {
+            return null;
+        }
+
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($installed)) {
+            return null;
+        }
 
         $filtered = array_filter(
             $installed['packages'],
@@ -322,16 +335,21 @@ final class Parsers extends Helper
     /**
      * Return the version of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getVersionJS(string $path, string $packageName): string | null
     {
-        $installed = json_decode(
-            file_get_contents($path . '/npm-shrinkwrap.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $content = @file_get_contents($path . '/npm-shrinkwrap.json');
+
+        if ($content === false) {
+            return null;
+        }
+
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($installed)) {
+            return null;
+        }
 
         return $installed['packages']['node_modules/' . $packageName]['version'] ?? $installed['dependencies'][$packageName]['version'] ?? null;
     }
@@ -339,16 +357,21 @@ final class Parsers extends Helper
     /**
      * Get the last change date of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
     {
-        $installed = json_decode(
-            file_get_contents($path . '/npm-shrinkwrap.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
-        );
+        $content = @file_get_contents($path . '/npm-shrinkwrap.json');
+
+        if ($content === false) {
+            return null;
+        }
+
+        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        if (!is_array($installed)) {
+            return null;
+        }
 
         if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {
             return new DateTimeImmutable(

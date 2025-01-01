@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,6 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
-use Override;
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,7 +27,6 @@ final class InitDb extends Command
     }
 
     /** @throws void */
-    #[Override]
     protected function configure(): void
     {
         $this->setName('init-db');
@@ -39,10 +37,11 @@ final class InitDb extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
-    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('~~~ initialize database ~~~');
+        $message = 'initialize database';
+
+        $output->write($message);
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `provider`')->execute();
         $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `provider` (
@@ -54,38 +53,37 @@ final class InitDb extends Command
     `proPackageName` VARCHAR(255) DEFAULT NULL,
     `proHomepage` VARCHAR(255) DEFAULT NULL,
     `proLanguage` VARCHAR(255) DEFAULT NULL,
-    `proIsLocal` TINYINT(1) NOT NULL,
-    `proIsApi` TINYINT(1) NOT NULL,
+    `proLocal` TINYINT(1) NOT NULL,
+    `proApi` TINYINT(1) NOT NULL,
     `proIsActive` TINYINT(1) NOT NULL,
     `proCanDetectClientName` TINYINT(1) NOT NULL,
     `proCanDetectClientModus` TINYINT(1) NOT NULL,
     `proCanDetectClientVersion` TINYINT(1) NOT NULL,
-    `proCanDetectClientManufacturer` TINYINT(1) NOT NULL,
-    `proCanDetectClientBits` TINYINT(1) NOT NULL,
+    `proCanDetectClientManufacturer` VARCHAR(255) DEFAULT NULL,
+    `proCanDetectClientBits` INT DEFAULT NULL,
     `proCanDetectClientIsBot` TINYINT(1) NOT NULL,
     `proCanDetectClientType` TINYINT(1) NOT NULL,
     `proCanDetectEngineName` TINYINT(1) NOT NULL,
     `proCanDetectEngineVersion` TINYINT(1) NOT NULL,
     `proCanDetectEngineManufacturer` TINYINT(1) NOT NULL,
     `proCanDetectOsName` TINYINT(1) NOT NULL,
-    `proCanDetectOsMarketingName` TINYINT(1) NOT NULL,
+    `proCanDetectOsMarketingName` VARCHAR(255) DEFAULT NULL,
     `proCanDetectOsVersion` TINYINT(1) NOT NULL,
-    `proCanDetectOsManufacturer` TINYINT(1) NOT NULL,
-    `proCanDetectOsBits` TINYINT(1) NOT NULL,
+    `proCanDetectOsManufacturer` VARCHAR(255) DEFAULT NULL,
+    `proCanDetectOsBits` INT DEFAULT NULL,
     `proCanDetectDeviceName` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceMarketingName` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceManufacturer` TINYINT(1) NOT NULL,
+    `proCanDetectDeviceMarketingName` VARCHAR(255) DEFAULT NULL,
+    `proCanDetectDeviceManufacturer` VARCHAR(255) DEFAULT NULL,
     `proCanDetectDeviceBrand` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceDualOrientation` TINYINT(1) NOT NULL,
+    `proCanDetectDeviceDualOrientation` TINYINT(1) DEFAULT NULL,
     `proCanDetectDeviceType` TINYINT(1) NOT NULL,
     `proCanDetectDeviceIsMobile` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceSimCount` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceDisplayWidth` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceDisplayHeight` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceDisplayIsTouch` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceDisplayType` TINYINT(1) NOT NULL,
-    `proCanDetectDeviceDisplaySize` TINYINT(1) NOT NULL,
-    `proCommand` VARCHAR(255) DEFAULT NULL,
+    `proCanDetectDeviceSimCount` INT DEFAULT NULL,
+    `proCanDetectDeviceDisplayWidth` INT DEFAULT NULL,
+    `proCanDetectDeviceDisplayHeight` INT DEFAULT NULL,
+    `proCanDetectDeviceDisplayIsTouch` TINYINT(1) DEFAULT NULL,
+    `proCanDetectDeviceDisplayType` VARCHAR(255) DEFAULT NULL,
+    `proCanDetectDeviceDisplaySize` DECIMAL(20,10) DEFAULT NULL,
     PRIMARY KEY (`proId`),
     UNIQUE KEY `unique_provider_name` (`proType`,`proName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
@@ -97,8 +95,7 @@ final class InitDb extends Command
     `uaString` LONGTEXT NOT NULL,
     `uaAdditionalHeaders` JSON NULL DEFAULT NULL,
     PRIMARY KEY (`uaId`),
-    UNIQUE KEY `userAgent_hash` (`uaHash`),
-    INDEX `uaString` (`uaString`(255))
+    UNIQUE KEY `userAgent_hash` (`uaHash`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
 
         $this->pdo->prepare('DROP TABLE IF EXISTS `result`')->execute();
@@ -170,39 +167,24 @@ final class InitDb extends Command
     `resNormaId` CHAR(36) NOT NULL COMMENT \'(DC2Type:uuid)\',
     `result_id` CHAR(36) DEFAULT NULL COMMENT \'(DC2Type:uuid)\',
     `resNormaClientName` VARCHAR(255) DEFAULT NULL,
-    `resNormaClientModus` VARCHAR(255) DEFAULT NULL,
     `resNormaClientVersion` VARCHAR(255) DEFAULT NULL,
-    `resNormaClientManufacturer` VARCHAR(255) DEFAULT NULL,
-    `resNormaClientBits` INT DEFAULT NULL,
     `resNormaClientIsBot` TINYINT(1) DEFAULT NULL,
     `resNormaClientType` VARCHAR(255) DEFAULT NULL,
     `resNormaEngineName` VARCHAR(255) DEFAULT NULL,
     `resNormaEngineVersion` VARCHAR(255) DEFAULT NULL,
-    `resNormaEngineManufacturer` VARCHAR(255) DEFAULT NULL,
     `resNormaOsName` VARCHAR(255) DEFAULT NULL,
-    `resNormaOsMarketingName` VARCHAR(255) DEFAULT NULL,
     `resNormaOsVersion` VARCHAR(255) DEFAULT NULL,
-    `resNormaOsManufacturer` VARCHAR(255) DEFAULT NULL,
-    `resNormaOsBits` INT DEFAULT NULL,
-    `resNormaDeviceName` VARCHAR(255) DEFAULT NULL,
-    `resNormaDeviceMarketingName` VARCHAR(255) DEFAULT NULL,
-    `resNormaDeviceManufacturer` VARCHAR(255) DEFAULT NULL,
+    `resNormaDeviceModel` VARCHAR(255) DEFAULT NULL,
     `resNormaDeviceBrand` VARCHAR(255) DEFAULT NULL,
-    `resNormaDeviceDualOrientation` TINYINT(1) DEFAULT NULL,
     `resNormaDeviceType` VARCHAR(255) DEFAULT NULL,
     `resNormaDeviceIsMobile` TINYINT(1) DEFAULT NULL,
-    `resNormaDeviceSimCount` INT DEFAULT NULL,
-    `resNormaDeviceDisplayWidth` INT DEFAULT NULL,
-    `resNormaDeviceDisplayHeight` INT DEFAULT NULL,
-    `resNormaDeviceDisplayIsTouch` TINYINT(1) DEFAULT NULL,
-    `resNormaDeviceDisplayType` VARCHAR(255) DEFAULT NULL,
-    `resNormaDeviceDisplaySize` DECIMAL(20,10) DEFAULT NULL,
+    `resNormaDeviceIsTouch` TINYINT(1) DEFAULT NULL,
     PRIMARY KEY (`resNormaId`),
     UNIQUE KEY `unique_result` (`result_id`),
     KEY `resNormaClientName` (`resNormaClientName`),
     KEY `resNormaEngineName` (`resNormaEngineName`),
     KEY `resNormaOsName` (`resNormaOsName`),
-    KEY `resNormaDeviceName` (`resNormaDeviceName`),
+    KEY `resNormaDeviceModel` (`resNormaDeviceModel`),
     KEY `resNormaDeviceBrand` (`resNormaDeviceBrand`),
     KEY `resNormaDeviceType` (`resNormaDeviceType`),
     KEY `resNormaClientIsBot` (`resNormaClientIsBot`),
@@ -348,14 +330,14 @@ final class InitDb extends Command
             'CREATE OR REPLACE VIEW `list-found-general-client-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resClientName` IS NOT NULL',
         )->execute();
         $this->pdo->prepare('CREATE OR REPLACE VIEW `found-general-client-names` AS SELECT
-        `list-found-general-client-names`.`resClientName` AS `name`,
-        `userAgent`.`uaId`,
-        `userAgent`.`uaString`,
-        COUNT(`list-found-general-client-names`.`resClientName`) AS `detectionCount`
+        `resClientName` AS `name`,
+        `uaId`,
+        `uaString`,
+        COUNT(`resClientName`) AS `detectionCount`
     FROM `list-found-general-client-names`
     INNER JOIN `userAgent`
-        ON `userAgent`.`uaId` = `list-found-general-client-names`.`userAgent_id`
-    GROUP BY `list-found-general-client-names`.`resClientName`')->execute();
+        ON `uaId` = `userAgent_id`
+    GROUP BY `resClientName`')->execute();
         $this->pdo->prepare(
             'CREATE OR REPLACE VIEW `list-found-general-engine-names` AS SELECT * FROM `result` WHERE `provider_id` IN (SELECT `proId` FROM `real-provider`) AND `resEngineName` IS NOT NULL',
         )->execute();
@@ -438,54 +420,8 @@ final class InitDb extends Command
         $this->pdo->prepare(
             'CREATE OR REPLACE VIEW `found-results` AS SELECT * FROM `result` WHERE `resResultFound` = 1 AND `provider_id` IN (SELECT `proId` FROM `real-provider`)',
         )->execute();
-        $this->pdo->prepare(
-            'CREATE OR REPLACE VIEW `useragents-general-overview` AS SELECT `proId`, `proName`, COUNT(*) AS `countNumber` FROM `test-provider` JOIN `result` ON `provider_id` = `proId` GROUP BY `proId` ORDER BY `proName`',
-        )->execute();
 
-        $this->pdo->prepare('DROP TABLE IF EXISTS `useragent-headers`')->execute();
-        $this->pdo->prepare('CREATE TABLE IF NOT EXISTS `useragent-headers` (
-    `uaId` CHAR(36) NOT NULL COMMENT \'(DC2Type:uuid)\',
-    `provider` VARCHAR(255) NOT NULL,
-    `providerVersion` VARCHAR(255) DEFAULT NULL,
-    `date` DATETIME NULL DEFAULT NULL,
-    `headers` JSON NOT NULL,
-    `user-agent` LONGTEXT NULL DEFAULT NULL,
-    `device-stock-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-device-user-agent` LONGTEXT NULL DEFAULT NULL,
-    `x-skyfire-version` LONGTEXT NULL DEFAULT NULL,
-    `x-skyfire-phone` LONGTEXT NULL DEFAULT NULL,
-    `x-bluecoat-via` LONGTEXT NULL DEFAULT NULL,
-    `x-operamini-phone-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-operamini-phone` LONGTEXT NULL DEFAULT NULL,
-    `x-ucbrowser-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-ucbrowser-device-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-ucbrowser-device` LONGTEXT NULL DEFAULT NULL,
-    `x-ucbrowser-phone-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-ucbrowser-phone` LONGTEXT NULL DEFAULT NULL,
-    `x-original-user-agent` LONGTEXT NULL DEFAULT NULL,
-    `x-bolt-phone-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-mobile-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-requested-with` LONGTEXT NULL DEFAULT NULL,
-    `ua-os` LONGTEXT NULL DEFAULT NULL,
-    `baidu-flyflow` LONGTEXT NULL DEFAULT NULL,
-    `x-wap-profile` LONGTEXT NULL DEFAULT NULL,
-    `x-puffin-ua` LONGTEXT NULL DEFAULT NULL,
-    `x-mobile-gateway` LONGTEXT NULL DEFAULT NULL,
-    `x-nb-content` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-arch` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-bitness` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-full-version` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-full-version-list` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-mobile` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-model` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-platform` LONGTEXT NULL DEFAULT NULL,
-    `sec-ch-ua-platform-version` LONGTEXT NULL DEFAULT NULL,
-    PRIMARY KEY (`uaId`),
-    UNIQUE KEY `userAgent_headers` (`headers`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();
-
-        $output->writeln('<info>done!</info>');
+        $output->writeln("\r" . $message . ' <info>done</info>');
 
         return self::SUCCESS;
     }

@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,7 +29,7 @@ use const JSON_THROW_ON_ERROR;
 
 final class UserAgentDetail extends AbstractHtml
 {
-    /** @var array<string> */
+    /** @var array<int, string> */
     private array $userAgent = [];
 
     /** @var array<array<mixed>> */
@@ -69,7 +69,7 @@ final class UserAgentDetail extends AbstractHtml
                 JSON_THROW_ON_ERROR,
             );
 
-            if (is_array($addHeaders) && 0 < count($addHeaders)) {
+            if (is_array($addHeaders) && count($addHeaders) > 0) {
                 $addStr = '<br /><strong>Additional headers</strong><br />';
 
                 foreach ($addHeaders as $key => $value) {
@@ -97,21 +97,10 @@ final class UserAgentDetail extends AbstractHtml
 ';
 
         $script = '
-(() => {
-    const allModalTriggers = document.querySelectorAll(\'.modal-trigger\');
-    allModalTriggers.forEach(function (modalTrigger) {
-        const dialog = document.getElementById(modalTrigger.getAttribute(\'data-modal\'));
-        const cancelButton = dialog.querySelectorAll(".modal-close")[0];
-
-        modalTrigger.addEventListener("click", () => {
-            dialog.showModal();
-        });
-
-        cancelButton.addEventListener("click", () => {
-            dialog.close();
-        });
-    });
-})();
+$(document).ready(function(){
+    // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
+    $(\'.modal-trigger\').leanModal();
+});
         ';
 
         return parent::getHtmlCombined($body, $script);
@@ -168,11 +157,9 @@ final class UserAgentDetail extends AbstractHtml
         $html .= '</th></tr>';
 
         foreach ($this->results as $result) {
-            if (!array_key_exists('proType', $result) || $result['proType'] !== 'testSuite') {
-                continue;
+            if (array_key_exists('proType', $result) && $result['proType'] === 'testSuite') {
+                $html .= $this->getRow($result);
             }
-
-            $html .= $this->getRow($result);
         }
 
         /*
@@ -183,11 +170,9 @@ final class UserAgentDetail extends AbstractHtml
         $html .= '</th></tr>';
 
         foreach ($this->results as $result) {
-            if (!array_key_exists('proType', $result) || $result['proType'] !== 'real') {
-                continue;
+            if (array_key_exists('proType', $result) && $result['proType'] === 'real') {
+                $html .= $this->getRow($result);
             }
-
-            $html .= $this->getRow($result);
         }
 
         $html .= '</tbody>';
@@ -199,8 +184,6 @@ final class UserAgentDetail extends AbstractHtml
      * @param array<mixed> $result
      *
      * @throws void
-     *
-     * @SuppressWarnings(PHPMD.DevelopmentCodeFragment)
      */
     private function getRow(array $result): string
     {
@@ -208,7 +191,7 @@ final class UserAgentDetail extends AbstractHtml
 
         $html .= '<th>';
 
-        if ($result['proIsLocal']) {
+        if ($result['proLocal']) {
             $html .= '<div><span class="material-icons">public_off</span>';
 
             switch ($result['proLanguage']) {
@@ -243,7 +226,7 @@ final class UserAgentDetail extends AbstractHtml
             }
 
             $html .= '</div>';
-        } elseif ($result['proIsApi']) {
+        } elseif ($result['proApi']) {
             $html .= '<div><span class="material-icons">public</span></div>';
 
             $html .= '<div>';
@@ -339,8 +322,8 @@ final class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($result['proCanDetectDeviceName']) {
-                $html .= '<td>' . $result['resDeviceName'] . '</td>';
+            if ($result['proCanDetectDeviceModel']) {
+                $html .= '<td>' . $result['resDeviceModel'] . '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
@@ -351,7 +334,10 @@ final class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($result['proCanDetectDeviceIsMobile']) {
+            if (
+                array_key_exists('proCanDetectDeviceIsMobile', $result)
+                && $result['proCanDetectDeviceIsMobile'] !== null
+            ) {
                 if ($result['resDeviceIsMobile']) {
                     $html .= '<td>yes</td>';
                 } else {
@@ -361,8 +347,11 @@ final class UserAgentDetail extends AbstractHtml
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($result['proCanDetectDeviceDisplayIsTouch']) {
-                if ($result['resDeviceDisplayIsTouch']) {
+            if (
+                array_key_exists('proCanDetectDeviceIsTouch', $result)
+                && $result['proCanDetectDeviceIsTouch'] !== null
+            ) {
+                if ($result['resDeviceIsTouch']) {
                     $html .= '<td>yes</td>';
                 } else {
                     $html .= '<td>no</td>';
@@ -372,17 +361,17 @@ final class UserAgentDetail extends AbstractHtml
             }
         }
 
-        $html .= '<td>' . number_format(round((float) $result['resParseTime'] * 1000, 3), 3) . '</td>';
+        $html .= '<td>' . number_format(round($result['resParseTime'] * 1000, 3), 3) . '</td>';
 
-        $html .= '<td>' . number_format(round((float) $result['resMemoryUsed'], 2), 2) . '</td>';
+        $html .= '<td>' . number_format(round($result['resMemoryUsed'], 2), 2) . '</td>';
 
         $html .= '<td>
 
 <!-- Modal Trigger -->
-<a class="modal-trigger btn waves-effect waves-light" href="#" data-modal="modal-' . $result['proId'] . '">Detail</a>
+<a class="modal-trigger btn waves-effect waves-light" href="#modal-' . $result['proId'] . '">Detail</a>
 
 <!-- Modal Structure -->
-<dialog id="modal-' . $result['proId'] . '">
+<div id="modal-' . $result['proId'] . '" class="modal modal-fixed-footer">
     <div class="modal-content">
         <h4>' . $result['proName'] . ' result detail</h4>
         <p><pre><code class="php">' . print_r($result['resRawResult'], true) . '</code></pre></p>
@@ -390,7 +379,7 @@ final class UserAgentDetail extends AbstractHtml
     <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">close</a>
     </div>
-</dialog>
+</div>
 
                 </td>';
 

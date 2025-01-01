@@ -3,7 +3,7 @@
 /**
  * This file is part of the mimmi20/useragent-parser-comparison package.
  *
- * Copyright (c) 2015-2024, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,11 +13,10 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
+use Closure;
 use DateTimeImmutable;
 use FilesystemIterator;
-use Generator;
 use JsonException;
-use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -66,7 +65,6 @@ final class Tests extends Helper
     private string $testDir       = __DIR__ . '/../../../tests';
 
     /** @throws void */
-    #[Override]
     public function getName(): string
     {
         return 'tests';
@@ -169,7 +167,7 @@ final class Tests extends Helper
                 ),
             ];
 
-            if (1 < $countRows) {
+            if ($countRows > 1) {
                 for ($i = 1, $max = $countRows; $i < $max; ++$i) {
                     $rows[] = [
                         new TableCell(
@@ -202,14 +200,12 @@ final class Tests extends Helper
 
             $rows[] = new TableSeparator();
 
-            if (!$valid) {
-                continue;
+            if ($valid) {
+                $names[$testDir->getFilename()] = $testDir->getFilename();
             }
-
-            $names[$testDir->getFilename()] = $testDir->getFilename();
         }
 
-        if (1 > count($rows)) {
+        if (count($rows) < 1) {
             return null;
         }
 
@@ -256,9 +252,9 @@ final class Tests extends Helper
     }
 
     /**
-     * @return array<mixed>|Generator
+     * @return iterable<string, array{name: string, path: string, metadata: array<string, mixed>, command: string, build: Closure}>
      *
-     * @throws JsonException
+     * @throws void
      */
     public function collectTests(OutputInterface $output, string | null $thisRunDir): iterable
     {
@@ -269,6 +265,7 @@ final class Tests extends Helper
             $metadata = [];
             $pathName = $testDir->getPathname();
             $pathName = str_replace('\\', '/', $pathName);
+            assert(is_string($pathName));
 
             if (file_exists($pathName . '/metadata.json')) {
                 $contents = @file_get_contents($pathName . '/metadata.json');
@@ -289,8 +286,8 @@ final class Tests extends Helper
             }
 
             $language = $metadata['language'] ?? '';
-            //            $local    = $metadata['local'] ?? false;
-            //            $api      = $metadata['api'] ?? false;
+//            $local    = $metadata['local'] ?? false;
+//            $api      = $metadata['api'] ?? false;
 
             if (is_string($metadata['packageName'])) {
                 switch ($language) {
@@ -328,9 +325,8 @@ final class Tests extends Helper
             switch ($language) {
                 case 'PHP':
                     $command = match ($testName) {
-                        'browser-detector' => 'php -d memory_limit=4048M ' . $pathName . '/scripts/build.php',
-                        'crawler-detect' => 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php',
-                        default => 'php ' . $pathName . '/scripts/build.php',
+                        'browser-detector', 'crawler-detect' => 'php -d memory_limit=3048M ' . $pathName . '/scripts/build.php',
+                        default => 'php -d memory_limit=1024M ' . $pathName . '/scripts/build.php',
                     };
 
                     break;
@@ -345,6 +341,10 @@ final class Tests extends Helper
             $testPath = $testDir->getFilename();
 
             yield $testPath => [
+                'name' => $pathName,
+                'path' => $testPath,
+                'metadata' => $metadata,
+                'command' => $command,
                 'build' => static function () use ($testPath, $output, $expectedDir, $command): iterable {
                     $message = sprintf('test suite <fg=yellow>%s</>', $testPath);
 
@@ -383,9 +383,9 @@ final class Tests extends Helper
                         || !is_array($tests['tests'])
                         || $tests['tests'] === []
                     ) {
-//                        $output->writeln(
-//                            "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>',
-//                        );
+                        $output->writeln(
+                            "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>',
+                        );
 
                         return null;
                     }
@@ -404,22 +404,16 @@ final class Tests extends Helper
                         yield $singleTestName => $singleTestData;
                     }
 
-                    if ($expectedDir === null) {
-                        return;
+                    if ($expectedDir !== null) {
+                        file_put_contents(
+                            $expectedDir . '/' . $testPath . '/metadata.json',
+                            json_encode(
+                                ['version' => $tests['version'] ?? null],
+                                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+                            ),
+                        );
                     }
-
-                    file_put_contents(
-                        $expectedDir . '/' . $testPath . '/metadata.json',
-                        json_encode(
-                            ['version' => $tests['version'] ?? null],
-                            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
-                        ),
-                    );
                 },
-                'command' => $command,
-                'metadata' => $metadata,
-                'name' => $pathName,
-                'path' => $testPath,
             ];
         }
     }
@@ -427,7 +421,7 @@ final class Tests extends Helper
     /**
      * Return the version of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getVersionPHP(string $path, string $packageName): string | null
     {
@@ -462,7 +456,7 @@ final class Tests extends Helper
     /**
      * Get the last change date of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
     {
@@ -497,7 +491,7 @@ final class Tests extends Helper
     /**
      * Return the version of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getVersionJS(string $path, string $packageName): string | null
     {
@@ -514,7 +508,7 @@ final class Tests extends Helper
     /**
      * Get the last change date of the provider
      *
-     * @throws JsonException
+     * @throws void
      */
     private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
     {
