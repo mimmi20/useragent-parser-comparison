@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of the mimmi20/useragent-parser-comparison package.
+ * This file is part of the browser-detector-version package.
  *
- * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,13 +15,11 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use JsonException;
-use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
 
 use function array_merge;
-use function is_scalar;
 use function json_encode;
 use function str_replace;
 
@@ -37,14 +35,13 @@ final class Result extends Helper
     }
 
     /** @throws void */
-    #[Override]
     public function getName(): string
     {
         return 'result';
     }
 
     /**
-     * @param array<mixed> $singleResult
+     * @param array{version?: string, parse_time?: float, init_time?: float, memory_used?: int, result: array<string, mixed>} $singleResult
      *
      * @throws JsonException
      */
@@ -60,10 +57,10 @@ final class Result extends Helper
             'SELECT * FROM `result` WHERE `provider_id` = :proId AND `userAgent_id` = :uaId AND `run` = :run',
         );
         $statementInsertResult = $this->pdo->prepare(
-            'INSERT INTO `result` (`run`, `provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resResultError`, `resClientName`, `resClientModus`, `resClientVersion`, `resClientManufacturer`, `resClientBits`, `resEngineName`, `resEngineVersion`, `resEngineManufacturer`, `resOsName`, `resOsMarketingName`, `resOsVersion`, `resOsManufacturer`, `resOsBits`, `resDeviceName`, `resDeviceMarketingName`, `resDeviceManufacturer`, `resDeviceBrand`, `resDeviceDualOrientation`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceSimCount`, `resDeviceDisplayWidth`, `resDeviceDisplayHeight`, `resDeviceDisplayIsTouch`, `resDeviceDisplayType`, `resDeviceDisplaySize`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:run, :proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resResultError, :resClientName, :resClientModus, :resClientVersion, :resClientManufacturer, :resClientBits, :resEngineName, :resEngineVersion, :resEngineManufacturer, :resOsName, :resOsMarketingName, :resOsVersion, :resOsManufacturer, :resOsBits, :resDeviceName, :resDeviceMarketingName, :resDeviceManufacturer, :resDeviceBrand, :resDeviceDualOrientation, :resDeviceType, :resDeviceIsMobile, :resDeviceSimCount, :resDeviceDisplayWidth, :resDeviceDisplayHeight, :resDeviceDisplayIsTouch, :resDeviceDisplayType, :resDeviceDisplaySize, :resClientIsBot, :resClientType, :resRawResult)',
+            'INSERT INTO `result` (`run`, `provider_id`, `userAgent_id`, `resId`, `resProviderVersion`, `resFilename`, `resParseTime`, `resInitTime`, `resMemoryUsed`, `resLastChangeDate`, `resResultFound`, `resResultError`, `resClientName`, `resClientVersion`, `resEngineName`, `resEngineVersion`, `resOsName`, `resOsVersion`, `resDeviceModel`, `resDeviceBrand`, `resDeviceType`, `resDeviceIsMobile`, `resDeviceIsTouch`, `resClientIsBot`, `resClientType`, `resRawResult`) VALUES (:run, :proId, :uaId, :resId, :resProviderVersion, :resFilename, :resParseTime, :resInitTime, :resMemoryUsed, :resLastChangeDate, :resResultFound, :resResultError, :resClientName, :resClientVersion, :resEngineName, :resEngineVersion, :resOsName, :resOsVersion, :resDeviceModel, :resDeviceBrand, :resDeviceType, :resDeviceIsMobile, :resDeviceIsTouch, :resClientIsBot, :resClientType, :resRawResult)',
         );
         $statementUpdateResult = $this->pdo->prepare(
-            'UPDATE `result` SET `resProviderVersion` = :resProviderVersion, `resFilename` = :resFilename, `resParseTime` = :resParseTime, `resInitTime` = :resInitTime, `resMemoryUsed` = :resMemoryUsed, `resLastChangeDate` = :resLastChangeDate, `resResultFound` = :resResultFound, `resResultError` = :resResultError, `resClientName` = :resClientName, `resClientModus` = :resClientModus, `resClientVersion` = :resClientVersion, `resClientManufacturer` = :resClientManufacturer, `resClientBits` = :resClientBits, `resEngineName` = :resEngineName, `resEngineVersion` = :resEngineVersion, `resEngineManufacturer` = :resEngineManufacturer, `resOsName` = :resOsName, `resOsMarketingName` = :resOsMarketingName, `resOsVersion` = :resOsVersion, `resOsManufacturer` = :resOsManufacturer, `resOsBits` = :resOsBits, `resDeviceName` = :resDeviceName, `resDeviceMarketingName` = :resDeviceMarketingName, `resDeviceManufacturer` = :resDeviceManufacturer, `resDeviceBrand` = :resDeviceBrand, `resDeviceDualOrientation` = :resDeviceDualOrientation, `resDeviceType` = :resDeviceType, `resDeviceIsMobile` = :resDeviceIsMobile, `resDeviceSimCount` = :resDeviceSimCount, `resDeviceDisplayWidth` = :resDeviceDisplayWidth, `resDeviceDisplayHeight` = :resDeviceDisplayHeight, `resDeviceDisplayIsTouch` = :resDeviceDisplayIsTouch, `resDeviceDisplayType` = :resDeviceDisplayType, `resDeviceDisplaySize` = :resDeviceDisplaySize, `resClientIsBot` = :resClientIsBot, `resClientType` = :resClientType, `resRawResult` = :resRawResult WHERE `resId` = :resId',
+            'UPDATE `result` SET `resProviderVersion` = :resProviderVersion, `resFilename` = :resFilename, `resParseTime` = :resParseTime, `resInitTime` = :resInitTime, `resMemoryUsed` = :resMemoryUsed, `resLastChangeDate` = :resLastChangeDate, `resResultFound` = :resResultFound, `resResultError` = :resResultError, `resClientName` = :resClientName, `resClientVersion` = :resClientVersion, `resEngineName` = :resEngineName, `resEngineVersion` = :resEngineVersion, `resOsName` = :resOsName, `resOsVersion` = :resOsVersion, `resDeviceModel` = :resDeviceModel, `resDeviceBrand` = :resDeviceBrand, `resDeviceType` = :resDeviceType, `resDeviceIsMobile` = :resDeviceIsMobile, `resDeviceIsTouch` = :resDeviceIsTouch, `resClientIsBot` = :resClientIsBot, `resClientType` = :resClientType, `resRawResult` = :resRawResult WHERE `resId` = :resId',
         );
 
         $statementSelectResult->bindValue(':proId', $proId, PDO::PARAM_STR);
@@ -144,66 +141,18 @@ final class Result extends Helper
                 PDO::PARAM_INT,
             );
             $statementInsertResult->bindValue(':resClientName', $row2['resClientName'] ?? null);
-            $statementInsertResult->bindValue(':resClientModus', $row2['resClientModus'] ?? null);
             $statementInsertResult->bindValue(':resClientVersion', $row2['resClientVersion'] ?? null);
-            $statementInsertResult->bindValue(
-                ':resClientManufacturer',
-                $row2['resClientManufacturer'] ?? null,
-            );
-            $statementInsertResult->bindValue(':resClientBits', $row2['resClientBits'] ?? null);
             $statementInsertResult->bindValue(':resClientIsBot', $row2['resClientIsBot'] ?? null);
             $statementInsertResult->bindValue(':resClientType', $row2['resClientType'] ?? null);
             $statementInsertResult->bindValue(':resEngineName', $row2['resEngineName'] ?? null);
             $statementInsertResult->bindValue(':resEngineVersion', $row2['resEngineVersion'] ?? null);
-            $statementInsertResult->bindValue(
-                ':resEngineManufacturer',
-                $row2['resEngineManufacturer'] ?? null,
-            );
             $statementInsertResult->bindValue(':resOsName', $row2['resOsName'] ?? null);
-            $statementInsertResult->bindValue(
-                ':resOsMarketingName',
-                $row2['resOsMarketingName'] ?? null,
-            );
             $statementInsertResult->bindValue(':resOsVersion', $row2['resOsVersion'] ?? null);
-            $statementInsertResult->bindValue(':resOsManufacturer', $row2['resOsManufacturer'] ?? null);
-            $statementInsertResult->bindValue(':resOsBits', $row2['resOsBits'] ?? null);
-            $statementInsertResult->bindValue(':resDeviceName', $row2['resDeviceName'] ?? null);
-            $statementInsertResult->bindValue(
-                ':resDeviceMarketingName',
-                $row2['resDeviceMarketingName'] ?? null,
-            );
-            $statementInsertResult->bindValue(
-                ':resDeviceManufacturer',
-                $row2['resDeviceManufacturer'] ?? null,
-            );
+            $statementInsertResult->bindValue(':resDeviceModel', $row2['resDeviceModel'] ?? null);
             $statementInsertResult->bindValue(':resDeviceBrand', $row2['resDeviceBrand'] ?? null);
-            $statementInsertResult->bindValue(
-                ':resDeviceDualOrientation',
-                $row2['resDeviceDualOrientation'] ?? null,
-            );
             $statementInsertResult->bindValue(':resDeviceType', $row2['resDeviceType'] ?? null);
             $statementInsertResult->bindValue(':resDeviceIsMobile', $row2['resDeviceIsMobile'] ?? null);
-            $statementInsertResult->bindValue(':resDeviceSimCount', $row2['resDeviceSimCount'] ?? null);
-            $statementInsertResult->bindValue(
-                ':resDeviceDisplayWidth',
-                $row2['resDeviceDisplayWidth'] ?? null,
-            );
-            $statementInsertResult->bindValue(
-                ':resDeviceDisplayHeight',
-                $row2['resDeviceDisplayHeight'] ?? null,
-            );
-            $statementInsertResult->bindValue(
-                ':resDeviceDisplayIsTouch',
-                $row2['resDeviceDisplayIsTouch'] ?? null,
-            );
-            $statementInsertResult->bindValue(
-                ':resDeviceDisplayType',
-                $row2['resDeviceDisplayType'] ?? null,
-            );
-            $statementInsertResult->bindValue(
-                ':resDeviceDisplaySize',
-                $row2['resDeviceDisplaySize'] ?? null,
-            );
+            $statementInsertResult->bindValue(':resDeviceIsTouch', $row2['resDeviceIsTouch'] ?? null);
             $statementInsertResult->bindValue(':resRawResult', $row2['resRawResult'] ?? null);
 
             $statementInsertResult->execute();
@@ -240,66 +189,18 @@ final class Result extends Helper
                 PDO::PARAM_INT,
             );
             $statementUpdateResult->bindValue(':resClientName', $row2['resClientName'] ?? null);
-            $statementUpdateResult->bindValue(':resClientModus', $row2['resClientModus'] ?? null);
             $statementUpdateResult->bindValue(':resClientVersion', $row2['resClientVersion'] ?? null);
-            $statementUpdateResult->bindValue(
-                ':resClientManufacturer',
-                $row2['resClientManufacturer'] ?? null,
-            );
-            $statementUpdateResult->bindValue(':resClientBits', $row2['resClientBits'] ?? null);
             $statementUpdateResult->bindValue(':resClientIsBot', $row2['resClientIsBot'] ?? null);
             $statementUpdateResult->bindValue(':resClientType', $row2['resClientType'] ?? null);
             $statementUpdateResult->bindValue(':resEngineName', $row2['resEngineName'] ?? null);
             $statementUpdateResult->bindValue(':resEngineVersion', $row2['resEngineVersion'] ?? null);
-            $statementUpdateResult->bindValue(
-                ':resEngineManufacturer',
-                $row2['resEngineManufacturer'] ?? null,
-            );
             $statementUpdateResult->bindValue(':resOsName', $row2['resOsName'] ?? null);
-            $statementUpdateResult->bindValue(
-                ':resOsMarketingName',
-                $row2['resOsMarketingName'] ?? null,
-            );
             $statementUpdateResult->bindValue(':resOsVersion', $row2['resOsVersion'] ?? null);
-            $statementUpdateResult->bindValue(':resOsManufacturer', $row2['resOsManufacturer'] ?? null);
-            $statementUpdateResult->bindValue(':resOsBits', $row2['resOsBits'] ?? null);
-            $statementUpdateResult->bindValue(':resDeviceName', $row2['resDeviceName'] ?? null);
-            $statementUpdateResult->bindValue(
-                ':resDeviceMarketingName',
-                $row2['resDeviceMarketingName'] ?? null,
-            );
-            $statementUpdateResult->bindValue(
-                ':resDeviceManufacturer',
-                $row2['resDeviceManufacturer'] ?? null,
-            );
+            $statementUpdateResult->bindValue(':resDeviceModel', $row2['resDeviceModel'] ?? null);
             $statementUpdateResult->bindValue(':resDeviceBrand', $row2['resDeviceBrand'] ?? null);
-            $statementUpdateResult->bindValue(
-                ':resDeviceDualOrientation',
-                $row2['resDeviceDualOrientation'] ?? null,
-            );
             $statementUpdateResult->bindValue(':resDeviceType', $row2['resDeviceType'] ?? null);
             $statementUpdateResult->bindValue(':resDeviceIsMobile', $row2['resDeviceIsMobile'] ?? null);
-            $statementUpdateResult->bindValue(':resDeviceSimCount', $row2['resDeviceSimCount'] ?? null);
-            $statementUpdateResult->bindValue(
-                ':resDeviceDisplayWidth',
-                $row2['resDeviceDisplayWidth'] ?? null,
-            );
-            $statementUpdateResult->bindValue(
-                ':resDeviceDisplayHeight',
-                $row2['resDeviceDisplayHeight'] ?? null,
-            );
-            $statementUpdateResult->bindValue(
-                ':resDeviceDisplayIsTouch',
-                $row2['resDeviceDisplayIsTouch'] ?? null,
-            );
-            $statementUpdateResult->bindValue(
-                ':resDeviceDisplayType',
-                $row2['resDeviceDisplayType'] ?? null,
-            );
-            $statementUpdateResult->bindValue(
-                ':resDeviceDisplaySize',
-                $row2['resDeviceDisplaySize'] ?? null,
-            );
+            $statementUpdateResult->bindValue(':resDeviceIsTouch', $row2['resDeviceIsTouch'] ?? null);
             $statementUpdateResult->bindValue(':resRawResult', $row2['resRawResult'] ?? null);
 
             $statementUpdateResult->execute();
@@ -307,49 +208,32 @@ final class Result extends Helper
     }
 
     /**
-     * @param array<mixed>        $row2
-     * @param array<array<mixed>> $result
+     * @param array<string, array<string, bool|string|null>> $row2
+     * @param array<string, array<string, bool|string|null>> $result
      *
-     * @return array<mixed>
+     * @return array<string, array<string, bool|string|null>>
      *
      * @throws void
      */
     private function hydrateResult(array $row2, array $result): array
     {
         $toHydrate = [
-            'resClientBits' => $result['client']['bits'] ?? null,
-            'resClientIsBot' => $result['client']['isBot'] ?? null,
-            'resClientManufacturer' => $result['client']['manufacturer'] ?? null,
-            'resClientModus' => $result['client']['modus'] ?? null,
             'resClientName' => $result['client']['name'] ?? null,
-            'resClientType' => $result['client']['type'] ?? null,
             'resClientVersion' => $result['client']['version'] ?? null,
-            'resDeviceBrand' => $result['device']['brand'] ?? null,
-            'resDeviceDisplayHeight' => $result['device']['display']['height'] ?? null,
-            'resDeviceDisplayIsTouch' => $result['device']['display']['touch'] ?? null,
-            'resDeviceDisplaySize' => $result['device']['display']['size'] ?? null,
-            'resDeviceDisplayType' => $result['device']['display']['type'] ?? null,
-            'resDeviceDisplayWidth' => $result['device']['display']['width'] ?? null,
-            'resDeviceDualOrientation' => $result['device']['dualOrientation'] ?? null,
-            'resDeviceIsMobile' => $result['device']['ismobile'] ?? null,
-            'resDeviceManufacturer' => $result['device']['manufacturer'] ?? null,
-            'resDeviceMarketingName' => $result['device']['marketingName'] ?? null,
+            'resClientIsBot' => $result['client']['isBot'] ?? null,
+            'resClientType' => $result['client']['type'] ?? null,
 
-            'resDeviceName' => isset($result['device']['deviceName']) && is_scalar(
-                $result['device']['deviceName'],
-            ) ? $result['device']['deviceName'] : null,
-            'resDeviceSimCount' => $result['device']['simCount'] ?? null,
-            'resDeviceType' => $result['device']['type'] ?? null,
-            'resEngineManufacturer' => $result['engine']['manufacturer'] ?? null,
+            'resEngineName' => $result['engine']['name'],
+            'resEngineVersion' => $result['engine']['version'],
 
-            'resEngineName' => $result['engine']['name'] ?? null,
-            'resEngineVersion' => $result['engine']['version'] ?? null,
-            'resOsBits' => $result['platform']['bits'] ?? null,
-            'resOsManufacturer' => $result['platform']['manufacturer'] ?? null,
-            'resOsMarketingName' => $result['platform']['marketingName'] ?? null,
+            'resOsName' => $result['platform']['name'],
+            'resOsVersion' => $result['platform']['version'],
 
-            'resOsName' => $result['platform']['name'] ?? null,
-            'resOsVersion' => $result['platform']['version'] ?? null,
+            'resDeviceModel' => $result['device']['name'],
+            'resDeviceBrand' => $result['device']['brand'],
+            'resDeviceType' => $result['device']['type'],
+            'resDeviceIsMobile' => $result['device']['ismobile'],
+            'resDeviceIsTouch' => $result['device']['istouch'],
         ];
 
         return array_merge($row2, $toHydrate);

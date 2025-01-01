@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of the mimmi20/useragent-parser-comparison package.
+ * This file is part of the browser-detector-version package.
  *
- * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,11 +20,11 @@ use function htmlspecialchars;
 
 final class SimpleList extends AbstractHtml
 {
-    /** @var array<array<string>> */
+    /** @var array<string, mixed> */
     private array $elements = [];
 
     /**
-     * @param array<array<string>> $elements
+     * @param array<string, mixed> $elements
      *
      * @throws void
      */
@@ -49,8 +49,8 @@ final class SimpleList extends AbstractHtml
 <div class="section" id="simple-list">
     <form>
         <div class="input-field">
-            <input class="search" type="search" placeholder="Search for a user agent">
-            <i class="material-icons">close</i>
+          <input class="search" type="search" placeholder="Search for a user agent">
+          <i class="material-icons">close</i>
         </div>
 
         <a class="sort btn" data-sort="name">Sort by name</a>
@@ -93,6 +93,10 @@ var hackerList = new List(\'simple-list\', options);
              */
             if (isset($element['detectionCount'])) {
                 $html .= ' <small class="detectionCount">' . $element['detectionCount'] . 'x detected</small>';
+            }
+
+            if (isset($element['detectionCountUnique'])) {
+                $html .= ' <small class="detectionCountUnique">(' . $element['detectionCountUnique'] . 'x unique)</small>';
             }
 
             if (isset($element['detectionValuesDistinct'])) {

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of the mimmi20/useragent-parser-comparison package.
+ * This file is part of the browser-detector-version package.
  *
- * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -22,19 +22,18 @@ use function round;
 final class OverviewProvider extends AbstractHtml
 {
     /**
-     * @param array<string> $provider
+     * @param array<string, mixed> $provider
      *
      * @throws void
      */
-    public function __construct(PDO $pdo, private readonly array $provider, string | null $title = null)
+    public function __construct(PDO $pdo, private array $provider, string | null $title = null)
     {
-        $this->pdo   = $pdo;
-        $this->title = $title;
+        parent::__construct($pdo, $title);
     }
 
     /** @throws void */
     #[Override]
-    public function getHtml(string | null $run = null): string
+    public function getHtml(): string
     {
         $body = '
 <div class="section">
@@ -42,9 +41,7 @@ final class OverviewProvider extends AbstractHtml
 
     <div class="row center">
         <h5 class="header light">
-            We took <strong>' . $this->getUserAgentCount(
-        $run,
-) . '</strong> different user agents and analyzed them with this provider<br />
+            We took <strong>' . $this->getUserAgentCount() . '</strong> different user agents and analyzed them with this provider<br />
         </h5>
     </div>
 </div>
@@ -52,7 +49,7 @@ final class OverviewProvider extends AbstractHtml
 <div class="section">
     ';
 
-        if ($this->provider['proIsLocal']) {
+        if ($this->provider['proLocal']) {
             $body .= '<div><span class="material-icons">public_off</span>';
 
             switch ($this->provider['proLanguage']) {
@@ -82,10 +79,12 @@ final class OverviewProvider extends AbstractHtml
 
             $body .= '<br /><small>' . $this->provider['proVersion'] . '</small>';
 
-            $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
+            if ($this->provider['proLastReleaseDate'] !== null) {
+                $body .= '<br /><small>' . $this->provider['proLastReleaseDate'] . '</small>';
+            }
 
             $body .= '</div>';
-        } elseif ($this->provider['proIsApi']) {
+        } elseif ($this->provider['proApi']) {
             $body .= '<div><span class="material-icons">public</span></div>';
 
             $body .= '<div>';
@@ -103,66 +102,67 @@ final class OverviewProvider extends AbstractHtml
 </div>
 
 <div class="section">
-    ' . $this->getTable($run) . '
+    ' . $this->getTable() . '
 </div>
 ';
 
         return parent::getHtmlCombined($body);
     }
 
-    /** @throws void */
-    private function getResult(string | null $run = null): array | false
+    /**
+     * @return array<string, mixed>
+     *
+     * @throws void
+     */
+    private function getResult(): array
     {
         $sql = '
             SELECT
-                SUM(`result`.`resResultFound`) AS `resultFound`,
-                SUM(`result`.`resResultError`) AS `resultError`,
+                SUM(`resResultFound`) AS `resultFound`,
+                SUM(`resResultError`) AS `resultError`,
 
-                COUNT(`result-normalized`.`resNormaClientName`) AS `clientNameFound`,
-                COUNT(`result-normalized`.`resNormaClientVersion`) AS `clientVersionFound`,
-                COUNT(`result-normalized`.`resNormaClientIsBot`) AS `asBotDetected`,
-                COUNT(`result-normalized`.`resNormaClientType`) AS `clientTypeFound`,
+                COUNT(`resClientName`) AS `clientNameFound`,
+                COUNT(`resClientVersion`) AS `clientVersionFound`,
+                COUNT(`resClientIsBot`) AS `asBotDetected`,
+                COUNT(`resClientType`) AS `clientTypeFound`,
 
-                COUNT(`result-normalized`.`resNormaEngineName`) AS `engineNameFound`,
-                COUNT(`result-normalized`.`resNormaEngineVersion`) AS `engineVersionFound`,
+                COUNT(`resEngineName`) AS `engineNameFound`,
+                COUNT(`resEngineVersion`) AS `engineVersionFound`,
 
-                COUNT(`result-normalized`.`resNormaOsName`) AS `osNameFound`,
-                COUNT(`result-normalized`.`resNormaOsVersion`) AS `osVersionFound`,
+                COUNT(`resOsName`) AS `osNameFound`,
+                COUNT(`resOsVersion`) AS `osVersionFound`,
 
-                COUNT(`result-normalized`.`resNormaDeviceBrand`) AS `deviceBrandFound`,
+                COUNT(`resDeviceBrand`) AS `deviceBrandFound`,
 
-                COUNT(`result-normalized`.`resNormaDeviceName`) AS `deviceModelFound`,
+                COUNT(`resDeviceModel`) AS `deviceModelFound`,
 
-                COUNT(`result-normalized`.`resNormaDeviceType`) AS `deviceTypeFound`,
+                COUNT(`resDeviceType`) AS `deviceTypeFound`,
 
-                COUNT(`result-normalized`.`resNormaDeviceIsMobile`) AS `asMobileDetected`,
-                COUNT(`result-normalized`.`resNormaDeviceDisplayIsTouch`) AS `asTouchDeviceDetected`,
+                COUNT(`resDeviceIsMobile`) AS `asMobileDetected`,
+                COUNT(`resDeviceIsTouch`) AS `asTouchDeviceDetected`,
 
-                AVG(`result`.`resInitTime`) AS `avgInitTime`,
-                AVG(`result`.`resParseTime`) AS `avgParseTime`,
-                AVG(`result`.`resMemoryUsed`) AS `avgMemoryUsed`
-            FROM `result-normalized`
-            INNER JOIN `result`
-                ON `result`.`resId` = `result-normalized`.`result_id`
-            INNER JOIN `real-provider`
-                ON `real-provider`.`proId` = `result`.`provider_id`
+                AVG(`resInitTime`) AS `avgInitTime`,
+                AVG(`resParseTime`) AS `avgParseTime`,
+                AVG(`resMemoryUsed`) AS `avgMemoryUsed`
+            FROM `result`
+            INNER JOIN `real-provider` ON `proId` = `provider_id`
             WHERE
-                `result`.`provider_id` = :proId AND
-                `result`.`run` = :run
+                `provider_id` = :proId
             GROUP BY
-                `real-provider`.`proId`
+                `proId`
         ';
 
         $statement = $this->pdo->prepare($sql);
+
         $statement->bindValue(':proId', $this->provider['proId'], PDO::PARAM_STR);
-        $statement->bindValue(':run', $run ?? 0, PDO::PARAM_STR);
+
         $statement->execute();
 
         return $statement->fetch();
     }
 
     /** @throws void */
-    private function getTable(string | null $run = null): string
+    private function getTable(): string
     {
         $provider = $this->provider;
 
@@ -185,26 +185,11 @@ final class OverviewProvider extends AbstractHtml
         /*
          * body
          */
-        $countOfUseragents = $this->getUserAgentCount($run);
+        $countOfUseragents = $this->getUserAgentCount();
 
-        $row = $this->getResult($run);
+        $row = $this->getResult();
 
         $html .= '<tbody>';
-
-        if ($row === false) {
-            $html .= '
-            <tr>
-                <td colspan="5" class="center-align red lighten-1">
-                    <strong>Not available with this provider</strong>
-                </td>
-            </tr>
-
-            ';
-
-            $html .= '</tbody>';
-
-            return $html . '</table>';
-        }
 
         /*
          * Results found
@@ -214,7 +199,7 @@ final class OverviewProvider extends AbstractHtml
             <th rowspan="2"></th>
             <th>Results</th>
             <td>' . $row['resultFound'] . '</td>
-            <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['resultFound']) . '</td>
+            <td>' . $this->getPercentCircle($countOfUseragents, $row['resultFound']) . '</td>
             <td>
                 <a href="not-detected/' . $provider['proName'] . '/no-result-found.html" class="btn waves-effect waves-light">
                     Not detected
@@ -226,7 +211,7 @@ final class OverviewProvider extends AbstractHtml
             <tr>
             <th>Errors</th>
             <td>' . $row['resultError'] . '</td>
-            <td>' . $this->getPercentCircle($countOfUseragents, (int) $row['resultError']) . '</td>
+            <td>' . $this->getPercentCircle($countOfUseragents, $row['resultError']) . '</td>
             <td></td>
             </tr>
         ';
@@ -245,8 +230,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['clientNameFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['clientNameFound'],
-                    (int) $row['resultFound'],
+                    $row['clientNameFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
@@ -280,8 +265,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['clientVersionFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['clientVersionFound'],
-                    (int) $row['resultFound'],
+                    $row['clientVersionFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td></td>
                 </tr>
@@ -308,8 +293,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['clientTypeFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['clientTypeFound'],
-                    (int) $row['resultFound'],
+                    $row['clientTypeFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td></td>
                 </tr>
@@ -336,8 +321,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['asBotDetected'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['asBotDetected'],
-                    (int) $row['resultFound'],
+                    $row['asBotDetected'],
+                    $row['resultFound'],
 ) . '</td>
                 <td></td>
                 </tr>
@@ -368,8 +353,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['engineNameFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['engineNameFound'],
-                    (int) $row['resultFound'],
+                    $row['engineNameFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/rendering-engines.html" class="btn waves-effect waves-light">
@@ -403,8 +388,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['engineVersionFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['engineVersionFound'],
-                    (int) $row['resultFound'],
+                    $row['engineVersionFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td></td>
                 </tr>
@@ -435,8 +420,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['osNameFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['osNameFound'],
-                    (int) $row['resultFound'],
+                    $row['osNameFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/operating-systems.html" class="btn waves-effect waves-light">
@@ -470,8 +455,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['osVersionFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['osVersionFound'],
-                    (int) $row['resultFound'],
+                    $row['osVersionFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td></td>
                 </tr>
@@ -502,8 +487,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['deviceBrandFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['deviceBrandFound'],
-                    (int) $row['resultFound'],
+                    $row['deviceBrandFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-brands.html" class="btn waves-effect waves-light">
@@ -532,13 +517,13 @@ final class OverviewProvider extends AbstractHtml
                 <th>Model</th>
             ';
 
-        if ($provider['proCanDetectDeviceName']) {
+        if ($provider['proCanDetectDeviceModel']) {
             $html .= '
                 <td>' . $row['deviceModelFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['deviceModelFound'],
-                    (int) $row['resultFound'],
+                    $row['deviceModelFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-models.html" class="btn waves-effect waves-light">
@@ -572,8 +557,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['deviceTypeFound'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['deviceTypeFound'],
-                    (int) $row['resultFound'],
+                    $row['deviceTypeFound'],
+                    $row['resultFound'],
 ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-types.html" class="btn waves-effect waves-light">
@@ -607,8 +592,8 @@ final class OverviewProvider extends AbstractHtml
                 <td>' . $row['asMobileDetected'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['asMobileDetected'],
-                    (int) $row['resultFound'],
+                    $row['asMobileDetected'],
+                    $row['resultFound'],
 ) . '</td>
                 <td>
                     <a href="not-detected/' . $provider['proName'] . '/device-is-mobile.html" class="btn waves-effect waves-light">
@@ -634,13 +619,13 @@ final class OverviewProvider extends AbstractHtml
                 <th>Is touch</th>
             ';
 
-        if ($provider['proCanDetectDeviceDisplayIsTouch']) {
+        if ($provider['proCanDetectDeviceIsTouch']) {
             $html .= '
                 <td>' . $row['asTouchDeviceDetected'] . '</td>
                 <td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    (int) $row['asTouchDeviceDetected'],
-                    (int) $row['resultFound'],
+                    $row['asTouchDeviceDetected'],
+                    $row['resultFound'],
 ) . '</td>
                 <td></td>
                 </tr>
@@ -663,7 +648,7 @@ final class OverviewProvider extends AbstractHtml
         $html .= '
             <tr>
             <th colspan="2">Parse time [ms]</th>
-            <td>' . number_format(round((float) $row['avgParseTime'] * 1000, 3), 3) . '</td>
+            <td>' . number_format(round($row['avgParseTime'] * 1000, 3), 3) . '</td>
             <td></td>
             <td></td>
             </tr>
@@ -675,7 +660,7 @@ final class OverviewProvider extends AbstractHtml
         $html .= '
             <tr>
             <th colspan="2">Required memory</th>
-            <td>' . number_format(round((float) $row['avgMemoryUsed'], 2), 2) . '</td>
+            <td>' . number_format(round($row['avgMemoryUsed'], 2), 2) . '</td>
             <td></td>
             <td></td>
             </tr>

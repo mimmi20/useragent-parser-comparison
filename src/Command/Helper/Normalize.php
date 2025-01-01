@@ -1,9 +1,9 @@
 <?php
 
 /**
- * This file is part of the mimmi20/useragent-parser-comparison package.
+ * This file is part of the browser-detector-version package.
  *
- * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ * Copyright (c) 2016-2024, Thomas Mueller <mimmi20@live.de>
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,26 +13,24 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
-use Override;
 use Symfony\Component\Console\Helper\Helper;
 
 use function array_key_exists;
-use function array_keys;
 use function array_slice;
 use function explode;
 use function file_exists;
 use function implode;
-use function in_array;
 use function is_array;
 use function mb_strtolower;
 use function preg_replace;
+use function sprintf;
 use function str_replace;
 
 final class Normalize extends Helper
 {
     private const string MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
 
-    /** @var array<array<string>> */
+    /** @var array<string, array<string, array<string, string|null>>> */
     private array $mappings = [];
 
     /** @throws void */
@@ -46,33 +44,34 @@ final class Normalize extends Helper
     }
 
     /** @throws void */
-    #[Override]
     public function getName(): string
     {
         return 'normalize';
     }
 
     /**
-     * @param array<mixed> $parsed
+     * @param array<string, mixed> $parsed
      *
-     * @return array<array<float|string|null>|float|string|null>
+     * @return array<string, mixed>
      *
      * @throws void
      */
     public function normalize(array $parsed): array
     {
         $normalized = [];
+        $sections   = ['client', 'platform', 'device', 'engine'];
 
-        foreach (array_keys($parsed) as $key) {
-            if ($key === 'raw') {
-                $normalized[$key] = $parsed[$key];
-
+        foreach ($sections as $section) {
+            if (!array_key_exists($section, $parsed)) {
                 continue;
             }
 
-            $normKey = mb_strtolower(str_replace('res', '', $key));
+            $normalized[$section] = [];
+            $properties           = $parsed[$section];
 
-            $normalized[$key] = $this->normalizeValue($normKey, $parsed[$key], $parsed);
+            foreach ($properties as $key => $value) {
+                $normalized[$section][$key] = $this->normalizeValue($section, $key, $value);
+            }
         }
 
         return $normalized;
@@ -89,78 +88,74 @@ final class Normalize extends Helper
     }
 
     /**
-     * @param array<mixed>|bool|float|int|string|null $value
-     * @param array<mixed>                            $parsed
-     *
-     * @return array<float|string|null>|float|string|null
+     * @return array<mixed>|string|null
      *
      * @throws void
      */
-    private function normalizeValue(
-        string $normKey,
-        bool | array | string | int | float | null $value,
-        array $parsed,
-    ): array | float | string | null {
+    private function normalizeValue(string $section, string $key, mixed $value): array | string | null
+    {
         if ($value === null) {
             return null;
-        }
-
-        if ($value === false) {
-            return 'false';
-        }
-
-        if ($value === true) {
-            return 'true';
         }
 
         if (is_array($value)) {
             $list = [];
 
             foreach ($value as $key2 => $value2) {
-                $list[$key2] = $this->normalizeValue($normKey, $value2, $parsed);
+                $list[$key2] = $this->normalizeValue($section, $key2, $value2);
             }
 
             return $list;
         }
 
-        if (in_array($normKey, ['clientversion', 'osversion', 'engineversion'], true)) {
-            $value = $this->truncateVersion(mb_strtolower((string) $value));
-        } elseif (in_array($normKey, ['devicedisplaysize'], true)) {
-            $value = preg_replace('|[^0-9a-z.]|', '', mb_strtolower((string) $value));
-        } elseif (!in_array($normKey, ['parse_time', 'init_time', 'version'], true)) {
-            $value = preg_replace('|[^0-9a-z]|', '', mb_strtolower((string) $value));
+        if ($value === false) {
+            $value = 'false';
         }
 
-        // Special Windows normalization for parsers that don't differntiate the version of windows
-        // in the name, but use the version.
-        if ($normKey === 'osname' && !empty($parsed['resOsVersion'])) {
-            if ($value === 'windows') {
-                $value .= preg_replace(
-                    '|[^0-9a-z.]|',
-                    '',
-                    mb_strtolower((string) $parsed['resOsVersion']),
-                );
-            }
-
-            if ($value === 'windowsphone') {
-                $value .= preg_replace(
-                    '|[^0-9a-z.]|',
-                    '',
-                    mb_strtolower((string) $parsed['resOsVersion']),
-                );
-            }
+        if ($value === true) {
+            $value = 'true';
         }
 
-        if (!array_key_exists($normKey, $this->mappings) || !is_array($this->mappings[$normKey])) {
+        $value = $key === 'version'
+            ? $this->truncateVersion(mb_strtolower((string) $value))
+            : preg_replace(
+                '|[^0-9a-z+]|',
+                '',
+                mb_strtolower((string) $value),
+            );
+
+        if (!isset($this->mappings[$section][$key])) {
             return $value;
         }
 
-        $v = array_key_exists($normKey, $this->mappings) && is_array($this->mappings[$normKey])
-            ? $this->mappings[$normKey]
-            : [];
+        $v = $this->mappings[$section][$key];
 
-        if (is_array($v) && array_key_exists($value, $v)) {
+        if (!is_array($v)) {
+            return $value;
+        }
+
+        $oldValue = $value;
+
+        while (array_key_exists($value, $v)) {
             $value = $v[$value];
+
+            if ($value === null) {
+                break;
+            }
+
+            if ($value === $oldValue) {
+                echo sprintf('normalizing circle detected for value "%s"', $oldValue);
+
+                exit;
+            }
+
+            if (array_key_exists($value, $v)) {
+                echo sprintf(
+                    '"%s" was normalized to "%s" which will be normalized again. Please update the normalizing array.' . "\n",
+                    $oldValue,
+                    $value,
+                );
+            }
         }
 
         return $value;
