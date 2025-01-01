@@ -885,7 +885,7 @@ final class GenerateIndexPage extends Command
                     GROUP_CONCAT(DISTINCT `list-found-general-client-types`.`resClientType`)
                 FROM `list-found-general-client-types`
                 WHERE
-                     `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
+                    `list-found-general-client-types`.`userAgent_id` = `userAgent`.`uaId`
                     AND `list-found-general-client-types`.`provider_id` != `found-results`.`provider_id`
             ) AS `detectionValuesDistinct`
         FROM `found-results`
