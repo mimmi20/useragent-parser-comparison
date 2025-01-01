@@ -809,16 +809,16 @@ final class GenerateIndexPage extends Command
 
                 $sql       = '
             SELECT
-            	`found-results`.`resClientName` AS `name`,
-            	`userAgent`.`uaId`,
-            	`userAgent`.`uaString`,
-            	(
-            		SELECT
-            			COUNT(`list-found-general-client-isbot`.`resClientName`)
-            		FROM `list-found-general-client-isbot`
+                `found-results`.`resClientName` AS `name`,
+                `userAgent`.`uaId`,
+                `userAgent`.`uaString`,
+                (
+                    SELECT
+                        COUNT(`list-found-general-client-isbot`.`resClientName`)
+                    FROM `list-found-general-client-isbot`
                     WHERE
-            			`list-found-general-client-isbot`.`userAgent_id` = `userAgent`.`uaId`
-            			AND `list-found-general-client-isbot`.`provider_id` != `found-results`.`provider_id`
+                        `list-found-general-client-isbot`.`userAgent_id` = `userAgent`.`uaId`
+                        AND `list-found-general-client-isbot`.`provider_id` != `found-results`.`provider_id`
                 ) as `detectionCount`
             FROM `found-results`
             INNER JOIN `userAgent`
