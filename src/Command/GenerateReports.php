@@ -92,7 +92,7 @@ final class GenerateReports extends Command
 
         $output->write('generate general overview page ...');
         $generate = new OverviewGeneral($this->pdo, 'UserAgentParserComparison comparison overview');
-        file_put_contents($basePath . '/index.html', $generate->getHtml($version, $thisRunName));
+        file_put_contents($basePath . '/index.html', $generate->getHtml());
         $output->writeln("\r" . 'generate general overview page <info>done</info>');
 
         $baseMessage      = 'generate overview page and found pages for';
@@ -127,7 +127,7 @@ final class GenerateReports extends Command
 
             file_put_contents(
                 $basePath . '/' . $dbResultProvider['proName'] . '.html',
-                $generate->getHtml($thisRunName),
+                $generate->getHtml(),
             );
 
             $message .= '.';
