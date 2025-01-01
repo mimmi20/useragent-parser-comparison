@@ -49,8 +49,8 @@ final class SimpleList extends AbstractHtml
 <div class="section" id="simple-list">
     <form>
         <div class="input-field">
-          <input class="search" type="search" placeholder="Search for a user agent">
-          <i class="material-icons">close</i>
+            <input class="search" type="search" placeholder="Search for a user agent">
+            <i class="material-icons">close</i>
         </div>
 
         <a class="sort btn" data-sort="name">Sort by name</a>
