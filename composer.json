@@ -21,7 +21,7 @@
     "ext-xml": "*",
     "ext-xmlwriter": "*",
     "infection/infection": "^0.29.14",
-    "mimmi20/coding-standard": "^6.0.15",
+    "mimmi20/coding-standard": "^6.0.16",
     "nikic/php-parser": "^5.4.0",
     "phpstan/extension-installer": "^1.4.3",
     "phpstan/phpstan": "^2.1.6",
@@ -33,7 +33,7 @@
     "symplify/phpstan-rules": "^14.3.5",
     "tomasvotruba/cognitive-complexity": "^1.0.0",
     "tomasvotruba/type-coverage": "^2.0.2",
-    "tomasvotruba/unused-public": "^2.0.0"
+    "tomasvotruba/unused-public": "^2.0.1"
   },
   "minimum-stability": "stable",
   "prefer-stable": true,
