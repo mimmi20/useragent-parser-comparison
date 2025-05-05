@@ -11,7 +11,7 @@
     "ext-pdo": "*",
     "composer-runtime-api": "^2.0.0",
     "ramsey/uuid": "^4.7.6",
-    "symfony/console": "^7.2.5"
+    "symfony/console": "^7.2.6"
   },
   "require-dev": {
     "ext-ctype": "*",
@@ -21,13 +21,13 @@
     "ext-xml": "*",
     "ext-xmlwriter": "*",
     "infection/infection": "^0.29.14",
-    "mimmi20/coding-standard": "^6.0.28",
+    "mimmi20/coding-standard": "^6.0.29",
     "nikic/php-parser": "^5.4.0",
     "phpstan/extension-installer": "^1.4.3",
-    "phpstan/phpstan": "^2.1.13",
+    "phpstan/phpstan": "^2.1.14",
     "phpstan/phpstan-deprecation-rules": "^2.0.2",
     "rector/rector": "^2.0.14",
-    "rector/type-perfect": "^2.0.2",
+    "rector/type-perfect": "^2.1.0",
     "shipmonk/composer-dependency-analyser": "^1.8.2",
     "symfony/process": "^7.2.5",
     "symplify/phpstan-rules": "^14.6.9",
