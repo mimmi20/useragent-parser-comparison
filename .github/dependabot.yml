@@ -11,18 +11,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -38,18 +27,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -66,18 +44,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -93,18 +60,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -120,18 +76,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -147,18 +92,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -174,18 +108,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -201,18 +124,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -228,18 +140,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -255,18 +156,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -282,18 +172,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -309,18 +188,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -336,18 +204,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -363,18 +220,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -390,18 +236,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -417,18 +252,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -445,18 +269,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -472,18 +285,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -499,18 +301,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -526,18 +317,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -553,18 +333,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -580,18 +349,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -607,18 +365,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -634,18 +381,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -661,18 +397,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -688,18 +413,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -715,18 +429,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -742,18 +445,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -769,18 +461,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -796,18 +477,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -823,18 +493,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -850,18 +509,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -877,18 +525,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -904,18 +541,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -931,18 +557,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -958,18 +573,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -985,18 +589,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1012,18 +605,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1039,18 +621,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1066,18 +637,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1093,18 +653,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1120,18 +669,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1147,18 +685,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1174,18 +701,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1201,18 +717,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1228,18 +733,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1255,18 +749,7 @@ updates:
       interval: "daily"
       time: "04:00"
       timezone: "Europe/Berlin"
-    groups:
-      security-updates:
-        applies-to: "security-updates"
-        patterns:
-          - "*"
-      version-updates:
-        applies-to: "version-updates"
-        patterns:
-          - "*"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
@@ -1284,8 +767,6 @@ updates:
       time: "04:00"
       timezone: "Europe/Berlin"
     open-pull-requests-limit: 10
-    reviewers:
-      - "mimmi20"
     assignees:
       - "mimmi20"
     labels:
