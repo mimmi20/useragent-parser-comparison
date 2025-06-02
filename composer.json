@@ -10,7 +10,7 @@
     "ext-mbstring": "*",
     "ext-pdo": "*",
     "composer-runtime-api": "^2.0.0",
-    "ramsey/uuid": "^4.7.6",
+    "ramsey/uuid": "^4.8.1",
     "symfony/console": "^7.3.0"
   },
   "require-dev": {
