@@ -137,8 +137,8 @@ final class InitUseragents extends Command
                 $agent = $singleTestData['headers']['user-agent'] ?? null;
 
                 if ($agent === null) {
-//                    var_dump($singleTestData);exit;
-//                    $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $testName . '.</error>');
+                    //                    var_dump($singleTestData);exit;
+                    //                    $output->writeln("\r" . $message . ' <error>There was no useragent header for the testsuite ' . $testName . '.</error>');
                     continue;
                 }
 

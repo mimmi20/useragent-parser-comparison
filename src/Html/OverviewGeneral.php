@@ -38,8 +38,8 @@ final class OverviewGeneral extends AbstractHtml
     <div class="row center">
         <h5 class="header light">
             We took <strong>' . number_format(
-        $this->getUserAgentCount(),
-) . '</strong> different user agents and analyzed them with all providers below.<br />
+            $this->getUserAgentCount(),
+        ) . '</strong> different user agents and analyzed them with all providers below.<br />
             That way, it\'s possible to get a good overview of each provider
         </h5>
     </div>
@@ -508,7 +508,7 @@ final class OverviewGeneral extends AbstractHtml
                 <td>
                     <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="' . htmlspecialchars(
                 $info,
-) . '">
+            ) . '">
                         ' . number_format(round($row['avgParseTime'] * 1000, 3), 3) . '
                     </a>
                 </td>
@@ -518,7 +518,7 @@ final class OverviewGeneral extends AbstractHtml
                 <td>
                     <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="' . htmlspecialchars(
                 $info,
-) . '">
+            ) . '">
                         ' . number_format(round($row['avgMemoryUsed'], 2), 2) . '
                     </a>
                 </td>
