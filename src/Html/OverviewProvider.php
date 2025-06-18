@@ -229,10 +229,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['clientNameFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['clientNameFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['clientNameFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
                         Detected
@@ -264,10 +264,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['clientVersionFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['clientVersionFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['clientVersionFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -292,10 +292,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['clientTypeFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['clientTypeFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['clientTypeFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -320,10 +320,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['asBotDetected'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['asBotDetected'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['asBotDetected'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -352,10 +352,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['engineNameFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['engineNameFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['engineNameFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/rendering-engines.html" class="btn waves-effect waves-light">
                         Detected
@@ -387,10 +387,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['engineVersionFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['engineVersionFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['engineVersionFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -419,10 +419,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['osNameFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['osNameFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['osNameFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/operating-systems.html" class="btn waves-effect waves-light">
                         Detected
@@ -454,10 +454,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['osVersionFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['osVersionFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['osVersionFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -486,10 +486,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['deviceBrandFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['deviceBrandFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['deviceBrandFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-brands.html" class="btn waves-effect waves-light">
                         Detected
@@ -521,10 +521,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['deviceModelFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['deviceModelFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['deviceModelFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-models.html" class="btn waves-effect waves-light">
                         Detected
@@ -556,10 +556,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['deviceTypeFound'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['deviceTypeFound'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['deviceTypeFound'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-types.html" class="btn waves-effect waves-light">
                         Detected
@@ -591,10 +591,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['asMobileDetected'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['asMobileDetected'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['asMobileDetected'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td>
                     <a href="not-detected/' . $provider['proName'] . '/device-is-mobile.html" class="btn waves-effect waves-light">
                         Not detected
@@ -623,10 +623,10 @@ final class OverviewProvider extends AbstractHtml
             $html .= '
                 <td>' . $row['asTouchDeviceDetected'] . '</td>
                 <td>' . $this->getPercentCircle(
-                $countOfUseragents,
-                $row['asTouchDeviceDetected'],
-                $row['resultFound'],
-            ) . '</td>
+                    $countOfUseragents,
+                    $row['asTouchDeviceDetected'],
+                    $row['resultFound'],
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
