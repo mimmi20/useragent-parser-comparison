@@ -232,7 +232,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['clientNameFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/client-names.html" class="btn waves-effect waves-light">
                         Detected
@@ -267,7 +267,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['clientVersionFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -295,7 +295,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['clientTypeFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -323,7 +323,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['asBotDetected'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -355,7 +355,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['engineNameFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/rendering-engines.html" class="btn waves-effect waves-light">
                         Detected
@@ -390,7 +390,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['engineVersionFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -422,7 +422,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['osNameFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/operating-systems.html" class="btn waves-effect waves-light">
                         Detected
@@ -457,7 +457,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['osVersionFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td></td>
                 </tr>
             ';
@@ -489,7 +489,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['deviceBrandFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-brands.html" class="btn waves-effect waves-light">
                         Detected
@@ -524,7 +524,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['deviceModelFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-models.html" class="btn waves-effect waves-light">
                         Detected
@@ -559,7 +559,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['deviceTypeFound'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td>
                     <a href="detected/' . $provider['proName'] . '/device-types.html" class="btn waves-effect waves-light">
                         Detected
@@ -594,7 +594,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['asMobileDetected'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td>
                     <a href="not-detected/' . $provider['proName'] . '/device-is-mobile.html" class="btn waves-effect waves-light">
                         Not detected
@@ -626,7 +626,7 @@ final class OverviewProvider extends AbstractHtml
                     $countOfUseragents,
                     $row['asTouchDeviceDetected'],
                     $row['resultFound'],
-) . '</td>
+                ) . '</td>
                 <td></td>
                 </tr>
             ';

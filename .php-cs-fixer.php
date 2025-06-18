@@ -46,6 +46,7 @@ return $config
                     'location' => 'after_open',
                     'separate' => 'bottom',
                 ],
+                'statement_indentation' => false,
             ],
         ),
     )

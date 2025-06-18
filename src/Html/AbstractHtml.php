@@ -89,7 +89,7 @@ abstract class AbstractHtml
             $resultFound,
             $countOfUseragents / 100,
             2,
-) . '%</tspan>
+        ) . '%</tspan>
                         </text>
                     </g>
                 </svg>

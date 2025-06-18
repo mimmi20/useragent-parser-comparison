@@ -1113,11 +1113,11 @@ final class Analyze extends Command
                 new TableCell(
                     'Platform',
                     ['colspan' => 3],
-),
+                ),
                 new TableCell(
                     'Device',
                     ['colspan' => 3],
-),
+                ),
             ],
         ]);
 
