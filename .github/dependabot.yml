@@ -8,9 +8,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -24,9 +30,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -41,9 +53,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/browscap/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -57,9 +75,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/browser-detector/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -73,9 +97,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/cbschuld/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -89,9 +119,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/crawler-detect/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -105,9 +141,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/curated/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -121,9 +163,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/donatj/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -137,9 +185,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/endorphin/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -153,9 +207,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/matomo/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -169,9 +229,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/mobile-detect/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -185,9 +251,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/ua-parser-js/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -201,9 +273,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/ua-parser-php/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -217,9 +295,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/whichbrowser-php/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -233,9 +317,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "tests/woothee-php/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -249,9 +339,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "tests/ua-parser-js/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -266,9 +362,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/3rd-eden-useragent/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -282,9 +384,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/amplitude-ua-parser-js/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -298,9 +406,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/bowser/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -314,9 +428,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/browscap-php/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -330,9 +450,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/browser-detect/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -346,9 +472,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/browser-detector/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -362,9 +494,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/cbschuld/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -378,9 +516,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/crawler-detect/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -394,9 +538,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/detect-browser/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -410,9 +560,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/device-detector/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -426,9 +582,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/device-detector-node/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -442,9 +604,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/donatj/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -458,9 +626,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/endorphin/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -474,9 +648,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/express-useragent/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -490,9 +670,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/fex-uadevice/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -506,9 +692,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/financial-times-useragent_parser/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -522,9 +714,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/hotoo-detector/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -538,9 +736,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/jenssegers-agent/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -554,9 +758,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/journyio-user-agent-parser/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -570,9 +780,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/matomo/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -586,9 +802,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/mobile-detect/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -602,9 +824,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/node-device-detector/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -618,9 +846,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/platformjs/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -634,9 +868,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/ua-parser-js/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -650,9 +890,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/ua-parser-php/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -666,9 +912,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/vigour-ua/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -682,9 +934,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/whichbrowser-js/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -698,9 +956,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/whichbrowser-php/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -714,9 +978,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/wolfcast/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -730,9 +1000,15 @@ updates:
   - package-ecosystem: "npm"
     directory: "parsers/woothee-js/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -746,9 +1022,15 @@ updates:
   - package-ecosystem: "composer"
     directory: "parsers/woothee-php/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
@@ -763,9 +1045,15 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+      day: "sunday"
       time: "04:00"
       timezone: "Europe/Berlin"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
     open-pull-requests-limit: 10
     assignees:
       - "mimmi20"
