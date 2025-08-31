@@ -11,7 +11,7 @@
     "ext-pdo": "*",
     "composer-runtime-api": "^2.0.0",
     "ramsey/uuid": "^4.9.0",
-    "symfony/console": "^7.3.2"
+    "symfony/console": "^7.3.3"
   },
   "require-dev": {
     "ext-ctype": "*",
