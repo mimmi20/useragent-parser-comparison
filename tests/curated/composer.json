@@ -1,7 +1,7 @@
 {
   "require": {
     "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
-    "ramsey/uuid": "^4.9.0"
+    "ramsey/uuid": "^4.9.1"
   },
   "config": {
     "preferred-install": "dist",
