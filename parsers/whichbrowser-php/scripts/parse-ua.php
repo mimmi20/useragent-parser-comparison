@@ -85,8 +85,8 @@ if ($hasUa) {
             'bits' => null,
         ],
         'engine' => [
-            'name'    => null,
-            'version' => null,
+            'name'    => $parser->engine->name ?? null,
+            'version' => $parser->engine->version->value ?? null,
             'manufacturer' => null,
         ],
         'raw' => $parser->toArray(),

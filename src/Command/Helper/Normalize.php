@@ -14,33 +14,23 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command\Helper;
 
 use Symfony\Component\Console\Helper\Helper;
+use UaDataMapper\InputMapper;
 
 use function array_key_exists;
 use function array_slice;
 use function explode;
-use function file_exists;
 use function implode;
 use function is_array;
-use function mb_strtolower;
-use function preg_replace;
-use function sprintf;
 use function str_replace;
 
 final class Normalize extends Helper
 {
-    private const string MAP_FILE = __DIR__ . '/../../../mappings/mappings.php';
-
-    /** @var array<string, array<string, array<string, string|null>>> */
-    private array $mappings = [];
+    private InputMapper $inputMapper;
 
     /** @throws void */
     public function __construct()
     {
-        if (!file_exists(self::MAP_FILE)) {
-            return;
-        }
-
-        $this->mappings = include self::MAP_FILE;
+        $this->inputMapper = new InputMapper();
     }
 
     /** @throws void */
@@ -58,23 +48,77 @@ final class Normalize extends Helper
      */
     public function normalize(array $parsed): array
     {
-        $normalized = [];
-        $sections   = ['client', 'platform', 'device', 'engine'];
-
-        foreach ($sections as $section) {
-            if (!array_key_exists($section, $parsed)) {
-                continue;
-            }
-
-            $normalized[$section] = [];
-            $properties           = $parsed[$section];
-
-            foreach ($properties as $key => $value) {
-                $normalized[$section][$key] = $this->normalizeValue($section, $key, $value);
-            }
+        if (is_array($parsed['device']['deviceName'])) {
+            $parsed['device']['deviceName'] = array_key_exists('model', $parsed['device']['deviceName'])
+                ? $parsed['device']['deviceName']['model']
+                : null;
         }
 
-        return $normalized;
+        return [
+            'client' => [
+                'name' => $this->inputMapper->mapBrowserName($parsed['client']['name']),
+                'modus' => $parsed['client']['modus'] ?? null,
+                'version' => $this->inputMapper->mapBrowserVersion(
+                    (string) ($parsed['client']['version'] ?? ''),
+                    $parsed['client']['name'],
+                ),
+                'manufacturer' => $this->inputMapper->mapBrowserMaker(
+                    $parsed['client']['manufacturer'] ?? '',
+                    $parsed['client']['name'],
+                ),
+                'bits' => $parsed['client']['bits'] ?? null,
+                'type' => $this->inputMapper->mapBrowserType($parsed['client']['type'] ?? null),
+                'isbot' => $parsed['client']['isbot'] ?? null,
+            ],
+            'platform' => [
+                'name' => $this->inputMapper->mapOsName($parsed['platform']['name']),
+                'marketingName' => $this->inputMapper->mapOsMaker(
+                    $parsed['platform']['marketingName'] ?? '',
+                    $parsed['platform']['name'],
+                ),
+                'version' => $this->inputMapper->mapOsVersion(
+                    (string) ($parsed['platform']['version'] ?? ''),
+                    $parsed['platform']['name'],
+                ),
+                'manufacturer' => $parsed['platform']['manufacturer'] ?? null,
+                'bits' => $parsed['platform']['bits'] ?? null,
+            ],
+            'device' => [
+                'deviceName' => $this->inputMapper->mapDeviceName(
+                    $parsed['device']['deviceName'] ?? null,
+                ),
+                'marketingName' => $this->inputMapper->mapDeviceMarketingName(
+                    $parsed['device']['marketingName'] ?? null,
+                    $parsed['device']['deviceName'] ?? null,
+                ),
+                'manufacturer' => $this->inputMapper->mapDeviceMaker(
+                    $parsed['device']['manufacturer'] ?? '',
+                    $parsed['device']['deviceName'] ?? null,
+                ),
+                'brand' => $this->inputMapper->mapDeviceBrandName(
+                    $parsed['device']['brand'] ?? null,
+                    $parsed['device']['deviceName'] ?? null,
+                ),
+                'display' => [
+                    'width' => $parsed['device']['display']['width'] ?? null,
+                    'height' => $parsed['device']['display']['height'] ?? null,
+                    'touch' => $parsed['device']['display']['touch'] ?? null,
+                    'type' => $parsed['device']['display']['type'] ?? null,
+                    'size' => $parsed['device']['display']['size'] ?? null,
+                ],
+                'dualOrientation' => $parsed['device']['dualOrientation'] ?? null,
+                'type' => $this->inputMapper->mapDeviceType($parsed['device']['type']),
+                'simCount' => $parsed['device']['simCount'] ?? null,
+                'ismobile' => $parsed['device']['ismobile'] ?? null,
+            ],
+            'engine' => [
+                'name' => $this->inputMapper->mapEngineName($parsed['engine']['name'] ?? null),
+                'version' => $this->inputMapper->mapEngineVersion(
+                    (string) $parsed['engine']['version'],
+                ),
+                'manufacturer' => $parsed['engine']['manufacturer'] ?? null,
+            ],
+        ];
     }
 
     /** @throws void */
@@ -85,79 +129,5 @@ final class Normalize extends Helper
         $versionParts = array_slice($versionParts, 0, 2);
 
         return implode('.', $versionParts);
-    }
-
-    /**
-     * @return array<mixed>|string|null
-     *
-     * @throws void
-     */
-    private function normalizeValue(string $section, string $key, mixed $value): array | string | null
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        if (is_array($value)) {
-            $list = [];
-
-            foreach ($value as $key2 => $value2) {
-                $list[$key2] = $this->normalizeValue($section, $key2, $value2);
-            }
-
-            return $list;
-        }
-
-        if ($value === false) {
-            $value = 'false';
-        }
-
-        if ($value === true) {
-            $value = 'true';
-        }
-
-        $value = $key === 'version'
-            ? $this->truncateVersion(mb_strtolower((string) $value))
-            : preg_replace(
-                '|[^0-9a-z+]|',
-                '',
-                mb_strtolower((string) $value),
-            );
-
-        if (!isset($this->mappings[$section][$key])) {
-            return $value;
-        }
-
-        $v = $this->mappings[$section][$key];
-
-        if (!is_array($v)) {
-            return $value;
-        }
-
-        $oldValue = $value;
-
-        while (array_key_exists($value, $v)) {
-            $value = $v[$value];
-
-            if ($value === null) {
-                break;
-            }
-
-            if ($value === $oldValue) {
-                echo sprintf('normalizing circle detected for value "%s"', $oldValue);
-
-                exit;
-            }
-
-            if (array_key_exists($value, $v)) {
-                echo sprintf(
-                    '"%s" was normalized to "%s" which will be normalized again. Please update the normalizing array.' . "\n",
-                    $oldValue,
-                    $value,
-                );
-            }
-        }
-
-        return $value;
     }
 }

@@ -107,7 +107,7 @@ if ($hasUa) {
             'version' => null,
             'manufacturer' => null,
         ],
-        'raw' => $browser,
+        'raw' => [],
     ];
 
     $output['parse_time'] = $end;

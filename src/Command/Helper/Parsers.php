@@ -35,11 +35,11 @@ use function file_get_contents;
 use function is_array;
 use function is_string;
 use function json_decode;
+use function mb_trim;
 use function reset;
 use function shell_exec;
 use function sort;
 use function str_replace;
-use function trim;
 
 use const JSON_THROW_ON_ERROR;
 use const SORT_FLAG_CASE;
@@ -215,14 +215,14 @@ final class Parsers extends Helper
                                 'php-get-browser' => 'php -d browscap=' . $pathName . '/data/browscap.ini ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg(
                                     $useragent,
                                 ),
-                                default => 'php ' . $pathName . '/scripts/parse-ua.php --ua ' . escapeshellarg(
+                                default => 'sh ' . $pathName . '/parse-ua.sh --ua ' . escapeshellarg(
                                     $useragent,
                                 ),
                             };
 
                             break;
                         case 'JavaScript':
-                            $command = 'node ' . $pathName . '/scripts/parse-ua.js --ua ' . escapeshellarg(
+                            $command = 'sh ' . $pathName . '/parse-ua.sh --ua ' . escapeshellarg(
                                 $useragent,
                             );
 
@@ -237,7 +237,7 @@ final class Parsers extends Helper
                         return null;
                     }
 
-                    $result = trim($result);
+                    $result = mb_trim($result);
 
                     try {
                         return json_decode($result, true, 512, JSON_THROW_ON_ERROR);

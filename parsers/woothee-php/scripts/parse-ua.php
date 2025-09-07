@@ -49,7 +49,7 @@ if ($hasUa) {
             'deviceName'     => null,
             'marketingName' => null,
             'manufacturer' => null,
-            'brand'    => $r['vendor'] ?? null,
+            'brand'    => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -66,7 +66,7 @@ if ($hasUa) {
             'name'    => $r['name'] ?? null,
             'modus' => null,
             'version' => $r['version'] ?? null,
-            'manufacturer' => null,
+            'manufacturer' => $r['vendor'] ?? null,
             'bits' => null,
             'type' => null,
             'isbot'    => null,

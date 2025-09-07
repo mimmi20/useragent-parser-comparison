@@ -5,11 +5,12 @@
   "type": "library",
   "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
   "require": {
-    "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
+    "php": "~8.4.0 || ~8.5.0",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
     "composer-runtime-api": "^2.0.0",
+    "mimmi20/ua-data-mapper": "^5.0.0",
     "ramsey/uuid": "^4.9.1",
     "symfony/console": "^7.3.3"
   },

@@ -26,18 +26,19 @@ use Throwable;
 use function addcslashes;
 use function array_key_exists;
 use function array_keys;
+use function array_multisort;
 use function assert;
-use function count;
 use function date;
 use function file_exists;
 use function file_put_contents;
+use function implode;
 use function is_string;
 use function json_encode;
 use function mb_str_pad;
 use function mb_strlen;
 use function mb_substr;
 use function mkdir;
-use function sort;
+use function number_format;
 use function sprintf;
 use function time;
 
@@ -46,8 +47,12 @@ use const JSON_THROW_ON_ERROR;
 use const JSON_UNESCAPED_SLASHES;
 use const JSON_UNESCAPED_UNICODE;
 use const PHP_EOL;
+use const SORT_ASC;
+use const SORT_DESC;
 use const SORT_FLAG_CASE;
 use const SORT_NATURAL;
+use const SORT_NUMERIC;
+use const STR_PAD_LEFT;
 
 final class Test extends Command
 {
@@ -102,19 +107,44 @@ final class Test extends Command
             $this->tests[$testPath] = $testConfig;
         }
 
-        $rows = [];
+        $rows   = [];
+        $paths  = [];
+        $counts = [];
 
         $output->writeln('These are all available test suites, choose which you would like to run');
 
-        $questions = array_keys($this->tests);
-        sort($questions, SORT_FLAG_CASE | SORT_NATURAL);
+        foreach ($this->tests as $testPath => $testConfig) {
+            $paths[$testPath]  = $testPath;
+            $counts[$testPath] = $testConfig['test-count'];
+        }
 
-        foreach ($questions as $name) {
-            $rows[] = [$name];
+        array_multisort(
+            $paths,
+            SORT_ASC,
+            SORT_FLAG_CASE | SORT_NATURAL,
+            $counts,
+            SORT_DESC,
+            SORT_NUMERIC,
+            $this->tests,
+        );
+
+        $questions = [];
+
+        foreach ($this->tests as $testPath => $testConfig) {
+            $questions[] = $testPath;
+            $rows[]      = [
+                $testPath,
+                mb_str_pad(
+                    number_format($testConfig['test-count'], 0, '.', ','),
+                    15,
+                    ' ',
+                    STR_PAD_LEFT,
+),
+            ];
         }
 
         $table = new Table($output);
-        $table->setHeaders(['Test Suite']);
+        $table->setHeaders(['Test Suite', 'Number of Tests']);
         $table->setRows($rows);
         $table->render();
 
@@ -124,9 +154,10 @@ final class Test extends Command
         $question       = new ChoiceQuestion(
             'Choose which test suites to run, separate multiple with commas (press enter to use all)',
             $questions,
-            count($questions) - 1,
+            implode(',', array_keys($questions)),
         );
         $question->setMultiselect(true);
+        $question->setAutocompleterValues($questions);
 
         $answers       = $questionHelper->ask($input, $output, $question);
         $selectedTests = [];

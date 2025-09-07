@@ -19,7 +19,7 @@ $parseTime = 0;
 
 $start = microtime(true);
 require_once __DIR__ . '/../vendor/autoload.php';
-$browser = new Browser();
+$browser = new cbschuld\Browser();
 $browser->setUserAgent('Test String');
 $initTime = microtime(true) - $start;
 
@@ -62,16 +62,16 @@ if ($hasUa) {
             'ismobile' => null,
         ],
         'client' => [
-            'name'    => $browser->getBrowser() === 'unknown' ? null : $browser->getBrowser(),
+            'name'    => $browser->getBrowser(),
             'modus' => null,
-            'version' => $browser->getVersion() === 'unknown' ? null : $browser->getVersion(),
+            'version' => $browser->getVersion(),
             'manufacturer' => null,
             'bits' => null,
             'type' => null,
             'isbot'    => null,
         ],
         'platform' => [
-            'name'    => $browser->getPlatform() === 'unknown' ? null : $browser->getPlatform(),
+            'name'    => $browser->getPlatform(),
             'marketingName' => null,
             'version' => null,
             'manufacturer' => null,
@@ -82,7 +82,7 @@ if ($hasUa) {
             'version' => null,
             'manufacturer' => null,
         ],
-        'raw' => $browser,
+        'raw' => [],
     ];
 
     $output['parse_time'] = $end;

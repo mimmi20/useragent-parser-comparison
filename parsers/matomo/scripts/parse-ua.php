@@ -26,6 +26,7 @@ $cache   = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
 
 $start = microtime(true);
 $dd = new DeviceDetector('Test String');
+$dd->setCache(new \DeviceDetector\Cache\PSR16Bridge($cache));
 $dd->parse();
 $initTime = microtime(true) - $start;
 
