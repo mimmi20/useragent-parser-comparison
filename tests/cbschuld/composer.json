@@ -2,7 +2,7 @@
   "require": {
     "php": "~8.3.0 || ~8.4.0 || ~8.5.0",
     "composer-runtime-api": "^2.0",
-    "cbschuld/browser.php": "^v1.9.6",
+    "cbschuld/browser.php": "^v2.0.0",
     "mimmi20/browscap-helper-source": "^5.1.3"
   },
   "config": {
