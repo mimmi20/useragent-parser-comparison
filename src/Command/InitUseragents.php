@@ -28,10 +28,10 @@ use function json_decode;
 use function json_encode;
 use function mb_str_pad;
 use function mb_strlen;
+use function mb_trim;
 use function sha1;
 use function shell_exec;
 use function sprintf;
-use function trim;
 use function var_dump;
 
 use const JSON_THROW_ON_ERROR;
@@ -111,7 +111,7 @@ final class InitUseragents extends Command
                 continue;
             }
 
-            $testOutput = trim($testOutput);
+            $testOutput = mb_trim($testOutput);
 
             try {
                 $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);

@@ -15,6 +15,8 @@ namespace UserAgentParserComparison\Compare;
 
 use function array_keys;
 use function is_array;
+use function is_bool;
+use function is_string;
 
 final class Comparison
 {
@@ -42,6 +44,22 @@ final class Comparison
 
                 if (is_array($expected) || is_array($actual)) {
                     continue;
+                }
+
+                if (is_bool($expected)) {
+                    $expected = $expected ? 'true' : 'false';
+                }
+
+                if (!is_string($expected) && $expected !== null) {
+                    $expected = (string) $expected;
+                }
+
+                if (is_bool($actual)) {
+                    $actual = $actual ? 'true' : 'false';
+                }
+
+                if (!is_string($actual) && $actual !== null) {
+                    $actual = (string) $actual;
                 }
 
                 $pair = new ValuePairs();

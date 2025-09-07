@@ -40,13 +40,13 @@ use function fopen;
 use function fputcsv;
 use function is_string;
 use function json_encode;
+use function mb_rtrim;
 use function mb_str_pad;
 use function mb_strlen;
 use function mb_substr;
 use function mkdir;
 use function rewind;
 use function round;
-use function rtrim;
 use function sprintf;
 use function stream_get_contents;
 use function time;
@@ -252,7 +252,7 @@ final class Parse extends Command
 
                     $rows[] = [
                         new TableCell(
-                            '<fg=yellow>' . (isset($singleResult['useragent']) ? ' ' . rtrim(
+                            '<fg=yellow>' . (isset($singleResult['useragent']) ? ' ' . mb_rtrim(
                                 $singleResult['useragent'],
                                 '\\',
                             ) . ' ' : '--') . '</fg>',
@@ -369,7 +369,7 @@ final class Parse extends Command
 
         fputcsv($fp, $input, $delimiter, $enclosure);
         rewind($fp);
-        $data = rtrim((string) stream_get_contents($fp), "\n");
+        $data = mb_rtrim((string) stream_get_contents($fp), "\n");
         fclose($fp);
 
         if ($csvFile) {

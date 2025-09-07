@@ -45,12 +45,12 @@ use function json_decode;
 use function json_encode;
 use function ksort;
 use function max;
+use function mb_trim;
 use function mkdir;
 use function reset;
 use function shell_exec;
 use function sprintf;
 use function str_replace;
-use function trim;
 
 use const JSON_PRETTY_PRINT;
 use const JSON_THROW_ON_ERROR;
@@ -329,22 +329,42 @@ final class Tests extends Helper
                         default => 'php -d memory_limit=1024M ' . $pathName . '/scripts/build.php',
                     };
 
+                    $commandCount = match ($testName) {
+                        'browser-detector', 'crawler-detect' => 'php -d memory_limit=3048M ' . $pathName . '/scripts/count.php',
+                        default => 'php -d memory_limit=1024M ' . $pathName . '/scripts/count.php',
+                    };
+
                     break;
                 case 'JavaScript':
-                    $command = 'php ' . $pathName . '/scripts/build.php';
+                    $command      = 'php ' . $pathName . '/scripts/build.php';
+                    $commandCount = 'php ' . $pathName . '/scripts/count.php';
 
                     break;
                 default:
                     continue 2;
             }
 
-            $testPath = $testDir->getFilename();
+            $testPath  = $testDir->getFilename();
+            $testCount = 0;
+
+            $testOutput = shell_exec($commandCount);
+
+            if ($testOutput !== null && $testOutput !== false) {
+                try {
+                    $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
+
+                    $testCount = (int) $tests['tests'];
+                } catch (JsonException) {
+                    // do nothing
+                }
+            }
 
             yield $testPath => [
                 'name' => $pathName,
                 'path' => $testPath,
                 'metadata' => $metadata,
                 'command' => $command,
+                'test-count' => $testCount,
                 'build' => static function () use ($testPath, $output, $expectedDir, $command): iterable {
                     $message = sprintf('test suite <fg=yellow>%s</>', $testPath);
 
@@ -360,7 +380,7 @@ final class Tests extends Helper
                         return null;
                     }
 
-                    $testOutput = trim($testOutput);
+                    $testOutput = mb_trim($testOutput);
 
                     if ($expectedDir !== null) {
                         if (!file_exists($expectedDir . '/' . $testPath)) {
