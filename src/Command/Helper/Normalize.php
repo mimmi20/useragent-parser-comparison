@@ -17,15 +17,11 @@ use Symfony\Component\Console\Helper\Helper;
 use UaDataMapper\InputMapper;
 
 use function array_key_exists;
-use function array_slice;
-use function explode;
-use function implode;
 use function is_array;
-use function str_replace;
 
 final class Normalize extends Helper
 {
-    private InputMapper $inputMapper;
+    private readonly InputMapper $inputMapper;
 
     /** @throws void */
     public function __construct()
@@ -119,15 +115,5 @@ final class Normalize extends Helper
                 'manufacturer' => $parsed['engine']['manufacturer'] ?? null,
             ],
         ];
-    }
-
-    /** @throws void */
-    private function truncateVersion(string $version): string
-    {
-        $version      = str_replace('_', '.', $version);
-        $versionParts = explode('.', $version);
-        $versionParts = array_slice($versionParts, 0, 2);
-
-        return implode('.', $versionParts);
     }
 }

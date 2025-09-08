@@ -177,11 +177,6 @@ final class Analyze extends Command
             'fg' => 'green',
         ]);
 
-        $dataStyle = new TableCellStyle([
-            'align' => 'right',
-            'fg' => 'green',
-        ]);
-
         $rows[] = [
             new TableCell(
                 'Parser',
@@ -341,7 +336,10 @@ final class Analyze extends Command
                 $initTime  = 0.0;
                 $memoryUse = 0;
 
-                if ($parserData['metadata']['name'] === 'BrowserDetector' || $parserData['metadata']['name'] === 'Matomo Device Detector') {
+                if (
+                    $parserData['metadata']['name'] === 'BrowserDetector'
+                    || $parserData['metadata']['name'] === 'Matomo Device Detector'
+                ) {
                     $rows[] = new TableSeparator();
                 }
 
@@ -645,105 +643,88 @@ final class Analyze extends Command
                         $parserData['metadata']['name'],
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'left',
-                                ]
-                            )
+                                ['align' => 'left'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         $parserData['metadata']['version'] ?? 'n/a',
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         $clientAContent,
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         $engineAContent,
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         $platformAContent,
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         $deviceAContent,
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         number_format($initTime, 3, ',', '.') . 's',
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         number_format($parseTime, 3, ',', '.') . 's',
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         number_format($memoryUse, 3, ',', '.') . 'B',
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                     new TableCell(
                         $summaryAContent,
                         [
                             'style' => new TableCellStyle(
-                                [
-                                    'align' => 'right',
-                                ]
-                            )
+                                ['align' => 'right'],
+                            ),
                         ],
                     ),
                 ];
 
-                if ($parserData['metadata']['name'] === 'BrowserDetector' || $parserData['metadata']['name'] === 'Matomo Device Detector') {
+                if (
+                    $parserData['metadata']['name'] === 'BrowserDetector'
+                    || $parserData['metadata']['name'] === 'Matomo Device Detector'
+                ) {
                     $rows[] = new TableSeparator();
                 }
 
