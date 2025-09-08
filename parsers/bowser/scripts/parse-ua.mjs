@@ -40,10 +40,13 @@ if (hasUa) {
 
   output.result.parsed = {
     device: {
+      architecture: null,
       deviceName: r.platform.model ? r.platform.model : null,
       marketingName: null,
       manufacturer: null,
       brand: r.platform.vendor ? r.platform.vendor : null,
+      dualOrientation: null,
+      simCount: null,
       display: {
         width: null,
         height: null,
@@ -51,10 +54,10 @@ if (hasUa) {
         type: null,
         size: null,
       },
-      dualOrientation: null,
       type: r.platform.type ? r.platform.type : null,
-      simCount: null,
       ismobile: r.platform.type === 'mobile' || r.platform.type === 'tablet' || r.platform.type === 'wearable',
+      istv: null,
+      bits: null,
     },
     client: {
       name: r.browser.name ? r.browser.name : null,
@@ -62,8 +65,8 @@ if (hasUa) {
       version: r.browser.version ? r.browser.version : null,
       manufacturer: null,
       bits: null,
-      type: null,
       isbot: null,
+      type: null,
     },
     platform: {
       name: r.os.name ? r.os.name : null,

@@ -367,7 +367,7 @@ final class Parse extends Command
 
         $fp = $csvFile ? fopen($csvFile, 'a+') : fopen('php://temp', 'r+');
 
-        fputcsv($fp, $input, $delimiter, $enclosure);
+        fputcsv($fp, $input, $delimiter, $enclosure, escape: '\\');
         rewind($fp);
         $data = mb_rtrim((string) stream_get_contents($fp), "\n");
         fclose($fp);

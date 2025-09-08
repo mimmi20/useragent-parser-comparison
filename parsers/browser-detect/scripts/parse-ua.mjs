@@ -38,10 +38,13 @@ if (hasUa) {
 
   output.result.parsed = {
     device: {
+      architecture: null,
       deviceName: null,
       marketingName: null,
       manufacturer: null,
       brand: null,
+      dualOrientation: null,
+      simCount: null,
       display: {
         width: null,
         height: null,
@@ -49,10 +52,10 @@ if (hasUa) {
         type: null,
         size: null,
       },
-      dualOrientation: null,
       type: null,
-      simCount: null,
       ismobile: r.mobile,
+      istv: null,
+      bits: null,
     },
     client: {
       name: r.name ? r.name : null,
@@ -60,8 +63,8 @@ if (hasUa) {
       version: r.version ? r.version : null,
       manufacturer: null,
       bits: null,
-      type: null,
       isbot: null,
+      type: null,
     },
     platform: {
       name: r.os ? r.os : null,

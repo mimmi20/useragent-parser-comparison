@@ -17,6 +17,7 @@ use function array_keys;
 use function is_array;
 use function is_bool;
 use function is_string;
+use function mb_strtolower;
 
 final class Comparison
 {
@@ -63,8 +64,8 @@ final class Comparison
                 }
 
                 $pair = new ValuePairs();
-                $pair->setExpected($expected);
-                $pair->setActual($actual);
+                $pair->setExpected($expected === null ? null : mb_strtolower($expected));
+                $pair->setActual($actual === null ? null : mb_strtolower($actual));
 
                 $this->data[$compareKey][$compareSubKey] = $pair;
             }

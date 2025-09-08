@@ -49,10 +49,13 @@ if (hasUa) {
   if (r !== null) {
     output.result.parsed = {
       device: {
+        architecture: null,
         deviceName: r.device && r.device.model ? r.device.model : null,
         marketingName: null,
         manufacturer: null,
         brand: r.device && r.device.brand ? r.device.brand : null,
+        dualOrientation: null,
+        simCount: null,
         display: {
           width: null,
           height: null,
@@ -60,10 +63,10 @@ if (hasUa) {
           type: null,
           size: null,
         },
-        dualOrientation: null,
         type: r.device && r.device.type ? r.device.type : null,
-        simCount: null,
         ismobile: r.device && (r.device.type === 'mobile' || r.device.type === 'mobilephone' || r.device.type === 'tablet' || r.device.type === 'wearable' || r.device.type === 'smartphone'),
+        istv: null,
+        bits: null,
       },
       client: {
         name: r.client && r.client.name ? r.client.name : null,
@@ -71,8 +74,8 @@ if (hasUa) {
         version: r.client && r.client.version ? r.client.version : null,
         manufacturer: null,
         bits: null,
-        type: null,
         isbot: null,
+        type: null,
       },
       platform: {
         name: r.os && r.os.name ? r.os.name : null,

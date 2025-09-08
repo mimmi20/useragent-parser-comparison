@@ -25,7 +25,11 @@ $header = <<<EOF
 $finder = PhpCsFixer\Finder::create()
     ->files()
     ->name('*.php')
+    ->in(__DIR__ . '/mappings')
+    ->in(__DIR__ . '/parsers')
     ->in(__DIR__ . '/src')
+    ->in(__DIR__ . '/tests')
+    ->exclude(['data', 'node_modules', 'vendor'])
     ->append([__DIR__ . '/rector.php'])
     ->append([__DIR__ . '/composer-dependency-analyser.php'])
     ->append([__FILE__]);

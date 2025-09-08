@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
 
 return [
@@ -101,7 +110,8 @@ return [
             'curlphp' => 'curl',
             'dalvik' => 'androidbrowser',
             'debianapthttp' => 'apthttptransport',
-            'defaultbrowser' => null, // browscap
+            // browscap
+            'defaultbrowser' => null,
             'digg' => 'diggbot',
             'dnsgroup' => 'dnsgroupcrawler',
             'dolfin' => 'dolphin',
@@ -208,7 +218,8 @@ return [
             'internetexplorerwithchromeframe' => 'googlechromeframe',
             'internetseercom' => 'internetseerbot',
             'ios' => null,
-            'iphone' => null, // cbschuld/browser.php
+            // cbschuld/browser.php
+            'iphone' => null,
             'iridium' => 'iridiumbrowser',
             'iris' => 'irisbrowser',
             'ironmobile' => 'iron',
@@ -338,7 +349,8 @@ return [
             'operanext' => 'opera',
             'operatablet' => 'opera',
             'orbiter' => 'orbiterbot',
-            'other' => null, // 3rd-eden-useragent-js
+            // 3rd-eden-useragent-js
+            'other' => null,
             'otterbrowser' => 'otter',
             'outlookexpress' => 'windowslivemail',
             'outlookiosandroid' => 'outlook',
@@ -434,7 +446,8 @@ return [
             'twitter' => 'twitterbot',
             'twitterbotbot' => 'twitterbot',
             'ubuntuapthttp' => 'apthttptransport',
-            'unknown' => null, // sinergi-php
+            // sinergi-php
+            'unknown' => null,
             'upbrowser' => 'openwavemobilebrowser',
             'updated' => 'updatedcrawler',
             'urlgrabberyum' => 'urlgrabber',
@@ -544,7 +557,8 @@ return [
             'yahooslurp' => 'inktomislurp',
             'webprosbot' => 'webpros',
             'pythonhttpx' => 'httpx',
-            'genericbot' => null, // Piwik
+            // Piwik
+            'genericbot' => null,
             'winhttpwinhttprequest' => 'winhttp',
             'microsoftstart' => 'start',
             'daumapp' => 'daum',
@@ -582,7 +596,7 @@ return [
             'midp-2.1' => null,
             'minefield (3.2)' => '3.2',
             'mini3.1' => '3.1',
-            'n\\a' => null,
+            'n\a' => null,
             'nexus' => null,
             'php' => null,
             'r2ae' => null,
@@ -663,7 +677,8 @@ return [
             '35222' => '35222.0',
             '35574' => '35574.0',
             '35843' => '35843.0',
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
         'type' => [
             'mobileapp' => 'application',
@@ -675,7 +690,8 @@ return [
         ],
         'manufacturer' => [
             'unknown' => null,
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
     ],
     'platform' => [
@@ -780,7 +796,8 @@ return [
             'androidv1021413' => 'android',
             'androidv22' => 'android',
             'androidwear' => 'android',
-            'apple' => 'macos', // cbschuld/browser.php
+            // cbschuld/browser.php
+            'apple' => 'macos',
             'appletv' => 'tvos',
             'archlinux' => 'linux',
             'arklinux' => 'linux',
@@ -1207,7 +1224,8 @@ return [
             'series60' => 'symbian',
         ],
         'marketingName' => [
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
             'mac' => 'macos',
             'macosx' => 'macos',
             'macintosh' => 'macos',
@@ -1262,7 +1280,7 @@ return [
             'ce.0' => 'ce',
             'me.0' => 'me',
             'n905imyu.w' => null,
-            'n\\a' => null,
+            'n\a' => null,
             'nt 10.0' => '10.0',
             'nt 4.0' => '4.0',
             'nt 5.0' => '5.0',
@@ -1284,19 +1302,24 @@ return [
             '11' => '11.0',
             '12' => '12.0',
             '13' => '13.0',
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
         'manufacturer' => [
             'unknown' => null,
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
     ],
     'device' => [
         'deviceName' => [
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
+            ' ' => null,
         ],
         'marketingName' => [
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
             'galaxyj62018' => 'galaxyj6',
             'galaxyxcover4sdualsim2019global' => 'galaxyxcover4s',
             'galaxys215ginternational' => 'galaxys215g',
@@ -1720,10 +1743,12 @@ return [
             'zunehd' => 'zune',
             'zuumblaze' => 'blaze',
             'zyncz81' => 'z81',
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
         'brand' => [
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
             'appleinc' => 'apple',
             'azumimobile' => 'azumi',
             'blackberry' => 'rim',
@@ -1771,27 +1796,33 @@ return [
             'television' => 'tvdevice',
             'tv' => 'tvdevice',
             'unknown' => null,
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
             'mobilemediaplayer' => 'portablemediaplayer',
             'tvmediaplayer' => 'tvdevice',
             'tvconsole' => 'console',
         ],
         'manufacturer' => [
             'unknown' => null,
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
         'istv' => [
             'false' => null,
             'unknown' => null,
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
     ],
     'engine' => [
         'name' => [
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
+            ' ' => null,
         ],
         'version' => [
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
             '0' => null,
             '1' => '1.0',
             '2' => '2.0',
@@ -1810,7 +1841,8 @@ return [
         ],
         'manufacturer' => [
             'unknown' => null,
-            '' => null, // Piwik
+            // Piwik
+            '' => null,
         ],
     ],
 ];

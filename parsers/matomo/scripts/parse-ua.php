@@ -1,10 +1,25 @@
 <?php
 
+/**
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
+
+use Composer\InstalledVersions;
+use DeviceDetector\Cache\PSR16Bridge;
+use DeviceDetector\DeviceDetector;
+use Psr\SimpleCache\CacheInterface;
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv);
+$uaPos       = array_search('--ua', $argv, true);
 $hasUa       = false;
 $agentString = '';
 
@@ -14,35 +29,111 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$result    = null;
-$parseTime = 0;
-
 require_once __DIR__ . '/../vendor/autoload.php';
-use DeviceDetector\DeviceDetector;
 
-$cache   = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
-    new \MatthiasMullie\Scrapbook\Adapters\MemoryStore()
-);
+$cache = new class () implements CacheInterface {
+    /**
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function get(string $key, mixed $default = null): mixed
+    {
+        return null;
+    }
+
+    /**
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function set(string $key, mixed $value, DateInterval | int | null $ttl = null): bool
+    {
+        return false;
+    }
+
+    /**
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function delete(string $key): bool
+    {
+        return false;
+    }
+
+    /** @throws void */
+    public function clear(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @param iterable<string> $keys a list of keys that can be obtained in a single operation
+     *
+     * @return iterable<mixed>
+     *
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function getMultiple(iterable $keys, mixed $default = null): iterable
+    {
+        return [];
+    }
+
+    /**
+     * @param iterable<string, mixed> $values a list of key => value pairs for a multiple-set operation
+     *
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function setMultiple(iterable $values, DateInterval | int | null $ttl = null): bool
+    {
+        return false;
+    }
+
+    /**
+     * @param iterable<string> $keys a list of string-based keys to be deleted
+     *
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function deleteMultiple(iterable $keys): bool
+    {
+        return false;
+    }
+
+    /**
+     * @throws void
+     *
+     * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
+     */
+    public function has(string $key): bool
+    {
+        return false;
+    }
+};
 
 $start = microtime(true);
-$dd = new DeviceDetector('Test String');
-$dd->setCache(new \DeviceDetector\Cache\PSR16Bridge($cache));
+$dd    = new DeviceDetector('Test String');
+$dd->setCache(new PSR16Bridge($cache));
 $dd->parse();
 $initTime = microtime(true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
-    'headers' => [
-        'user-agent' => $agentString,
-    ],
-    'result'      => [
+    'headers' => ['user-agent' => $agentString],
+    'result' => [
         'parsed' => null,
-        'err'    => null,
+        'err' => null,
     ],
-    'parse_time'  => 0,
-    'init_time'   => $initTime,
+    'parse_time' => 0,
+    'init_time' => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('matomo/device-detector'),
+    'version' => InstalledVersions::getPrettyVersion('matomo/device-detector'),
 ];
 
 if ($hasUa) {
@@ -64,10 +155,13 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => $model ?? null,
+            'architecture' => null,
+            'deviceName' => $model ?? null,
             'marketingName' => null,
             'manufacturer' => null,
-            'brand'    => $brand ?? null,
+            'brand' => $brand ?? null,
+            'dualOrientation' => null,
+            'simCount' => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -75,29 +169,29 @@ if ($hasUa) {
                 'type' => null,
                 'size' => null,
             ],
-            'dualOrientation' => null,
-            'type'     => $device ?? null,
-            'simCount' => null,
+            'type' => $device ?? null,
             'ismobile' => $isMobile,
+            'istv' => null,
+            'bits' => null,
         ],
         'client' => [
-            'name'    => $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
+            'name' => $isBot ? ($botInfo['name'] ?? null) : ($clientInfo['name'] ?? null),
             'modus' => null,
             'version' => $isBot ? null : ($clientInfo['version'] ?? null),
             'manufacturer' => null,
             'bits' => null,
-            'type' => $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
             'isbot' => $isBot,
+            'type' => $isBot ? ($botInfo['category'] ?? null) : ($clientInfo['type'] ?? null),
         ],
         'platform' => [
-            'name'    => $osInfo['name'] ?? null,
+            'name' => $osInfo['name'] ?? null,
             'marketingName' => null,
             'version' => $osInfo['version'] ?? null,
             'manufacturer' => null,
             'bits' => null,
         ],
         'engine' => [
-            'name'    => $isBot ? null : ($clientInfo['engine'] ?? null),
+            'name' => $isBot ? null : ($clientInfo['engine'] ?? null),
             'version' => $isBot ? null : ($clientInfo['engine_version'] ?? null),
             'manufacturer' => null,
         ],
@@ -109,4 +203,7 @@ if ($hasUa) {
 
 $output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode(
+    $output,
+    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+);

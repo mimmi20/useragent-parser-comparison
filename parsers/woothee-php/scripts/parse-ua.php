@@ -1,11 +1,23 @@
 <?php
 
+/**
+ * This file is part of the mimmi20/useragent-parser-comparison package.
+ *
+ * Copyright (c) 2015-2025, Thomas Mueller <mimmi20@live.de>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types = 1);
+
+use Composer\InstalledVersions;
+use Woothee\Classifier;
 
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv);
+$uaPos       = array_search('--ua', $argv, true);
 $hasUa       = false;
 $agentString = '';
 
@@ -15,28 +27,24 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$result    = null;
-$parseTime = 0;
-
 $start = microtime(true);
+
 require __DIR__ . '/../vendor/autoload.php';
-$parser = new \Woothee\Classifier();
+$parser = new Classifier();
 $parser->parse('Test String');
 $initTime = microtime(true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
-    'headers' => [
-        'user-agent' => $agentString,
-    ],
-    'result'      => [
+    'headers' => ['user-agent' => $agentString],
+    'result' => [
         'parsed' => null,
-        'err'    => null,
+        'err' => null,
     ],
-    'parse_time'  => 0,
-    'init_time'   => $initTime,
+    'parse_time' => 0,
+    'init_time' => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('woothee/woothee'),
+    'version' => InstalledVersions::getPrettyVersion('woothee/woothee'),
 ];
 
 if ($hasUa) {
@@ -46,10 +54,13 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => null,
+            'architecture' => null,
+            'deviceName' => null,
             'marketingName' => null,
             'manufacturer' => null,
-            'brand'    => null,
+            'brand' => null,
+            'dualOrientation' => null,
+            'simCount' => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -57,29 +68,29 @@ if ($hasUa) {
                 'type' => null,
                 'size' => null,
             ],
-            'dualOrientation' => null,
-            'type'     => $r['category'] ?? null,
-            'simCount' => null,
+            'type' => $r['category'] ?? null,
             'ismobile' => null,
+            'istv' => null,
+            'bits' => null,
         ],
         'client' => [
-            'name'    => $r['name'] ?? null,
+            'name' => $r['name'] ?? null,
             'modus' => null,
             'version' => $r['version'] ?? null,
             'manufacturer' => $r['vendor'] ?? null,
             'bits' => null,
+            'isbot' => null,
             'type' => null,
-            'isbot'    => null,
         ],
         'platform' => [
-            'name'    => $r['os'] ?? null,
+            'name' => $r['os'] ?? null,
             'marketingName' => null,
             'version' => $r['os_version'] ?? null,
             'manufacturer' => null,
             'bits' => null,
         ],
         'engine' => [
-            'name'    => null,
+            'name' => null,
             'version' => null,
             'manufacturer' => null,
         ],
@@ -91,4 +102,7 @@ if ($hasUa) {
 
 $output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode(
+    $output,
+    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+);

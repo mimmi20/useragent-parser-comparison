@@ -135,11 +135,11 @@ final class Test extends Command
             $rows[]      = [
                 $testPath,
                 mb_str_pad(
-                    number_format($testConfig['test-count'], 0, '.', ','),
+                    number_format($testConfig['test-count'], 0, ',', '.'),
                     15,
                     ' ',
                     STR_PAD_LEFT,
-),
+                ),
             ];
         }
 
