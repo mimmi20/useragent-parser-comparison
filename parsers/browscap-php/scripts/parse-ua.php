@@ -19,7 +19,7 @@ use MatthiasMullie\Scrapbook\Adapters\Flysystem;
 use MatthiasMullie\Scrapbook\Psr16\SimpleCache;
 use Psr\Log\NullLogger;
 
-/** phpcs:disable Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps */
+/* phpcs:disable Squiz.NamingConventions.ValidVariableName.MemberNotCamelCaps */
 
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');

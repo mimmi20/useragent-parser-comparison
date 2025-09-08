@@ -69,7 +69,7 @@ $cache = new class () implements CacheInterface {
     }
 
     /**
-     * @param iterable<string> $keys A list of keys that can be obtained in a single operation.
+     * @param iterable<string> $keys a list of keys that can be obtained in a single operation
      *
      * @return iterable<mixed>
      *
@@ -83,7 +83,7 @@ $cache = new class () implements CacheInterface {
     }
 
     /**
-     * @param iterable<string, mixed> $values A list of key => value pairs for a multiple-set operation.
+     * @param iterable<string, mixed> $values a list of key => value pairs for a multiple-set operation
      *
      * @throws void
      *
@@ -95,7 +95,7 @@ $cache = new class () implements CacheInterface {
     }
 
     /**
-     * @param iterable<string> $keys A list of string-based keys to be deleted.
+     * @param iterable<string> $keys a list of string-based keys to be deleted
      *
      * @throws void
      *
