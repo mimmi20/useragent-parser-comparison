@@ -51,10 +51,13 @@ if (hasUa) {
   if (r !== null) {
     output.result.parsed = {
       device: {
+        architecture: null,
         deviceName: r.device.model ? r.device.model : null,
         marketingName: null,
         manufacturer: null,
         brand: r.device.manufacturer ? r.device.manufacturer : null,
+        dualOrientation: null,
+        simCount: null,
         display: {
           width: null,
           height: null,
@@ -62,10 +65,10 @@ if (hasUa) {
           type: null,
           size: null,
         },
-        dualOrientation: null,
         type: r.device.type ? r.device.type : null,
-        simCount: null,
         ismobile: mobileDeviceTypes.indexOf(r.device.type) !== -1 || (r.device.subtype && r.device.subtype === 'portable'),
+        istv: null,
+        bits: null,
       },
       client: {
         name: r.browser.name ? r.browser.name : null,

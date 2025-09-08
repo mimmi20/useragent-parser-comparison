@@ -2,10 +2,18 @@
 
 declare(strict_types = 1);
 
+use BrowscapPHP\Browscap;
+use Composer\InstalledVersions;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Local\LocalFilesystemAdapter;
+use MatthiasMullie\Scrapbook\Adapters\Flysystem;
+use MatthiasMullie\Scrapbook\Psr16\SimpleCache;
+use Psr\Log\NullLogger;
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv);
+$uaPos       = array_search('--ua', $argv, true);
 $hasUa       = false;
 $agentString = '';
 
@@ -15,30 +23,23 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$result    = null;
-$parseTime = 0;
-
 require __DIR__ . '/../vendor/autoload.php';
-$cacheDir  = __DIR__ . '/../data';
-$browscapAdapter = new \League\Flysystem\Local\LocalFilesystemAdapter($cacheDir);
-$cache   = new \MatthiasMullie\Scrapbook\Psr16\SimpleCache(
-    new \MatthiasMullie\Scrapbook\Adapters\Flysystem(
-        new \League\Flysystem\Filesystem($browscapAdapter)
-    )
+$cacheDir        = __DIR__ . '/../data';
+$browscapAdapter = new LocalFilesystemAdapter($cacheDir);
+$cache           = new SimpleCache(
+    new Flysystem(
+        new Filesystem($browscapAdapter),
+    ),
 );
-$logger    = new \Psr\Log\NullLogger('null');
-$bc        = new \BrowscapPHP\Browscap($cache, $logger);
-$start = microtime(true);
+$logger          = new NullLogger('null');
+$bc              = new Browscap($cache, $logger);
+$start           = microtime(true);
 $bc->getBrowser('Test String');
 $initTime = microtime(true) - $start;
 
-$bcCache = new \BrowscapPHP\Cache\BrowscapCache($cache, $logger);
-
 $output = [
     'hasUa' => $hasUa,
-    'headers' => [
-        'user-agent' => $agentString,
-    ],
+    'headers' => ['user-agent' => $agentString],
     'result'      => [
         'parsed' => null,
         'err'    => null,
@@ -46,7 +47,7 @@ $output = [
     'parse_time'  => 0,
     'init_time'   => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('browscap/browscap-php'),
+    'version'     => InstalledVersions::getPrettyVersion('browscap/browscap-php'),
 ];
 
 if ($hasUa) {
@@ -56,10 +57,13 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
+            'architecture' => null,
             'deviceName'     => $r->device_name ?? null,
             'marketingName' => null,
             'manufacturer' => null,
             'brand'    => $r->device_maker ?? null,
+            'dualOrientation' => null,
+            'simCount' => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -67,10 +71,10 @@ if ($hasUa) {
                 'type' => null,
                 'size' => null,
             ],
-            'dualOrientation' => null,
             'type'     => $r->device_type ?? null,
-            'simCount' => null,
             'ismobile' => $r->ismobiledevice ?? null,
+            'istv' => null,
+            'bits' => null,
         ],
         'client' => [
             'name'    => $r->browser ?? null,
@@ -101,4 +105,7 @@ if ($hasUa) {
 
 $output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode(
+    $output,
+    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+);

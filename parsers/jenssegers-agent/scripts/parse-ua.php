@@ -1,10 +1,11 @@
 <?php
 
 declare(strict_types = 1);
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv);
+$uaPos       = array_search('--ua', $argv, true);
 $hasUa       = false;
 $agentString = '';
 
@@ -14,12 +15,10 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$result    = null;
-$parseTime = 0;
-
 $start = microtime(true);
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Composer\InstalledVersions;
 use Jenssegers\Agent\Agent;
 
 $agent = new Agent();
@@ -29,9 +28,7 @@ $initTime = microtime(true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
-    'headers' => [
-        'user-agent' => $agentString,
-    ],
+    'headers' => ['user-agent' => $agentString],
     'result'      => [
         'parsed' => null,
         'err'    => null,
@@ -39,7 +36,7 @@ $output = [
     'parse_time'  => 0,
     'init_time'   => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('jenssegers/agent'),
+    'version'     => InstalledVersions::getPrettyVersion('jenssegers/agent'),
 ];
 
 if ($hasUa) {
@@ -66,14 +63,18 @@ if ($hasUa) {
         $browser        = $agent->robot();
         $browserVersion = null;
     }
+
     $end = microtime(true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => (isset($device) && false !== $device) ? $device : null,
+            'architecture' => null,
+            'deviceName'     => isset($device) && $device !== false ? $device : null,
             'marketingName' => null,
             'manufacturer' => null,
             'brand'    => null,
+            'dualOrientation' => null,
+            'simCount' => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -81,24 +82,24 @@ if ($hasUa) {
                 'type' => null,
                 'size' => null,
             ],
-            'dualOrientation' => null,
             'type'     => $type,
-            'simCount' => null,
             'ismobile' => $isMobile,
+            'istv' => null,
+            'bits' => null,
         ],
         'client' => [
-            'name'    => (isset($browser) && false !== $browser) ? $browser : null,
+            'name'    => isset($browser) && $browser !== false ? $browser : null,
             'modus' => null,
-            'version' => (isset($browserVersion) && false !== $browserVersion) ? $browserVersion : null,
+            'version' => isset($browserVersion) && $browserVersion !== false ? $browserVersion : null,
             'manufacturer' => null,
             'bits' => null,
-            'type'    => $isBot ? 'crawler' : null,
             'isbot'   => $isBot,
+            'type'    => $isBot ? 'crawler' : null,
         ],
         'platform' => [
-            'name'    => (isset($platform) && false !== $platform) ? $platform : null,
+            'name'    => isset($platform) && $platform !== false ? $platform : null,
             'marketingName' => null,
-            'version' => (isset($platformVersion) && false !== $platformVersion) ? $platformVersion : null,
+            'version' => isset($platformVersion) && $platformVersion !== false ? $platformVersion : null,
             'manufacturer' => null,
             'bits' => null,
         ],
@@ -115,4 +116,7 @@ if ($hasUa) {
 
 $output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode(
+    $output,
+    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+);

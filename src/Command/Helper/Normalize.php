@@ -48,7 +48,7 @@ final class Normalize extends Helper
      */
     public function normalize(array $parsed): array
     {
-        if (is_array($parsed['device']['deviceName'])) {
+        if (isset($parsed['device']['deviceName']) && is_array($parsed['device']['deviceName'])) {
             $parsed['device']['deviceName'] = array_key_exists('model', $parsed['device']['deviceName'])
                 ? $parsed['device']['deviceName']['model']
                 : null;

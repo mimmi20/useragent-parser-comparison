@@ -2,10 +2,13 @@
 
 declare(strict_types = 1);
 
+use Composer\InstalledVersions;
+use Woothee\Classifier;
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv);
+$uaPos       = array_search('--ua', $argv, true);
 $hasUa       = false;
 $agentString = '';
 
@@ -15,20 +18,15 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$result    = null;
-$parseTime = 0;
-
 $start = microtime(true);
 require __DIR__ . '/../vendor/autoload.php';
-$parser = new \Woothee\Classifier();
+$parser = new Classifier();
 $parser->parse('Test String');
 $initTime = microtime(true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
-    'headers' => [
-        'user-agent' => $agentString,
-    ],
+    'headers' => ['user-agent' => $agentString],
     'result'      => [
         'parsed' => null,
         'err'    => null,
@@ -36,7 +34,7 @@ $output = [
     'parse_time'  => 0,
     'init_time'   => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('woothee/woothee'),
+    'version'     => InstalledVersions::getPrettyVersion('woothee/woothee'),
 ];
 
 if ($hasUa) {
@@ -46,10 +44,13 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
+            'architecture' => null,
             'deviceName'     => null,
             'marketingName' => null,
             'manufacturer' => null,
             'brand'    => null,
+            'dualOrientation' => null,
+            'simCount' => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -57,10 +58,10 @@ if ($hasUa) {
                 'type' => null,
                 'size' => null,
             ],
-            'dualOrientation' => null,
             'type'     => $r['category'] ?? null,
-            'simCount' => null,
             'ismobile' => null,
+            'istv' => null,
+            'bits' => null,
         ],
         'client' => [
             'name'    => $r['name'] ?? null,
@@ -68,8 +69,8 @@ if ($hasUa) {
             'version' => $r['version'] ?? null,
             'manufacturer' => $r['vendor'] ?? null,
             'bits' => null,
-            'type' => null,
             'isbot'    => null,
+            'type' => null,
         ],
         'platform' => [
             'name'    => $r['os'] ?? null,
@@ -91,4 +92,7 @@ if ($hasUa) {
 
 $output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode(
+    $output,
+    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+);

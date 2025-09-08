@@ -2,10 +2,15 @@
 
 declare(strict_types = 1);
 
+use Composer\InstalledVersions;
+use MatthiasMullie\Scrapbook\Adapters\MemoryStore;
+use MatthiasMullie\Scrapbook\Psr6\Pool;
+use WhichBrowser\Parser;
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv);
+$uaPos       = array_search('--ua', $argv, true);
 $hasUa       = false;
 $agentString = '';
 
@@ -15,14 +20,12 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$result    = null;
-$parseTime = 0;
 require __DIR__ . '/../vendor/autoload.php';
 
-$parser = new WhichBrowser\Parser();
+$parser = new Parser();
 
-$cache   = new \MatthiasMullie\Scrapbook\Psr6\Pool(
-    new \MatthiasMullie\Scrapbook\Adapters\MemoryStore()
+$cache = new Pool(
+    new MemoryStore(),
 );
 
 $start = microtime(true);
@@ -31,9 +34,7 @@ $initTime = microtime(true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
-    'headers' => [
-        'user-agent' => $agentString,
-    ],
+    'headers' => ['user-agent' => $agentString],
     'result'      => [
         'parsed' => null,
         'err'    => null,
@@ -41,21 +42,24 @@ $output = [
     'parse_time'  => 0,
     'init_time'   => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('whichbrowser/parser'),
+    'version'     => InstalledVersions::getPrettyVersion('whichbrowser/parser'),
 ];
 
 if ($hasUa) {
     $start = microtime(true);
     $parser->analyse(['User-Agent' => $agentString], ['cache' => $cache]);
     $isMobile = $parser->isMobile();
-    $end   = microtime(true) - $start;
+    $end      = microtime(true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [
+            'architecture' => null,
             'deviceName'     => $parser->device->model ?? null,
             'marketingName' => null,
             'manufacturer' => null,
             'brand'    => $parser->device->manufacturer ?? null,
+            'dualOrientation' => null,
+            'simCount' => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -63,10 +67,10 @@ if ($hasUa) {
                 'type' => null,
                 'size' => null,
             ],
-            'dualOrientation' => null,
             'type'     => $parser->device->type ?? null,
-            'simCount' => null,
             'ismobile' => $isMobile,
+            'istv' => null,
+            'bits' => null,
         ],
         'client' => [
             'name'    => $parser->browser->name ?? null,
@@ -74,8 +78,8 @@ if ($hasUa) {
             'version' => $parser->browser->version->value ?? null,
             'manufacturer' => null,
             'bits' => null,
-            'type' => null,
             'isbot'    => null,
+            'type' => null,
         ],
         'platform' => [
             'name'    => $parser->os->name ?? null,
@@ -97,4 +101,7 @@ if ($hasUa) {
 
 $output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode(
+    $output,
+    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+);

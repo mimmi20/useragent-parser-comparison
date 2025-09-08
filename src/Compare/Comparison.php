@@ -63,8 +63,8 @@ final class Comparison
                 }
 
                 $pair = new ValuePairs();
-                $pair->setExpected($expected);
-                $pair->setActual($actual);
+                $pair->setExpected($expected === null ? null : strtolower($expected));
+                $pair->setActual($actual === null ? null : strtolower($actual));
 
                 $this->data[$compareKey][$compareSubKey] = $pair;
             }

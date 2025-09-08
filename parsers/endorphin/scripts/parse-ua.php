@@ -1,10 +1,11 @@
 <?php
 
 declare(strict_types = 1);
+
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv);
+$uaPos       = array_search('--ua', $argv, true);
 $hasUa       = false;
 $agentString = '';
 
@@ -14,12 +15,10 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$result    = null;
-$parseTime = 0;
-
 $start = microtime(true);
 require_once __DIR__ . '/../vendor/autoload.php';
 
+use Composer\InstalledVersions;
 use EndorphinStudio\Detector\Detector;
 
 $detector = new Detector();
@@ -29,9 +28,7 @@ $initTime = microtime(true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
-    'headers' => [
-        'user-agent' => $agentString,
-    ],
+    'headers' => ['user-agent' => $agentString],
     'result'      => [
         'parsed' => null,
         'err'    => null,
@@ -39,7 +36,7 @@ $output = [
     'parse_time'  => 0,
     'init_time'   => $initTime,
     'memory_used' => 0,
-    'version'     => \Composer\InstalledVersions::getPrettyVersion('endorphin-studio/browser-detector'),
+    'version'     => InstalledVersions::getPrettyVersion('endorphin-studio/browser-detector'),
 ];
 
 if ($hasUa) {
@@ -51,10 +48,13 @@ if ($hasUa) {
 
     $output['result']['parsed'] = [
         'device' => [
-            'deviceName'     => $r->device->model ?? null,
+            'architecture' => null,
+            'deviceName'     => $r->device->model ?? $r->device->name ?? null,
             'marketingName' => null,
             'manufacturer' => null,
-            'brand'    => $r->device->name ?? null,
+            'brand'    => null,
+            'dualOrientation' => null,
+            'simCount' => null,
             'display' => [
                 'width' => null,
                 'height' => null,
@@ -62,10 +62,10 @@ if ($hasUa) {
                 'type' => null,
                 'size' => null,
             ],
-            'dualOrientation' => null,
             'type'     => $r->device->type ?? null,
-            'simCount' => null,
             'ismobile' => $r->isMobile ?? null,
+            'istv' => null,
+            'bits' => null,
         ],
         'client' => [
             'name'    => $r->isRobot ? ($r->robot->name ?? null) : ($r->browser->name ?? null),
@@ -73,8 +73,8 @@ if ($hasUa) {
             'version' => $r->browser->version ?? null,
             'manufacturer' => null,
             'bits' => null,
-            'type' => null,
             'isbot'   => $r->isRobot ?? null,
+            'type' => null,
         ],
         'platform' => [
             'name'    => $r->os->name ?? null,
@@ -96,4 +96,7 @@ if ($hasUa) {
 
 $output['memory_used'] = memory_get_peak_usage();
 
-echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+echo json_encode(
+    $output,
+    JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR,
+);
