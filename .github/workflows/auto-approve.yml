@@ -5,7 +5,7 @@ on:
 
 jobs:
   auto-approve:
-    runs-on: "ubuntu-24.04"
+    runs-on: "ubuntu-latest"
 
     if: ${{ github.actor == 'dependabot[bot]' }}
 
