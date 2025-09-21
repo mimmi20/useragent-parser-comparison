@@ -71,6 +71,7 @@ final class InitDb extends Command
     `proCanDetectOsVersion` TINYINT(1) NOT NULL,
     `proCanDetectOsManufacturer` VARCHAR(255) DEFAULT NULL,
     `proCanDetectOsBits` INT DEFAULT NULL,
+    `proCanDetectDeviceArchitecture` TINYINT(1) NOT NULL,
     `proCanDetectDeviceName` TINYINT(1) NOT NULL,
     `proCanDetectDeviceMarketingName` VARCHAR(255) DEFAULT NULL,
     `proCanDetectDeviceManufacturer` VARCHAR(255) DEFAULT NULL,
@@ -84,6 +85,7 @@ final class InitDb extends Command
     `proCanDetectDeviceDisplayIsTouch` TINYINT(1) DEFAULT NULL,
     `proCanDetectDeviceDisplayType` VARCHAR(255) DEFAULT NULL,
     `proCanDetectDeviceDisplaySize` DECIMAL(20,10) DEFAULT NULL,
+    `proCanDetectDeviceBits` INT DEFAULT NULL,
     PRIMARY KEY (`proId`),
     UNIQUE KEY `unique_provider_name` (`proType`,`proName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC CHECKSUM=1')->execute();

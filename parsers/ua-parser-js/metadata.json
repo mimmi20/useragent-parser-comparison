@@ -29,6 +29,7 @@
       "bits": false
     },
     "device": {
+      "architecture": false,
       "name": true,
       "marketing-name": false,
       "manufacturer": false,
@@ -41,7 +42,8 @@
       "display-height": false,
       "isTouch": false,
       "display-type": false,
-      "display-size": false
+      "display-size": false,
+      "bits": false
     }
   }
 }
