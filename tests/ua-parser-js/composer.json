@@ -1,7 +1,7 @@
 {
   "require": {
     "php": "~8.4.0 || ~8.5.0",
-    "mimmi20/browscap-helper-source": "^6.0.0"
+    "mimmi20/browscap-helper-source": "^6.0.1"
   },
   "config": {
     "preferred-install": "dist",
