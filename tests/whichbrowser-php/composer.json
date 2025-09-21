@@ -2,7 +2,7 @@
   "require": {
     "php": "~8.4.0 || ~8.5.0",
     "composer-runtime-api": "^2.0",
-    "mimmi20/browscap-helper-source": "^6.0.0",
+    "mimmi20/browscap-helper-source": "^6.0.1",
     "whichbrowser/parser": "^v2.1.8",
     "symfony/yaml": "^7.3.3"
   },
