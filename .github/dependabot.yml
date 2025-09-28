@@ -27,6 +27,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "/"
@@ -50,6 +51,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   # tests
   - package-ecosystem: "composer"
@@ -74,6 +76,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/browser-detector/"
@@ -97,6 +100,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/cbschuld/"
@@ -120,6 +124,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/crawler-detect/"
@@ -143,6 +148,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/curated/"
@@ -166,6 +172,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/donatj/"
@@ -189,6 +196,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/endorphin/"
@@ -212,6 +220,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/matomo/"
@@ -235,6 +244,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/mobile-detect/"
@@ -258,6 +268,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/ua-parser-js/"
@@ -281,6 +292,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/ua-parser-php/"
@@ -304,6 +316,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/whichbrowser-php/"
@@ -327,6 +340,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "tests/woothee-php/"
@@ -350,6 +364,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "tests/ua-parser-js/"
@@ -373,6 +388,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   # parsers
   - package-ecosystem: "composer"
@@ -397,6 +413,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/amplitude-ua-parser-js/"
@@ -420,6 +437,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/bowser/"
@@ -443,6 +461,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/browscap-php/"
@@ -466,6 +485,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/browser-detect/"
@@ -489,6 +509,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/browser-detector/"
@@ -512,6 +533,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/cbschuld/"
@@ -535,6 +557,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/crawler-detect/"
@@ -558,6 +581,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/detect-browser/"
@@ -581,6 +605,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/device-detector/"
@@ -604,6 +629,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/device-detector-node/"
@@ -627,6 +653,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/donatj/"
@@ -650,6 +677,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/endorphin/"
@@ -673,6 +701,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/express-useragent/"
@@ -696,6 +725,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/fex-uadevice/"
@@ -719,6 +749,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/financial-times-useragent_parser/"
@@ -742,6 +773,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/foroco/"
@@ -765,6 +797,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/fyre-useragent/"
@@ -788,6 +821,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/hotoo-detector/"
@@ -811,6 +845,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/jenssegers-agent/"
@@ -834,6 +869,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/journyio-user-agent-parser/"
@@ -857,6 +893,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/matomo/"
@@ -880,6 +917,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/mobile-detect/"
@@ -903,6 +941,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/node-device-detector/"
@@ -926,6 +965,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/platformjs/"
@@ -949,6 +989,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/platine-php/"
@@ -972,6 +1013,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/ua-parser-js/"
@@ -995,6 +1037,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/ua-parser-php/"
@@ -1018,6 +1061,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/vigour-ua/"
@@ -1041,6 +1085,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/whichbrowser-js/"
@@ -1064,6 +1109,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/whichbrowser-php/"
@@ -1087,6 +1133,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/wolfcast/"
@@ -1110,6 +1157,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "npm"
     directory: "parsers/woothee-js/"
@@ -1133,6 +1181,7 @@ updates:
       include: "scope"
       prefix: "npm"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "composer"
     directory: "parsers/woothee-php/"
@@ -1156,6 +1205,7 @@ updates:
       include: "scope"
       prefix: "composer"
     target-branch: "master"
+    rebase-strategy: "disabled"
 
   # actions
   - package-ecosystem: "github-actions"
@@ -1181,3 +1231,4 @@ updates:
     ignore:
       - dependency-name: "mimmi20/ci"
       - dependency-name: "release-drafter/release-drafter"
+    rebase-strategy: "disabled"
