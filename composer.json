@@ -12,7 +12,7 @@
     "composer-runtime-api": "^2.0.0",
     "mimmi20/ua-data-mapper": "^5.0.3",
     "ramsey/uuid": "^4.9.1",
-    "symfony/console": "^7.3.3"
+    "symfony/console": "^7.3.4"
   },
   "require-dev": {
     "ext-ctype": "*",
