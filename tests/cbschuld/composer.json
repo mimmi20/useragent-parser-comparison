@@ -3,7 +3,7 @@
     "php": "~8.4.0 || ~8.5.0",
     "composer-runtime-api": "^2.0",
     "cbschuld/browser.php": "^v2.0.0",
-    "mimmi20/browscap-helper-source": "^6.0.1"
+    "mimmi20/browscap-helper-source": "^6.0.2"
   },
   "config": {
     "preferred-install": {
