@@ -4,7 +4,7 @@
     "composer-runtime-api": "^2.0",
     "mimmi20/browscap-helper-source": "^6.0.2",
     "whichbrowser/parser": "^v2.1.8",
-    "symfony/yaml": "^7.3.3"
+    "symfony/yaml": "^7.3.5"
   },
   "config": {
     "preferred-install": {
