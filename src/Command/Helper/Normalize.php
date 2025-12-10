@@ -56,11 +56,9 @@ final class Normalize extends Helper
                 'modus' => $parsed['client']['modus'] ?? null,
                 'version' => $this->inputMapper->mapBrowserVersion(
                     (string) ($parsed['client']['version'] ?? ''),
-                    $parsed['client']['name'],
                 ),
                 'manufacturer' => $this->inputMapper->mapBrowserMaker(
                     $parsed['client']['manufacturer'] ?? '',
-                    $parsed['client']['name'],
                 ),
                 'bits' => $parsed['client']['bits'] ?? null,
                 'type' => $this->inputMapper->mapBrowserType($parsed['client']['type'] ?? null),
@@ -70,7 +68,6 @@ final class Normalize extends Helper
                 'name' => $this->inputMapper->mapOsName($parsed['platform']['name']),
                 'marketingName' => $this->inputMapper->mapOsMaker(
                     $parsed['platform']['marketingName'] ?? '',
-                    $parsed['platform']['name'],
                 ),
                 'version' => $this->inputMapper->mapOsVersion(
                     (string) ($parsed['platform']['version'] ?? ''),
@@ -85,15 +82,12 @@ final class Normalize extends Helper
                 ),
                 'marketingName' => $this->inputMapper->mapDeviceMarketingName(
                     $parsed['device']['marketingName'] ?? null,
-                    $parsed['device']['deviceName'] ?? null,
                 ),
                 'manufacturer' => $this->inputMapper->mapDeviceMaker(
                     $parsed['device']['manufacturer'] ?? '',
-                    $parsed['device']['deviceName'] ?? null,
                 ),
                 'brand' => $this->inputMapper->mapDeviceBrandName(
                     $parsed['device']['brand'] ?? null,
-                    $parsed['device']['deviceName'] ?? null,
                 ),
                 'display' => [
                     'width' => $parsed['device']['display']['width'] ?? null,
