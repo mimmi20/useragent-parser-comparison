@@ -10,7 +10,7 @@
     "ext-mbstring": "*",
     "ext-pdo": "*",
     "composer-runtime-api": "^2.0.0",
-    "mimmi20/ua-data-mapper": "^5.0.6",
+    "mimmi20/ua-data-mapper": "^5.0.10",
     "ramsey/uuid": "^4.9.1",
     "symfony/console": "^7.3.5"
   },
@@ -22,6 +22,7 @@
     "ext-xml": "*",
     "ext-xmlwriter": "*",
     "infection/infection": "^0.31.9",
+    "jbelien/phpstan-sarif-formatter": "^1.2.0",
     "mimmi20/coding-standard": "^7.0.2",
     "nikic/php-parser": "^5.6.2",
     "phpstan/extension-installer": "^1.4.3",
