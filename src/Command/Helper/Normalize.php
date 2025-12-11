@@ -86,9 +86,7 @@ final class Normalize extends Helper
                 'manufacturer' => $this->inputMapper->mapDeviceMaker(
                     $parsed['device']['manufacturer'] ?? '',
                 ),
-                'brand' => $this->inputMapper->mapDeviceBrandName(
-                    $parsed['device']['brand'] ?? null,
-                ),
+                'brand' => $this->inputMapper->mapDeviceBrandName($parsed['device']['brand'] ?? null),
                 'display' => [
                     'width' => $parsed['device']['display']['width'] ?? null,
                     'height' => $parsed['device']['display']['height'] ?? null,
