@@ -5,7 +5,7 @@
   "type": "library",
   "homepage": "https://github.com/diablomedia/useragent-parser-comparison",
   "require": {
-    "php": "~8.4.0 || ~8.5.0",
+    "php": "~8.5.0 || ~8.6.0",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-pdo": "*",
@@ -21,6 +21,7 @@
     "ext-tokenizer": "*",
     "ext-xml": "*",
     "ext-xmlwriter": "*",
+    "ergebnis/composer-normalize": "^2.50.0",
     "infection/infection": "^0.31.9",
     "jbelien/phpstan-sarif-formatter": "^1.2.0",
     "mimmi20/coding-standard": "^7.0.10",
@@ -47,12 +48,19 @@
   "config": {
     "allow-plugins": {
       "dealerdirect/phpcodesniffer-composer-installer": true,
+      "ergebnis/composer-normalize": true,
       "infection/extension-installer": true,
       "phpstan/extension-installer": true
     },
     "lock": false,
     "preferred-install": "dist",
     "sort-packages": true
+  },
+  "extra": {
+    "composer-normalize": {
+      "indent-size": 2,
+      "indent-style": "space"
+    }
   },
   "scripts": {
     "php-cs-fixer-check": "php-cs-fixer fix --dry-run -vv",
