@@ -2,9 +2,9 @@
   "require": {
     "php": "~8.5.0 || ~8.6.0",
     "composer-runtime-api": "^2.0",
-    "matomo/device-detector": "^6.4.8",
+    "matomo/device-detector": "^6.5.0",
     "mustangostang/spyc": "^0.6.3",
-    "mimmi20/browscap-helper-source": "^6.0.2"
+    "mimmi20/browscap-helper-source": "^8.0.0"
   },
   "config": {
     "preferred-install": "dist",
