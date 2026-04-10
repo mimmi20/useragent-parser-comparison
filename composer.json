@@ -11,7 +11,7 @@
     "ext-pdo": "*",
     "composer-runtime-api": "^2.0.0",
     "mimmi20/ua-data-mapper": "^5.0.10",
-    "ramsey/uuid": "^4.9.1",
+    "ramsey/uuid": "^4.9.2",
     "symfony/console": "^7.3.5"
   },
   "require-dev": {
