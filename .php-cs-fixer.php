@@ -58,4 +58,5 @@ return $config
         ),
     )
     ->setUsingCache(false)
-    ->setFinder($finder);
+    ->setFinder($finder)
+    ->setUnsupportedPhpVersionAllowed(true);
