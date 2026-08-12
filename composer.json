@@ -10,9 +10,9 @@
     "ext-mbstring": "*",
     "ext-pdo": "*",
     "composer-runtime-api": "^2.0.0",
-    "mimmi20/ua-data-mapper": "^6.0.11",
+    "mimmi20/ua-data-mapper": "^6.0.15",
     "ramsey/uuid": "^4.9.3",
-    "symfony/console": "^8.1.1"
+    "symfony/console": "^8.1.4"
   },
   "require-dev": {
     "ext-ctype": "*",

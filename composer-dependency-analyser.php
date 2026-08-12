@@ -19,17 +19,8 @@ $config = new Configuration();
 $config
     // Adjusting scanned paths
     ->addPathToScan(__DIR__ . '/src', isDev: false)
-    ->addPathToScan(__DIR__ . '/vendor', isDev: false)
-    ->addPathToExclude(__DIR__ . '/vendor/rector/rector')
-    ->addPathToExclude(__DIR__ . '/vendor/phpstan/phpstan')
     // applies only to directory scanning, not directly listed files
     ->setFileExtensions(['php'])
-
-    // Ignoring errors in vendor directory
-    ->ignoreErrorsOnPath(__DIR__ . '/vendor', [ErrorType::SHADOW_DEPENDENCY])
-    ->ignoreErrorsOnPath(__DIR__ . '/vendor', [ErrorType::UNKNOWN_FUNCTION])
-    ->ignoreErrorsOnPath(__DIR__ . '/vendor', [ErrorType::UNKNOWN_CLASS])
-    ->ignoreErrorsOnPath(__DIR__ . '/vendor', [ErrorType::DEV_DEPENDENCY_IN_PROD])
 
     // do not complain about some modules
     ->ignoreErrorsOnPackage('mimmi20/coding-standard', [ErrorType::UNUSED_DEPENDENCY])
