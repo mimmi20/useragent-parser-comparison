@@ -16,6 +16,7 @@ namespace UserAgentParserComparison\Command\Helper;
 use DateTimeImmutable;
 use FilesystemIterator;
 use JsonException;
+use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -50,6 +51,7 @@ final class Parsers extends Helper
     private string $parsersDir = __DIR__ . '/../../../parsers';
 
     /** @throws void */
+    #[Override]
     public function getName(): string
     {
         return 'parsers';
@@ -66,17 +68,17 @@ final class Parsers extends Helper
         $names   = [];
         $parsers = [];
 
-        foreach ($this->getAllParsers($output) as $parserPath => $parserConfig) {
-            $parsers[$parserPath] = $parserConfig;
+        foreach ($this->getAllParsers($output) as $parserPath => $allParser) {
+            $parsers[$parserPath] = $allParser;
 
             $rows[] = [
-                $parserConfig['metadata']['name'] ?? $parserPath,
-                $parserConfig['metadata']['language'] ?? '',
-                $parserConfig['metadata']['local'] ? 'yes' : 'no',
-                $parserConfig['metadata']['api'] ? 'yes' : 'no',
+                $allParser['metadata']['name'] ?? $parserPath,
+                $allParser['metadata']['language'] ?? '',
+                $allParser['metadata']['local'] ? 'yes' : 'no',
+                $allParser['metadata']['api'] ? 'yes' : 'no',
             ];
 
-            $names[$parserConfig['metadata']['name'] ?? $parserPath] = $parserPath;
+            $names[$allParser['metadata']['name'] ?? $parserPath] = $parserPath;
         }
 
         $table = new Table($output);
@@ -87,11 +89,11 @@ final class Parsers extends Helper
         $questions = array_keys($names);
         sort($questions, SORT_FLAG_CASE | SORT_NATURAL);
 
-        if ($multiple === true) {
+        if ($multiple) {
             $questions[] = 'All Parsers';
         }
 
-        if ($multiple === true) {
+        if ($multiple) {
             $questionText = 'Choose which parsers to use, separate multiple with commas (press enter to use all)';
             $default      = count($questions) - 1;
         } else {
@@ -99,27 +101,27 @@ final class Parsers extends Helper
             $default      = null;
         }
 
-        $question = new ChoiceQuestion($questionText, $questions, $default);
+        $choiceQuestion = new ChoiceQuestion($questionText, $questions, $default);
 
-        if ($multiple === true) {
-            $question->setMultiselect(true);
+        if ($multiple) {
+            $choiceQuestion->setMultiselect(multiselect: true);
         }
 
         $helper = $this->helperSet->get('question');
         assert($helper instanceof QuestionHelper);
-        $answers = $helper->ask($input, $output, $question);
+        $answers = $helper->ask($input, $output, $choiceQuestion);
 
         $answers         = (array) $answers;
         $selectedParsers = [];
 
-        foreach ($answers as $name) {
-            if ($name === 'All Parsers') {
+        foreach ($answers as $answer) {
+            if ($answer === 'All Parsers') {
                 $selectedParsers = $parsers;
 
                 break;
             }
 
-            $selectedParsers[$names[$name]] = $parsers[$names[$name]];
+            $selectedParsers[$names[$answer]] = $parsers[$names[$answer]];
         }
 
         return $selectedParsers;
@@ -151,7 +153,7 @@ final class Parsers extends Helper
                 }
 
                 try {
-                    $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    $metadata = json_decode($contents, associative: true, flags: JSON_THROW_ON_ERROR);
                 } catch (JsonException) {
                     $output->writeln(
                         '<error>An error occured while parsing metadata for parser ' . $pathName . '</error>',
@@ -240,7 +242,7 @@ final class Parsers extends Helper
                     $result = mb_trim($result);
 
                     try {
-                        return json_decode($result, true, 512, JSON_THROW_ON_ERROR);
+                        return json_decode($result, associative: true, flags: JSON_THROW_ON_ERROR);
                     } catch (JsonException $e) {
                         $output->writeln('<error>' . $result . '</error>');
                         $output->writeln('<error>' . $result . $e . '</error>');
@@ -265,7 +267,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        $installed = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;
@@ -305,7 +307,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        $installed = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;
@@ -345,7 +347,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        $installed = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;
@@ -367,7 +369,7 @@ final class Parsers extends Helper
             return null;
         }
 
-        $installed = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        $installed = json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
 
         if (!is_array($installed)) {
             return null;

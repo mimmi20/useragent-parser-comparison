@@ -19,7 +19,7 @@ use Psr\SimpleCache\CacheInterface;
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv, true);
+$uaPos       = array_search('--ua', $argv, strict: true);
 $hasUa       = false;
 $agentString = '';
 
@@ -117,11 +117,11 @@ $cache = new class () implements CacheInterface {
     }
 };
 
-$start = microtime(true);
+$start = microtime(as_float: true);
 $dd    = new DeviceDetector('Test String');
 $dd->setCache(new PSR16Bridge($cache));
 $dd->parse();
-$initTime = microtime(true) - $start;
+$initTime = microtime(as_float: true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
@@ -139,7 +139,7 @@ $output = [
 if ($hasUa) {
     $dd->setUserAgent($agentString);
 
-    $start = microtime(true);
+    $start = microtime(as_float: true);
     $dd->parse();
 
     $clientInfo = $dd->getClient();
@@ -151,7 +151,7 @@ if ($hasUa) {
     $isBot      = $dd->isBot();
     $botInfo    = $dd->getBot();
 
-    $end = microtime(true) - $start;
+    $end = microtime(as_float: true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [

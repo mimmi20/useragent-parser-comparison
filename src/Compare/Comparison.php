@@ -63,11 +63,11 @@ final class Comparison
                     $actual = (string) $actual;
                 }
 
-                $pair = new ValuePairs();
-                $pair->setExpected($expected === null ? null : mb_strtolower($expected));
-                $pair->setActual($actual === null ? null : mb_strtolower($actual));
+                $valuePairs = new ValuePairs();
+                $valuePairs->setExpected($expected === null ? null : mb_strtolower($expected));
+                $valuePairs->setActual($actual === null ? null : mb_strtolower($actual));
 
-                $this->data[$compareKey][$compareSubKey] = $pair;
+                $this->data[$compareKey][$compareSubKey] = $valuePairs;
             }
         }
     }
@@ -121,25 +121,21 @@ final class Comparison
                 $expectedValue = $pair->getExpected() ?? '[n/a]';
                 $actualValue   = $pair->getActual() ?? '[n/a]';
 
-                if (!isset($comparison[$compareKey][$compareSubKey][$expectedValue])) {
-                    $comparison[$compareKey][$compareSubKey][$expectedValue] = [
-                        'expected' => [
-                            'count' => 0,
-                            'agents' => [],
-                        ],
-                        $parserName => [],
-                    ];
-                }
+                $comparison[$compareKey][$compareSubKey][$expectedValue] ??= [
+                    'expected' => [
+                        'count' => 0,
+                        'agents' => [],
+                    ],
+                    $parserName => [],
+                ];
 
                 ++$comparison[$compareKey][$compareSubKey][$expectedValue]['expected']['count'];
                 $comparison[$compareKey][$compareSubKey][$expectedValue]['expected']['agents'][] = $countUseragent;
 
-                if (!isset($comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue])) {
-                    $comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue] = [
-                        'count' => 0,
-                        'agents' => [],
-                    ];
-                }
+                $comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue] ??= [
+                    'count' => 0,
+                    'agents' => [],
+                ];
 
                 ++$comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['count'];
                 $comparison[$compareKey][$compareSubKey][$expectedValue][$parserName][$actualValue]['agents'][] = $countUseragent;

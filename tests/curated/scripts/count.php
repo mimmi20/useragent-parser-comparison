@@ -14,7 +14,7 @@ declare(strict_types = 1);
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 chdir(dirname(__DIR__));
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(__DIR__ . '/../files'));
 $files    = new class ($iterator, 'php') extends FilterIterator {
@@ -23,7 +23,7 @@ $files    = new class ($iterator, 'php') extends FilterIterator {
      *
      * @throws void
      */
-    public function __construct(Iterator $iterator, private string $extension)
+    public function __construct(Iterator $iterator, private readonly string $extension)
     {
         parent::__construct($iterator);
     }

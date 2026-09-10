@@ -13,10 +13,10 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command\Helper;
 
+use Override;
 use Symfony\Component\Console\Helper\Helper;
 use UaDataMapper\InputMapper;
 
-use function array_key_exists;
 use function is_array;
 
 final class Normalize extends Helper
@@ -30,6 +30,7 @@ final class Normalize extends Helper
     }
 
     /** @throws void */
+    #[Override]
     public function getName(): string
     {
         return 'normalize';
@@ -45,9 +46,7 @@ final class Normalize extends Helper
     public function normalize(array $parsed): array
     {
         if (isset($parsed['device']['deviceName']) && is_array($parsed['device']['deviceName'])) {
-            $parsed['device']['deviceName'] = array_key_exists('model', $parsed['device']['deviceName'])
-                ? $parsed['device']['deviceName']['model']
-                : null;
+            $parsed['device']['deviceName'] = $parsed['device']['deviceName']['model'] ?? null;
         }
 
         return [

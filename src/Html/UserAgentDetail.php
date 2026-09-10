@@ -64,9 +64,8 @@ final class UserAgentDetail extends AbstractHtml
         if ($this->userAgent['uaAdditionalHeaders'] !== null) {
             $addHeaders = json_decode(
                 $this->userAgent['uaAdditionalHeaders'],
-                true,
-                512,
-                JSON_THROW_ON_ERROR,
+                associative: true,
+                flags: JSON_THROW_ON_ERROR,
             );
 
             if (is_array($addHeaders) && count($addHeaders) > 0) {
@@ -374,7 +373,10 @@ $(document).ready(function(){
 <div id="modal-' . $result['proId'] . '" class="modal modal-fixed-footer">
     <div class="modal-content">
         <h4>' . $result['proName'] . ' result detail</h4>
-        <p><pre><code class="php">' . print_r($result['resRawResult'], true) . '</code></pre></p>
+        <p><pre><code class="php">' . print_r(
+            $result['resRawResult'],
+            return: true,
+) . '</code></pre></p>
     </div>
     <div class="modal-footer">
         <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">close</a>

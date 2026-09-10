@@ -15,6 +15,7 @@ namespace UserAgentParserComparison\Command;
 
 use Exception;
 use JsonException;
+use Override;
 use SplFileObject;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -62,25 +63,32 @@ final class Parse extends Command
     private string $runDir = __DIR__ . '/../../data/test-runs';
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('parse')
             ->setDescription('Parses useragents in a file using the selected parser(s)')
             ->addArgument('file', InputArgument::REQUIRED, 'Path to the file to parse')
             ->addArgument('run', InputArgument::OPTIONAL, 'Name of the run, for storing results')
-            ->addOption('normalize', null, InputOption::VALUE_NONE, 'Whether to normalize the output')
-            ->addOption('csv', null, InputOption::VALUE_NONE, 'Outputs CSV without showing CLI table')
+            ->addOption(
+                'normalize',
+                mode: InputOption::VALUE_NONE,
+                description: 'Whether to normalize the output',
+            )
+            ->addOption(
+                'csv',
+                mode: InputOption::VALUE_NONE,
+                description: 'Outputs CSV without showing CLI table',
+            )
             ->addOption(
                 'no-output',
-                null,
-                InputOption::VALUE_NONE,
-                'Disables output after parsing, useful when chaining commands',
+                mode: InputOption::VALUE_NONE,
+                description: 'Disables output after parsing, useful when chaining commands',
             )
             ->addOption(
                 'csv-file',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'File name to output CSV data to, implies the options "csv" and "no-output"',
+                mode: InputOption::VALUE_OPTIONAL,
+                description: 'File name to output CSV data to, implies the options "csv" and "no-output"',
             )
             ->setHelp(
                 'Parses the useragent strings (one per line) from the passed in file and outputs the parsed properties.',
@@ -88,6 +96,7 @@ final class Parse extends Command
     }
 
     /** @throws JsonException */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $filename = $input->getArgument('file');

@@ -84,9 +84,9 @@ final class Benchmark extends Command
             $progress->start();
 
             for ($i = 0; $i < $iterations; ++$i) {
-                $start  = microtime(true);
+                $start  = microtime(as_float: true);
                 $result = $parser['parse']($file, true);
-                $end    = microtime(true) - $start;
+                $end    = microtime(as_float: true) - $start;
 
                 $initTime  += $result['init_time'];
                 $parseTime += $result['parse_time'];

@@ -242,15 +242,15 @@ final class OverviewGeneral extends AbstractHtml
          */
         $html .= '<tbody>';
 
-        foreach ($this->getProviders() as $row) {
+        foreach ($this->getProviders() as $provider) {
             $html .= '<tr>';
 
             $html .= '<th>';
 
-            if ($row['proLocal']) {
+            if ($provider['proLocal']) {
                 $html .= '<div><span class="material-icons">public_off</span>';
 
-                switch ($row['proLanguage']) {
+                switch ($provider['proLanguage']) {
                     case 'PHP':
                         $html .= '<span class="material-icons">php</span>';
 
@@ -265,32 +265,32 @@ final class OverviewGeneral extends AbstractHtml
 
                 $html .= '<div>';
 
-                if ($row['proPackageName']) {
-                    match ($row['proLanguage']) {
-                        'PHP' => $html        .= '<a href="https://packagist.org/packages/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>',
-                        'JavaScript' => $html .= '<a href="https://www.npmjs.com/package/' . $row['proPackageName'] . '">' . $row['proName'] . '</a>',
-                        default => $html      .= $row['proName'],
+                if ($provider['proPackageName']) {
+                    match ($provider['proLanguage']) {
+                        'PHP' => $html        .= '<a href="https://packagist.org/packages/' . $provider['proPackageName'] . '">' . $provider['proName'] . '</a>',
+                        'JavaScript' => $html .= '<a href="https://www.npmjs.com/package/' . $provider['proPackageName'] . '">' . $provider['proName'] . '</a>',
+                        default => $html      .= $provider['proName'],
                     };
                 } else {
-                    $html .= $row['proName'];
+                    $html .= $provider['proName'];
                 }
 
-                $html .= '<br /><small>' . $row['proVersion'] . '</small>';
+                $html .= '<br /><small>' . $provider['proVersion'] . '</small>';
 
-                if ($row['proLastReleaseDate'] !== null) {
-                    $html .= '<br /><small>' . $row['proLastReleaseDate'] . '</small>';
+                if ($provider['proLastReleaseDate'] !== null) {
+                    $html .= '<br /><small>' . $provider['proLastReleaseDate'] . '</small>';
                 }
 
                 $html .= '</div>';
-            } elseif ($row['proApi']) {
+            } elseif ($provider['proApi']) {
                 $html .= '<div><span class="material-icons">public</span></div>';
 
                 $html .= '<div>';
 
-                if ($row['proHomepage']) {
-                    $html .= '<a href="' . $row['proHomepage'] . '">' . $row['proName'] . '</a>';
+                if ($provider['proHomepage']) {
+                    $html .= '<a href="' . $provider['proHomepage'] . '">' . $provider['proName'] . '</a>';
                 } else {
-                    $html .= $row['proName'];
+                    $html .= $provider['proName'];
                 }
 
                 $html .= '</div>';
@@ -303,65 +303,65 @@ final class OverviewGeneral extends AbstractHtml
             /*
              * Result found?
              */
-            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['resultFound']);
-            $html .= '<br />Tot.' . $row['resultFound'];
+            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $provider['resultFound']);
+            $html .= '<br />Tot.' . $provider['resultFound'];
             $html .= '<br />&nbsp;';
             $html .= '</td>';
 
-            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $row['resultError']);
-            $html .= '<br />Tot.' . $row['resultError'];
+            $html .= '<td>' . $this->getPercentCircle($countOfUseragents, $provider['resultError']);
+            $html .= '<br />Tot.' . $provider['resultError'];
             $html .= '<br />&nbsp;';
             $html .= '</td>';
 
             /*
              * Client
              */
-            if ($row['proCanDetectClientName']) {
+            if ($provider['proCanDetectClientName']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['clientNameFound'],
-                    $row['resultFound'],
+                    $provider['clientNameFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['clientNameFound'];
-                $html .= '<br />Unq.' . $row['clientNameFoundUnique'];
+                $html .= '<br />Tot.' . $provider['clientNameFound'];
+                $html .= '<br />Unq.' . $provider['clientNameFoundUnique'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectClientVersion']) {
+            if ($provider['proCanDetectClientVersion']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['clientVersionFound'],
-                    $row['resultFound'],
+                    $provider['clientVersionFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['clientVersionFound'];
+                $html .= '<br />Tot.' . $provider['clientVersionFound'];
                 $html .= '<br />&nbsp;';
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectClientType']) {
+            if ($provider['proCanDetectClientType']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['clientTypeFound'],
-                    $row['resultFound'],
+                    $provider['clientTypeFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['clientTypeFound'];
+                $html .= '<br />Tot.' . $provider['clientTypeFound'];
                 $html .= '<br />&nbsp;';
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectClientIsBot']) {
+            if ($provider['proCanDetectClientIsBot']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['asBotDetected'],
-                    $row['resultFound'],
+                    $provider['asBotDetected'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['asBotDetected'];
+                $html .= '<br />Tot.' . $provider['asBotDetected'];
                 $html .= '<br />&nbsp;';
                 $html .= '</td>';
             } else {
@@ -371,26 +371,26 @@ final class OverviewGeneral extends AbstractHtml
             /*
              * Engine
              */
-            if ($row['proCanDetectEngineName']) {
+            if ($provider['proCanDetectEngineName']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['engineNameFound'],
-                    $row['resultFound'],
+                    $provider['engineNameFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['engineNameFound'];
-                $html .= '<br />Unq.' . $row['engineNameFoundUnique'];
+                $html .= '<br />Tot.' . $provider['engineNameFound'];
+                $html .= '<br />Unq.' . $provider['engineNameFoundUnique'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectEngineVersion']) {
+            if ($provider['proCanDetectEngineVersion']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['engineVersionFound'],
-                    $row['resultFound'],
+                    $provider['engineVersionFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['engineVersionFound'];
+                $html .= '<br />Tot.' . $provider['engineVersionFound'];
                 $html .= '<br />&nbsp;';
                 $html .= '</td>';
             } else {
@@ -400,26 +400,26 @@ final class OverviewGeneral extends AbstractHtml
             /*
              * OS
              */
-            if ($row['proCanDetectOsName']) {
+            if ($provider['proCanDetectOsName']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['osNameFound'],
-                    $row['resultFound'],
+                    $provider['osNameFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['osNameFound'];
-                $html .= '<br />Unq.' . $row['osNameFoundUnique'];
+                $html .= '<br />Tot.' . $provider['osNameFound'];
+                $html .= '<br />Unq.' . $provider['osNameFoundUnique'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectOsVersion']) {
+            if ($provider['proCanDetectOsVersion']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['osVersionFound'],
-                    $row['resultFound'],
+                    $provider['osVersionFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['osVersionFound'];
+                $html .= '<br />Tot.' . $provider['osVersionFound'];
                 $html .= '<br />&nbsp;';
                 $html .= '</td>';
             } else {
@@ -429,65 +429,65 @@ final class OverviewGeneral extends AbstractHtml
             /*
              * device
              */
-            if ($row['proCanDetectDeviceBrand']) {
+            if ($provider['proCanDetectDeviceBrand']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['deviceBrandFound'],
-                    $row['resultFound'],
+                    $provider['deviceBrandFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['deviceBrandFound'];
-                $html .= '<br />Unq.' . $row['deviceBrandFoundUnique'];
+                $html .= '<br />Tot.' . $provider['deviceBrandFound'];
+                $html .= '<br />Unq.' . $provider['deviceBrandFoundUnique'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectDeviceModel']) {
+            if ($provider['proCanDetectDeviceModel']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['deviceModelFound'],
-                    $row['resultFound'],
+                    $provider['deviceModelFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['deviceModelFound'];
-                $html .= '<br />Unq.' . $row['deviceModelFoundUnique'];
+                $html .= '<br />Tot.' . $provider['deviceModelFound'];
+                $html .= '<br />Unq.' . $provider['deviceModelFoundUnique'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectDeviceType']) {
+            if ($provider['proCanDetectDeviceType']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['deviceTypeFound'],
-                    $row['resultFound'],
+                    $provider['deviceTypeFound'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['deviceTypeFound'];
-                $html .= '<br />Unq.' . $row['deviceTypeFoundUnique'];
+                $html .= '<br />Tot.' . $provider['deviceTypeFound'];
+                $html .= '<br />Unq.' . $provider['deviceTypeFoundUnique'];
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectDeviceIsMobile']) {
+            if ($provider['proCanDetectDeviceIsMobile']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['asMobileDetected'],
-                    $row['resultFound'],
+                    $provider['asMobileDetected'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['asMobileDetected'];
+                $html .= '<br />Tot.' . $provider['asMobileDetected'];
                 $html .= '<br />&nbsp;';
                 $html .= '</td>';
             } else {
                 $html .= '<td class="center-align">x</td>';
             }
 
-            if ($row['proCanDetectDeviceIsTouch']) {
+            if ($provider['proCanDetectDeviceIsTouch']) {
                 $html .= '<td>' . $this->getPercentCircle(
                     $countOfUseragents,
-                    $row['asTouchDeviceDetected'],
-                    $row['resultFound'],
+                    $provider['asTouchDeviceDetected'],
+                    $provider['resultFound'],
                 );
-                $html .= '<br />Tot.' . $row['asTouchDeviceDetected'];
+                $html .= '<br />Tot.' . $provider['asTouchDeviceDetected'];
                 $html .= '<br />&nbsp;';
                 $html .= '</td>';
             } else {
@@ -509,7 +509,7 @@ final class OverviewGeneral extends AbstractHtml
                     <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="' . htmlspecialchars(
                 $info,
             ) . '">
-                        ' . number_format(round($row['avgParseTime'] * 1000, 3), 3) . '
+                        ' . number_format(round($provider['avgParseTime'] * 1000, 3), 3) . '
                     </a>
                 </td>
             ';
@@ -519,12 +519,12 @@ final class OverviewGeneral extends AbstractHtml
                     <a class="tooltipped" data-position="top" data-delay="50" data-tooltip="' . htmlspecialchars(
                 $info,
             ) . '">
-                        ' . number_format(round($row['avgMemoryUsed'], 2), 2) . '
+                        ' . number_format(round($provider['avgMemoryUsed'], 2), 2) . '
                     </a>
                 </td>
             ';
 
-            $html .= '<td><a href="' . $row['proName'] . '.html" class="btn waves-effect waves-light">Details</a></td>';
+            $html .= '<td><a href="' . $provider['proName'] . '.html" class="btn waves-effect waves-light">Details</a></td>';
 
             $html .= '</tr>';
         }

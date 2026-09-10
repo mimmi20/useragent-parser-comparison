@@ -15,6 +15,7 @@ namespace UserAgentParserComparison\Command\Helper;
 
 use DateTimeImmutable;
 use JsonException;
+use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Helper\Helper;
@@ -35,6 +36,7 @@ final class Result extends Helper
     }
 
     /** @throws void */
+    #[Override]
     public function getName(): string
     {
         return 'result';
@@ -119,7 +121,7 @@ final class Result extends Helper
             if ($resFilename !== null) {
                 $statementInsertResult->bindValue(':resFilename', str_replace('\\', '/', $resFilename));
             } else {
-                $statementInsertResult->bindValue(':resFilename', null);
+                $statementInsertResult->bindValue(':resFilename', value: null);
             }
 
             $statementInsertResult->bindValue(':resParseTime', $row2['resParseTime']);
@@ -167,7 +169,7 @@ final class Result extends Helper
             if ($resFilename !== null) {
                 $statementUpdateResult->bindValue(':resFilename', str_replace('\\', '/', $resFilename));
             } else {
-                $statementUpdateResult->bindValue(':resFilename', null);
+                $statementUpdateResult->bindValue(':resFilename', value: null);
             }
 
             $statementUpdateResult->bindValue(':resParseTime', $row2['resParseTime']);

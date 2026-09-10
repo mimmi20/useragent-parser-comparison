@@ -17,6 +17,7 @@ use Closure;
 use DateTimeImmutable;
 use FilesystemIterator;
 use JsonException;
+use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -65,6 +66,7 @@ final class Tests extends Helper
     private string $testDir       = __DIR__ . '/../../../tests';
 
     /** @throws void */
+    #[Override]
     public function getName(): string
     {
         return 'tests';
@@ -100,17 +102,16 @@ final class Tests extends Helper
 
         ksort($tests, SORT_FLAG_CASE | SORT_NATURAL);
 
-        foreach ($tests as $testDir) {
-            assert($testDir instanceof SplFileInfo);
-            $pathName = $testDir->getPathname();
+        foreach ($tests as $test) {
+            $pathName = $test->getPathname();
             $pathName = str_replace('\\', '/', $pathName);
 
             try {
                 $contents = file_get_contents($pathName . '/metadata.json');
 
                 try {
-                    $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-                } catch (Throwable) {
+                    $metadata = json_decode($contents, associative: true, flags: JSON_THROW_ON_ERROR);
+                } catch (JsonException) {
                     $output->writeln(
                         '<error>An error occured while parsing metadata for test ' . $pathName . '</error>',
                     );
@@ -134,11 +135,11 @@ final class Tests extends Helper
                 $valid = false;
             }
 
-            if (empty($testNames)) {
+            if ($testNames === []) {
                 $valid = false;
             }
 
-            if (empty($parserNames)) {
+            if ($parserNames === []) {
                 $valid = false;
             }
 
@@ -146,7 +147,7 @@ final class Tests extends Helper
 
             $rows[] = [
                 new TableCell(
-                    ($valid ? '<fg=green;bg=black>' : '<fg=red;bg=black>') . $testDir->getFilename() . '</>',
+                    ($valid ? '<fg=green;bg=black>' : '<fg=red;bg=black>') . $test->getFilename() . '</>',
                     ['rowspan' => $countRows],
                 ),
                 new TableCell(
@@ -201,7 +202,7 @@ final class Tests extends Helper
             $rows[] = new TableSeparator();
 
             if ($valid) {
-                $names[$testDir->getFilename()] = $testDir->getFilename();
+                $names[$test->getFilename()] = $test->getFilename();
             }
         }
 
@@ -242,11 +243,11 @@ final class Tests extends Helper
         $questions    = array_keys($names);
         $questionText = 'Select the test run to use';
 
-        $question = new ChoiceQuestion($questionText, $questions);
+        $choiceQuestion = new ChoiceQuestion($questionText, $questions);
 
         $helper = $this->helperSet->get('question');
         assert($helper instanceof QuestionHelper);
-        $answer = $helper->ask($input, $output, $question);
+        $answer = $helper->ask($input, $output, $choiceQuestion);
 
         return $names[$answer];
     }
@@ -276,7 +277,11 @@ final class Tests extends Helper
                     );
                 } else {
                     try {
-                        $metadata = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                        $metadata = json_decode(
+                            $contents,
+                            associative: true,
+                            flags: JSON_THROW_ON_ERROR,
+                        );
                     } catch (JsonException) {
                         $output->writeln(
                             '<error>An error occured while parsing metadata for testsuite ' . $testDir->getFilename() . '</error>',
@@ -284,6 +289,8 @@ final class Tests extends Helper
                     }
                 }
             }
+
+            assert(is_array($metadata));
 
             $language = $metadata['language'] ?? '';
             //            $local    = $metadata['local'] ?? false;
@@ -351,7 +358,7 @@ final class Tests extends Helper
 
             if ($testOutput !== null && $testOutput !== false) {
                 try {
-                    $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
+                    $tests = json_decode($testOutput, associative: true, flags: JSON_THROW_ON_ERROR);
 
                     $testCount = (int) $tests['tests'];
                 } catch (JsonException) {
@@ -389,7 +396,11 @@ final class Tests extends Helper
                     }
 
                     try {
-                        $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
+                        $tests = json_decode(
+                            $testOutput,
+                            associative: true,
+                            flags: JSON_THROW_ON_ERROR,
+                        );
                     } catch (JsonException) {
                         $output->writeln(
                             "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! json_decode failed.</error>',
@@ -398,11 +409,9 @@ final class Tests extends Helper
                         return null;
                     }
 
-                    if (
-                        $tests['tests'] === null
-                        || !is_array($tests['tests'])
-                        || $tests['tests'] === []
-                    ) {
+                    assert(is_array($tests));
+
+                    if (!is_array($tests['tests']) || $tests['tests'] === []) {
                         $output->writeln(
                             "\r" . $message . ' <error>There was an error with the output from the testsuite ' . $testPath . '! No tests were found.</error>',
                         );
@@ -441,15 +450,14 @@ final class Tests extends Helper
     /**
      * Return the version of the provider
      *
-     * @throws void
+     * @throws JsonException
      */
     private function getVersionPHP(string $path, string $packageName): string | null
     {
         $installed = json_decode(
             file_get_contents($path . '/vendor/composer/installed.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
+            associative: true,
+            flags: JSON_THROW_ON_ERROR,
         );
 
         $filtered = array_filter(
@@ -476,16 +484,17 @@ final class Tests extends Helper
     /**
      * Get the last change date of the provider
      *
-     * @throws void
+     * @throws JsonException
      */
     private function getUpdateDatePHP(string $path, string $packageName): DateTimeImmutable | null
     {
         $installed = json_decode(
             file_get_contents($path . '/vendor/composer/installed.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
+            associative: true,
+            flags: JSON_THROW_ON_ERROR,
         );
+
+        assert(is_array($installed));
 
         $filtered = array_filter(
             $installed['packages'],
@@ -511,16 +520,17 @@ final class Tests extends Helper
     /**
      * Return the version of the provider
      *
-     * @throws void
+     * @throws JsonException
      */
     private function getVersionJS(string $path, string $packageName): string | null
     {
         $installed = json_decode(
             file_get_contents($path . '/npm-shrinkwrap.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
+            associative: true,
+            flags: JSON_THROW_ON_ERROR,
         );
+
+        assert(is_array($installed));
 
         return $installed['packages']['node_modules/' . $packageName]['version'] ?? $installed['dependencies'][$packageName]['version'] ?? null;
     }
@@ -528,16 +538,17 @@ final class Tests extends Helper
     /**
      * Get the last change date of the provider
      *
-     * @throws void
+     * @throws JsonException
      */
     private function getUpdateDateJS(string $path, string $packageName): DateTimeImmutable | null
     {
         $installed = json_decode(
             file_get_contents($path . '/npm-shrinkwrap.json'),
-            true,
-            512,
-            JSON_THROW_ON_ERROR,
+            associative: true,
+            flags: JSON_THROW_ON_ERROR,
         );
+
+        assert(is_array($installed));
 
         if (isset($installed['packages']['node_modules/' . $packageName]['time'])) {
             return new DateTimeImmutable(

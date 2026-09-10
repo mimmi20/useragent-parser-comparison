@@ -17,7 +17,7 @@ use Platine\UserAgent\UserAgent;
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv, true);
+$uaPos       = array_search('--ua', $argv, strict: true);
 $hasUa       = false;
 $agentString = '';
 
@@ -27,7 +27,7 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$start = microtime(true);
+$start = microtime(as_float: true);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 $bc = new UserAgent();
@@ -37,7 +37,7 @@ $r->browser();
 $r->os();
 $r->engine();
 $r->cpu();
-$initTime = microtime(true) - $start;
+$initTime = microtime(as_float: true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
@@ -53,7 +53,7 @@ $output = [
 ];
 
 if ($hasUa) {
-    $start = microtime(true);
+    $start = microtime(as_float: true);
 
     try {
         $r      = $bc->parse($agentString);
@@ -63,7 +63,7 @@ if ($hasUa) {
         $engine = $r->engine();
         $cpu    = $r->cpu();
 
-        $parseTime = microtime(true) - $start;
+        $parseTime = microtime(as_float: true) - $start;
 
         $output['result']['parsed'] = [
             'device' => [
@@ -118,7 +118,7 @@ if ($hasUa) {
     } catch (Throwable $e) {
         trigger_error((string) $e, E_USER_WARNING);
 
-        $parseTime = microtime(true) - $start;
+        $parseTime = microtime(as_float: true) - $start;
     }
 
     $output['parse_time'] = $parseTime;
