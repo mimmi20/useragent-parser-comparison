@@ -15,6 +15,7 @@ namespace UserAgentParserComparison\Command;
 
 use FilesystemIterator;
 use JsonException;
+use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -33,6 +34,7 @@ use UserAgentParserComparison\Compare\Comparison;
 use function array_filter;
 use function array_flip;
 use function array_key_exists;
+use function array_key_first;
 use function array_keys;
 use function array_merge;
 use function array_pop;
@@ -42,7 +44,6 @@ use function array_splice;
 use function array_values;
 use function assert;
 use function count;
-use function current;
 use function file_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -80,6 +81,7 @@ final class Analyze extends Command
     private array $failures = [];
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('analyze')
@@ -93,6 +95,7 @@ final class Analyze extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->input  = $input;
@@ -136,7 +139,7 @@ final class Analyze extends Command
         }
 
         try {
-            $this->options = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+            $this->options = json_decode($contents, associative: true, flags: JSON_THROW_ON_ERROR);
         } catch (Throwable) {
             $output->writeln(
                 '<error>An error occured while parsing metadata for run ' . $run . '</error>',
@@ -172,7 +175,7 @@ final class Analyze extends Command
         $rows   = [];
         $totals = [];
 
-        $headerStyle = new TableCellStyle([
+        $tableCellStyle = new TableCellStyle([
             'align' => 'center',
             'fg' => 'green',
         ]);
@@ -180,43 +183,43 @@ final class Analyze extends Command
         $rows[] = [
             new TableCell(
                 'Parser',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Version',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Client Results',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Engine Results',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Platform Results',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Device Results',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Init Time',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Parsing Time',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Memory',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
             new TableCell(
                 'Score',
-                ['style' => $headerStyle],
+                ['style' => $tableCellStyle],
             ),
         ];
 
@@ -245,7 +248,7 @@ final class Analyze extends Command
                     }
 
                     try {
-                        $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                        $data = json_decode($contents, associative: true, flags: JSON_THROW_ON_ERROR);
                     } catch (Throwable) {
                         $output->writeln(
                             "\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>',
@@ -280,7 +283,11 @@ final class Analyze extends Command
                 }
 
                 try {
-                    $testResult    = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    $testResult    = json_decode(
+                        $contents,
+                        associative: true,
+                        flags: JSON_THROW_ON_ERROR,
+                    );
                     $headerMessage = sprintf(
                         '<fg=yellow>Parser comparison for %s file, using %s results as expected</>',
                         $testSuite,
@@ -363,7 +370,11 @@ final class Analyze extends Command
                         }
 
                         try {
-                            $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                            $data = json_decode(
+                                $contents,
+                                associative: true,
+                                flags: JSON_THROW_ON_ERROR,
+                            );
                         } catch (Throwable) {
                             $this->output->writeln(
                                 sprintf(
@@ -405,7 +416,7 @@ final class Analyze extends Command
                             $possibleScore = $this->calculateScore(
                                 $expected[$compareKey],
                                 $data['parsed'][$compareKey],
-                                true,
+                                possible: true,
                             );
 
                             $passFail[$compareKey]['count'] += count($expected[$compareKey]);
@@ -428,7 +439,7 @@ final class Analyze extends Command
                         );
                         $failures                     = $comparison->getFailures();
 
-                        if (empty($failures)) {
+                        if ($failures === []) {
                             continue;
                         }
 
@@ -453,7 +464,7 @@ final class Analyze extends Command
                             },
                         );
 
-                        if (empty($failuresWithDiff)) {
+                        if ($failuresWithDiff === []) {
                             continue;
                         }
 
@@ -479,7 +490,11 @@ final class Analyze extends Command
                     }
 
                     try {
-                        $multiData = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                        $multiData = json_decode(
+                            $contents,
+                            associative: true,
+                            flags: JSON_THROW_ON_ERROR,
+                        );
                     } catch (JsonException) {
                         $output->writeln(
                             "\r" . $message . '<error>An error occured while parsing results for the ' . $this->runDir . '/' . $run . '/results/' . $parserName . '/normalized/' . $testSuite . '.json test file</error>',
@@ -542,7 +557,7 @@ final class Analyze extends Command
                         );
                         $failures                     = $comparison->getFailures();
 
-                        if (empty($failures)) {
+                        if ($failures === []) {
                             continue;
                         }
 
@@ -567,7 +582,7 @@ final class Analyze extends Command
                             },
                         );
 
-                        if (empty($failuresWithDiff)) {
+                        if ($failuresWithDiff === []) {
                             continue;
                         }
 
@@ -728,18 +743,16 @@ final class Analyze extends Command
                     $rows[] = new TableSeparator();
                 }
 
-                if (!isset($totals[$parserName])) {
-                    $totals[$parserName] = [
-                        'client' => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                        'engine' => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                        'platform' => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                        'device' => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                        'time' => 0,
-                        'init' => 0,
-                        'memory' => 0,
-                        'score' => ['count' => 0, 'pass' => 0, 'fail' => 0],
-                    ];
-                }
+                $totals[$parserName] ??= [
+                    'client' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'engine' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'platform' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'device' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                    'time' => 0,
+                    'init' => 0,
+                    'memory' => 0,
+                    'score' => ['count' => 0, 'pass' => 0, 'fail' => 0],
+                ];
 
                 $totals[$parserName]['client']['count']   += $passFail['client']['count'];
                 $totals[$parserName]['client']['pass']    += $passFail['client']['pass'];
@@ -871,17 +884,15 @@ final class Analyze extends Command
         $questionHelper = $this->getHelper('question');
 
         if (count($this->options['tests']) > 1) {
-            $question = new ChoiceQuestion(
+            $choiceQuestion = new ChoiceQuestion(
                 'Which Test Suite?',
                 array_keys($this->options['tests']),
             );
 
-            $selectedTest = $questionHelper->ask($this->input, $this->output, $question);
-        } else {
-            $selectedTest = array_keys($this->options['tests'])[0];
+            return $questionHelper->ask($this->input, $this->output, $choiceQuestion);
         }
 
-        return $selectedTest;
+        return array_keys($this->options['tests'])[0];
     }
 
     /** @throws void */
@@ -889,12 +900,12 @@ final class Analyze extends Command
     {
         $questionHelper = $this->getHelper('question');
 
-        $question = new ChoiceQuestion(
+        $choiceQuestion = new ChoiceQuestion(
             'Which Section?',
             ['client', 'engine', 'platform', 'device'],
         );
 
-        return $questionHelper->ask($this->input, $this->output, $question);
+        return $questionHelper->ask($this->input, $this->output, $choiceQuestion);
     }
 
     /** @throws void */
@@ -917,8 +928,8 @@ final class Analyze extends Command
         }
 
         if (count($subs) > 1) {
-            $question = new ChoiceQuestion('Which Property?', $subs);
-            $property = $questionHelper->ask($this->input, $this->output, $question);
+            $choiceQuestion = new ChoiceQuestion('Which Property?', $subs);
+            $property       = $questionHelper->ask($this->input, $this->output, $choiceQuestion);
         } elseif (count($subs) === 1) {
             $property = reset($subs);
         } else {
@@ -994,18 +1005,18 @@ final class Analyze extends Command
 
                     $justAgentsQuestion = 'Show Just UserAgents';
 
-                    if ($justAgents === true) {
+                    if ($justAgents) {
                         $justAgentsQuestion = 'Show Full Diff';
                     }
 
                     $questions = ['Change Test Suite', 'Change Parser', $justAgentsQuestion, 'Back to Main Menu'];
 
                     if (count($this->options['tests']) <= 1) {
-                        unset($questions[array_search('Change Test Suite', $questions, true)]);
+                        unset($questions[array_search('Change Test Suite', $questions, strict: true)]);
                     }
 
                     if (count($this->options['parsers']) <= 1) {
-                        unset($questions[array_search('Change Parser', $questions, true)]);
+                        unset($questions[array_search('Change Parser', $questions, strict: true)]);
                     }
 
                     // Re-index
@@ -1053,7 +1064,7 @@ final class Analyze extends Command
 
                     $justFailureQuestion = 'Just Show Failures';
 
-                    if ($justFails === true) {
+                    if ($justFails) {
                         $justFailureQuestion = 'Show All';
                     }
 
@@ -1217,7 +1228,7 @@ final class Analyze extends Command
                 continue;
             }
 
-            if ($justAgents === true) {
+            if ($justAgents) {
                 foreach ($failData['headers'] as $header => $value) {
                     $this->output->writeln($header . ': ' . $value);
                 }
@@ -1323,7 +1334,7 @@ final class Analyze extends Command
                         sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual),
                     );
 
-                    $htmlC .= $this->outputDiffHtml2($field, $data, true);
+                    $htmlC .= $this->outputDiffHtml2($field, $data, withRow: true);
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
                     $columns[] = new TableCell('');
@@ -1374,7 +1385,7 @@ final class Analyze extends Command
                         sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual),
                     );
 
-                    $htmlE .= $this->outputDiffHtml2($field, $data, true);
+                    $htmlE .= $this->outputDiffHtml2($field, $data, withRow: true);
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
                     $columns[] = new TableCell('');
@@ -1425,7 +1436,7 @@ final class Analyze extends Command
                         sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual),
                     );
 
-                    $htmlP .= $this->outputDiffHtml2($field, $data, true);
+                    $htmlP .= $this->outputDiffHtml2($field, $data, withRow: true);
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
                     $columns[] = new TableCell('');
@@ -1476,7 +1487,7 @@ final class Analyze extends Command
                         sprintf('<fg=white;bg=%s>%s</> ', $actualBgColor, $actual),
                     );
 
-                    $htmlD .= $this->outputDiffHtml2($field, $data, true);
+                    $htmlD .= $this->outputDiffHtml2($field, $data, withRow: true);
                     $htmlG .= $this->outputDiffHtml2($field, $data);
                 } else {
                     $columns[] = new TableCell('');
@@ -1500,7 +1511,7 @@ final class Analyze extends Command
         $htmlP .= '</tbody></table></body></html>';
         $htmlD .= '</tbody></table></body></html>';
 
-        if ($justAgents !== false) {
+        if ($justAgents) {
             return;
         }
 
@@ -1546,7 +1557,7 @@ final class Analyze extends Command
         $rows = [];
 
         foreach ($this->comparison[$test][$compareKey][$compareSubKey] as $expected => $compareRow) {
-            if ($justFails === true && empty($compareRow['expected']['hasFailures'])) {
+            if ($justFails && empty($compareRow['expected']['hasFailures'])) {
                 continue;
             }
 
@@ -1589,7 +1600,7 @@ final class Analyze extends Command
                     }
 
                     if (isset($compareRow[$parser]) && count($compareRow[$parser]) > 0) {
-                        $key      = current(array_keys($compareRow[$parser]));
+                        $key      = array_key_first($compareRow[$parser]);
                         $quantity = array_shift($compareRow[$parser]);
 
                         if ($key === $expected) {
@@ -1635,7 +1646,7 @@ final class Analyze extends Command
         $score = 0;
 
         foreach ($expected as $field => $value) {
-            if ($possible === true) {
+            if ($possible) {
                 ++$score;
 
                 continue;
@@ -1663,7 +1674,7 @@ final class Analyze extends Command
      */
     private function outputDiffHtml2(string $field, array $data, bool $withRow = false): string
     {
-        if (empty($data)) {
+        if ($data === []) {
             return '';
         }
 
@@ -1698,7 +1709,7 @@ final class Analyze extends Command
         $content = '<td>' . $field . '</td><td><span style="background-color: ' . $colorExpected . '; color: white">' . $expected . '</span></td><td><span style="background-color: ' . $colorActual . '; color: white">' . $actual . '</span></td>';
 
         if ($withRow) {
-            $content = '<tr>' . $content . '</tr>';
+            return '<tr>' . $content . '</tr>';
         }
 
         return $content;

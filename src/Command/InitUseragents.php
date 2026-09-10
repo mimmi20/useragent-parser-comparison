@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use JsonException;
+use Override;
 use PDO;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Console\Command\Command;
@@ -47,6 +48,7 @@ final class InitUseragents extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('init-useragents');
@@ -57,6 +59,7 @@ final class InitUseragents extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare(
@@ -79,7 +82,7 @@ final class InitUseragents extends Command
         $testHelper = $this->getHelper('tests');
         assert($testHelper instanceof Tests);
 
-        foreach ($testHelper->collectTests($output, null) as $testPath => $testConfig) {
+        foreach ($testHelper->collectTests($output, thisRunDir: null) as $testPath => $testConfig) {
             if (!$testConfig['metadata']['isActive']) {
                 continue;
             }
@@ -114,7 +117,7 @@ final class InitUseragents extends Command
             $testOutput = mb_trim($testOutput);
 
             try {
-                $tests = json_decode($testOutput, true, 512, JSON_THROW_ON_ERROR);
+                $tests = json_decode($testOutput, associative: true, flags: JSON_THROW_ON_ERROR);
             } catch (JsonException) {
                 var_dump($testOutput);
                 $output->writeln(
@@ -142,7 +145,7 @@ final class InitUseragents extends Command
                     continue;
                 }
 
-                $uaHash = bin2hex(sha1($agent, true));
+                $uaHash = bin2hex(sha1($agent, binary: true));
 
                 /*
                  * insert UA itself

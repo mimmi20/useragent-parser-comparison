@@ -14,7 +14,7 @@ declare(strict_types = 1);
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv, true);
+$uaPos       = array_search('--ua', $argv, strict: true);
 $hasUa       = false;
 $agentString = '';
 
@@ -24,7 +24,7 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$start = microtime(true);
+$start = microtime(as_float: true);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -34,7 +34,7 @@ use EndorphinStudio\Detector\Detector;
 $detector = new Detector();
 
 $detector->analyse('Test String');
-$initTime = microtime(true) - $start;
+$initTime = microtime(as_float: true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
@@ -50,9 +50,9 @@ $output = [
 ];
 
 if ($hasUa) {
-    $start = microtime(true);
+    $start = microtime(as_float: true);
     $r     = $detector->analyse($agentString);
-    $end   = microtime(true) - $start;
+    $end   = microtime(as_float: true) - $start;
 
     $r = json_decode(json_encode($r));
 

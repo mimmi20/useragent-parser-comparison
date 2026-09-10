@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use Exception;
+use Override;
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,6 +44,7 @@ final class GenerateIndexPage extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('generate-index-page');
@@ -53,10 +55,11 @@ final class GenerateIndexPage extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if (!file_exists($this->basePath)) {
-            mkdir($this->basePath, 0777, true);
+            mkdir($this->basePath, 0777, recursive: true);
         }
 
         $output->write('generate index page ...');
@@ -102,7 +105,7 @@ final class GenerateIndexPage extends Command
             $folder = $this->basePath . '/detected/' . $dbResultProvider['proName'];
 
             if (!file_exists($folder)) {
-                mkdir($folder, 0777, true);
+                mkdir($folder, 0777, recursive: true);
             }
 
             /*
@@ -364,7 +367,7 @@ final class GenerateIndexPage extends Command
             $folder = $this->basePath . '/not-detected/' . $dbResultProvider['proName'];
 
             if (!file_exists($folder)) {
-                mkdir($folder, 0777, true);
+                mkdir($folder, 0777, recursive: true);
             }
 
             /*
@@ -925,7 +928,7 @@ final class GenerateIndexPage extends Command
         $folder = $this->basePath . '/detected/general';
 
         if (!file_exists($folder)) {
-            mkdir($folder, 0777, true);
+            mkdir($folder, 0777, recursive: true);
         }
 
         $output->write('generate overview pages for found elements ');
@@ -1064,7 +1067,7 @@ final class GenerateIndexPage extends Command
             ) . '/' . mb_substr($dbResultUa['uaId'], 2, 2);
 
             if (!file_exists($folder)) {
-                mkdir($folder, 0777, true);
+                mkdir($folder, 0777, recursive: true);
             }
 
             /*

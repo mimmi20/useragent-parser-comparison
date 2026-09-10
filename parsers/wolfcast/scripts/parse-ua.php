@@ -17,7 +17,7 @@ use Wolfcast\BrowserDetection;
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv, true);
+$uaPos       = array_search('--ua', $argv, strict: true);
 $hasUa       = false;
 $agentString = '';
 
@@ -27,11 +27,11 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$start = microtime(true);
+$start = microtime(as_float: true);
 
 require __DIR__ . '/../vendor/autoload.php';
 new BrowserDetection('Test String');
-$initTime = microtime(true) - $start;
+$initTime = microtime(as_float: true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
@@ -47,9 +47,9 @@ $output = [
 ];
 
 if ($hasUa) {
-    $start  = microtime(true);
+    $start  = microtime(as_float: true);
     $result = new BrowserDetection($agentString);
-    $end    = microtime(true) - $start;
+    $end    = microtime(as_float: true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [

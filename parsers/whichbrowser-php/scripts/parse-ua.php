@@ -19,7 +19,7 @@ use WhichBrowser\Parser;
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv, true);
+$uaPos       = array_search('--ua', $argv, strict: true);
 $hasUa       = false;
 $agentString = '';
 
@@ -37,9 +37,9 @@ $cache = new Pool(
     new MemoryStore(),
 );
 
-$start = microtime(true);
+$start = microtime(as_float: true);
 $parser->analyse(['User-Agent' => 'Test String'], ['cache' => $cache]);
-$initTime = microtime(true) - $start;
+$initTime = microtime(as_float: true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
@@ -55,10 +55,10 @@ $output = [
 ];
 
 if ($hasUa) {
-    $start = microtime(true);
+    $start = microtime(as_float: true);
     $parser->analyse(['User-Agent' => $agentString], ['cache' => $cache]);
     $isMobile = $parser->isMobile();
-    $end      = microtime(true) - $start;
+    $end      = microtime(as_float: true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [

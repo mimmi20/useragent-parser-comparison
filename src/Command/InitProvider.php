@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use PDO;
 use PDOStatement;
 use Ramsey\Uuid\Uuid;
@@ -34,6 +35,7 @@ final class InitProvider extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('init-provider');
@@ -44,6 +46,7 @@ final class InitProvider extends Command
      *
      * @phpcsSuppress SlevomatCodingStandard.Functions.UnusedParameter.UnusedParameter
      */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $statementSelectProvider = $this->pdo->prepare(
@@ -59,21 +62,21 @@ final class InitProvider extends Command
         $parserHelper = $this->getHelper('parsers');
         assert($parserHelper instanceof Parsers);
 
-        foreach ($parserHelper->getAllParsers($output) as $parserConfig) {
+        foreach ($parserHelper->getAllParsers($output) as $allParser) {
             $this->insertProvider(
                 $output,
                 $statementSelectProvider,
                 $statementInsertProvider,
                 $statementUpdateProvider,
                 'real',
-                $parserConfig,
+                $allParser,
             );
         }
 
         $testHelper = $this->getHelper('tests');
         assert($testHelper instanceof Tests);
 
-        foreach ($testHelper->collectTests($output, null) as $testConfig) {
+        foreach ($testHelper->collectTests($output, thisRunDir: null) as $testConfig) {
             $this->insertProvider(
                 $output,
                 $statementSelectProvider,
@@ -169,7 +172,7 @@ final class InitProvider extends Command
                     PDO::PARAM_STR,
                 );
             } else {
-                $statementUpdateProvider->bindValue(':proLastReleaseDate', null);
+                $statementUpdateProvider->bindValue(':proLastReleaseDate', value: null);
             }
 
             $statementUpdateProvider->bindValue(':proPackageName', $proPackageName, PDO::PARAM_STR);
@@ -348,7 +351,7 @@ final class InitProvider extends Command
                 PDO::PARAM_STR,
             );
         } else {
-            $statementInsertProvider->bindValue(':proLastReleaseDate', null);
+            $statementInsertProvider->bindValue(':proLastReleaseDate', value: null);
         }
 
         $statementInsertProvider->bindValue(':proPackageName', $proPackageName, PDO::PARAM_STR);

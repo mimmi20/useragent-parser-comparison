@@ -13,6 +13,7 @@ declare(strict_types = 1);
 
 namespace UserAgentParserComparison\Command;
 
+use Override;
 use PDO;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -39,6 +40,7 @@ final class InitResults extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('init-results')
@@ -51,6 +53,7 @@ final class InitResults extends Command
     }
 
     /** @throws void */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getOption('run');
@@ -78,8 +81,8 @@ final class InitResults extends Command
         $providers  = [];
         $nameLength = 0;
 
-        foreach ($parserHelper->getAllParsers($output) as $parserPath => $parserConfig) {
-            $proName = $parserConfig['metadata']['name'] ?? $parserPath;
+        foreach ($parserHelper->getAllParsers($output) as $parserPath => $allParser) {
+            $proName = $allParser['metadata']['name'] ?? $parserPath;
 
             $statementSelectProvider->bindValue(':proName', $proName, PDO::PARAM_STR);
 
@@ -95,7 +98,7 @@ final class InitResults extends Command
 
             $nameLength = max($nameLength, mb_strlen($proName));
 
-            $providers[$proName] = [$parserPath, $parserConfig, $proId];
+            $providers[$proName] = [$parserPath, $allParser, $proId];
         }
 
         $currenUserAgent = 1;
@@ -136,9 +139,9 @@ final class InitResults extends Command
                         ),
                     );
 
-                    [, $parserConfig, $proId] = $provider;
+                    [, $allParser, $proId] = $provider;
 
-                    $singleResult = $parserConfig['parse-ua']($row['uaString']);
+                    $singleResult = $allParser['parse-ua']($row['uaString']);
 
                     if ($singleResult === null) {
                         $message .= 'E';

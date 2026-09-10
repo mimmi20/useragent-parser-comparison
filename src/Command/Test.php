@@ -14,6 +14,7 @@ declare(strict_types = 1);
 namespace UserAgentParserComparison\Command;
 
 use JsonException;
+use Override;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
@@ -61,11 +62,16 @@ final class Test extends Command
     private string $runDir = __DIR__ . '/../../data/test-runs';
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('test')
             ->setDescription('Runs test against the parsers')
-            ->addOption('use-db', null, InputOption::VALUE_NONE, 'Whether to use a database')
+            ->addOption(
+                'use-db',
+                mode: InputOption::VALUE_NONE,
+                description: 'Whether to use a database',
+            )
             ->addArgument(
                 'run',
                 InputArgument::OPTIONAL,
@@ -77,6 +83,7 @@ final class Test extends Command
     }
 
     /** @throws JsonException */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $thisRunDirName = $input->getArgument('run');
@@ -151,25 +158,25 @@ final class Test extends Command
         $questions[] = 'All Suites';
 
         $questionHelper = $this->getHelper('question');
-        $question       = new ChoiceQuestion(
+        $choiceQuestion = new ChoiceQuestion(
             'Choose which test suites to run, separate multiple with commas (press enter to use all)',
             $questions,
             implode(',', array_keys($questions)),
         );
-        $question->setMultiselect(true);
-        $question->setAutocompleterValues($questions);
+        $choiceQuestion->setMultiselect(multiselect: true);
+        $choiceQuestion->setAutocompleterValues($questions);
 
-        $answers       = $questionHelper->ask($input, $output, $question);
+        $answers       = $questionHelper->ask($input, $output, $choiceQuestion);
         $selectedTests = [];
 
-        foreach ($answers as $name) {
-            if ($name === 'All Suites') {
+        foreach ($answers as $answer) {
+            if ($answer === 'All Suites') {
                 $selectedTests = $this->tests;
 
                 break;
             }
 
-            $selectedTests[$name] = $this->tests[$name];
+            $selectedTests[$answer] = $this->tests[$answer];
         }
 
         $output->writeln('Choose which parsers you would like to run this test suite against');

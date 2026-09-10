@@ -15,6 +15,7 @@ namespace UserAgentParserComparison\Command;
 
 use FilesystemIterator;
 use JsonException;
+use Override;
 use SplFileInfo;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -47,6 +48,7 @@ final class Normalize extends Command
     private array $options = [];
 
     /** @throws void */
+    #[Override]
     protected function configure(): void
     {
         $this->setName('normalize')
@@ -60,6 +62,7 @@ final class Normalize extends Command
     }
 
     /** @throws JsonException */
+    #[Override]
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $run = $input->getArgument('run');
@@ -89,7 +92,11 @@ final class Normalize extends Command
                 $contents = file_get_contents($this->runDir . '/' . $run . '/metadata.json');
 
                 try {
-                    $this->options = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    $this->options = json_decode(
+                        $contents,
+                        associative: true,
+                        flags: JSON_THROW_ON_ERROR,
+                    );
                 } catch (Throwable) {
                     $output->writeln(
                         '<error>An error occured while parsing metadata for run ' . $run . '</error>',
@@ -141,7 +148,7 @@ final class Normalize extends Command
                     }
 
                     try {
-                        $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                        $data = json_decode($contents, associative: true, flags: JSON_THROW_ON_ERROR);
                     } catch (Throwable) {
                         $output->writeln(
                             "\r" . $message . '<error>An error occured while normalizing test suite ' . $testFile->getFilename() . '</error>',
@@ -219,7 +226,11 @@ final class Normalize extends Command
                             }
 
                             try {
-                                $data = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                                $data = json_decode(
+                                    $contents,
+                                    associative: true,
+                                    flags: JSON_THROW_ON_ERROR,
+                                );
                             } catch (JsonException) {
                                 $output->writeln(
                                     "\r" . $message . '<error>An error occured while parsing results for the ' . $testSuite . ' test suite</error>',
@@ -284,7 +295,7 @@ final class Normalize extends Command
                 $output->write("\r" . $message . '<info> parsing result   </info>');
 
                 try {
-                    $multiData = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+                    $multiData = json_decode($contents, associative: true, flags: JSON_THROW_ON_ERROR);
                 } catch (JsonException) {
                     $output->writeln(
                         "\r" . $message . '<error>An error occured while parsing results for the ' . $testSuite . ' test file</error>',

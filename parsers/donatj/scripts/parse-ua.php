@@ -19,7 +19,7 @@ use function donatj\UserAgent\parse_user_agent;
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv, true);
+$uaPos       = array_search('--ua', $argv, strict: true);
 $hasUa       = false;
 $agentString = '';
 
@@ -29,11 +29,11 @@ if ($uaPos !== false) {
     $agentString = $argv[2];
 }
 
-$start = microtime(true);
+$start = microtime(as_float: true);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 parse_user_agent('Test String');
-$initTime = microtime(true) - $start;
+$initTime = microtime(as_float: true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
@@ -49,9 +49,9 @@ $output = [
 ];
 
 if ($hasUa) {
-    $start = microtime(true);
+    $start = microtime(as_float: true);
     $r     = parse_user_agent($agentString);
-    $end   = microtime(true) - $start;
+    $end   = microtime(as_float: true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [

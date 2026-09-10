@@ -80,7 +80,7 @@ final class GenerateReports extends Command
         $basePath .= $version;
 
         if (!file_exists($basePath)) {
-            mkdir($basePath, 0777, true);
+            mkdir($basePath, 0777, recursive: true);
         }
 
         if (empty($thisRunName)) {

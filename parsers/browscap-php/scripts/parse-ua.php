@@ -24,7 +24,7 @@ use Psr\Log\NullLogger;
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', '-1');
 
-$uaPos       = array_search('--ua', $argv, true);
+$uaPos       = array_search('--ua', $argv, strict: true);
 $hasUa       = false;
 $agentString = '';
 
@@ -44,9 +44,9 @@ $cache           = new SimpleCache(
 );
 $logger          = new NullLogger('null');
 $bc              = new Browscap($cache, $logger);
-$start           = microtime(true);
+$start           = microtime(as_float: true);
 $bc->getBrowser('Test String');
-$initTime = microtime(true) - $start;
+$initTime = microtime(as_float: true) - $start;
 
 $output = [
     'hasUa' => $hasUa,
@@ -62,9 +62,9 @@ $output = [
 ];
 
 if ($hasUa) {
-    $start = microtime(true);
+    $start = microtime(as_float: true);
     $r     = $bc->getBrowser($agentString);
-    $end   = microtime(true) - $start;
+    $end   = microtime(as_float: true) - $start;
 
     $output['result']['parsed'] = [
         'device' => [

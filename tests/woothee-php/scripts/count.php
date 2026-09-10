@@ -16,7 +16,7 @@ use BrowscapHelper\Source\WootheeSource;
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 chdir(dirname(__DIR__));
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 $source        = new WootheeSource();
 $baseMessage   = sprintf('reading from source %s ', $source->getName());
